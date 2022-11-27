@@ -1,60 +1,59 @@
 #include <iostream>
-#include <cstdio>
+#include <string>
+#include <vector>
+
 using namespace std;
 
+/*
+При обработке команд WORRY и HAPPY присвойте элементу вектора по индексу значение true или false.
+При обработке команды COME измените размер вектора методом resize. Когда в очередь встают новые люди, они спокойны — соответствующие им элементы должны иметь значение false.
+Чтобы вычислить нужный размер вектора, сложите количество пришедших людей и стоящих в очереди.
+Чтобы при обработке команды LAST_WORRY узнать состояние последнего человека в очереди, воспользуйтесь методом back. Этот метод возвращает значение последнего элемента вектора.
+*/
+
 int main() {
-    // Напишите цикл for, выполняющий 10 подходов к холодильнику.
-    // Если торт не найдён выведите текст так:
-    string input_number; 
-    getline(cin, input_number);
-    //cout << input_number << " size :"<< input_number.size()<< endl;
-    for (int i = 0; i < 20; ++i) {
-        // если текущая буква строки - а, 
-        //int res = atoi( input_number[i].c_str() );
+    int q;
+    cin >> q;
 
-        //cout << res << endl;
-        if (input_number[i] == '1') {
-            // то выведем индекс i на экран и закончим цикл
-            cout << /*i <<": " */"Om-nom-nom :P"s << endl;
-        }
-        else if (input_number[i] == '0') {cout <<  "No cake :( "s << endl;
-             break;}
-    }
+    // создайте вектор типа vector<bool> для хранения очереди
     
+    vector<bool> query;
+  
+    for (int i = 0; i < q; ++i) {
+        string operation_code;
+        cin >> operation_code;
+    
+        if (operation_code == "WORRY"s) {
+            int index;
+            cin >> index;
+            query[i] =  true;
 
+            // Отметьте человека по индексу index как 
+            // беспокоящегося (значение true).
+        } else if (operation_code == "HAPPY"s) {
+            int index;
+            cin >> index;
+
+            // Отметьте человека по индексу index как 
+            // спокойного (значение false).
+            query[i] =  false;
+        } else if (operation_code == "COME"s) {
+            int count;
+            cin >> count;
+
+            // Измените размер на count. Указывайте второй параметр метода
+            // resize, чтобы добавлялись только спокойные (значение false).
+            query.resize(query.size()+count, false);
+            
+            if (count > 0) {query.resize(query.size()+count, false);}
+            else {query.resize(query.size()+count);}
+
+        } else if (operation_code == "LAST_WORRY"s)  {
+            // Выведите worry, если последний человек беспокойный, и happy,
+            // если спокойный
+            if (query.back()==1) {cout << "worry"s << endl;}
+            else {cout << "happy"s << endl;}
+            //cout << "last_el : "s <<query.back() << endl;
+        }
+    }
 }
-
-ЗАДАНИЕ 
-
-Задание 1
-По результатам опроса, проведенного бюро Самой Точной Статистики, респонденты совершают за ночь в среднем по 10 подходов к холодильнику. Остановить их может только одно обстоятельство: в холодильнике закончился торт.
-Напишите программу, которая симулирует ночные похождения среднестатистического жителя. Узнать, есть ли торт, можно прочитав число из cin. Оно будет принимать только два значения:
-1 — торт ещё есть,
-0 — торт закончился.
-Если торт обнаружен, выведите строку "Om-nom-nom :P". Если торт закончился, напечатайте "No cake :(" и завершите подходы оператором break. Ввод более чем 10 единиц нужно игнорировать, так как торт в этом случае у среднестатистического жителя уже закончился.
-Пример
-Ввод:
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
-Вывод:
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P 
-Ввод:
-1 1 1 0 0 0 0 0 1 1 
-Вывод:
-Om-nom-nom :P
-Om-nom-nom :P
-Om-nom-nom :P
-No cake :( 
-Ввод:
-0 
-Вывод:
-No cake :( 
-
