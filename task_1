@@ -7,26 +7,21 @@ int main() {
     // Если торт не найдён выведите текст так:
     string input_number; 
     getline(cin, input_number);
-    cout << input_number << endl;
-    for (int i = 0; i < 11; ++i) {
+    //cout << input_number << " size :"<< input_number.size()<< endl;
+    for (int i = 0; i < 20; ++i) {
         // если текущая буква строки - а, 
         //int res = atoi( input_number[i].c_str() );
 
         //cout << res << endl;
         if (input_number[i] == '1') {
             // то выведем индекс i на экран и закончим цикл
-            cout << i <<": " << "Om-nom-nom :P"s << endl;
+            cout << /*i <<": " */"Om-nom-nom :P"s << endl;
         }
-        else {cout << i <<": " << "No cake :( "s << endl;
+        else if (input_number[i] == '0') {cout <<  "No cake :( "s << endl;
              break;}
     }
     
-    
-    
-    //cout << "No cake :(" << endl;
 
-    // А если найден, то так:
-    //cout << "Om-nom-nom :P" << endl;
 }
 
 ЗАДАНИЕ 
