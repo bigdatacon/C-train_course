@@ -1,16 +1,42 @@
-int main() {
-    // считываем число строк
-    // создаём множество
-    // заполняем его строками и выводим размер
-    //int quantity; 
-    set<string> words;
-    string line;
-    cin >> line;
-    getline(cin, line);
-    for (string str: line){cout << str << endl;}
-    // при этом работает так : for (char str: line){cout << str << endl;}
+#include <iostream>
+#include <string>
+#include <vector>
 
-    return 0;
+using namespace std;
+/*
+Вызовите SplitIntoWords("test search query"s) и пройдитесь по результату циклом for, выводя квадратные скобки вокруг каждого слова. Получится [test] [search] [query].
+*/
+
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            }
+        } else {
+            word += c;
+        }
+    }
+    if (!word.empty()) {
+        words.push_back(word);
+    }
+
+    return words;
 }
 
-читаю строку из ввода типа 6 cat dog cat fish dog dog и мне нужно закинуть все слова в set
+int main() {
+	  // ваш код
+    for (string w : SplitIntoWords("test search query"s)){cout << '[' << w << ']' ; }
+}
+
+
+
+// задание : 
+Урок 5. Хитрости константных ссылок
+Задание 1
+Поэкспериментируйте с вызовом функции SplitIntoWords, которая принимает строку по константной ссылке. Передайте в неё текст 
+test search query и выведите полученные слова в квадратных скобках.
+
