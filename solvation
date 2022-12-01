@@ -95,16 +95,19 @@ int MatchDocument(const pair<int, vector<string>>& content,
 
 //правильное представление FindDocument - пока оставил void чтобы просто проверить что
 //работаетпечать 
-void /*vector<pair<int, int>>*/ FindDocuments(const vector<pair<int, vector<string>>>& documents,
+/*void*/ vector<pair<int, int>> FindDocuments(const vector<pair<int, vector<string>>>& documents,
                                      const set<string>& stop_words,
                                      const string& query) {
     const set<string> query_words = ParseQuery(query, stop_words);
     vector<pair<int, int>> matched_documents;
-    for (const auto& entry : documents) {
-    cout << entry.first /*<< " : "s << entry.second*/ << endl;
-    //if ()
-} 
     
+    for (const auto& entry : documents) {
+    
+    int match_count = MatchDocument(entry, query_words);
+    if (match_count > 0){matched_documents.push_back({entry.first, match_count});}
+    //cout << entry.first /*<< " : "s << entry.second*/<< " match_count "s << match_count << endl;
+} 
+    return matched_documents;
 } 
 
 
@@ -119,12 +122,15 @@ int main() {
     
     vector<pair<int, vector<string>>> documents;
     const int document_count = ReadLineWithNumber();
+    
+    //Правильное представение ADD DOCUMENT   
     for (int document_id = 0; document_id < document_count; ++document_id) {
-        AddDocument(documents, stop_words, ReadLine());
+        AddDocument(documents, stop_words, document_id, ReadLine());
     }
 
     const string query = ReadLine();
+    //FindDocuments(documents, stop_words, query);
     for (auto document_id : FindDocuments(documents, stop_words, query)) {
-        cout << "{ document_id = "s << document_id << " }"s << endl;
+        cout << "{ document_id = "s << document_id.first << ", relevance = " << document_id.second << " }"s << endl;
     }
 }
