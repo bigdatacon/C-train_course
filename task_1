@@ -1,18 +1,14 @@
-#include <algorithm>
 #include <iostream>
 #include <set>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace std;
-
 /*
-Чтобы разобрать запрос пользователя в ParseQuery, извлеките из текста запроса слова функцией SplitIntoWordsNoStop и сохраните их в результирующее множество.
-В функции MatchDocument верните true, если хотя бы одно из слов документа входит во множество слов поискового запроса. Если ни одно слово не входит, верните false.
-В функции FindDocuments сначала разберите поисковый запрос, используя ParseQuery. Затем в цикле переберите все документы и соберите id тех из них, которые подходят под критерии поискового запроса. Чтобы проверить документ на соответствие запросу, используйте MatchDocument.
-Чтобы компактно объявить тип переменной, укажите вместо её типа ключевое слово auto. Компилятор автоматически определит тип этой переменной. Обычно auto применяют, когда название типа слишком длинное:
+Чтобы вычислить релевантность документа запросу, подсчитайте количество уникальных слов документа, присутствующих в запросе. В этом может быть полезен контейнер set.
+Документы с нулевой релевантностью в результаты поиска не включайте.
 */
+
 
 string ReadLine() {
     string s;
@@ -57,13 +53,11 @@ set<string> ParseStopWords(const string& text) {
 
 vector<string> SplitIntoWordsNoStop(const string& text, const set<string>& stop_words) {
     vector<string> words;
-    // проходим по всем словам из текста и проверяем, что их нет в списке стоп-слов
     for (const string& word : SplitIntoWords(text)) {
         if (stop_words.count(word) == 0) {
             words.push_back(word);
         }
     }
-    // вернём результат без стоп-слов
     return words;
 }
 
@@ -73,33 +67,35 @@ void AddDocument(vector<vector<string>>& documents, const set<string>& stop_word
     documents.push_back(words);
 }
 
-// Разбирает text на слова и возвращает только те из них, которые не входят в stop_words
 set<string> ParseQuery(const string& text, const set<string>& stop_words) {
     set<string> query_words;
-
-    // Напишите код функции
-
+    for (const string& word : SplitIntoWordsNoStop(text, stop_words)) {
+        query_words.insert(word);
+    }
     return query_words;
 }
 
-// Возвращает true, если среди слов документа (document_words)
-// встречаются слова поискового запроса query_words
 bool MatchDocument(const vector<string>& document_words, const set<string>& query_words) {
-    // Напишите код функции
-
+    for (const string& word : document_words) {
+        if (query_words.count(word) != 0) {
+            return true;
+        }
+    }
     return false;
 }
 
-// Возвращает массив id документов, подходящих под запрос query
-// Стоп-слова исключаются из поиска
+// Для каждого найденного документа возвращает его id
 vector<int> FindDocuments(const vector<vector<string>>& documents, const set<string>& stop_words,
                           const string& query) {
+    const set<string> query_words = ParseQuery(query, stop_words);
     vector<int> matched_documents;
-
-    // Напишите код функции
-    // Воспользуйте вспомогательными функциями ParseQuery, MatchDocument
-    // В качестве id документа используйте его индекс в массиве documents
-
+    int document_id = 0;
+    for (const auto& document : documents) {
+        if (MatchDocument(document, query_words)) {
+            matched_documents.push_back(document_id);
+        }
+        ++document_id;
+    }
     return matched_documents;
 }
 
@@ -115,7 +111,7 @@ int main() {
     }
 
     const string query = ReadLine();
-    for (const int document_id : FindDocuments(documents, stop_words, query)) {
+    for (auto document_id : FindDocuments(documents, stop_words, query)) {
         cout << "{ document_id = "s << document_id << " }"s << endl;
     }
 }
