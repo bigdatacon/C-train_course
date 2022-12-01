@@ -93,7 +93,8 @@ int MatchDocument(const pair<int, vector<string>>& content,
 
 
 
-//правильное представление FindDocument 
+//правильное представление FindDocument - пока оставил void чтобы просто проверить что
+//работаетпечать 
 void /*vector<pair<int, int>>*/ FindDocuments(const vector<pair<int, vector<string>>>& documents,
                                      const set<string>& stop_words,
                                      const string& query) {
@@ -113,7 +114,9 @@ int main() {
     const set<string> stop_words = ParseStopWords(stop_words_joined);
 
     // Read documents
-    //vector<vector<string>> documents;
+    //vector<vector<string>> documents; - изначально было так меняю ниже 
+    // на вектор пар 
+    
     vector<pair<int, vector<string>>> documents;
     const int document_count = ReadLineWithNumber();
     for (int document_id = 0; document_id < document_count; ++document_id) {
