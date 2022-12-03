@@ -56,3 +56,9 @@ cheburashka with big ears likes oranges
 Документ “a strange brown creature was seen in the box of oranges” с id=2. Так как совпало только слово “oranges”, релевантность этого документа равна 1.
 Документ “a strange animal with big ears is building a house for its friends” с id=3. Его релевантность равна 2.
 А “with” — стоп-слово. Оно не участвует в поиске. Поэтому документ “a small curly guinea pig with grey hair has been found” не будет найден.
+
+Замените все pair<int, int> на Document, а при сортировке вектора документов используйте компаратор из прошлой задачи:
+bool HasDocumentGreaterRelevance(const Document& lhs, const Document& rhs) {
+    return lhs.relevance > rhs.relevance;
+} 
+Вызов reverse больше не нужен!
