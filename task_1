@@ -117,7 +117,7 @@ vector<Document> FindAllDocuments(const vector<DocumentContent>& documents,
 }
 
 // Возвращает топ-5 самых релевантных документов в виде пар: {id, релевантность}
-vector<Document> FindTopDocuments(const vector<DocumentContent>& documents,
+vector<Document> FindTopDocuments( vector<DocumentContent>& documents,
                                         const set<string>& stop_words, const string& raw_query) {
     const set<string> query_words = ParseQuery(raw_query, stop_words);
     auto matched_documents = FindAllDocuments(documents, query_words);
