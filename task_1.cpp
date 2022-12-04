@@ -1,45 +1,65 @@
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace std;
+const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 /*
-Вызовите метод size множества stop_words_ в методе GetStopWordsSize класса SearchServer.
-Вызовите метод GetStopWordsSize сервера в функции GetStopWordsSize.
+Замените функцию AddDocument на класс SearchServer из урока. Функции SplitIntoWords и SplitIntoWordsNoStop оставьте, а остальной код можете закомментировать.
 */
+/*
+Перенесите функцию SplitIntoWordsNoStop внутрь класса, в самый его конец: под private: и поля. Оставьте у полученного метода один параметр — строку, а множество стоп-слов в теле метода получите из поля класса, как это уже сделано в AddDocument. Тогда при вызове SplitIntoWordsNoStop не нужно будет передавать стоп-слова.
+*/
+
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            }
+        } else {
+            word += c;
+        }
+    }
+    if (!word.empty()) {
+        words.push_back(word);
+    }
+
+    return words;
+}
+
+
 
 
 class SearchServer {
-    // Содержимое раздела public: доступно для вызова из кода вне класса
 public:
-    int GetStopWordsSize() const {
-        // Верните количество стоп-слов
-        return stop_words_.size();
+    void AddDocument(int document_id, const string& document) {
+        const vector<string> words = SplitIntoWordsNoStop(document, stop_words_);
+        documents_.push_back({document_id, words});
     }
-
-    // Содержимое раздела private: доступно только внутри методов самого класса
 private:
     struct DocumentContent {
         int id = 0;
         vector<string> words;
     };
-
-    DocumentContent documents_;
+    vector<DocumentContent> documents_;
     set<string> stop_words_;
+    
+    vector<string> SplitIntoWordsNoStop(const string& text) {
+    vector<string> words;
+    for (const string& word : SplitIntoWords(text)) {
+        if (stop_words_.count(word) == 0) {
+            words.push_back(word);
+        }
+    }
+    return words;
+}
+
 };
-
-int GetStopWordsSize(const SearchServer& server) {
-    // Верните количество стоп-слов у server
-    return GetStopWordsSize();
-}
-
-int main() {
-    // 1. Создайте переменную server типа SearchServer
-    SearchServer server;
-    // 2. Вызовите функцию GetStopWordsSize, передав ей объект server
-    GetStopWordsSize(server);
-    // 3. Выведите результат, возвращёный функцией GetStopWordsSize в cout
-    cout << GetStopWordsSize(server) << endl;
-}
