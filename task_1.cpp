@@ -38,10 +38,11 @@ vector<string> SplitIntoWords(const string& text) {
 
 
 
+
 class SearchServer {
 public:
     void AddDocument(int document_id, const string& document) {
-        const vector<string> words = SplitIntoWordsNoStop(document, stop_words_);
+        const vector<string> words = SplitIntoWordsNoStop(document);
         documents_.push_back({document_id, words});
     }
 private:
@@ -52,7 +53,7 @@ private:
     vector<DocumentContent> documents_;
     set<string> stop_words_;
     
-    vector<string> SplitIntoWordsNoStop(const string& text) {
+    vector<string> SplitIntoWordsNoStop( string text) {
     vector<string> words;
     for (const string& word : SplitIntoWords(text)) {
         if (stop_words_.count(word) == 0) {
@@ -61,5 +62,4 @@ private:
     }
     return words;
 }
-
 };
