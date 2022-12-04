@@ -9,6 +9,11 @@ using namespace std;
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 
+struct Document {
+    int id;
+    int relevance;
+};
+
 string ReadLine() {
     string s;
     getline(cin, s);
@@ -42,20 +47,15 @@ vector<string> SplitIntoWords(const string& text) {
     return words;
 }
 
-vector<string> SplitIntoWordsNoStop(const string& text, const set<string>& stop_words) {
-    vector<string> words;
-    for (const string& word : SplitIntoWords(text)) {
-        if (stop_words.count(word) == 0) {
-            words.push_back(word);
-        }
-    }
-    return words;
+
+bool HasDocumentGreaterRelevance(const Document& lhs, const Document& rhs) {
+    return lhs.relevance > rhs.relevance;
 }
 
 /*
 1 Перенесите FindAllDocuments в приватную часть класса, оставьте только один параметр — множество query_words. 
-????? 
-Переделать нужно все участки кода, в которых используется массив documents, множество stop_words и функция (теперь уже метод) SplitIntoWordsNoStop.
+
+?????  2. Переделать нужно все участки кода, в которых используется массив documents, множество stop_words и функция (теперь уже метод) SplitIntoWordsNoStop.
 
 3 Перенесите FindTopDocuments в публичную часть класса и проделайте те же преобразования.
 
@@ -82,11 +82,11 @@ public:
         }
         return stop_words_;
     }
-    
+    /*3. Перенесите FindTopDocuments в публичную часть класса и проделайте те же преобразования.*/
     vector<Document> FindTopDocuments(/*const vector<DocumentContent>& documents,
                                   const set<string>& stop_words,*/ const string& raw_query) {
-    const set<string> query_words = ParseQuery(raw_query, stop_words);
-    auto matched_documents = FindAllDocuments(documents, query_words);
+    const set<string> query_words = ParseQuery(raw_query, stop_words_);
+    auto matched_documents = FindAllDocuments(documents_, query_words);
  
     sort(matched_documents.begin(), matched_documents.end(), HasDocumentGreaterRelevance);
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
@@ -113,10 +113,10 @@ private:
     }
     return words;
     }
-    
+    /*1. Перенесите FindAllDocuments в приватную часть класса, оставьте только один параметр — множество query_words. */
     vector<Document> FindAllDocuments(/*const vector<DocumentContent>& documents,*/ const set<string>& query_words)
     {vector<Document> matched_documents;
-    for (const auto& document : documents) {
+    for (const auto& document : documents_) {
         const int relevance = MatchDocument(document, query_words);
         if (relevance > 0) {
             matched_documents.push_back({document.id, relevance});
@@ -125,6 +125,7 @@ private:
     return matched_documents;
     }
     
+    /*4 Перенесите функцию MatchDocument в приватную часть класса, сделав её статическим методом.ъ*/
     static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
     if (query_words.empty()) {
         return 0;
@@ -141,16 +142,14 @@ private:
     return static_cast<int>(matched_words.size());
     }
     
-    set<string> ParseQuery(const string& text, const set<string>& stop_words) {
+    /*5 Функцию ParseQuery тоже нужно сделать методом класса.*/
+    set<string> ParseQuery(const string& text) {
     set<string> query_words;
-    for (const string& word : SplitIntoWordsNoStop(text, stop_words)) {
+    for (const string& word : SplitIntoWordsNoStop(text)) {
         query_words.insert(word);
     }
     return query_words;
-    }
-    
-
-    
+    }    
 };
 
 
@@ -190,3 +189,4 @@ int main() {
     
     
 }
+
