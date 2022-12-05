@@ -30,8 +30,8 @@ vector<string> SplitIntoWords(const string& text) {
                 word.clear();
             }
         } else {
-            word += tolower(c);
-            //word += c;
+            //word += tolower(c);
+            word += c;
         }
     }
     if (!word.empty()) {
@@ -57,15 +57,17 @@ bool lexicographical_compare(string l,
                              string r)
         {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );}
 
+
+
 int main() {
     // считайте входные данные и сформируйте вывод программы
     const string string_query = ReadLine();
     //transform(string_query.begin(), string_query.end(), string_query.begin(), tolower)   // Не работает 
-    vector<string> words = SplitIntoWords(string_query );
-    sort (words.begin() , words.end());
-    for (auto el : words){cout << el << endl;}
+    vector<string> input_vct = SplitIntoWords(string_query );
+    //sort (words.begin() , words.end());
+    //for (auto el : words){cout << el << endl;}
     
-    sort (words.begin() , words.end(), ToLowerString); // не работает 
+    //sort (words.begin() , words.end(), ToLowerString); // не работает 
     //sort (words.begin() , words.end(), lexicographical_compare); // не работает 
     
     /*sort(words.begin() , words.end(), [](const string& l, const string& r){
@@ -74,11 +76,37 @@ int main() {
     }
         );
     */
-    sort(words.begin() , words.end(), lexicographical_compare);
+    //sort(words.begin() , words.end(), lexicographical_compare);
 
     
-    for (auto el : words){cout << el << endl;}
+    //for (auto el : words){cout << el << endl;}
+    
+    sort(input_vct.begin(), input_vct.end(),
+         [](const string& first, const string& second) {
+             return lexicographical_compare(first.begin(), first.end(), 
+                                            second.begin(), second.end(),
+                                            [](const char& first, const char& second) {
+                                                return tolower(first) < tolower(second);
+                                            });
+         });
+    
+     sort(input_vct.begin(), input_vct.end(),
+         [](const string& first, const string& second) {
+             return lexicographical_compare(first.begin(), first.end(), 
+                                            second.begin(), second.end(),
+                                            [](const char& first, const char& second) {
+                                                return tolower(first) < tolower(second);
+                                            });
+     });
+ 
+    for (const string& s : input_vct) {
+        cout << s + ' ';
+    }
+    cout << "\n"s << endl;
 
     
 
 }
+
+
+
