@@ -72,6 +72,13 @@ int main() {
     sort (words.begin() , words.end(), ToLowerString); // не работает 
     //sort (words.begin() , words.end(), lexicographical_compare); // не работает 
     
+    sort(words.begin() , words.end(), [](const string& l, const string& r){
+        return lexicographical_compare(l.begin(), l.end(), r.begin(), r.end(), [](char ch){return tolower(ch);}
+                                      );
+    }
+        );
+
+    
     for (auto el : words){cout << el << endl;}
 
     
