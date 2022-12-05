@@ -55,40 +55,42 @@ bool OneMoreTwo(char first, char second){
     return first> second;
 }
 
-bool lexicographical_compare(string l, 
-                             string r)
-        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), OneMoreTwo );}
-
-так тоже не работает в том числе если написать string l, string r
 /*bool lexicographical_compare(string l, 
                              string r)
-        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), [](char l, char r){return l<r;});}*/
+        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), OneMoreTwo );}*/
+
+bool lexicographical_compare(string l, 
+                             string r)
+        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), [](char l, char r){return l<r;});}
 
 int main() {
     // считайте входные данные и сформируйте вывод программы
+    int num_string;
+    cin >> num_string;
     const string string_query = ReadLine();
     vector<string> input_vct = SplitIntoWords(string_query );
-    sort(input_vct.begin() , input_vct.end(), lexicographical_compare);
+    //sort(input_vct.begin() , input_vct.end(), lexicographical_compare);
 
 
     
-    /*sort(input_vct.begin(), input_vct.end(),
+    sort(input_vct.begin(), input_vct.end(),
          [](const string& first, const string& second) {
              return lexicographical_compare(first.begin(), first.end(), 
                                             second.begin(), second.end(),
                                             [](const char& first, const char& second) {
                                                 return tolower(first) < tolower(second);
                                             });
-         });*/
+         });
     
 
  
     for (const string& s : input_vct) {
         cout << s + ' ';
     }
-    cout << "\n"s << endl;
+    //cout << "\n"s << endl;
 
     
 
 }
+
 
