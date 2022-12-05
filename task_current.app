@@ -51,53 +51,34 @@ string ToLowerString(string s) {
     return new_string;
 }
 
-
+bool OneMoreTwo(char first, char second){
+    return first> second;
+}
 
 bool lexicographical_compare(string l, 
                              string r)
-        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );}
+        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), OneMoreTwo );}
 
 
 
 int main() {
     // считайте входные данные и сформируйте вывод программы
     const string string_query = ReadLine();
-    //transform(string_query.begin(), string_query.end(), string_query.begin(), tolower)   // Не работает 
     vector<string> input_vct = SplitIntoWords(string_query );
-    //sort (words.begin() , words.end());
-    //for (auto el : words){cout << el << endl;}
-    
-    //sort (words.begin() , words.end(), ToLowerString); // не работает 
-    //sort (words.begin() , words.end(), lexicographical_compare); // не работает 
-    
-    /*sort(words.begin() , words.end(), [](const string& l, const string& r){
-        return lexicographical_compare(l.begin(), l.end(), r.begin(), r.end(), [](char ch){return tolower(ch);}
-                                      );
-    }
-        );
-    */
-    //sort(words.begin() , words.end(), lexicographical_compare);
+    sort(input_vct.begin() , input_vct.end(), lexicographical_compare);
+
 
     
-    //for (auto el : words){cout << el << endl;}
-    
-    sort(input_vct.begin(), input_vct.end(),
+    /*sort(input_vct.begin(), input_vct.end(),
          [](const string& first, const string& second) {
              return lexicographical_compare(first.begin(), first.end(), 
                                             second.begin(), second.end(),
                                             [](const char& first, const char& second) {
                                                 return tolower(first) < tolower(second);
                                             });
-         });
+         });*/
     
-     sort(input_vct.begin(), input_vct.end(),
-         [](const string& first, const string& second) {
-             return lexicographical_compare(first.begin(), first.end(), 
-                                            second.begin(), second.end(),
-                                            [](const char& first, const char& second) {
-                                                return tolower(first) < tolower(second);
-                                            });
-     });
+
  
     for (const string& s : input_vct) {
         cout << s + ' ';
@@ -107,6 +88,4 @@ int main() {
     
 
 }
-
-
 
