@@ -30,7 +30,8 @@ vector<string> SplitIntoWords(const string& text) {
                 word.clear();
             }
         } else {
-            word += tolower(c);
+            //word += tolower(c);
+            word += c;
         }
     }
     if (!word.empty()) {
@@ -44,13 +45,19 @@ vector<string> SplitIntoWords(const string& text) {
     return lhs.relevance > rhs.relevance;
 }*/
 
+string ToLowerString(string s) {
+    string new_string; 
+    for (const char c : s) {new_string+= tolower(c);}
+    return new_string;
+}
+
+
 bool lexicographical_compare(string first1, 
                              string first2)
     {
         if (first1 < first2) return true;
         else  return false;
     }
-
 
 
 
@@ -62,8 +69,8 @@ int main() {
     sort (words.begin() , words.end());
     for (auto el : words){cout << el << endl;}
     
-    
-    sort (words.begin() , words.end(), lexicographical_compare); // не работает 
+    sort (words.begin() , words.end(), ToLowerString); // не работает 
+    //sort (words.begin() , words.end(), lexicographical_compare); // не работает 
     
     for (auto el : words){cout << el << endl;}
 
