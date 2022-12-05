@@ -1,96 +1,42 @@
-#include <algorithm>
-#include <iostream>
+#include <map>
 #include <string>
 #include <vector>
-#include <cctype>
-#include <clocale>
-
-#include <cstdlib>
-#include <ctime>
-
+#include <iostream>
 
 using namespace std;
 
-/*
-Прочитайте слова в вектор, а потом отсортируйте их алгоритмом sort. По умолчанию sort сравнивает элементы операцией <, которая для строк учитывает регистр символов. Чтобы сравнивать слова без учёта регистра символов, передайте алгоритму sort компаратор.
-В этом компараторе сравнивайте строки алгоритмом lexicographical_compare. Чтобы lexicographical_compare игнорировал регистр символов, передайте этому алгоритму компаратор, который перед сравнением приводит символы к нижнему регистру функцией tolower.
-*/
-string ReadLine() {
-    string s;
-    getline(cin, s);
-    return s;
-}
-vector<string> SplitIntoWords(const string& text) {
-    vector<string> words;
-    string word;
-    for (const char c : text) {
-        if (c == ' ') {
-            if (!word.empty()) {
-                words.push_back(word);
-                word.clear();
-            }
-        } else {
-            //word += tolower(c);
-            word += c;
-        }
-    }
-    if (!word.empty()) {
-        words.push_back(word);
-    }
- 
-    return words;
+/*Примените count_if и захват по ссылке в лямбда-выражении.*/
+/*int CountShortQueryWords(const vector<string>& query,
+    const set<string>& minus_words, int max_length)
+{
+    return count_if(query.begin(), query.end(),
+        [max_length, &minus_words](const string& w) {
+            return w.size() <= max_length && minus_words.count(w) == 0;
+        });
 }
 
-/*bool HasDocumentGreaterRelevance(const Document& lhs, const Document& rhs) {
-    return lhs.relevance > rhs.relevance;
+
+int CountAndAddNewDogs(const vector<string>& new_dogs, const map<string, int>& max_amount,
+                       map<string, int>& shelter) {
+    //...
 }*/
 
-string ToLowerString(string s) {
-    string new_string; 
-    for (const char c : s) {new_string+= tolower(c);}
-    return new_string;
-}
-
-bool OneMoreTwo(char first, char second){
-    return first> second;
-}
-
-/*bool lexicographical_compare(string l, 
-                             string r)
-        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), OneMoreTwo );}*/
-
-bool lexicographical_compare(string l, 
-                             string r)
-        {return lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), [](char l, char r){return l<r;});}
-
 int main() {
-    // считайте входные данные и сформируйте вывод программы
-    int num_string;
-    cin >> num_string;
-    const string string_query = ReadLine();
-    vector<string> input_vct = SplitIntoWords(string_query );
-    //sort(input_vct.begin() , input_vct.end(), lexicographical_compare);
-
-
+    map<string, int> shelter = {{"landseer"s, 1}, {"otterhound"s, 2}, {"pekingese"s, 2}, {"pointer"s, 3}};
+    map<string, int> max_amount = {{"landseer"s, 2}, {"otterhound"s, 3}, {"pekingese"s, 4}, {"pointer"s, 7}};
+    vector<string> new_dogs = {"landseer"s, "otterhound"s, "otterhound"s, "otterhound"s, "pointer"s};
     
-    sort(input_vct.begin(), input_vct.end(),
-         [](const string& first, const string& second) {
-             return lexicographical_compare(first.begin(), first.end(), 
-                                            second.begin(), second.end(),
-                                            [](const char& first, const char& second) {
-                                                return tolower(first) < tolower(second);
-                                            });
-         });
+    for (auto [breed, q] : shelter){cout << "breed " << breed << " q " << q << endl;}
+    for (auto breed : new_dogs){
+        [&shelter, max_amount](string breed){
+            if (shelter[breed]<max_amount[breed] ){++shelter[breed];}
+        }
+        
+        
+        
     
-
- 
-    for (const string& s : input_vct) {
-        cout << s + ' ';
     }
-    //cout << "\n"s << endl;
-
     
-
+    cout << "breedafter " << breed << " q " << q << endl;
+    return 0;
 }
-
-
