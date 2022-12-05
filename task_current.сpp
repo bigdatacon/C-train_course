@@ -27,9 +27,10 @@ int main() {
     vector<string> new_dogs = {"landseer"s, "otterhound"s, "otterhound"s, "otterhound"s, "pointer"s};
     
     for (auto [breed, q] : shelter){cout << "breed " << breed << " q " << q << endl;}
+    int dog_arrival= 0;
     for (auto breed : new_dogs){
         [&shelter, max_amount](string breed){
-            if (shelter[breed]<max_amount[breed] ){++shelter[breed];}
+            if (shelter[breed]!=0 && shelter[breed]<max_amount[breed] ){++shelter[breed]; ++dog_arrival;}
         }
         
         
