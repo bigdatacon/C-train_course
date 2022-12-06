@@ -118,7 +118,8 @@ private:
             else {
             pluswords.insert(word);}
         }
-        query_words.push_back({minuswords, pluswords}); 
+        query_words.minuswords = minuswords; 
+        query_words.pluswords = pluswords;
         for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}
         
         
