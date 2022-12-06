@@ -46,6 +46,6 @@ int main() {
     
     for (auto [breed, q] : shelter){cout << "breednew " << breed << " q " << q << endl;}
      cout << "NEW " << dog_arrival << endl;
-    //cout << "NEW " <<  CountAndAddNewDogs(new_dogs, max_amount, shelter ) << endl;
+    cout << "NEW " <<  CountAndAddNewDogs(new_dogs, max_amount, shelter ) << endl;
     return 0;
 }
