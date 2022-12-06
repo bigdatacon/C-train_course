@@ -40,7 +40,7 @@ int main() {
     int dog_arrival= 0;
     for (auto breed : new_dogs){
         [&shelter, max_amount, &dog_arrival](string breed){
-            if (shelter.at(breed)!=0 && shelter.at(breed)<max_amount.at(breed) ){++shelter.at(breed); ++dog_arrival;}
+            if ( shelter.at(breed)<max_amount.at(breed) ){++shelter[breed]; ++dog_arrival;}
         };    
     }
     
