@@ -18,20 +18,5 @@ int CountAndAddNewDogs(const vector<string>& new_dogs, const map<string, int>& m
 
 
 int main() {
-    map<string, int> shelter = {{"landseer"s, 1}, {"otterhound"s, 2}, {"pekingese"s, 2}, {"pointer"s, 3}};
-    map<string, int> max_amount = {{"landseer"s, 2}, {"otterhound"s, 3}, {"pekingese"s, 4}, {"pointer"s, 7}};
-    vector<string> new_dogs = {"landseer"s, "otterhound"s, "otterhound"s, "otterhound"s, "pointer"s};
-    
-    for (auto [breed, q] : shelter){cout << "breed " << breed << " q " << q << endl;}
-    int dog_arrival= 0;
-    for (auto breed : new_dogs){
-        [&shelter, max_amount, &dog_arrival](string breed){
-            if (shelter.at(breed)!=0 && shelter.at(breed)<max_amount.at(breed) ){++shelter.at(breed); ++dog_arrival;}
-        };    
-    }
-    
-    for (auto [breed, q] : shelter){cout << "breednew " << breed << " q " << q << endl;}
-     cout << "NEW " << dog_arrival << endl;
-    cout << "NEW " <<  CountAndAddNewDogs(new_dogs, max_amount, shelter ) << endl;
     return 0;
 }
