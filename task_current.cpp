@@ -5,6 +5,20 @@
 #include <algorithm>
 using namespace std;
 
+// Это разбор решения от наставников  - до 20 строки
+int CountAndAddNewDogs(const vector<string>& new_dogs,
+                       const map<string, int>& max_amount,
+                       map<string, int>& shelter) {
+		return count_if(собаки из new_dogs, [...](порода) {
+						eсли лимит породы > текущее количество породы в приюте то {
+								добавить в приют
+	              return true; // увеличиваем счётчик
+						} или {
+								return false; // не увеличиваем счётчик
+						}		
+				};
+}
+
 
 int CountAndAddNewDogs(const vector<string>& new_dogs, const map<string, int>& max_amount,
                        map<string, int>& shelter) {
