@@ -47,6 +47,12 @@ struct Document {
     int relevance;
 };
 
+struct DocumentQuery {
+    vector<string> minuswords;
+    vector<string> pluswords;
+};
+
+
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -61,8 +67,8 @@ public:
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
-        const set<string> query_words = ParseQuery(raw_query);
-        auto matched_documents = FindAllDocuments(query_words);
+        const DocumentQuery query_words = ParseQuery(raw_query);
+        auto matched_documents = FindAllDocuments(query_words.pluswords);
 
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
@@ -98,11 +104,24 @@ private:
         return words;
     }
 
-    set<string> ParseQuery(const string& text) const {
-        set<string> query_words;
+    DocumentQuery ParseQuery(const string& text) const {
+        set<string> pluswords;
+        set<string> minuswords;
+
+        DocumentQuery query_words;
+        
         for (const string& word : SplitIntoWordsNoStop(text)) {
-            query_words.insert(word);
+            cout << "here query w " << word << endl;
+            char ch = word.at(0);
+            if (ch == '-') {cout << "here query w word.at(0)):  " << int(ch)  << endl;
+                           minuswords.insert(word.substr(1));}
+            else {
+            pluswords.insert(word);}
         }
+        query_words.push_back({minuswords, pluswords}); 
+        for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}
+        
+        
         return query_words;
     }
 
@@ -149,6 +168,8 @@ SearchServer CreateSearchServer() {
 /*Минус-слова запроса должны обрабатываться до плюс-слов. Каждый документ, где есть минус-слово, не должен включаться в результаты поиска, даже если в нём присутствуют плюс-слова.
 Для хранения запроса удобно создать структуру Query с двумя множествами слов: плюс- и минус-словами. Возвращать эту структуру по строке запроса нужно в новом приватном методе — ParseQuery.
 После сравнения первого символа с '-' не забудьте отрезать этот минус вызовом .substr(1), а затем проверить результат по словарю стоп-слов.*/
+
+
 
 
 int main() {
