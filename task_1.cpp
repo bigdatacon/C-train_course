@@ -102,8 +102,9 @@ private:
         set<string> query_words;
         for (const string& word : SplitIntoWordsNoStop(text)) {
             cout << "here query w " << word << endl;
-
-            cout << "here query w substr(0,1):  " << word.substr(1) << endl;
+            char ch = word.at(0));
+           //cout << "here query w substr(0,1):  " << word.at(0)  << endl;
+            cout << "here query w substr(0,1):  " << int(ch)  <<
             query_words.insert(word);
         }
         return query_words;
