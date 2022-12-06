@@ -5,20 +5,6 @@
 #include <algorithm>
 using namespace std;
 
-// разбор решения от наставников  - до 20 строки
-/*int CountAndAddNewDogs(const vector<string>& new_dogs,
-                       const map<string, int>& max_amount,
-                       map<string, int>& shelter) {
-		return count_if(собаки из new_dogs, [...](порода) {
-						eсли лимит породы > текущее количество породы в приюте то {
-								добавить в приют
-	              return true; // увеличиваем счётчик
-						} или {
-								return false; // не увеличиваем счётчик
-						}		
-				};
-}*/
-
 
 int CountAndAddNewDogs(const vector<string>& new_dogs, const map<string, int>& max_amount,
                        map<string, int>& shelter) {
@@ -32,9 +18,15 @@ int CountAndAddNewDogs(const vector<string>& new_dogs, const map<string, int>& m
 
 
 int main() {
-    map<string, int> shelter = {{"landseer"s, 1}, {"otterhound"s, 2}, {"pekingese"s, 2}, {"pointer"s, 3}};
+        //map<string, int> shelter = {{"landseer"s, 1}, {"otterhound"s, 2}, {"pekingese"s, 2}, {"pointer"s, 3}};
+    //map<string, int> shelter = {{"landseer"s, 1}, {"otterhound"s, 2}, {"pekingese"s, 2}, {"pointer"s, 3}};
     map<string, int> max_amount = {{"landseer"s, 2}, {"otterhound"s, 3}, {"pekingese"s, 4}, {"pointer"s, 7}};
-    vector<string> new_dogs = {"landseer"s, "otterhound"s, "otterhound"s, "otterhound"s, "pointer"s};
+    //vector<string> new_dogs = {"landseer"s, "otterhound"s, "otterhound"s, "otterhound"s, "pointer"s};
+    vector<string> new_dogs = { "pointer"s, "pointer"s, "pointer"s, "pointer"s, "otterhound"s, "landseer"s, "pekingese"s, "pekingese"s}; // проверка что все собаки помещяются 
+        
+        map<string, int> shelter = {{"landseer"s, 2}, {"otterhound"s, 2}, {"pekingese"s, 2}, {"pointer"s, 3}};
+        //vector<string> new_dogs = { "pointer"s,  "landseer"s, "otterhound"s}; // проверка что 1 собака помещяется
+        //vector<string> new_dogs = { "pointer"s,  "landseer"s}; // проверка что 0 собак помещяется
     
     for (auto [breed, q] : shelter){cout << "breed " << breed << " q " << q << endl;}
     int dog_arrival= 0;
@@ -48,4 +40,5 @@ int main() {
      cout << "NEW " << dog_arrival << endl;
     cout << "NEW " <<  CountAndAddNewDogs(new_dogs, max_amount, shelter ) << endl;
     return 0;
+
 }
