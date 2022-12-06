@@ -48,8 +48,8 @@ struct Document {
 };
 
 struct DocumentQuery {
-    vector<string> minuswords;
-    vector<string> pluswords;
+    set<string> minuswords;
+    set<string> pluswords;
 };
 
 
