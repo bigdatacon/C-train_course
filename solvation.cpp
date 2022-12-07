@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -119,26 +120,21 @@ private:
         }
         query_words.minuswords = minuswords; 
         query_words.pluswords = pluswords;
-        /*for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}*/
+
         
         
         return query_words;
     }
     
-    bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words) const {
+   /* bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words) const {
         if (content.words.empty()) {
             return false;
-        }
-        //for (const auto& word : minus_words){cout << "here minus_word " << word << endl;}
-        
-        
+        }         
         for (const auto& word : content.words) {
-            //cout << "here content.word " << word << endl;
-            if (minus_words.count(word)){/*cout << "here return true  " << word << endl;*/ return true;}
-            //else {return false;}
+               if (minus_words.count(word)){ return true;}
         }
         return false;
-    }
+    }*/
     
     /*3. В методе FindAllDocuments объявите переменную document_to_relevance типа map<int, int>. В ней ключ — id найденного документа, а значение — релевантность соответствующего документа. Она равна количеству плюс-слов, найденных в нём.*/
     /*4. В методе FindAllDocuments переберите в цикле все плюс-слова поискового запроса. Если в word_to_documents_ есть плюс-слово, увеличьте в document_to_relevance релевантности всех документов, где это слово найдено. Так вы соберёте все документы, которые содержат плюс-слова запроса.*/
