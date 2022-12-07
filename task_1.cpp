@@ -47,6 +47,12 @@ struct Document {
     int relevance;
 };
 
+struct DocumentQuery {
+    set<string> minuswords;
+    set<string> pluswords;
+};
+
+
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -61,8 +67,8 @@ public:
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
-        const set<string> query_words = ParseQuery(raw_query);
-        auto matched_documents = FindAllDocuments(query_words);
+        const DocumentQuery query_words = ParseQuery(raw_query);
+        auto matched_documents = FindAllDocuments(query_words.pluswords, query_words.minuswords);
 
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
@@ -98,25 +104,57 @@ private:
         return words;
     }
 
-    set<string> ParseQuery(const string& text) const {
-        set<string> query_words;
+    DocumentQuery ParseQuery(const string& text) const {
+        set<string> pluswords;
+        set<string> minuswords;
+
+        DocumentQuery query_words;
+        
         for (const string& word : SplitIntoWordsNoStop(text)) {
-            cout << "here query w " << word << endl;
-            char ch = word.at(0));
-           //cout << "here query w substr(0,1):  " << word.at(0)  << endl;
-            cout << "here query w substr(0,1):  " << int(ch)  <<
-            query_words.insert(word);
+            //cout << "here query w " << word << endl;
+            char ch = word.at(0);
+            if (ch == '-') {/*cout << "here query w word.at(0)):  " << int(ch)  << endl;*/
+                           minuswords.insert(word.substr(1));}
+            else {
+            pluswords.insert(word);}
         }
+        query_words.minuswords = minuswords; 
+        query_words.pluswords = pluswords;
+        /*for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}*/
+        
+        
         return query_words;
     }
+    
+    bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words) const {
+        if (content.words.empty()) {
+            return false;
+        }
+        //for (const auto& word : minus_words){cout << "here minus_word " << word << endl;}
+        
+        
+        for (const auto& word : content.words) {
+            //cout << "here content.word " << word << endl;
+            if (minus_words.count(word)){/*cout << "here return true  " << word << endl;*/ return true;}
+            //else {return false;}
+        }
+        return false;
+    }
+    
+    
+    vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
 
-    vector<Document> FindAllDocuments(const set<string>& query_words) const {
         vector<Document> matched_documents;
         for (const auto& document : documents_) {
+            
+            if (CheckMinusWords(document,  minus_words)){/*cout << "Skipping document" << document.id << endl; */continue;}
+            else {
+            
             const int relevance = MatchDocument(document, query_words);
             if (relevance > 0) {
                 matched_documents.push_back({document.id, relevance});
             }
+        }
         }
         return matched_documents;
     }
@@ -154,10 +192,7 @@ SearchServer CreateSearchServer() {
 Для хранения запроса удобно создать структуру Query с двумя множествами слов: плюс- и минус-словами. Возвращать эту структуру по строке запроса нужно в новом приватном методе — ParseQuery.
 После сравнения первого символа с '-' не забудьте отрезать этот минус вызовом .substr(1), а затем проверить результат по словарю стоп-слов.*/
 
-struct DocumentContent {
-    int id;
-    vector<string> words;
-};
+
 
 
 int main() {
