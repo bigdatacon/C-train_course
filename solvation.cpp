@@ -128,13 +128,14 @@ private:
     
     bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words) const {
         if (content.words.empty()) {
-            return 0;
+            return false;
         }
 
         for (const auto& word : content.words) {
             if (minus_words.count(word)){return true;}
             else {return false;}
         }
+        return false;
     }
     
     
