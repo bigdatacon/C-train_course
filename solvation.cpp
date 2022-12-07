@@ -126,19 +126,24 @@ private:
         return query_words;
     }
     
-    bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words){
+    bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words) const {
+        if (content.words.empty()) {
+            return 0;
+        }
+
         for (const auto& word : content.words) {
             if (minus_words.count(word)){return true;}
             else {return false;}
         }
     }
     
+    
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
 
         vector<Document> matched_documents;
         for (const auto& document : documents_) {
             
-            if (CheckMinusWords(document,  query_words)){continue;}
+            if (CheckMinusWords(document,  minus_words)){continue;}
             else {
             
             const int relevance = MatchDocument(document, query_words);
