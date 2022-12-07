@@ -144,7 +144,7 @@ private:
         vector<Document> matched_documents;
         for (const auto& document : documents_) {
             
-            if (CheckMinusWords(document,  minus_words)){continue;}
+            if (CheckMinusWords(document,  minus_words)){cout << "Skipping document" << document.id << endl; continue;}
             else {
             
             const int relevance = MatchDocument(document, query_words);
