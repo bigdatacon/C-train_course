@@ -145,10 +145,11 @@ private:
         map<int, int> document_to_relevance;
         vector<Document> matched_documents;
         
-        for (auto str : query_words){ (if word_to_documents_.first ==str) ) {
+        for (auto str : query_words){ if (word_to_documents_.first ==str) ) {
             set <string> doc_ids =word_to_documents_.second;
-            for (auto id : doc_ids) {++document_to_relevance[id];}
-        } 
+            for (auto id : doc_ids) {++document_to_relevance[id];
+                                    }
+                                                                            } 
         for (auto str : minus_words){ (if word_to_documents_.first ==str) ) {
             set <string> doc_ids =word_to_documents_.second;
             for (auto id : doc_ids) {--document_to_relevance[id];
@@ -156,17 +157,19 @@ private:
                                          /*it = document_to_relevance.find (id);            
                                          document_to_relevance.erase (it);*/
                                     }
-        } 
+                                                                            } 
         for (auto el : document_to_relevance){
             Document matched_document;
             matched_document.id  = el.first;
             matched_document.relevance  = el.second;
             matched_documents.push_back(matched_document);
-        }             
+                                             }             
             return matched_documents;
+                                    }
+                                                                                                            }}
 
 
-    static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
+    /*static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
         if (query_words.empty()) {
             return 0;
         }
@@ -180,7 +183,7 @@ private:
             }
         }
         return static_cast<int>(matched_words.size());
-    }
+    }*/
 };
 
 SearchServer CreateSearchServer() {
