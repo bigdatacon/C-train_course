@@ -145,19 +145,24 @@ private:
         map<int, int> document_to_relevance;
         vector<Document> matched_documents;
         
-        for (auto str : query_words){ if (word_to_documents_.first ==str) ) {
-            set <string> doc_ids =word_to_documents_.second;
+        for (auto str : query_words){ 
+            for (auto word_to_doc : word_to_documents_ ){
+            if (word_to_doc.first ==str){
+            set <int> doc_ids =word_to_doc.second;
             for (auto id : doc_ids) {++document_to_relevance[id];
                                     }
-                                                                            } 
-        for (auto str : minus_words){ (if word_to_documents_.first ==str) ) {
-            set <string> doc_ids =word_to_documents_.second;
-            for (auto id : doc_ids) {--document_to_relevance[id];
-                                   // пробую удалить через erase 
-                                         /*it = document_to_relevance.find (id);            
-                                         document_to_relevance.erase (it);*/
+                                                         }
+                                        } 
                                     }
-                                                                            } 
+        for (auto str : minus_words){ 
+            for (auto word_to_doc : word_to_documents_ ){
+            if (word_to_doc.first ==str){
+            set <int> doc_ids =word_to_doc.second;
+            for (auto id : doc_ids) {--document_to_relevance[id];
+                                    }
+                                                         }
+                                        } 
+                                    }
         for (auto el : document_to_relevance){
             Document matched_document;
             matched_document.id  = el.first;
@@ -165,8 +170,8 @@ private:
             matched_documents.push_back(matched_document);
                                              }             
             return matched_documents;
-                                    }
-                                                                                                            }}
+                    }
+                                                                                                     
 
 
     /*static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
