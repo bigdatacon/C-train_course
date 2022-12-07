@@ -52,6 +52,8 @@ struct DocumentQuery {
     set<string> pluswords;
 };
 
+/*Вместо vector<DocumentContent> documents_ объявите поле map<string, set<int>> word_to_documents_. В нём будет храниться инвертированный индекс документов. Структуру DocumentContent удалите.*/
+
 
 class SearchServer {
 public:
@@ -60,10 +62,11 @@ public:
             stop_words_.insert(word);
         }
     }
-
+    /*2. В методе AddDocument переберите в цикле все слова документа, кроме стоп-слов. Вставьте в множество документов, соответствующих очередному слову документа, id вставляемого документа. Так очередной документ будет добавлен в инвертированный индекс.*/
     void AddDocument(int document_id, const string& document) {
         const vector<string> words = SplitIntoWordsNoStop(document);
-        documents_.push_back({document_id, words});
+        //map<string, set<int>> word_to_documents_;
+        for (/*const*/ auto word :  words){word_to_documents_[word].insert(document_id);}
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
@@ -81,12 +84,8 @@ public:
     }
 
 private:
-    struct DocumentContent {
-        int id = 0;
-        vector<string> words;
-    };
 
-    vector<DocumentContent> documents_;
+    map<string, set<int>> word_to_documents_;
 
     set<string> stop_words_;
 
@@ -111,16 +110,16 @@ private:
         DocumentQuery query_words;
         
         for (const string& word : SplitIntoWordsNoStop(text)) {
-            cout << "here query w " << word << endl;
+            //cout << "here query w " << word << endl;
             char ch = word.at(0);
-            if (ch == '-') {cout << "here query w word.at(0)):  " << int(ch)  << endl;
+            if (ch == '-') {/*cout << "here query w word.at(0)):  " << int(ch)  << endl;*/
                            minuswords.insert(word.substr(1));}
             else {
             pluswords.insert(word);}
         }
         query_words.minuswords = minuswords; 
         query_words.pluswords = pluswords;
-        for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}
+        /*for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}*/
         
         
         return query_words;
@@ -130,31 +129,46 @@ private:
         if (content.words.empty()) {
             return false;
         }
-
+        //for (const auto& word : minus_words){cout << "here minus_word " << word << endl;}
+        
+        
         for (const auto& word : content.words) {
-            if (minus_words.count(word)){return true;}
-            else {return false;}
+            //cout << "here content.word " << word << endl;
+            if (minus_words.count(word)){/*cout << "here return true  " << word << endl;*/ return true;}
+            //else {return false;}
         }
         return false;
     }
     
+    /*3. В методе FindAllDocuments объявите переменную document_to_relevance типа map<int, int>. В ней ключ — id найденного документа, а значение — релевантность соответствующего документа. Она равна количеству плюс-слов, найденных в нём.*/
+    /*4. В методе FindAllDocuments переберите в цикле все плюс-слова поискового запроса. Если в word_to_documents_ есть плюс-слово, увеличьте в document_to_relevance релевантности всех документов, где это слово найдено. Так вы соберёте все документы, которые содержат плюс-слова запроса.*/
+    /*5. Исключите из результатов поиска все документы, в которых есть минус-слова. В методе FindAllDocuments переберите в цикле все минус-слова поискового запроса. Если в word_to_documents_ есть минус-слово, удалите из document_to_relevance все документы с этим минус-словом. Так в document_to_relevance останутся только подходящие документы.*/
+    /*6. Перенесите id и релевантности документов из document_to_relevance в vector<Document> и верните результирующий вектор.*/
     
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
-
+        map<int, int> document_to_relevance;
         vector<Document> matched_documents;
-        for (const auto& document : documents_) {
-            
-            if (CheckMinusWords(document,  minus_words)){cout << "Skipping document" << document.id << endl; continue;}
-            else {
-            
-            const int relevance = MatchDocument(document, query_words);
-            if (relevance > 0) {
-                matched_documents.push_back({document.id, relevance});
-            }
-        }
-        }
-        return matched_documents;
-    }
+        
+        for (auto str : query_words){ (if word_to_documents_.first ==str) ) {
+            set <string> doc_ids =word_to_documents_.second;
+            for (auto id : doc_ids) {++document_to_relevance[id];}
+        } 
+        for (auto str : minus_words){ (if word_to_documents_.first ==str) ) {
+            set <string> doc_ids =word_to_documents_.second;
+            for (auto id : doc_ids) {--document_to_relevance[id];
+                                   // пробую удалить через erase 
+                                         /*it = document_to_relevance.find (id);            
+                                         document_to_relevance.erase (it);*/
+                                    }
+        } 
+        for (auto el : document_to_relevance){
+            Document matched_document;
+            matched_document.id  = el.first;
+            matched_document.relevance  = el.second;
+            matched_documents.push_back(matched_document);
+        }             
+            return matched_documents;
+
 
     static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
         if (query_words.empty()) {
@@ -184,10 +198,6 @@ SearchServer CreateSearchServer() {
 
     return search_server;
 }
-
-/*Минус-слова запроса должны обрабатываться до плюс-слов. Каждый документ, где есть минус-слово, не должен включаться в результаты поиска, даже если в нём присутствуют плюс-слова.
-Для хранения запроса удобно создать структуру Query с двумя множествами слов: плюс- и минус-словами. Возвращать эту структуру по строке запроса нужно в новом приватном методе — ParseQuery.
-После сравнения первого символа с '-' не забудьте отрезать этот минус вызовом .substr(1), а затем проверить результат по словарю стоп-слов.*/
 
 
 
