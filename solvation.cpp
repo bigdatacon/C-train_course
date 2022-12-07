@@ -158,7 +158,10 @@ private:
             for (auto word_to_doc : word_to_documents_ ){
             if (word_to_doc.first ==str){
             set <int> doc_ids =word_to_doc.second;
-            for (auto id : doc_ids) {--document_to_relevance[id];
+            for (auto id : doc_ids) {/*--document_to_relevance[id]; */
+                std::map<int,int>::iterator it;
+                it = document_to_relevance.find(id);
+                                      document_to_relevance.erase (it);
                                     }
                                                          }
                                         } 
