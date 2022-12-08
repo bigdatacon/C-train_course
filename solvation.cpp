@@ -63,11 +63,18 @@ public:
             stop_words_.insert(word);
         }
     }
-
+    /*Как и раньше, для поиска документов и вычисления их релевантности хватит двойной вложенности циклов for: внешний — по словам запроса, внутренний — по документам, где это слово встречается.
+Помимо добавления количества документов, достаточно будет переделать словарь «слово → документы» в более сложную структуру map<string, map<int, double>> word_to_document_freqs_, которая сопоставляет каждому слову словарь «документ → TF». Подумайте, как с этими данными быстро вычислять IDF.
+Для хранения релевантности найденных документов используйте контейнер map<int, double>. Ключи в нём — id найденных документов, а значения вычисляются по формуле TF-IDF, описанной в уроке.*/
+    
     void AddDocument(int document_id, const string& document, const int document_count) {
         const vector<string> words = SplitIntoWordsNoStop(document);
         //map<string, set<int>> word_to_documents_;
         //map<string, double> word_idf_;
+        //map<int, vector<string>> words_full;
+        //map<string, map<int, double>> word_to_document_freqs_
+        
+        
 
 
         if (words.size()!=0) {
@@ -76,7 +83,13 @@ public:
         //добавляю в word_idf_ : словл : IDF 
         for (const auto& [key, value]: word_to_documents_) {
         word_idf_.insert({key, log(document_count/value.size())}); 
+            
+        words_full_.insert({document_id, words});
+            
     }
+        //for (auto el : word_idf_){cout << "el.first : " << el.first << " el sec " << el.second << endl;}
+        //for (auto el : words_full_){cout << "el.first : " << el.first << " el sec.size " << el.second.size() << endl;}
+        
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
@@ -94,6 +107,7 @@ public:
     }
 
 private:
+    map<int, vector<string>> words_full_;  //  словарь : {id документа, сам документ в формате вектора}
     map<string, double> word_idf_;
     map<string, map<int, double>> word_to_document_freqs_;
     map<string, set<int>> word_to_documents_;
@@ -157,9 +171,7 @@ private:
                                                                 
             return false; 
 }
-    /*Как и раньше, для поиска документов и вычисления их релевантности хватит двойной вложенности циклов for: внешний — по словам запроса, внутренний — по документам, где это слово встречается.
-Помимо добавления количества документов, достаточно будет переделать словарь «слово → документы» в более сложную структуру map<string, map<int, double>> word_to_document_freqs_, которая сопоставляет каждому слову словарь «документ → TF». Подумайте, как с этими данными быстро вычислять IDF.
-Для хранения релевантности найденных документов используйте контейнер map<int, double>. Ключи в нём — id найденных документов, а значения вычисляются по формуле TF-IDF, описанной в уроке.*/
+
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
         map<int, int> document_to_relevance;
         vector<Document> matched_documents;
