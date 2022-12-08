@@ -169,10 +169,7 @@ private:
                                         } 
                                     }
         for (auto el : document_to_relevance){
-            Document matched_document;
-            matched_document.id  = el.first;
-            matched_document.relevance  = el.second;
-            matched_documents.push_back(matched_document);
+            matched_documents.push_back({el.first, el.second});
                                              }             
             return matched_documents;
                     }
