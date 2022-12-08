@@ -85,10 +85,6 @@ public:
         
     }
     
-
-
-    
-    
     
     vector<Document> FindTopDocuments(const string& raw_query) const {
         const DocumentQuery query_words = ParseQuery(raw_query);
