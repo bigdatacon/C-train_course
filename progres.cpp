@@ -193,10 +193,10 @@ private:
             //map<string, double> word_idf_; // словарь : слово IDF 
             //map<string, map<int, double>> word_to_document_freqs_; словарь типа : слово : {id документа TF}
         map<string, map<int, double>>    word_to_document_freqs_2 = word_to_document_freqs_; // создаю копию и передаю ее по //ссылке чтобы в ней заменить TF уже на TFIDF для каждого слова-документа, так как IDF у лобого слова одинаков 
-        len_docs = words_full_.size();
+        int len_docs = words_full_.size();
             for (auto str: query_words){
                 double idf_word = word_idf_.at(str);
-                for (auto word_to_doc : word_to_document_freqs_2&){if (word_to_doc.first==str){word_to_doc.second.second =word_to_doc.second.second*idf_word; }                                              
+                for (auto word_to_doc : word_to_document_freqs_2){if (word_to_doc.first==str){word_to_doc.second.second =word_to_doc.second.second*idf_word; }                                              
                                                                  }
                 
                 }
@@ -204,7 +204,7 @@ private:
         map <int, double> itog_tf_idf;
         for (j ==0, j<len_docs, ++j){
             double sum_tf_idf =0;
-        for (auto word_to_doc : word_to_document_freqs_2&){if (word_to_doc.second.first == j ) {sum_tf_idf+=word_to_doc.second.second;}
+        for (auto word_to_doc : word_to_document_freqs_2){if (word_to_doc.second.first == j ) {sum_tf_idf+=word_to_doc.second.second;}
                                                           }
             itog_tf_idf.insert({j, sum_tf_idf});
             
