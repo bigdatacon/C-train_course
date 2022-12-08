@@ -137,6 +137,19 @@ private:
         }
         return false;
     }*/
+  
+    // функция проверки что хотя бы 1 слово из запроса есть в докуентах
+        bool CheckAnyWordsinDoc(const set<string>& query_words) const {
+  
+           for (auto str : query_words){ 
+                    for (auto word_to_doc : word_to_documents_ ){
+                    if (word_to_doc.first ==str){ return true;}
+                                                                        }
+                                       }
+                                                                
+            return false; 
+}
+    
     
     /*3. В методе FindAllDocuments объявите переменную document_to_relevance типа map<int, int>. В ней ключ — id найденного документа, а значение — релевантность соответствующего документа. Она равна количеству плюс-слов, найденных в нём.*/
     /*4. В методе FindAllDocuments переберите в цикле все плюс-слова поискового запроса. Если в word_to_documents_ есть плюс-слово, увеличьте в document_to_relevance релевантности всех документов, где это слово найдено. Так вы соберёте все документы, которые содержат плюс-слова запроса.*/
@@ -146,6 +159,8 @@ private:
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
         map<int, int> document_to_relevance;
         vector<Document> matched_documents;
+        
+        if (CheckAnyWordsinDoc(query_words)){
         
         for (auto str : query_words){ 
             for (auto word_to_doc : word_to_documents_ ){
@@ -171,7 +186,9 @@ private:
         for (auto el : document_to_relevance){
             matched_documents.push_back({el.first, el.second});
                                              }             
-            return matched_documents;
+            
+                                                                    }
+        return matched_documents;
                     }
                                                                                                      
 
