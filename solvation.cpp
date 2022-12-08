@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
+ #include <iterator>
 
 using namespace std;
 
@@ -69,14 +70,6 @@ public:
     
     void AddDocument(int document_id, const string& document, const int document_count) {
         const vector<string> words = SplitIntoWordsNoStop(document);
-        //map<string, set<int>> word_to_documents_;
-        //map<string, double> word_idf_;
-        //map<int, vector<string>> words_full;
-        //map<string, map<int, double>> word_to_document_freqs_
-        
-        
-
-
         if (words.size()!=0) {
         for (/*const*/ auto word :  words){word_to_documents_[word].insert(document_id);}
                            }
@@ -91,7 +84,12 @@ public:
         //for (auto el : words_full_){cout << "el.first : " << el.first << " el sec.size " << el.second.size() << endl;}
         
     }
+    
 
+
+    
+    
+    
     vector<Document> FindTopDocuments(const string& raw_query) const {
         const DocumentQuery query_words = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query_words.pluswords, query_words.minuswords);
@@ -171,6 +169,27 @@ private:
                                                                 
             return false; 
 }
+    
+        // функция которая рассчитывает TF для каждого слова 
+    void CountTF( const set<string>& query_words) const {
+        //map<string, map<int, double>> word_to_document_freqs_;
+        for (auto str : query_words){
+            
+            for (auto words_full : words_full_ ){
+                int schetch = 0;
+                int size_doc = words_full.second.size();
+                
+                for (auto words : words_full.second){
+                    if (words==str) {++schetch; }
+                }
+                double tf = schetch/size_doc;
+                cout << "TF " << tf << endl;
+                //map<int, double > iter = { words_full.first, tf};
+                //word_to_document_freqs_.insert({str, iter});
+            }
+        }  
+        
+    }
 
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
         map<int, int> document_to_relevance;
@@ -178,6 +197,7 @@ private:
         map<string, map<int, double>> word_to_document_freqs_;
         
         if (CheckAnyWordsinDoc(query_words)){
+            CountTF(query_words); //проверка что все рассчитывается 
         
         for (auto str : query_words){ 
             for (auto word_to_doc : word_to_documents_ ){
