@@ -67,7 +67,9 @@ public:
     void AddDocument(int document_id, const string& document) {
         const vector<string> words = SplitIntoWordsNoStop(document);
         //map<string, set<int>> word_to_documents_;
+        if (words.size()!=0) {
         for (/*const*/ auto word :  words){word_to_documents_[word].insert(document_id);}
+                           }
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
