@@ -4,6 +4,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
+#include <cmath>
 
 using namespace std;
 
@@ -44,7 +46,7 @@ vector<string> SplitIntoWords(const string& text) {
 
 struct Document {
     int id;
-    int relevance;
+    double relevance;
 };
 
 struct DocumentQuery {
@@ -63,12 +65,26 @@ public:
 
     void AddDocument(int document_id, const string& document) {
         const vector<string> words = SplitIntoWordsNoStop(document);
-        documents_.push_back({document_id, words});
+        //int count_doc_ = 0;
+        //map<string, map<int, double>> word_to_document_freqs_;
+        double dolya_w = 1.0/document.size(); 
+        if (words.size()!=0) {
+        for (/*const*/ auto word :  words){
+            word_to_documents_[word].insert(document_id);
+            word_to_document_freqs_[word][document_id]+=dolya_w;}
+            ++count_doc_;
+                           }
+        
+                //добавляю в word_idf_ : словарь  слово : IDF 
+        if (word_to_documents_.size()!=0){
+        for (const auto& [key, value]: word_to_documents_) {
+        word_idf_.insert({key, log(double(count_doc_)/value.size())});}} 
+        
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
         const DocumentQuery query_words = ParseQuery(raw_query);
-        auto matched_documents = FindAllDocuments(query_words.pluswords);
+        auto matched_documents = FindAllDocuments(query_words.pluswords, query_words.minuswords);
 
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
@@ -81,12 +97,10 @@ public:
     }
 
 private:
-    struct DocumentContent {
-        int id = 0;
-        vector<string> words;
-    };
-
-    vector<DocumentContent> documents_;
+    map<string, double> word_idf_; // словарь : слово IDF
+    int count_doc_ = 0;
+    map<string, map<int, double>> word_to_document_freqs_;
+    map<string, set<int>> word_to_documents_;
 
     set<string> stop_words_;
 
@@ -111,47 +125,73 @@ private:
         DocumentQuery query_words;
         
         for (const string& word : SplitIntoWordsNoStop(text)) {
-            cout << "here query w " << word << endl;
+            //cout << "here query w " << word << endl;
             char ch = word.at(0);
-            if (ch == '-') {cout << "here query w word.at(0)):  " << int(ch)  << endl;
+            if (ch == '-') {/*cout << "here query w word.at(0)):  " << int(ch)  << endl;*/
                            minuswords.insert(word.substr(1));}
             else {
             pluswords.insert(word);}
         }
         query_words.minuswords = minuswords; 
         query_words.pluswords = pluswords;
-        for (auto el : query_words.minuswords){cout << "here stop word:  " << el  << endl;}
+
         
         
         return query_words;
     }
+    
+  
+    // функция проверки что хотя бы 1 слово из запроса есть в докуентах
+        bool CheckAnyWordsinDoc(const set<string>& query_words) const {
+  
+           for (auto str : query_words){ 
+                    for (auto word_to_doc : word_to_documents_ ){
+                    if (word_to_doc.first ==str){ return true;}
+                                                                        }
+                                       }
+                                                                
+            return false; 
+}
 
-    vector<Document> FindAllDocuments(const set<string>& query_words) const {
+    
+    vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
+        map<int, double> document_to_relevance;
         vector<Document> matched_documents;
-        for (const auto& document : documents_) {
-            const int relevance = MatchDocument(document, query_words);
-            if (relevance > 0) {
-                matched_documents.push_back({document.id, relevance});
+        vector<int> numbers_to_delete;     //вектор с номерами id для удаления
+        
+        if (CheckAnyWordsinDoc(query_words)){
+        //word_to_document_freqs_
+        //count_doc_
+        //map<string, set<int>> word_to_documents_
+        //map<string, double> word_idf_; // словарь : слово IDF
+        
+        for (auto str : query_words){ 
+            double word_idf = word_idf_.at(str); // получаю IDF слова 
+            
+            for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(str) ){
+            double tf_idf = word_idf*word_tf;
+            document_to_relevance[doc_id] += tf_idf;
+                                        } }
+            
+        
+        for ( auto minus_word : minus_words) {
+        for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(minus_word)) {
+        numbers_to_delete.push_back(doc_id);   //вектор с номерами id для удаления
+                 }
             }
-        }
+ 
+        for (const int& number : numbers_to_delete) {
+            document_to_relevance.erase(number);
+        }  
+            
+        for (auto el : document_to_relevance){
+            matched_documents.push_back({el.first, el.second});
+                                             }             
+            
+                                                                    }
         return matched_documents;
-    }
+                    }
 
-    static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
-        if (query_words.empty()) {
-            return 0;
-        }
-        set<string> matched_words;
-        for (const string& word : content.words) {
-            if (matched_words.count(word) != 0) {
-                continue;
-            }
-            if (query_words.count(word) != 0) {
-                matched_words.insert(word);
-            }
-        }
-        return static_cast<int>(matched_words.size());
-    }
 };
 
 SearchServer CreateSearchServer() {
@@ -165,12 +205,6 @@ SearchServer CreateSearchServer() {
 
     return search_server;
 }
-
-/*Минус-слова запроса должны обрабатываться до плюс-слов. Каждый документ, где есть минус-слово, не должен включаться в результаты поиска, даже если в нём присутствуют плюс-слова.
-Для хранения запроса удобно создать структуру Query с двумя множествами слов: плюс- и минус-словами. Возвращать эту структуру по строке запроса нужно в новом приватном методе — ParseQuery.
-После сравнения первого символа с '-' не забудьте отрезать этот минус вызовом .substr(1), а затем проверить результат по словарю стоп-слов.*/
-
-
 
 
 int main() {
