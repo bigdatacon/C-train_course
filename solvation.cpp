@@ -182,7 +182,9 @@ private:
                 //double tf = 5/10;
                 
                 cout << " str  " << str << " TF " << tf << " schtch : " << schetch<< " size doc "<< size_doc<<  endl;
-                map<int, double > iter = { words_full.first, tf};
+                map<int, double> iter;
+                iter[words_full.first] = tf;
+                //map<int, double > iter = { words_full.first, tf};
                 word_to_document_freqs_.insert({str, iter});
             }
         }  
