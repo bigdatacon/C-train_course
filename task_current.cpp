@@ -65,8 +65,8 @@ public:
 
     void AddDocument(int document_id, const string& document) {
         const vector<string> words = SplitIntoWordsNoStop(document);
-        //int count_doc_ = 0;
-        //map<string, map<int, double>> word_to_document_freqs_;
+        if (!words.empty()){
+        
         double dolya_w = 1.0/words.size(); 
         ++count_doc_;
         if (words.size()!=0) {
@@ -76,13 +76,7 @@ public:
             
                            }
         
-                //добавляю в word_idf_ : словарь  слово : IDF 
-        /*if (word_to_documents_.size()!=0){
-        for (const auto& [key, value]: word_to_documents_) {
-
-        //word_idf_.insert({key, log(double(count_doc_)/value.size())});
-        word_idf_[key] = log(double(count_doc_)/value.size());
-        }} */
+        }
         
     }
 
