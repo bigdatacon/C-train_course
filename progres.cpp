@@ -5,8 +5,6 @@
 #include <utility>
 #include <vector>
 #include <map>
-#include <cmath>
- #include <iterator>
 
 using namespace std;
 
@@ -47,14 +45,13 @@ vector<string> SplitIntoWords(const string& text) {
 
 struct Document {
     int id;
-    int relevance;
+    double relevance;
 };
 
 struct DocumentQuery {
     set<string> minuswords;
     set<string> pluswords;
 };
-
 
 
 class SearchServer {
@@ -64,28 +61,26 @@ public:
             stop_words_.insert(word);
         }
     }
-    /*Как и раньше, для поиска документов и вычисления их релевантности хватит двойной вложенности циклов for: внешний — по словам запроса, внутренний — по документам, где это слово встречается.
-Помимо добавления количества документов, достаточно будет переделать словарь «слово → документы» в более сложную структуру map<string, map<int, double>> word_to_document_freqs_, которая сопоставляет каждому слову словарь «документ → TF». Подумайте, как с этими данными быстро вычислять IDF.
-Для хранения релевантности найденных документов используйте контейнер map<int, double>. Ключи в нём — id найденных документов, а значения вычисляются по формуле TF-IDF, описанной в уроке.*/
-    
-    void AddDocument(int document_id, const string& document, const int document_count) {
+
+    void AddDocument(int document_id, const string& document) {
         const vector<string> words = SplitIntoWordsNoStop(document);
+        //int count_doc_ = 0;
+        //map<string, map<int, double>> word_to_document_freqs_;
+        double dolya_w = 1.0/document.size(); 
         if (words.size()!=0) {
-        for (/*const*/ auto word :  words){word_to_documents_[word].insert(document_id);}
+        for (/*const*/ auto word :  words){
+            word_to_documents_[word].insert(document_id);
+            word_to_document_freqs_[word][document_id]+=dolya_w;}
+            ++count_doc_;
                            }
-        //добавляю в word_idf_ : словл : IDF 
+        
+                //добавляю в word_idf_ : словарь  слово : IDF 
+        if (word_to_documents_.size()!=0){
         for (const auto& [key, value]: word_to_documents_) {
-        word_idf_.insert({key, log(document_count/value.size())}); 
-            
-        words_full_.insert({document_id, words});
-            
-    }
-        //for (auto el : word_idf_){cout << "el.first : " << el.first << " el sec " << el.second << endl;}
-        //for (auto el : words_full_){cout << "el.first : " << el.first << " el sec.size " << el.second.size() << endl;}
+        word_idf_.insert({key, log(double(document_count)/value.size())});}} 
         
     }
-    
-    
+
     vector<Document> FindTopDocuments(const string& raw_query) const {
         const DocumentQuery query_words = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query_words.pluswords, query_words.minuswords);
@@ -101,8 +96,8 @@ public:
     }
 
 private:
-    map<int, vector<string>> words_full_;  //  словарь : {id документа, сам документ в формате вектора}
-    map<string, double> word_idf_; // словарь : слово IDF 
+    map<string, double> word_idf_; // словарь : слово IDF
+    int count_doc_ = 0;
     map<string, map<int, double>> word_to_document_freqs_;
     map<string, set<int>> word_to_documents_;
 
@@ -144,15 +139,6 @@ private:
         return query_words;
     }
     
-   /* bool CheckMinusWords(const DocumentContent& content, const set<string>& minus_words) const {
-        if (content.words.empty()) {
-            return false;
-        }         
-        for (const auto& word : content.words) {
-               if (minus_words.count(word)){ return true;}
-        }
-        return false;
-    }*/
   
     // функция проверки что хотя бы 1 слово из запроса есть в докуентах
         bool CheckAnyWordsinDoc(const set<string>& query_words) const {
@@ -165,87 +151,37 @@ private:
                                                                 
             return false; 
 }
-    
-        // функция которая рассчитывает TF для каждого слова 
-    void CountTF( const set<string>& query_words) const {
-        //map<string, map<int, double>> word_to_document_freqs_;
-        for (auto str : query_words){
-            
-            for (auto words_full : words_full_ ){
-                int schetch = 0;
-                int size_doc = words_full.second.size();
-                
-                for (auto words : words_full.second){
-                    if (words==str) {++schetch; }
-                }
-                double tf = schetch/size_doc;
-                //double tf = 5/10;
-                
-                cout << " str  " << str << " TF " << tf << " schtch : " << schetch<< " size doc "<< size_doc<<  endl;
-                //map<int, double > iter = { words_full.first, tf};
-                //word_to_document_freqs_.insert({str, iter});
-            }
-        }  
-        
-    }
-    
-    map <int, double> GetTFIDF(const set<string>& query_words){
-            //map<string, double> word_idf_; // словарь : слово IDF 
-            //map<string, map<int, double>> word_to_document_freqs_; словарь типа : слово : {id документа TF}
-        map<string, map<int, double>>    word_to_document_freqs_2 = word_to_document_freqs_; // создаю копию и передаю ее по //ссылке чтобы в ней заменить TF уже на TFIDF для каждого слова-документа, так как IDF у лобого слова одинаков 
-        int len_docs = words_full_.size();
-            for (auto str: query_words){
-                double idf_word = word_idf_.at(str);
-                for (auto word_to_doc : word_to_document_freqs_2){if (word_to_doc.first==str){word_to_doc.second.second =word_to_doc.second.second*idf_word; }                                              
-                                                                 }
-                
-                }
-        // считаю TFIDF суммарный для документа 
-        map <int, double> itog_tf_idf;
-        for (j ==0, j<len_docs, ++j){
-            double sum_tf_idf =0;
-        for (auto word_to_doc : word_to_document_freqs_2){if (word_to_doc.second.first == j ) {sum_tf_idf+=word_to_doc.second.second;}
-                                                          }
-            itog_tf_idf.insert({j, sum_tf_idf});
-            
-            
-            }
-        
-        return itog_tf_idf;
-    }
-    
-    
 
+    
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
-        map<int, int> document_to_relevance;
+        map<int, double> document_to_relevance;
         vector<Document> matched_documents;
-        map<string, map<int, double>> word_to_document_freqs_;
         
         if (CheckAnyWordsinDoc(query_words)){
-            CountTF(query_words); //проверка что все рассчитывается 
+        //word_to_document_freqs_
+        //count_doc_
+        //map<string, set<int>> word_to_documents_
+        //map<string, double> word_idf_; // словарь : слово IDF
         
         for (auto str : query_words){ 
-            for (auto word_to_doc : word_to_documents_ ){
-            if (word_to_doc.first ==str){
-            set <int> doc_ids =word_to_doc.second;
-            for (auto id : doc_ids) {++document_to_relevance[id];
-                                    }
-                                                         }
-                                        } 
-                                    }
+            double word_idf = word_idf_.at(str); // получаю IDF слова 
+            
+            for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(str) ){
+            double tf_idf = word_idf*word_t;
+            document_to_relevance[doc_id] += tf_idf;
+                                        } }
+                                  
         for (auto str : minus_words){ 
-            for (auto word_to_doc : word_to_documents_ ){
-            if (word_to_doc.first ==str){
-            set <int> doc_ids =word_to_doc.second;
-            for (auto id : doc_ids) {/*--document_to_relevance[id]; */
-                std::map<int,int>::iterator it;
-                it = document_to_relevance.find(id);
-                if (it!=document_to_relevance.end()){
-                                      document_to_relevance.erase (it);};
-                                    }
-                                                         }
-                                        } 
-                                    }
+             for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(str) ){
+            //double tf_idf = word_idf*word_t;
+            //document_to_relevance[doc_id] -= tf_idf;
+            std::map<int,int>::iterator it;
+            it = document_to_relevance.find(doc_id);
+            if (it!=document_to_relevance.end()){
+            document_to_relevance.erase (it);}
+                                        } }
+
+            
         for (auto el : document_to_relevance){
             matched_documents.push_back({el.first, el.second});
                                              }             
@@ -253,24 +189,7 @@ private:
                                                                     }
         return matched_documents;
                     }
-                                                                                                     
 
-
-    /*static int MatchDocument(const DocumentContent& content, const set<string>& query_words) {
-        if (query_words.empty()) {
-            return 0;
-        }
-        set<string> matched_words;
-        for (const string& word : content.words) {
-            if (matched_words.count(word) != 0) {
-                continue;
-            }
-            if (query_words.count(word) != 0) {
-                matched_words.insert(word);
-            }
-        }
-        return static_cast<int>(matched_words.size());
-    }*/
 };
 
 SearchServer CreateSearchServer() {
@@ -279,17 +198,12 @@ SearchServer CreateSearchServer() {
 
     const int document_count = ReadLineWithNumber();
     for (int document_id = 0; document_id < document_count; ++document_id) {
-        search_server.AddDocument(document_id, ReadLine(), document_count);
+        search_server.AddDocument(document_id, ReadLine());
     }
 
     return search_server;
 }
 
-// IDF  =log(количество документов / количество документов) где слово встречается. Рассчитывается для слова 
-
-// TF  = количество раз сколько слово встречается в документе / на количество слов в документе. Рассчитывается для каждого слова и докумена 
-
-// TF-IDF: считается для каждого документа и строки запроса. Для этого IDF каждого слова запроса * TF каждого слова в запроса  и далее суммируются ти произведения. Так получается TF IDF документа.
 
 int main() {
     const SearchServer search_server = CreateSearchServer();
