@@ -68,20 +68,21 @@ public:
         //int count_doc_ = 0;
         //map<string, map<int, double>> word_to_document_freqs_;
         double dolya_w = 1.0/words.size(); 
+        ++count_doc_;
         if (words.size()!=0) {
         for (/*const*/ auto word :  words){
-            word_to_documents_[word].insert(document_id);
+            //word_to_documents_[word].insert(document_id);
             word_to_document_freqs_[word][document_id]+=dolya_w;}
-            ++count_doc_;
+            
                            }
         
                 //добавляю в word_idf_ : словарь  слово : IDF 
-        if (word_to_documents_.size()!=0){
+        /*if (word_to_documents_.size()!=0){
         for (const auto& [key, value]: word_to_documents_) {
 
         //word_idf_.insert({key, log(double(count_doc_)/value.size())});
         word_idf_[key] = log(double(count_doc_)/value.size());
-        }} 
+        }} */
         
     }
 
@@ -100,10 +101,10 @@ public:
     }
 
 private:
-    map<string, double> word_idf_; // словарь : слово IDF
+    //map<string, double> word_idf_; // словарь : слово IDF
     int count_doc_ = 0;
     map<string, map<int, double>> word_to_document_freqs_;
-    map<string, set<int>> word_to_documents_;
+    //map<string, set<int>> word_to_documents_;
 
     set<string> stop_words_;
 
@@ -130,7 +131,7 @@ private:
         for (const string& word : SplitIntoWordsNoStop(text)) {
             //cout << "here query w " << word << endl;
             char ch = word.at(0);
-            if (ch == '-') {/*cout << "here query w word.at(0)):  " << int(ch)  << endl;*/
+            if (ch == '-') /*(word[0] == '-')*/ {/*cout << "here query w word.at(0)):  " << int(ch)  << endl;*/
                            minuswords.insert(word.substr(1));}
             else {
             pluswords.insert(word);}
@@ -145,7 +146,7 @@ private:
     
   
     // функция проверки что хотя бы 1 слово из запроса есть в докуентах
-        bool CheckAnyWordsinDoc(const set<string>& query_words) const {
+        /*bool CheckAnyWordsinDoc(const set<string>& query_words) const {
   
            for (auto str : query_words){ 
                     for (auto word_to_doc : word_to_documents_ ){
@@ -154,7 +155,7 @@ private:
                                        }
                                                                 
             return false; 
-}
+}*/
 
     
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
@@ -162,15 +163,15 @@ private:
         vector<Document> matched_documents;
         vector<int> numbers_to_delete;     //вектор с номерами id для удаления
         
-        if (CheckAnyWordsinDoc(query_words)){
+        if (!query_words.empty()){
         //word_to_document_freqs_
         //count_doc_
         //map<string, set<int>> word_to_documents_
         //map<string, double> word_idf_; // словарь : слово IDF
         
         for (auto str : query_words){ 
-            double word_idf = word_idf_.at(str); // получаю IDF слова 
-            
+            //double word_idf = word_idf_.at(str); // получаю IDF слова 
+            double word_idf = log((count_doc_*1.0)/word_to_document_freqs_.at(str).size());
             for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(str) ){
             double tf_idf = word_idf*word_tf;
             document_to_relevance[doc_id] += tf_idf;
