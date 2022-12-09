@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 #include <map>
+#include <cmath>
 
 using namespace std;
 
@@ -77,7 +78,7 @@ public:
                 //добавляю в word_idf_ : словарь  слово : IDF 
         if (word_to_documents_.size()!=0){
         for (const auto& [key, value]: word_to_documents_) {
-        word_idf_.insert({key, log(double(document_count)/value.size())});}} 
+        word_idf_.insert({key, log(double(count_doc_)/value.size())});}} 
         
     }
 
@@ -167,7 +168,7 @@ private:
             double word_idf = word_idf_.at(str); // получаю IDF слова 
             
             for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(str) ){
-            double tf_idf = word_idf*word_t;
+            double tf_idf = word_idf*word_tf;
             document_to_relevance[doc_id] += tf_idf;
                                         } }
                                   
