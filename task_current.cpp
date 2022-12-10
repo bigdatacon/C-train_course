@@ -137,19 +137,7 @@ private:
         
         return query_words;
     }
-    
-  
-    // функция проверки что хотя бы 1 слово из запроса есть в докуентах
-        /*bool CheckAnyWordsinDoc(const set<string>& query_words) const {
-  
-           for (auto str : query_words){ 
-                    for (auto word_to_doc : word_to_documents_ ){
-                    if (word_to_doc.first ==str){ return true;}
-                                                                        }
-                                       }
-                                                                
-            return false; 
-}*/
+
 
     
     vector<Document> FindAllDocuments(const set<string>& query_words, const set<string>& minus_words) const {
@@ -164,19 +152,24 @@ private:
         //map<string, double> word_idf_; // словарь : слово IDF
         
         for (auto str : query_words){ 
-            //double word_idf = word_idf_.at(str); // получаю IDF слова 
+            //проверяю ниже что слово есть в словаре 
+            if  (word_to_document_freqs_.find(str) != word_to_document_freqs_.end()) {
             double word_idf = log((count_doc_*1.0)/word_to_document_freqs_.at(str).size());
             for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(str) ){
             double tf_idf = word_idf*word_tf;
             document_to_relevance[doc_id] += tf_idf;
                                         } }
+            continue;}
             
         
         for ( auto minus_word : minus_words) {
+            //проверяю ниже что слово есть в словаре 
+            if  (word_to_document_freqs_.find(minus_word) != word_to_document_freqs_.end()) {
         for (const auto& [doc_id, word_tf] : word_to_document_freqs_.at(minus_word)) {
         numbers_to_delete.push_back(doc_id);   //вектор с номерами id для удаления
                  }
-            }
+            } continue;
+        }
  
         for (const int& number : numbers_to_delete) {
             document_to_relevance.erase(number);
