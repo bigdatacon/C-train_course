@@ -19,6 +19,23 @@ int main() {
     return 0;
 }
 */
+vector<int> ReadLineWithNumbers()
+{
+    vector<int> grades;
+    int grades_count;
+    cin >> grades_count;
+    cin.get();
+    if (grades_count > 0)
+        for (int i = 0; i < grades_count; ++i)
+        {
+            int cur_grade;
+            cin >> cur_grade;
+            cin.get();
+            grades.push_back(cur_grade);
+        }
+    return grades;
+}
+
 // C++ program for the above approach
 #include "bits/stdc++.h"
 using namespace std;
@@ -83,6 +100,14 @@ string ReadLine() {
     return s;
 }
 
+int ReadLineWithNumber() {
+    int result;
+    cin >> result;
+    ReadLine();
+    return result;
+}
+
+
 // Driver Code
 int main()
 {
@@ -107,7 +132,7 @@ int main()
     string vvod = ReadLine();
     cout << "vvod: "s << vvod << endl;
     //for (auto el : vvod){cout << atoi(el.c_str())<< endl;}
-    for (char el : vvod){cout <<"int : " << int(el)<< endl;}
+    for (int el : vvod){cout <<"int : " << el<<  " : "<<  el+15<< endl;}
     
     
 }
