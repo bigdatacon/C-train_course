@@ -107,7 +107,7 @@ int main()
     string vvod = ReadLine();
     cout << "vvod: "s << vvod << endl;
     //for (auto el : vvod){cout << atoi(el.c_str())<< endl;}
-    for (auto el : vvod){cout << std::stoi(el)<< endl;}
+    for (char el : vvod){cout <<"int : " << int(el)<< endl;}
     
     
 }
