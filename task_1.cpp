@@ -24,6 +24,20 @@ int ReadLineWithNumber() {
     return result;
 }
 
+vector<int> ReadLineWithNumbers()
+{
+    vector<int> new_ans;
+    int  n;
+    cin >> n;
+    for (int i=0; i < n; ++i) {
+    	int m;
+    	cin >> m;
+    	cout << "m: "s << m << endl;
+    	new_ans.push_back(m);
+    }
+    return new_ans;
+}
+
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
     string word;
@@ -47,7 +61,9 @@ vector<string> SplitIntoWords(const string& text) {
 struct Document {
     int id;
     double relevance;
+    int rating;
 };
+
 
 class SearchServer {
 public:
@@ -64,6 +80,10 @@ public:
         for (const string& word : words) {
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
+        vector<int> new_ans = ReadLineWithNumbers();
+        for (auto el : new_ans){cout << "elnew_ans : "s<< el << endl;}}
+        int avg_rating = ComputeAverageRating(new_ans);
+        document_ratings_[document_id] = avg_rating ;
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
@@ -81,6 +101,7 @@ public:
     }
 
 private:
+    map<int, int> document_ratings_; 
     int document_count_ = 0;
     set<string> stop_words_;
     map<string, map<int, double>> word_to_document_freqs_;
@@ -93,9 +114,9 @@ private:
     int ComputeAverageRating(const vector<int>& ratings){
         // Given range
         int X = 1;
-        int end_v =arr.size();
-        auto start = arr.begin() + X;
-        auto end = arr.begin() + end_v;
+        int end_v =ratings.size();
+        auto start = ratings.begin() + X;
+        auto end = ratings.begin() + end_v;
         //auto end = arr.end();
 
         // To store the sliced vector
@@ -185,7 +206,7 @@ private:
 
         vector<Document> matched_documents;
         for (const auto [document_id, relevance] : document_to_relevance) {
-            matched_documents.push_back({document_id, relevance});
+            matched_documents.push_back({document_id, relevance, document_ratings_.at(document_id)});
         }
         return matched_documents;
     }
