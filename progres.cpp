@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cctype>
+
 using namespace std;
 /*
 int main() {
@@ -132,7 +134,13 @@ int main()
     string vvod = ReadLine();
     cout << "vvod: "s << vvod << endl;
     //for (auto el : vvod){cout << atoi(el.c_str())<< endl;}
-    for (int el : vvod){cout <<"int : " << el<<  " : "<<  el+15<< endl;}
+    vector<int> new_arr;
+    for (auto el : vvod){
+        if (isdigit(el)) {
+            new_arr.push_back(el);
+        cout <<"int : " << el<<  " : "<<  el+15<< endl;}}
+    
+    for (auto el : new_arr) { cout <<"new_arr el : " << el<<  " : "<<  el+15<< endl;}
     
     
 }
