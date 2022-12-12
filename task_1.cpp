@@ -75,7 +75,9 @@ public:
 
     void AddDocument(int document_id, const string& document) {
         ++document_count_;
+        //cout << "HERE STRING "s << document << endl;
         const vector<string> words = SplitIntoWordsNoStop(document);
+        
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
             word_to_document_freqs_[word][document_id] += inv_word_count;
@@ -85,6 +87,9 @@ public:
         int avg_rating = ComputeAverageRating(new_ans);
         //cout << "avg_ratings : "s<< avg_rating << endl;
         document_ratings_[document_id] = avg_rating ;
+        
+        
+        
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
@@ -222,8 +227,10 @@ int main() {
     const SearchServer search_server = CreateSearchServer();
 
     const string query = ReadLine();
+    cout << "HERE query "s << query << endl;
     for (auto [document_id, relevance, rating] : search_server.FindTopDocuments(query)) {
         cout << "{ document_id = "s << document_id << ", "s
-             << "relevance = "s << relevance << " }"s << " ratng = " << rating << endl;
+             << "relevance = "s << relevance << ", "s 
+            << "rating = "s <<  rating << " }"s << endl;
     }
 }
