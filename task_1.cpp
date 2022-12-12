@@ -29,10 +29,12 @@ vector<int> ReadLineWithNumbers()
     vector<int> new_ans;
     int  n;
     cin >> n;
+    cin.get();
     for (int i=0; i < n; ++i) {
     	int m;
     	cin >> m;
-    	cout << "m: "s << m << endl;
+        cin.get();
+    	//cout << "m: "s << m << endl;
     	new_ans.push_back(m);
     }
     return new_ans;
@@ -227,7 +229,7 @@ int main() {
     const SearchServer search_server = CreateSearchServer();
 
     const string query = ReadLine();
-    cout << "HERE query "s << query << endl;
+    //cout << "HERE query "s << query << endl;
     for (auto [document_id, relevance, rating] : search_server.FindTopDocuments(query)) {
         cout << "{ document_id = "s << document_id << ", "s
              << "relevance = "s << relevance << ", "s 
