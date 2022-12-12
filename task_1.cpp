@@ -81,8 +81,9 @@ public:
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         vector<int> new_ans = ReadLineWithNumbers();
-        for (auto el : new_ans){cout << "elnew_ans : "s<< el << endl;}
+        //for (auto el : new_ans){cout << "elnew_ans : "s<< el << endl;}
         int avg_rating = ComputeAverageRating(new_ans);
+        //cout << "avg_ratings : "s<< avg_rating << endl;
         document_ratings_[document_id] = avg_rating ;
     }
 
@@ -113,21 +114,14 @@ private:
     // нахожу средний рейтинг 
     int ComputeAverageRating(const vector<int>& ratings){
         // Given range
-        int X = 1;
-        int end_v =ratings.size();
-        auto start = ratings.begin() + X;
-        auto end = ratings.begin() + end_v;
-        //auto end = arr.end();
-
-        // To store the sliced vector
-        vector<int> result(end_v - X );
-
-        // Copy vector using copy function()
-        copy(start, end, result.begin());
+        if (ratings.empty()) {
+            return 0;
+        }
+        int size_r = ratings.size();
 
         int summ = 0;
-        for (auto el : result){summ+= el;}
-        return summ/(end_v-1);
+        for (auto el : ratings){summ+= el;}
+        return summ/size_r;
     }
     
     
