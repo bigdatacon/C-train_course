@@ -51,7 +51,7 @@ struct Document {
     int id;
     double relevance;
     int rating;
-    string documentstatus;
+    DocumentStatus documentstatus;
 };
 
 bool HasDocumentGreaterStatus(const Document& lhs, DocumentStatus status) {
