@@ -54,9 +54,10 @@ struct Document {
     DocumentStatus documentstatus;
 };
 
-bool HasDocumentGreaterStatus(const Document& lhs, DocumentStatus status) {
+/*vector<Document> HasDocumentGreaterStatus(const Document& lhs, DocumentStatus status) {
+    
     return lhs.documentstatus == status;
-} 
+} */
 
 class SearchServer {
 public:
@@ -81,21 +82,34 @@ public:
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query);
         
-        sort(matched_documents.begin(), matched_documents.end(),
+        /*sort(matched_documents.begin(), matched_documents.end(),
              [&status](const Document& el) {
                  return el.documentstatus == status;
-             });
+             });*/
+        
+        vector<Document> to_vector;
+        std::copy_if(matched_documents.begin(), matched_documents.end(),
+                     std::back_inserter(to_vector),
+                     [&status](const Document& el) { return el.documentstatus == status;; });
         
         //sort(matched_documents.begin(), matched_documents.end(), HasDocumentGreaterStatus);
         
-        sort(matched_documents.begin(), matched_documents.end(),
+        /*sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
                  return lhs.relevance > rhs.relevance;
              });
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
-        return matched_documents;
+        return matched_documents;*/
+        sort(to_vector.begin(), to_vector.end(),
+             [](const Document& lhs, const Document& rhs) {
+                 return lhs.relevance > rhs.relevance;
+             });
+        if (to_vector.size() > MAX_RESULT_DOCUMENT_COUNT) {
+            to_vector.resize(MAX_RESULT_DOCUMENT_COUNT);
+        }
+        return to_vector;
     }
     
 private:
@@ -205,32 +219,6 @@ private:
     }
 };
 
-
-/*SearchServer CreateSearchServer() {
-    SearchServer search_server;
-    search_server.SetStopWords(ReadLine());
-
-    const int document_count = ReadLineWithNumber();
-    for (int document_id = 0; document_id < document_count; ++document_id) {
-        const string document = ReadLine();
-        int ratings_size;
-        cin >> ratings_size;
-        
-        // создали вектор размера ratings_size из нулей
-        vector<int> ratings(ratings_size, 0);
-        
-        // считали каждый элемент с помощью ссылки
-        for (int& rating : ratings) {
-            cin >> rating;
-        }
-
-        
-        search_server.AddDocument(document_id, document, DocumentStatus documentstatus,  ratings);           
-        ReadLine();
-    }
-    
-    return search_server;
-}*/
 
 void PrintDocument(const Document& document) {
     cout << "{ "s
