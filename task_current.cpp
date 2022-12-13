@@ -47,8 +47,22 @@ void SortDocuments(vector<Document>& matched_documents) {
     //1 сортирую по возрастению статусов 
     sort(matched_documents.begin(), matched_documents.end(),
          [](const Document& lhs, const Document& rhs) {
-                
-             return tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1).status < tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1).status;
+                //return std::get<1>(a) > std::get<1>(b);
+             return std::get<1>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) <std::get<1>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
+         });
+    
+    //2 сортирую по убыванию рейтинга
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+                //return std::get<1>(a) > std::get<1>(b);
+             return std::get<3>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<3>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
+         });
+    
+        //3 сортирую по убыванию релевантности
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+                //return std::get<1>(a) > std::get<1>(b);
+             return std::get<2>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<2>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
          });
     
 } 
