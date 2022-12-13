@@ -54,6 +54,10 @@ struct Document {
     string documentstatus;
 };
 
+bool HasDocumentGreaterStatus(const Document& lhs, DocumentStatus status) {
+    return lhs.documentstatus == status;
+} 
+
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -81,6 +85,8 @@ public:
              [&status](const Document& el) {
                  return el.documentstatus == status;
              });
+        
+        //sort(matched_documents.begin(), matched_documents.end(), HasDocumentGreaterStatus);
         
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
@@ -251,3 +257,4 @@ int main() {
     }
     return 0;
 }
+
