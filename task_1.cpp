@@ -99,7 +99,7 @@ public:
     }
     
 private:
-    map<int, string> document_status_;
+    map<int, DocumentStatus> document_status_;
     set<string> stop_words_;
     map<string, map<int, double>> word_to_document_freqs_;
     map<int, int> document_ratings_;
@@ -206,7 +206,7 @@ private:
 };
 
 
-SearchServer CreateSearchServer() {
+/*SearchServer CreateSearchServer() {
     SearchServer search_server;
     search_server.SetStopWords(ReadLine());
 
@@ -230,7 +230,7 @@ SearchServer CreateSearchServer() {
     }
     
     return search_server;
-}
+}*/
 
 void PrintDocument(const Document& document) {
     cout << "{ "s
@@ -257,4 +257,3 @@ int main() {
     }
     return 0;
 }
-
