@@ -27,10 +27,17 @@ struct Document {
 };
 
 // было 
-/*
+
 void SortDocuments(vector<Document>& matched_documents) {
     sort(matched_documents.begin(), matched_documents.end(),
          [](const Document& lhs, const Document& rhs) {
+               // Declaring tuple
+               //tuple < Document> geek;   -- так не работает 
+               tuple <int, Status, double, int> geek;
+               geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
+               cout << "tuple "s << std::get<1>(geek) << endl; // так ошибка, geek.id - тоже ошибка
+                 
+             
              if (lhs.status==rhs.status){
              
              return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
@@ -39,10 +46,10 @@ void SortDocuments(vector<Document>& matched_documents) {
              return false;
          });
 } 
-}*/
+}
 
 // стало
-void SortDocuments(vector<Document>& matched_documents) {
+/*void SortDocuments(vector<Document>& matched_documents) {
   
     //1 сортирую по возрастению статусов 
     sort(matched_documents.begin(), matched_documents.end(),
@@ -65,7 +72,7 @@ void SortDocuments(vector<Document>& matched_documents) {
              return std::get<2>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<2>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
          });
     
-} 
+} */
 
 
 int main() {
