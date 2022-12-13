@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <iostream>
+#include <vector>
 #include <tuple>
 
 using namespace std;
@@ -40,28 +43,14 @@ void SortDocuments(vector<Document>& matched_documents) {
 
 // стало
 void SortDocuments(vector<Document>& matched_documents) {
-        // сортирую по статусу и рейтингу
-        sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
-             if (lhs.status==rhs.status){
-             
-             return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
-             
-             if (lhs.status<rhs.status){return true;}
-             return false;
-         });
-        
-        // сортирую дополнительно по релевантности
-        sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
-             return lhs.relevance > rhs.relevance;});
-    
+  
+    //1 сортирую по возрастению статусов 
     sort(matched_documents.begin(), matched_documents.end(),
          [](const Document& lhs, const Document& rhs) {
-
-             return tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)
-                 < tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1);
+                
+             return tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1).status < tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1).status;
          });
+    
 } 
 
 
