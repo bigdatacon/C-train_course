@@ -1,5 +1,14 @@
+#include <tuple>
 
- 4
+using namespace std;
+
+/*
+Перепишите компаратор из предыдущего урока, применив кортежи.
+Код должен вывести следующее:
+104 0 0.3 5
+102 0 1.2 4
+100 0 0.5 4
+101 1 0.5 4
 103 2 1.2 4
 
 Документы нужно упорядочить сначала по возрастанию статусов, а при их равенстве — по убыванию рейтинга, затем по убыванию релевантности. Но при сравнении кортежей все компоненты сравниваются одинаково. Поэтому при создании кортежа удобно умножить рейтинг и релевантность на −1.
@@ -31,6 +40,22 @@ void SortDocuments(vector<Document>& matched_documents) {
 
 // стало
 void SortDocuments(vector<Document>& matched_documents) {
+        // сортирую по статусу и рейтингу
+        sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+             if (lhs.status==rhs.status){
+             
+             return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
+             
+             if (lhs.status<rhs.status){return true;}
+             return false;
+         });
+        
+        // сортирую дополнительно по релевантности
+        sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+             return lhs.relevance > rhs.relevance;});
+    
     sort(matched_documents.begin(), matched_documents.end(),
          [](const Document& lhs, const Document& rhs) {
 
