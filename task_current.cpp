@@ -59,13 +59,13 @@ void SortDocuments(vector<Document>& matched_documents) {
                week = make_tuple(rhs.id, rhs.status, rhs.relevance, rhs.rating);
                  
                //cout << "tuple "s << std::get<2>(geek) << endl; // так работает 
-               cout << "tuple "s << std::get<2>(geek) == std::get<2>(week) << endl; // так ошибка 
+               cout << "tuple "s << (std::get<2>(geek) == std::get<2>(week)) << endl; // так ошибка 
              
-             if (lhs.status==rhs.status){
+             if ((std::get<1>(geek) == std::get<1>(week))){
              
-             return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
+             return geek > week;}
              
-             if (lhs.status<rhs.status){return true;}
+             if ((std::get<1>(geek) < std::get<1>(week))){return true;}
              return false;
          });
 
