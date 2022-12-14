@@ -28,14 +28,14 @@ struct Document {
 
 // было 
 
-void SortDocuments(vector<Document>& matched_documents) {
+/*void SortDocuments(vector<Document>& matched_documents) {
     sort(matched_documents.begin(), matched_documents.end(),
          [](const Document& lhs, const Document& rhs) {
                // Declaring tuple
                //tuple < Document> geek;   -- так не работает 
                tuple <int, Status, double, int> geek;
                geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
-               cout << "tuple "s << std::get<1>(geek) << endl; // так ошибка, geek.id - тоже ошибка
+               cout << "tuple "s << std::get<2>(geek) << endl; // так ошибка, geek.id - тоже ошибка
                  
              
              if (lhs.status==rhs.status){
@@ -45,8 +45,34 @@ void SortDocuments(vector<Document>& matched_documents) {
              if (lhs.status<rhs.status){return true;}
              return false;
          });
-} 
+
+}*/
+
+void SortDocuments(vector<Document>& matched_documents) {
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+               // Declaring tuple
+               //tuple < Document> geek;   -- так не работает 
+               tuple <int, Status, double, int> geek;
+                 tuple <int, Status, double, int> week;
+               geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
+               week = make_tuple(rhs.id, rhs.status, rhs.relevance, rhs.rating);
+                 
+               //cout << "tuple "s << std::get<2>(geek) << endl; // так работает 
+               cout << "tuple "s << std::get<2>(geek) == std::get<2>(week) << endl; // так ошибка 
+             
+             if (lhs.status==rhs.status){
+             
+             return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
+             
+             if (lhs.status<rhs.status){return true;}
+             return false;
+         });
+
 }
+
+
+
 
 // стало
 /*void SortDocuments(vector<Document>& matched_documents) {
