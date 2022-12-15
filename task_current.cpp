@@ -23,35 +23,44 @@ struct Document {
     Status status;
     double relevance;
     int rating;
+    auto MakeKey() {
+        return tuple(status, -rating, -relevance);
+    }
 };
 
 
 
 void SortDocuments(vector<Document>& matched_documents) {
     sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
+         [](const Document& lhs, const Document& rhs)  {
                // Declaring tuple
                //tuple < Document> geek;   -- так не работает 
-               tuple <int, Status, double, int> geek;
-                 tuple <int, Status, double, int> week;
-               geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
-               week = make_tuple(rhs.id, rhs.status, rhs.relevance, rhs.rating);
+               //tuple <int, Status, double, int> geek;
+                 //tuple <int, Status, double, int> week;
+             
+                /* tuple < Status,  int ,double, int> geek;
+                 tuple < Status,  int ,double, int> week;
+             
+               geek = make_tuple( lhs.status, lhs.rating*-1, lhs.relevance*-1, lhs.id);
+               week = make_tuple(rhs.status, rhs.rating*-1, rhs.relevance*-1, rhs.id);*/
                  
-               //cout << "tuple "s << std::get<2>(geek) << endl; // так работает 
-               //cout << "tuple "s << (std::get<2>(geek) == std::get<2>(week)) << endl; // так ошибка 
+            return  lhs.MakeKey() < rhs.MakeKey();
              
-             if ((std::get<1>(geek) == std::get<1>(week))){
+            /* if ((std::get<1>(geek) == std::get<1>(week))){
              
-             //return geek > week;
-             //return tuple(get<2>(geek), get<3>(geek)) < tuple(get<2>(week), get<3>(week));
-             return tuple(get<3>(geek), get<2>(geek) ) < tuple(get<3>(week), get<2>(week));
+            return tuple(get<3>(geek), get<2>(geek) ) < tuple(get<3>(week), get<2>(week));
              }
              
              if ((std::get<1>(geek) < std::get<1>(week))){return true;}
-             return false;
+             return false;*/
          });
 
 }
+
+t1  2753.74
+t2  1949.71
+t3   3480.47
+t123 8183.92
 
 int main() {
     vector<Document> documents = {
