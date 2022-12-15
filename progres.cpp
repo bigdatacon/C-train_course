@@ -1,146 +1,115 @@
-#include <iostream>
-#include <string>
-#include <vector>
 #include <algorithm>
-#include <cctype>
+#include <iostream>
+#include <vector>
+#include <tuple>
 
 using namespace std;
+
 /*
-int main() {
-        // входной вектор
-    std::vector<int> v = { 1, 2, 3, 4, 2, 2, 4, 6, 5 };
- 
-    // начальный и конечный индекс
-    //int m = 4, n = 7;
- 
-    int v_0 = v.at(0);
-    cout << v_0 << endl;
-    
-    for (auto v.begin()+1, v.end() ){cout << v_0 << endl;}
- 
-    return 0;
-}
+Перепишите компаратор из предыдущего урока, применив кортежи.
+Код должен вывести следующее:
+104 0 0.3 5
+102 0 1.2 4
+100 0 0.5 4
+101 1 0.5 4
+103 2 1.2 4
+Документы нужно упорядочить сначала по возрастанию статусов, а при их равенстве — по убыванию рейтинга, затем по убыванию релевантности. Но при сравнении кортежей все компоненты сравниваются одинаково. Поэтому при создании кортежа удобно умножить рейтинг и релевантность на −1.
 */
-vector<int> ReadLineWithNumbers()
-{
-    vector<int> grades;
-    int grades_count;
-    cin >> grades_count;
-    cin.get();
-    if (grades_count > 0)
-        for (int i = 0; i < grades_count; ++i)
-        {
-            int cur_grade;
-            cin >> cur_grade;
-            cin.get();
-            grades.push_back(cur_grade);
-        }
-    return grades;
-}
 
-// C++ program for the above approach
-#include "bits/stdc++.h"
-using namespace std;
+enum class Status { ACTUAL, EXPIRED, DELETED };
 
-// Function to slice a given vector
-// from range X to Y
-vector<int> slicing(vector<int>& arr,
-					int X)
-{
+struct Document {
+    int id;
+    Status status;
+    double relevance;
+    int rating;
+};
 
-	// Starting and Ending iterators
-    int s =arr.size();
-	auto start = arr.begin() + X;
-	auto end = arr.begin() + s;
-    //auto end = arr.end();
+// было 
 
-	// To store the sliced vector
-	vector<int> result(s - X );
+/*void SortDocuments(vector<Document>& matched_documents) {
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+               // Declaring tuple
+               //tuple < Document> geek;   -- так не работает 
+               tuple <int, Status, double, int> geek;
+               geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
+               cout << "tuple "s << std::get<2>(geek) << endl; // так ошибка, geek.id - тоже ошибка
+                 
+             
+             if (lhs.status==rhs.status){
+             
+             return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
+             
+             if (lhs.status<rhs.status){return true;}
+             return false;
+         });
+}*/
 
-	// Copy vector using copy function()
-	copy(start, end, result.begin());
+void SortDocuments(vector<Document>& matched_documents) {
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+               // Declaring tuple
+               //tuple < Document> geek;   -- так не работает 
+               tuple <int, Status, double, int> geek;
+                 tuple <int, Status, double, int> week;
+               geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
+               week = make_tuple(rhs.id, rhs.status, rhs.relevance, rhs.rating);
+                 
+               //cout << "tuple "s << std::get<2>(geek) << endl; // так работает 
+               cout << "tuple "s << (std::get<2>(geek) == std::get<2>(week)) << endl; // так ошибка 
+             
+             if ((std::get<1>(geek) == std::get<1>(week))){
+             
+             return geek > week;}
+             
+             if ((std::get<1>(geek) < std::get<1>(week))){return true;}
+             return false;
+         });
 
-	// Return the final sliced vector
-	return result;
-}
-
-// Function to print the vector ans
-void printResult(vector<int>& ans)
-{
-
-	// Traverse the vector ans
-	for (auto& it : ans) {
-
-		// Print elements
-		cout << it << ' ';
-	}
-}
-
-// нахожу средний рейтинг 
-int ComputeAverageRating(const vector<int>& ratings){
-    // Given range
-	int X = 1;
-    int end_v =ratings.size();
-	auto start = ratings.begin() + X;
-	auto end = ratings.begin() + end_v;
-    //auto end = arr.end();
-
-	// To store the sliced vector
-	vector<int> result(end_v - X );
-
-	// Copy vector using copy function()
-	copy(start, end, result.begin());
-    
-    int summ = 0;
-    for (auto el : result){summ+= el;}
-    return summ/(end_v-1);
-}
-
-string ReadLine() {
-    string s;
-    getline(cin, s);
-    return s;
-}
-
-int ReadLineWithNumber() {
-    int result;
-    cin >> result;
-    ReadLine();
-    return result;
 }
 
 
-// Driver Code
-int main()
-{
 
-	// Given vector
-	vector<int> arr = { 1, 3, 4, 2,
-						4, 2, 1 };
 
-	// Given range
-	int X = 1;
+// стало
+/*void SortDocuments(vector<Document>& matched_documents) {
+  
+    //1 сортирую по возрастению статусов 
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+                //return std::get<1>(a) > std::get<1>(b);
+             return std::get<1>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) <std::get<1>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
+         });
     
-   
+    //2 сортирую по убыванию рейтинга
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+                //return std::get<1>(a) > std::get<1>(b);
+             return std::get<3>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<3>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
+         });
+    
+        //3 сортирую по убыванию релевантности
+    sort(matched_documents.begin(), matched_documents.end(),
+         [](const Document& lhs, const Document& rhs) {
+                //return std::get<1>(a) > std::get<1>(b);
+             return std::get<2>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<2>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
+         });
+    
+} */
 
-	// Function Call
-	vector<int> ans;
-	ans = slicing(arr, X);
 
-	// Print the sliced vector
-	printResult(ans);
-    cout << "summ : "s << ComputeAverageRating(arr) << endl;
-    
-    string vvod = ReadLine();
-    cout << "vvod: "s << vvod << endl;
-    //for (auto el : vvod){cout << atoi(el.c_str())<< endl;}
-    vector<int> new_arr;
-    for (auto el : vvod){
-        if (isdigit(el)) {
-            new_arr.push_back(el);
-        cout <<"int : " << el<<  " : "<<  el+15<< endl;}}
-    
-    for (auto el : new_arr) { cout <<"new_arr el : " << el<<  " : "<<  el+15<< endl;}
-    
-    
+int main() {
+    vector<Document> documents = {
+        {100, Status::ACTUAL, 0.5, 4}, {101, Status::EXPIRED, 0.5, 4},
+        {102, Status::ACTUAL, 1.2, 4}, {103, Status::DELETED, 1.2, 4},
+        {104, Status::ACTUAL, 0.3, 5},
+    };
+    SortDocuments(documents);
+    for (const Document& document : documents) {
+        cout << document.id << ' ' << static_cast<int>(document.status) << ' ' << document.relevance
+             << ' ' << document.rating << endl;
+    }
+
+    return 0;
 }
