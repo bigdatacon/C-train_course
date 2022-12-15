@@ -118,7 +118,8 @@ public:
     	std::sort(result_vector.begin(), result_vector.end());
     	return tuple(result_vector, document_status);
 
-    }}
+    }
+    return tuple(result_vector, document_status);}
     ;
 
 private:
