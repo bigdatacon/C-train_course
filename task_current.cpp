@@ -42,7 +42,10 @@ void SortDocuments(vector<Document>& matched_documents) {
              
              if ((std::get<1>(geek) == std::get<1>(week))){
              
-             return geek > week;}
+             //return geek > week;
+             //return tuple(get<2>(geek), get<3>(geek)) < tuple(get<2>(week), get<3>(week));
+             return tuple(get<3>(geek), get<2>(geek) ) < tuple(get<3>(week), get<2>(week));
+             }
              
              if ((std::get<1>(geek) < std::get<1>(week))){return true;}
              return false;
