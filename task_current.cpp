@@ -13,7 +13,6 @@ using namespace std;
 100 0 0.5 4
 101 1 0.5 4
 103 2 1.2 4
-
 Документы нужно упорядочить сначала по возрастанию статусов, а при их равенстве — по убыванию рейтинга, затем по убыванию релевантности. Но при сравнении кортежей все компоненты сравниваются одинаково. Поэтому при создании кортежа удобно умножить рейтинг и релевантность на −1.
 */
 
@@ -26,27 +25,7 @@ struct Document {
     int rating;
 };
 
-// было 
 
-/*void SortDocuments(vector<Document>& matched_documents) {
-    sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
-               // Declaring tuple
-               //tuple < Document> geek;   -- так не работает 
-               tuple <int, Status, double, int> geek;
-               geek = make_tuple(lhs.id, lhs.status, lhs.relevance, lhs.rating);
-               cout << "tuple "s << std::get<2>(geek) << endl; // так ошибка, geek.id - тоже ошибка
-                 
-             
-             if (lhs.status==rhs.status){
-             
-             return pair(lhs.rating, lhs.relevance) > pair(rhs.rating, rhs.relevance);}
-             
-             if (lhs.status<rhs.status){return true;}
-             return false;
-         });
-
-}*/
 
 void SortDocuments(vector<Document>& matched_documents) {
     sort(matched_documents.begin(), matched_documents.end(),
@@ -59,7 +38,7 @@ void SortDocuments(vector<Document>& matched_documents) {
                week = make_tuple(rhs.id, rhs.status, rhs.relevance, rhs.rating);
                  
                //cout << "tuple "s << std::get<2>(geek) << endl; // так работает 
-               cout << "tuple "s << (std::get<2>(geek) == std::get<2>(week)) << endl; // так ошибка 
+               //cout << "tuple "s << (std::get<2>(geek) == std::get<2>(week)) << endl; // так ошибка 
              
              if ((std::get<1>(geek) == std::get<1>(week))){
              
@@ -70,36 +49,6 @@ void SortDocuments(vector<Document>& matched_documents) {
          });
 
 }
-
-
-
-
-// стало
-/*void SortDocuments(vector<Document>& matched_documents) {
-  
-    //1 сортирую по возрастению статусов 
-    sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
-                //return std::get<1>(a) > std::get<1>(b);
-             return std::get<1>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) <std::get<1>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
-         });
-    
-    //2 сортирую по убыванию рейтинга
-    sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
-                //return std::get<1>(a) > std::get<1>(b);
-             return std::get<3>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<3>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
-         });
-    
-        //3 сортирую по убыванию релевантности
-    sort(matched_documents.begin(), matched_documents.end(),
-         [](const Document& lhs, const Document& rhs) {
-                //return std::get<1>(a) > std::get<1>(b);
-             return std::get<2>(tuple(lhs.id, lhs.status, lhs.relevance*-1, lhs.rating*-1)) > std::get<2>(tuple(rhs.id, rhs.status, rhs.relevance*-1, rhs.rating*-1));
-         });
-    
-} */
-
 
 int main() {
     vector<Document> documents = {
