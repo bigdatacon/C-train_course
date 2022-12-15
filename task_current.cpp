@@ -73,6 +73,9 @@ public:
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
+
+        //Добавляю все документы в один вектор
+        all_words_.emplace(document_id, words);
     }
 
     vector<Document> FindTopDocuments(const string& raw_query,
@@ -89,8 +92,38 @@ public:
         }
         return matched_documents;
     }
+        //1. Возвращаю количество документов
+    int GetDocumentCount() const {
+        return all_words_.size();
+    };
+
+    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const{
+    	const Query query = ParseQuery(raw_query);
+    	DocumentStatus document_status = documents_.at(document_id).status;
+    	vector<string> result_vector;
+    	tuple<vector<string>, DocumentStatus> result;
+
+
+    	vector<string> document_words = all_words_.at(document_id);
+    	for (auto document_word : document_words) {
+    		if (query.minus_words.count(document_word)){
+    			return tuple(result_vector, document_status);}
+    		else {
+    			if (query.plus_words.count(document_word)){
+
+    			int cnt = count(result_vector.begin(), result_vector.end(), document_word);
+    			if (cnt==0){result_vector.push_back(document_word);}
+    		}
+    	}
+    	std::sort(result_vector.begin(), result_vector.end());
+    	//return tuple(result_vector, document_status);
+
+    }
+    return tuple(result_vector, document_status);}
+    ;
 
 private:
+    map<int , vector<string>> all_words_; // словарь для всех документов
     struct DocumentData {
         int rating;
         DocumentStatus status;
@@ -220,4 +253,4 @@ int main() {
         const auto [words, status] = search_server.MatchDocument("пушистый кот"s, document_id);
         PrintMatchDocumentResult(document_id, words, status);
     }
-} 
+}
