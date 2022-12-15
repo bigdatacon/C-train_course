@@ -95,7 +95,7 @@ public:
         //1. Возвращаю количество документов
     int GetDocumentCount() const {
         return all_words_.size();
-    }
+    };
 
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const{
     	const Query query = ParseQuery(raw_query);
@@ -103,11 +103,12 @@ public:
     	vector<string> result_vector;
     	tuple<vector<string>, DocumentStatus> result;
 
+
     	vector<string> document_words = all_words_.at(document_id);
-    	
-        for (auto document_word : document_words) {
+    	for (auto document_word : document_words) {
     		if (query.minus_words.count(document_word)){
-    			return tuple(result_vector, document_status);}
+    			//return tuple(result_vector, document_status);
+                return tuple(vector<string>(), document_status);;}
     		else {
     			if (query.plus_words.count(document_word)){
 
@@ -116,10 +117,11 @@ public:
     		}
     	}
     	std::sort(result_vector.begin(), result_vector.end());
-    	return tuple(result_vector, document_status);
+    	//return tuple(result_vector, document_status);
+
     }
-    //return tuple(result_vector, document_status);}
-    
+    return tuple(result_vector, document_status);}
+    ;
 
 private:
     map<int , vector<string>> all_words_; // словарь для всех документов
@@ -253,4 +255,3 @@ int main() {
         PrintMatchDocumentResult(document_id, words, status);
     }
 }
-
