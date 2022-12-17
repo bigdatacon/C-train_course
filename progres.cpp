@@ -67,12 +67,15 @@ public:
 
 				left_to_change_task = left_to_change_task - quantity;
 				AddNewTaskUpdated(person, next_status, quantity);
+				left_to_change_task = left_to_change_task - quantity;
 
 			} else {
+				if (left_to_change_task!=0){
 				AddNewTaskUpdated(person, next_status, left_to_change_task);
 				int itg_q = quantity - left_to_change_task;
 				AddNewTaskUntached(person, status, itg_q);
-				left_to_change_task = 0;
+				left_to_change_task = 0;}
+				else break;
 
 			}
 			++status_number;
