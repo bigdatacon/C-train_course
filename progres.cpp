@@ -47,12 +47,13 @@ public:
 		int status_number = 0;
 		int next_status = status_number + 1;
 
-		for (const auto [status, quantity] : untached_tasks[person]) {
+		/*for (const auto [status, quantity] : untached_tasks[person]) {
 			cout << " BEGIN quantity_untached_tasks :  " << quantity << endl;
 		}
 		for (const auto [status, quantity] : updated_tasks[person]) {
 			cout << " BEGIN quantity_updated_tasks :  " << quantity << endl;
-		}
+		}*/
+
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
 			cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
@@ -61,23 +62,25 @@ public:
 			if (left_to_change_task >= quantity) {
 				AddNewTaskUpdated(person, next_status, quantity);
 				left_to_change_task = left_to_change_task - quantity;
-				persons_tasks.at(person)[(TaskStatus) (status_number)] -=
+				//persons_tasks.at(person)[(TaskStatus) (status_number)] -=
 						quantity;
-				persons_tasks.at(person)[(TaskStatus) (next_status)] +=
+				//persons_tasks.at(person)[(TaskStatus) (next_status)] +=
 						quantity;
 
 			} else {
 				if (left_to_change_task != 0) {
 					if (quantity != 0) {
+						cout << "HERE < Q : " << left_to_change_task <<  endl;
 						AddNewTaskUpdated(person, next_status,
 								left_to_change_task);
 						int itg_q = quantity - left_to_change_task;
 						AddNewTaskUntached(person, status_number, itg_q);
+
+						//persons_tasks.at(person)[(TaskStatus) (status_number)] -=
+								left_to_change_task;
+						//persons_tasks.at(person)[(TaskStatus) (next_status)] +=
+								left_to_change_task ;
 						left_to_change_task = 0;
-						persons_tasks.at(person)[(TaskStatus) (status_number)] -=
-								itg_q;
-						persons_tasks.at(person)[(TaskStatus) (next_status)] +=
-								itg_q;
 
 					}
 				 else {
@@ -87,16 +90,20 @@ public:
 			  else break;
 
 		}
+
+
 		++status_number;
 		++next_status;
-		cout << "out NAME :  "s << person << "  out left_to_change_task : " << left_to_change_task << " out quantity : " << quantity << " out status_number : "s
-		 << status_number << " out next_status : "s << next_status << endl;
 	}
 
 		untached_tasks[person].erase(TaskStatus::DONE);
 
-		for (const auto [status, quantity] : untached_tasks[person]){cout << " END quantity_untached_tasks :  " << quantity << endl; }
-		for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
+		//for (const auto [status, quantity] : untached_tasks[person]){cout << " END quantity_untached_tasks :  " << quantity << endl; }
+		//for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
+
+		for (const auto [status, quantity] : persons_tasks.at(person)) {
+		cout << "out NAME :  "s << person << "  out left_to_change_task : " << left_to_change_task << " out quantity : " << quantity << /*" out status_number : "s
+		 << status_number << " out next_status : "s << next_status <<*/ endl;}
 
 		return make_tuple(updated_tasks[person], untached_tasks[person]);
 
