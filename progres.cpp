@@ -80,10 +80,11 @@ public:
 								itg_q;
 
 					}
-				} else {
+				 else {
 					continue;
 				}
-			else break;
+				}
+			  else break;
 
 		}
 		++status_number;
@@ -244,3 +245,4 @@ Updated Ivan's tasks: 0 new tasks, 4 tasks in progress, 0 tasks are being tested
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 
   */
+
