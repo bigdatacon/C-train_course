@@ -104,8 +104,7 @@ public:
 		//for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
-		cout << "out NAME :  "s << person << "  out left_to_change_task : " << left_to_change_task << " out quantity : " << quantity << /*" out status_number : "s
-		 << status_number << " out next_status : "s << next_status <<*/ endl;}
+		cout << "out NAME :  "s << person  << " out quantity : " << quantity <<  endl;}
 
 		return make_tuple(updated_tasks[person], untached_tasks[person]);
 
@@ -221,16 +220,16 @@ int main() {
     TasksInfo updated_tasks, untouched_tasks;
 
     tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    /*cout << "Updated Ivan's tasks: ";
+    cout << "Updated Ivan's tasks: ";
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);*/
+    PrintTasksInfo(untouched_tasks);
 
     tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    /*cout << "Updated Ivan's tasks: ";
+    cout << "Updated Ivan's tasks: ";
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);*/
+    PrintTasksInfo(untouched_tasks);
 }
 
 // правильный вывод
@@ -250,7 +249,8 @@ Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 task
 Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 4 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 3 tasks in progress, 1 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 1 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
+
 
   */
