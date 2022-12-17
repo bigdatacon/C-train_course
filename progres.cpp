@@ -91,7 +91,8 @@ public:
 		for (auto [status, quantity] : updated_tasks[person]){cout << " updated_tasks_quantity : "s <<  quantity << endl; }
 
 		//cout << get_next_status(persons_tasks[person][TaskStatus::NEW])<< endl;
-		return tie(updated_tasks[person], untached_tasks[person]);
+		//return tie(updated_tasks[person], untached_tasks[person]);
+		return make_tuple(updated_tasks[person], untached_tasks[person]);
 
 	}
 	;
@@ -183,12 +184,12 @@ int main() {
 	PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"s));
 	cout << "Ivan's tasks: "s;
 	PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"s));
-
+	TasksInfo updated_tasks, untouched_tasks;
 	tasks.PerformPersonTasks("Ivan"s, 2);
 
-	/*tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
+	tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
 
-	TasksInfo updated_tasks, untouched_tasks;
+	//TasksInfo updated_tasks, untouched_tasks;
 
 	 tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
 	 cout << "Updated Ivan's tasks: "s;
@@ -200,6 +201,5 @@ int main() {
 	 cout << "Updated Ivan's tasks: "s;
 	 PrintTasksInfo(updated_tasks);
 	 cout << "Untouched Ivan's tasks: "s;
-	 PrintTasksInfo(untouched_tasks);*/
+	 PrintTasksInfo(untouched_tasks);
 }
-
