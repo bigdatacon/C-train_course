@@ -204,3 +204,24 @@ int main() {
 	 PrintTasksInfo(untouched_tasks);
 }
 
+// правильный вывод
+/*
+ Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
+ */
+
+
+// мой вывод
+/*
+ Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 6 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 8 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 4 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+
+  */
