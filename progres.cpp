@@ -47,7 +47,11 @@ public:
 		int status_number = 0;
 		int next_status = status_number + 1;
 		map<string, TasksInfo> persons_tasks_copy = persons_tasks ;
+		map<string, TasksInfo> untached_tasks_copy = untached_tasks ;
+		map<string, TasksInfo> updated_tasks_copy = updated_tasks ;
 
+		updated_tasks[person].clear();
+		untached_tasks[person].clear();
 		/*for (const auto [status, quantity] : untached_tasks[person]) {
 			cout << " BEGIN quantity_untached_tasks :  " << quantity << endl;
 		}
@@ -57,8 +61,8 @@ public:
 
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
-			cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
-			 << status_number << " input next_status : "s << next_status << endl;
+			/*cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
+			 << status_number << " input next_status : "s << next_status << endl;*/
 
 			if (left_to_change_task >= quantity) {
 				AddNewTaskUpdated(person, next_status, quantity);
@@ -71,7 +75,7 @@ public:
 			} else {
 				if (left_to_change_task != 0) {
 					if (quantity != 0) {
-						cout << "HERE < Q : " << left_to_change_task <<  endl;
+						//cout << "HERE < Q : " << left_to_change_task <<  endl;
 						AddNewTaskUpdated(person, next_status,
 								left_to_change_task);
 						int itg_q = quantity - left_to_change_task;
@@ -100,11 +104,11 @@ public:
 		untached_tasks[person].erase(TaskStatus::DONE);
 		persons_tasks = persons_tasks_copy; // Отражаю все правки после изменения задач в изначальном словаре
 
-		//for (const auto [status, quantity] : untached_tasks[person]){cout << " END quantity_untached_tasks :  " << quantity << endl; }
-		//for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
+		/*for (const auto [status, quantity] : untached_tasks[person]){cout << " END quantity_untached_tasks :  " << quantity << endl; }
+		for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
-		cout << "out NAME :  "s << person  << " out quantity : " << quantity <<  endl;}
+		cout << "out NAME :  "s << person  << " out quantity : " << quantity <<  endl;}*/
 
 		return make_tuple(updated_tasks[person], untached_tasks[person]);
 
@@ -249,8 +253,8 @@ Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 task
 Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 3 tasks in progress, 1 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 1 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
 
 
   */
