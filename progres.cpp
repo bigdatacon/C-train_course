@@ -56,12 +56,15 @@ public:
 
 		// ниже закомментировано - не работает - не пойму почему
 		//updated_tasks[person][status_number] += 4;
+		//updated_tasks.at(person)[(TaskStatus) (status_number)] += 4;
 		//cout << (static_cast<int>(static_cast<int>(updated_tasks.at(person)[(TaskStatus)(status_number)]))) << endl;
 
 		//cout << typeid(persons_tasks.at(person)[TaskStatus]).name() << endl;
 		//cout << get_next_status(persons_tasks[person][TaskStatus::NEW])<< endl;
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
+			/*cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
+					<< status_number << " input next_status : "s << next_status << endl;*/
 
 			if (left_to_change_task >= quantity) {
 
@@ -80,6 +83,8 @@ public:
 			}
 			++status_number;
 			++next_status;
+			/*cout << "out NAME :  "s << person << "  out left_to_change_task : " << left_to_change_task << " out quantity : " << quantity << " out status_number : "s
+					<< status_number << " out next_status : "s << next_status << endl;*/
 		}
 
 		// удаляю из нетронутых статус DONE  - ниже 2 варианта Вы могли бы уточнить как правильно и в чем разница между at - он исключение выдаст если нет ключа?
@@ -174,34 +179,31 @@ void PrintTasksInfo(TasksInfo tasks_info) {
 			<< tasks_info[TaskStatus::DONE] << " tasks are done"s << endl;
 }
 
+
 int main() {
-	TeamTasks tasks;
-	tasks.AddNewTask("Ilia"s);
-	for (int i = 0; i < 3; ++i) {
-		tasks.AddNewTask("Ivan"s);
-	}
-	cout << "Ilia's tasks: "s;
-	PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"s));
-	cout << "Ivan's tasks: "s;
-	PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"s));
-	TasksInfo updated_tasks, untouched_tasks;
-	tasks.PerformPersonTasks("Ivan"s, 2);
+    TeamTasks tasks;
+    tasks.AddNewTask("Ilia");
+    for (int i = 0; i < 3; ++i) {
+        tasks.AddNewTask("Ivan");
+    }
+    cout << "Ilia's tasks: ";
+    PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"));
+    cout << "Ivan's tasks: ";
+    PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"));
 
-	tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
+    TasksInfo updated_tasks, untouched_tasks;
 
-	//TasksInfo updated_tasks, untouched_tasks;
+    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
+    cout << "Updated Ivan's tasks: ";
+    PrintTasksInfo(updated_tasks);
+    cout << "Untouched Ivan's tasks: ";
+    PrintTasksInfo(untouched_tasks);
 
-	 tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
-	 cout << "Updated Ivan's tasks: "s;
-	 PrintTasksInfo(updated_tasks);
-	 cout << "Untouched Ivan's tasks: "s;
-	 PrintTasksInfo(untouched_tasks);
-
-	 tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
-	 cout << "Updated Ivan's tasks: "s;
-	 PrintTasksInfo(updated_tasks);
-	 cout << "Untouched Ivan's tasks: "s;
-	 PrintTasksInfo(untouched_tasks);
+    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
+    cout << "Updated Ivan's tasks: ";
+    PrintTasksInfo(updated_tasks);
+    cout << "Untouched Ivan's tasks: ";
+    PrintTasksInfo(untouched_tasks);
 }
 
 // правильный вывод
@@ -217,11 +219,11 @@ Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being test
 
 // мой вывод
 /*
- Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 6 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 8 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 4 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Updated Ivan's tasks: 0 new tasks, 4 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 2 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 
   */
