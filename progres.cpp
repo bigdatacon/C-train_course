@@ -107,6 +107,10 @@ private:
 		else if (status == 3) {
 			updated_tasks[person][TaskStatus::DONE] += quantity;
 		}
+		else if (status == 4) {
+			continue;
+		}
+		
 	}
 
 	void AddNewTaskUntached(const string &person, int status, int quantity) {
