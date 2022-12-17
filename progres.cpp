@@ -44,22 +44,22 @@ public:
 	// Обновить статусы по данному количеству задач конкретного разработчика,
 	// подробности см. ниже
 	/*tuple<TasksInfo, TasksInfo>*/
-	void PerformPersonTasks(const string &person, int task_count) {
+	/*void*/
+	tuple<TasksInfo, TasksInfo> PerformPersonTasks(const string &person, int task_count) {
 		int left_to_change_task = task_count;
 		int status_number = 0;
 		int next_status = status_number + 1;
 
-		cout
-				<< (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)])))
-				<< endl;
-		persons_tasks.at(person)[(TaskStatus) (status_number)] += 4;
-		cout
-				<< (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)])))
-				<< endl;
+		cout << (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)]))) << endl;
+		//persons_tasks.at(person)[(TaskStatus) (status_number)] += 4;
+		//cout << (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)]))) << endl;
 
 		// ниже закомментировано - не работает - не пойму почему
 		//updated_tasks[person][status_number] += 4;
 		//cout << (static_cast<int>(static_cast<int>(updated_tasks.at(person)[(TaskStatus)(status_number)]))) << endl;
+
+		//cout << typeid(persons_tasks.at(person)[TaskStatus]).name() << endl;
+		//cout << get_next_status(persons_tasks[person][TaskStatus::NEW])<< endl;
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
 
@@ -73,7 +73,7 @@ public:
 				if (left_to_change_task!=0){
 				AddNewTaskUpdated(person, next_status, left_to_change_task);
 				int itg_q = quantity - left_to_change_task;
-				AddNewTaskUntached(person, status, itg_q);
+				AddNewTaskUntached(person, status_number, itg_q);
 				left_to_change_task = 0;}
 				else break;
 
@@ -85,7 +85,13 @@ public:
 		// удаляю из нетронутых статус DONE  - ниже 2 варианта Вы могли бы уточнить как правильно и в чем разница между at - он исключение выдаст если нет ключа?
 		// но почему тогда в цикле все через .at()?
 		untached_tasks[person].erase(TaskStatus::DONE);
-		untached_tasks.at(person).erase(TaskStatus::DONE);
+		//untached_tasks.at(person).erase(TaskStatus::DONE);
+
+		for (auto [status, quantity] : untached_tasks[person]){cout << " untached_tasks_quantity : "s <<  quantity << endl; }
+		for (auto [status, quantity] : updated_tasks[person]){cout << " updated_tasks_quantity : "s <<  quantity << endl; }
+
+		//cout << get_next_status(persons_tasks[person][TaskStatus::NEW])<< endl;
+		return tie(updated_tasks[person], untached_tasks[person]);
 
 	}
 	;
@@ -113,7 +119,7 @@ private:
 		else if (status == 4) {
 			return;
 		}
-		
+
 	}
 
 	void AddNewTaskUntached(const string &person, int status, int quantity) {
@@ -180,9 +186,9 @@ int main() {
 
 	tasks.PerformPersonTasks("Ivan"s, 2);
 
-	//tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
+	/*tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
 
-	/*TasksInfo updated_tasks, untouched_tasks;
+	TasksInfo updated_tasks, untouched_tasks;
 
 	 tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
 	 cout << "Updated Ivan's tasks: "s;
@@ -196,3 +202,4 @@ int main() {
 	 cout << "Untouched Ivan's tasks: "s;
 	 PrintTasksInfo(untouched_tasks);*/
 }
+
