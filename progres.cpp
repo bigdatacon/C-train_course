@@ -46,6 +46,7 @@ public:
 		int left_to_change_task = task_count;
 		int status_number = 0;
 		int next_status = status_number + 1;
+		map<string, TasksInfo> persons_tasks_copy = persons_tasks ;
 
 		/*for (const auto [status, quantity] : untached_tasks[person]) {
 			cout << " BEGIN quantity_untached_tasks :  " << quantity << endl;
@@ -62,9 +63,9 @@ public:
 			if (left_to_change_task >= quantity) {
 				AddNewTaskUpdated(person, next_status, quantity);
 				left_to_change_task = left_to_change_task - quantity;
-				//persons_tasks.at(person)[(TaskStatus) (status_number)] -=
+				persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
 						quantity;
-				//persons_tasks.at(person)[(TaskStatus) (next_status)] +=
+				persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
 						quantity;
 
 			} else {
@@ -76,9 +77,9 @@ public:
 						int itg_q = quantity - left_to_change_task;
 						AddNewTaskUntached(person, status_number, itg_q);
 
-						//persons_tasks.at(person)[(TaskStatus) (status_number)] -=
+						persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
 								left_to_change_task;
-						//persons_tasks.at(person)[(TaskStatus) (next_status)] +=
+						persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
 								left_to_change_task ;
 						left_to_change_task = 0;
 
@@ -97,6 +98,7 @@ public:
 	}
 
 		untached_tasks[person].erase(TaskStatus::DONE);
+		persons_tasks = persons_tasks_copy; // Отражаю все правки после изменения задач в изначальном словаре
 
 		//for (const auto [status, quantity] : untached_tasks[person]){cout << " END quantity_untached_tasks :  " << quantity << endl; }
 		//for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
@@ -219,16 +221,16 @@ int main() {
     TasksInfo updated_tasks, untouched_tasks;
 
     tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
+    /*cout << "Updated Ivan's tasks: ";
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
+    PrintTasksInfo(untouched_tasks);*/
 
     tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
+    /*cout << "Updated Ivan's tasks: ";
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
+    PrintTasksInfo(untouched_tasks);*/
 }
 
 // правильный вывод
