@@ -50,7 +50,7 @@ public:
 		int status_number = 0;
 		int next_status = status_number + 1;
 
-		cout << (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)]))) << endl;
+		//cout << (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)]))) << endl;
 		//persons_tasks.at(person)[(TaskStatus) (status_number)] += 4;
 		//cout << (static_cast<int>(static_cast<int>(persons_tasks.at(person)[(TaskStatus) (status_number)]))) << endl;
 
@@ -87,8 +87,8 @@ public:
 		untached_tasks[person].erase(TaskStatus::DONE);
 		//untached_tasks.at(person).erase(TaskStatus::DONE);
 
-		for (auto [status, quantity] : untached_tasks[person]){cout << " untached_tasks_quantity : "s <<  quantity << endl; }
-		for (auto [status, quantity] : updated_tasks[person]){cout << " updated_tasks_quantity : "s <<  quantity << endl; }
+		//for (auto [status, quantity] : untached_tasks[person]){cout << " untached_tasks_quantity : "s <<  quantity << endl; }
+		//for (auto [status, quantity] : updated_tasks[person]){cout << " updated_tasks_quantity : "s <<  quantity << endl; }
 
 		//cout << get_next_status(persons_tasks[person][TaskStatus::NEW])<< endl;
 		//return tie(updated_tasks[person], untached_tasks[person]);
@@ -203,3 +203,4 @@ int main() {
 	 cout << "Untouched Ivan's tasks: "s;
 	 PrintTasksInfo(untouched_tasks);
 }
+
