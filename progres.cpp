@@ -55,8 +55,8 @@ public:
 		}
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
-			/*cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
-			 << status_number << " input next_status : "s << next_status << endl;*/
+			cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
+			 << status_number << " input next_status : "s << next_status << endl;
 
 			if (left_to_change_task >= quantity) {
 				AddNewTaskUpdated(person, next_status, quantity);
@@ -89,8 +89,8 @@ public:
 		}
 		++status_number;
 		++next_status;
-		/*cout << "out NAME :  "s << person << "  out left_to_change_task : " << left_to_change_task << " out quantity : " << quantity << " out status_number : "s
-		 << status_number << " out next_status : "s << next_status << endl;*/
+		cout << "out NAME :  "s << person << "  out left_to_change_task : " << left_to_change_task << " out quantity : " << quantity << " out status_number : "s
+		 << status_number << " out next_status : "s << next_status << endl;
 	}
 
 		untached_tasks[person].erase(TaskStatus::DONE);
@@ -245,4 +245,3 @@ Updated Ivan's tasks: 0 new tasks, 4 tasks in progress, 0 tasks are being tested
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 
   */
-
