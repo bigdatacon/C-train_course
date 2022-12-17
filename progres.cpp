@@ -67,17 +67,22 @@ public:
 					<< status_number << " input next_status : "s << next_status << endl;*/
 
 			if (left_to_change_task >= quantity) {
-
-				left_to_change_task = left_to_change_task - quantity;
 				AddNewTaskUpdated(person, next_status, quantity);
 				left_to_change_task = left_to_change_task - quantity;
+				persons_tasks.at(person)[(TaskStatus) (status_number)] -= quantity;
+				persons_tasks.at(person)[(TaskStatus) (next_status)] += quantity;
+
 
 			} else {
 				if (left_to_change_task!=0){
 				AddNewTaskUpdated(person, next_status, left_to_change_task);
 				int itg_q = quantity - left_to_change_task;
 				AddNewTaskUntached(person, status_number, itg_q);
-				left_to_change_task = 0;}
+				left_to_change_task = 0;
+				persons_tasks.at(person)[(TaskStatus) (status_number)] -= itg_q;
+				persons_tasks.at(person)[(TaskStatus) (next_status)] += itg_q;
+
+				}
 				else break;
 
 			}
@@ -107,6 +112,23 @@ private:
 	map<string, TasksInfo> persons_tasks;
 	map<string, TasksInfo> updated_tasks;
 	map<string, TasksInfo> untached_tasks;
+
+	/*void AddNewTaskPerson(const string &person, int status, int quantity) {
+		if (status == 0) {
+			persons_tasks[person][TaskStatus::NEW] += quantity;
+		} else if (status == 1) {
+			persons_tasks[person][TaskStatus::IN_PROGRESS] += quantity;
+		}
+
+		else if (status == 2) {
+			persons_tasks[person][TaskStatus::TESTING] += quantity;
+		}
+
+		else if (status == 3) {
+			persons_tasks[person][TaskStatus::DONE] += quantity;
+		}
+	}
+	;*/
 
 	void AddNewTaskUpdated(const string &person, int status, int quantity) {
 		if (status == 0) {
@@ -224,6 +246,6 @@ Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 task
 Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Updated Ivan's tasks: 0 new tasks, 4 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 2 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
+Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 
   */
