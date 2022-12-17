@@ -108,7 +108,7 @@ private:
 			updated_tasks[person][TaskStatus::DONE] += quantity;
 		}
 		else if (status == 4) {
-			continue;
+			return;
 		}
 		
 	}
@@ -193,4 +193,3 @@ int main() {
 	 cout << "Untouched Ivan's tasks: "s;
 	 PrintTasksInfo(untouched_tasks);*/
 }
-
