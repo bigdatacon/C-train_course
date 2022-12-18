@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 /*
@@ -24,9 +25,35 @@ map<Term, int> ComputeTermFreqs(const vector<Term>& terms) {
     }
     return term_freqs;
 }
+
+
 pair<string, int> FindMaxFreqAnimal(const vector<pair<string, int>>& animals) {
     // верните животного с максимальной частотой
+    map<pair<string, int>, int> animal_freqs = ComputeTermFreqs(animals);
+
+    int max_q = 0;
+    pair<string, int> min_par;
+
+    for (auto [pair , q] : animal_freqs){/*cout << " pair.first : " <<  pair.first << " pair.second :"s << pair.second << " quantity : " <<  q << endl;*/
+    if (q>max_q){max_q = q; min_par = pair;}
+    else if ( (q==max_q) && (min_par<pair) ) {continue; }
+    else if ((q==max_q) && (min_par>pair) ) {min_par = pair;}
+    else continue;
+    }
+    pair<string, int> max_key = {"jd" , 0};
+    //sort(animal_freqs.begin(), animal_freqs.end()); - не работает
+    /*sort(animal_freqs.begin(), animal_freqs.end(), [](map<pair<string, int>& a, map<pair<string, int>& b)
+    {
+        return a.second > b.second;
+    }
+    );*/ //- Так тоже не работает
+
+    max_key = min_par;
+    return max_key;
 }
+
+
+
 
 int main() {
     const vector<pair<string, int>> animals = {
