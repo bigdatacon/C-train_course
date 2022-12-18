@@ -22,6 +22,25 @@ using TasksInfo = map<TaskStatus, int>;
 
 class TeamTasks {
 public:
+
+	// Вернуть person_tasks
+	/*map<string, TasksInfo> GetPersonTask(const string &person){
+		return persons_tasks;
+	}*/
+
+	map<string, TasksInfo> GetPersonTask(){
+		return persons_tasks;
+	}
+
+
+	void AddManyTasks(){
+	    persons_tasks["Ivan"][TaskStatus::NEW] += 5;
+	    persons_tasks["Ivan"][TaskStatus::IN_PROGRESS] -= 2;
+	    persons_tasks["Ivan"][TaskStatus::TESTING] += 1;
+	    persons_tasks["Ivan"][TaskStatus::DONE] += 7;
+	}
+
+
 	// Получить статистику по статусам задач конкретного разработчика
 	const TasksInfo& GetPersonTasksInfo(const string &person) const {
 		return persons_tasks.at(person);
@@ -35,11 +54,6 @@ public:
 	}
 	;
 
-	template<typename Enumeration>
-	auto as_integer(
-			Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
-		return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-	}
 
 	tuple<TasksInfo, TasksInfo> PerformPersonTasks(const string &person,
 			int task_count) {
@@ -47,68 +61,53 @@ public:
 		int status_number = 0;
 		int next_status = status_number + 1;
 		map<string, TasksInfo> persons_tasks_copy = persons_tasks ;
-		map<string, TasksInfo> untached_tasks_copy = untached_tasks ;
-		map<string, TasksInfo> updated_tasks_copy = updated_tasks ;
 
 		updated_tasks[person].clear();
 		untached_tasks[person].clear();
-		/*for (const auto [status, quantity] : untached_tasks[person]) {
-			cout << " BEGIN quantity_untached_tasks :  " << quantity << endl;
-		}
-		for (const auto [status, quantity] : updated_tasks[person]) {
-			cout << " BEGIN quantity_updated_tasks :  " << quantity << endl;
-		}*/
 
 
-		for (const auto [status, quantity] : persons_tasks.at(person)) {
-			/*cout <<"in NAME :  "s << person << "  input left_to_change_task : " << left_to_change_task << " input quantity : " << quantity << " input status_number : "s
-			 << status_number << " input next_status : "s << next_status << endl;*/
-
-			if (left_to_change_task >= quantity) {
-				AddNewTaskUpdated(person, next_status, quantity);
-				left_to_change_task = left_to_change_task - quantity;
-				persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
-						quantity;
-				persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
-						quantity;
-
-			} else {
-				if (left_to_change_task != 0) {
-					if (quantity != 0) {
-						//cout << "HERE < Q : " << left_to_change_task <<  endl;
-						AddNewTaskUpdated(person, next_status,
-								left_to_change_task);
-						int itg_q = quantity - left_to_change_task;
-						AddNewTaskUntached(person, status_number, itg_q);
-
-						persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
-								left_to_change_task;
-						persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
-								left_to_change_task ;
-						left_to_change_task = 0;
-
-					}
-				 else {
-					continue;
+		//for (const auto [status, quantity] : persons_tasks.at(person)) {
+		for (const auto [status, quantity] : persons_tasks[person]) {
+			if (status_number < 3) {
+				if (left_to_change_task >= quantity) {
+					AddNewTaskUpdated(person, next_status, quantity);
+					left_to_change_task = left_to_change_task - quantity;
+					persons_tasks_copy[person][(TaskStatus) (status_number)] -=  // тут убрал at
+							quantity;
+					persons_tasks_copy[person][(TaskStatus) (next_status)] +=   // тут убрал at
+							quantity;
 				}
+
+				else {
+					if (left_to_change_task != 0) {
+						if (quantity != 0) {
+							AddNewTaskUpdated(person, next_status,
+									left_to_change_task);
+							int itg_q = quantity - left_to_change_task;
+							AddNewTaskUntached(person, status_number, itg_q);
+
+							persons_tasks_copy[person][(TaskStatus) (status_number)] -=  // тут убрал at
+									left_to_change_task;
+							persons_tasks_copy[person][(TaskStatus) (next_status)] +=  // тут убрал at
+									left_to_change_task;
+							left_to_change_task = 0;
+
+						} else {
+							continue;
+						}
+					} else
+						break;
+
 				}
-			  else break;
 
+				++status_number;
+				++next_status;
+
+			} else {break;}
 		}
-
-
-		++status_number;
-		++next_status;
-	}
 
 		untached_tasks[person].erase(TaskStatus::DONE);
 		persons_tasks = persons_tasks_copy; // Отражаю все правки после изменения задач в изначальном словаре
-
-		/*for (const auto [status, quantity] : untached_tasks[person]){cout << " END quantity_untached_tasks :  " << quantity << endl; }
-		for (const auto [status, quantity] : updated_tasks[person]){cout << " END quantity_updated_tasks :  " << quantity << endl; }
-
-		for (const auto [status, quantity] : persons_tasks.at(person)) {
-		cout << "out NAME :  "s << person  << " out quantity : " << quantity <<  endl;}*/
 
 		return make_tuple(updated_tasks[person], untached_tasks[person]);
 
@@ -121,22 +120,7 @@ private:
 	map<string, TasksInfo> updated_tasks;
 	map<string, TasksInfo> untached_tasks;
 
-	/*void AddNewTaskPerson(const string &person, int status, int quantity) {
-		if (status == 0) {
-			persons_tasks[person][TaskStatus::NEW] += quantity;
-		} else if (status == 1) {
-			persons_tasks[person][TaskStatus::IN_PROGRESS] += quantity;
-		}
 
-		else if (status == 2) {
-			persons_tasks[person][TaskStatus::TESTING] += quantity;
-		}
-
-		else if (status == 3) {
-			persons_tasks[person][TaskStatus::DONE] += quantity;
-		}
-	}
-	;*/
 
 	void AddNewTaskUpdated(const string &person, int status, int quantity) {
 		if (status == 0) {
@@ -175,14 +159,6 @@ private:
 	}
 	;
 
-	/*TaskStatus get_next_status(TaskStatus status) {
-	 if (status == TasksInfo.NEW) {
-	 return TasksInfo.IN_PROGRESS;
-	 } else if (status == TasksInfo.IN_PROGRESS) {
-	 return TasksInfo.TESTING;
-	 } else if (status == TasksInfo.TESTING) {
-	 return status;
-	 }}*/
 
 	TaskStatus get_next_status(TaskStatus status) {
 		if (status == TaskStatus::NEW) {
@@ -234,6 +210,34 @@ int main() {
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
     PrintTasksInfo(untouched_tasks);
+
+    /*
+     Tasks: 5/0/2/7
+		> PerformPersonTasks(100)
+		Updated: 0/5/0/2
+		Untouched: 0/0/0/0
+		Tasks: 0/5/0/2
+		А еще 7 где?
+     */
+
+
+    tasks.AddManyTasks();  // добавляю таски чтобы было как в примере выше
+    map<string, TasksInfo> persons_tasks = tasks.GetPersonTask();
+
+    for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after"s << quantity << endl;};
+
+
+    cout << "ADD 100 to IVAN : "s << endl;
+
+    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 100);
+    cout << "Updated Ivan's tasks: ";
+    PrintTasksInfo(updated_tasks);
+    cout << "Untouched Ivan's tasks: ";
+    PrintTasksInfo(untouched_tasks);
+
+    map<string, TasksInfo> persons_tasks_all = tasks.GetPersonTask();
+    for (const auto [status, quantity] : persons_tasks_all["Ivan"]){cout << "quantity after all "s << quantity << endl;};
+
 }
 
 // правильный вывод
@@ -255,6 +259,5 @@ Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
 Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
-
 
   */
