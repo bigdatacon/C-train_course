@@ -47,14 +47,15 @@ public:
 		untached_tasks[person].clear();
 
 
-		for (const auto [status, quantity] : persons_tasks.at(person)) {
+		//for (const auto [status, quantity] : persons_tasks.at(person)) {
+		for (const auto [status, quantity] : persons_tasks[person]) {
 			if (status_number < 3) {
 				if (left_to_change_task >= quantity) {
 					AddNewTaskUpdated(person, next_status, quantity);
 					left_to_change_task = left_to_change_task - quantity;
-					persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
+					persons_tasks_copy[person][(TaskStatus) (status_number)] -=  // тут убрал at
 							quantity;
-					persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
+					persons_tasks_copy[person][(TaskStatus) (next_status)] +=   // тут убрал at
 							quantity;
 				}
 
@@ -66,9 +67,9 @@ public:
 							int itg_q = quantity - left_to_change_task;
 							AddNewTaskUntached(person, status_number, itg_q);
 
-							persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
+							persons_tasks_copy[person][(TaskStatus) (status_number)] -=  // тут убрал at
 									left_to_change_task;
-							persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
+							persons_tasks_copy[person][(TaskStatus) (next_status)] +=  // тут убрал at
 									left_to_change_task;
 							left_to_change_task = 0;
 
@@ -211,6 +212,5 @@ Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
 Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
-
 
   */
