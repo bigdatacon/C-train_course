@@ -22,6 +22,16 @@ using TasksInfo = map<TaskStatus, int>;
 
 class TeamTasks {
 public:
+
+	// Вернуть person_tasks
+	/*map<string, TasksInfo> GetPersonTask(const string &person){
+		return persons_tasks;
+	}*/
+
+	map<string, TasksInfo> GetPersonTask(){
+		return persons_tasks;
+	}
+
 	// Получить статистику по статусам задач конкретного разработчика
 	const TasksInfo& GetPersonTasksInfo(const string &person) const {
 		return persons_tasks.at(person);
@@ -191,6 +201,37 @@ int main() {
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
     PrintTasksInfo(untouched_tasks);
+
+    /*
+     Tasks: 5/0/2/7
+		> PerformPersonTasks(100)
+		Updated: 0/5/0/2
+		Untouched: 0/0/0/0
+		Tasks: 0/5/0/2
+		А еще 7 где?
+     */
+
+    map<string, TasksInfo> persons_tasks = tasks.GetPersonTask();
+
+    for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after"s << quantity << endl;};
+    persons_tasks["Ivan"][TaskStatus::NEW] += 5;
+    persons_tasks["Ivan"][TaskStatus::IN_PROGRESS] -= 2;
+    persons_tasks["Ivan"][TaskStatus::TESTING] += 1;
+    persons_tasks["Ivan"][TaskStatus::DONE] += 7;
+    for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after2 "s << quantity << endl;};
+
+    cout << "ADD 100 to IVAN : "s << endl;
+
+    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 100);
+    cout << "Updated Ivan's tasks: ";
+    PrintTasksInfo(updated_tasks);
+    cout << "Untouched Ivan's tasks: ";
+    PrintTasksInfo(untouched_tasks);
+
+    map<string, TasksInfo> persons_tasks_all = tasks.GetPersonTask();
+    for (const auto [status, quantity] : persons_tasks_all["Ivan"]){cout << "quantity after all "s << quantity << endl;};
+
+	//persons_tasks_copy[person][(TaskStatus) (status_number)] -=  quantity;
 }
 
 // правильный вывод
