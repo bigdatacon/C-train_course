@@ -32,6 +32,15 @@ public:
 		return persons_tasks;
 	}
 
+
+	void AddManyTasks(){
+	    persons_tasks["Ivan"][TaskStatus::NEW] += 5;
+	    persons_tasks["Ivan"][TaskStatus::IN_PROGRESS] -= 2;
+	    persons_tasks["Ivan"][TaskStatus::TESTING] += 1;
+	    persons_tasks["Ivan"][TaskStatus::DONE] += 7;
+	}
+
+
 	// Получить статистику по статусам задач конкретного разработчика
 	const TasksInfo& GetPersonTasksInfo(const string &person) const {
 		return persons_tasks.at(person);
@@ -211,14 +220,12 @@ int main() {
 		А еще 7 где?
      */
 
+
+    tasks.AddManyTasks();  // добавляю таски чтобы было как в примере выше
     map<string, TasksInfo> persons_tasks = tasks.GetPersonTask();
 
     for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after"s << quantity << endl;};
-    persons_tasks["Ivan"][TaskStatus::NEW] += 5;
-    persons_tasks["Ivan"][TaskStatus::IN_PROGRESS] -= 2;
-    persons_tasks["Ivan"][TaskStatus::TESTING] += 1;
-    persons_tasks["Ivan"][TaskStatus::DONE] += 7;
-    for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after2 "s << quantity << endl;};
+
 
     cout << "ADD 100 to IVAN : "s << endl;
 
@@ -231,7 +238,6 @@ int main() {
     map<string, TasksInfo> persons_tasks_all = tasks.GetPersonTask();
     for (const auto [status, quantity] : persons_tasks_all["Ivan"]){cout << "quantity after all "s << quantity << endl;};
 
-	//persons_tasks_copy[person][(TaskStatus) (status_number)] -=  quantity;
 }
 
 // правильный вывод
@@ -253,5 +259,4 @@ Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested
 Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
 Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
 Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
-
   */
