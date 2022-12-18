@@ -48,41 +48,43 @@ public:
 
 
 		for (const auto [status, quantity] : persons_tasks.at(person)) {
-			if (left_to_change_task >= quantity) {
-				AddNewTaskUpdated(person, next_status, quantity);
-				left_to_change_task = left_to_change_task - quantity;
-				persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
-						quantity;
-				persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
-						quantity;
-
-			} else {
-				if (left_to_change_task != 0) {
-					if (quantity != 0) {
-						AddNewTaskUpdated(person, next_status,
-								left_to_change_task);
-						int itg_q = quantity - left_to_change_task;
-						AddNewTaskUntached(person, status_number, itg_q);
-
-						persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
-								left_to_change_task;
-						persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
-								left_to_change_task ;
-						left_to_change_task = 0;
-
-					}
-				 else {
-					continue;
+			if (status_number < 3) {
+				if (left_to_change_task >= quantity) {
+					AddNewTaskUpdated(person, next_status, quantity);
+					left_to_change_task = left_to_change_task - quantity;
+					persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
+							quantity;
+					persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
+							quantity;
 				}
-				}
-			  else break;
 
+				else {
+					if (left_to_change_task != 0) {
+						if (quantity != 0) {
+							AddNewTaskUpdated(person, next_status,
+									left_to_change_task);
+							int itg_q = quantity - left_to_change_task;
+							AddNewTaskUntached(person, status_number, itg_q);
+
+							persons_tasks_copy.at(person)[(TaskStatus) (status_number)] -=
+									left_to_change_task;
+							persons_tasks_copy.at(person)[(TaskStatus) (next_status)] +=
+									left_to_change_task;
+							left_to_change_task = 0;
+
+						} else {
+							continue;
+						}
+					} else
+						break;
+
+				}
+
+				++status_number;
+				++next_status;
+
+			} else {break;}
 		}
-
-
-		++status_number;
-		++next_status;
-	}
 
 		untached_tasks[person].erase(TaskStatus::DONE);
 		persons_tasks = persons_tasks_copy; // Отражаю все правки после изменения задач в изначальном словаре
