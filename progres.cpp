@@ -36,8 +36,8 @@ public:
 	void AddManyTasks(){
 	    persons_tasks["Ivan"][TaskStatus::NEW] += 5;
 	    persons_tasks["Ivan"][TaskStatus::IN_PROGRESS] -= 2;
-	    persons_tasks["Ivan"][TaskStatus::TESTING] += 1;
-	    persons_tasks["Ivan"][TaskStatus::DONE] += 7;
+	    persons_tasks["Ivan"][TaskStatus::TESTING] += 4;
+	    //persons_tasks["Ivan"][TaskStatus::DONE] += 7;
 	}
 
 
@@ -91,6 +91,15 @@ public:
 							persons_tasks_copy[person][(TaskStatus) (next_status)] +=  // тут убрал at
 									left_to_change_task;
 							left_to_change_task = 0;
+							int status_for_untached = next_status;
+							// добавляю в untached оставшиеся нетрунутые таски из persons_tasks
+						    while (status_for_untached <=3)
+						    {
+						    	AddNewTaskUntached(person, status_for_untached, static_cast<int>(persons_tasks[person][(TaskStatus) (status_for_untached)]));
+						        ++status_for_untached;
+						    }
+
+
 
 						} else {
 							continue;
@@ -220,6 +229,14 @@ int main() {
 		А еще 7 где?
      */
 
+    /*
+     Tasks: 5/0/5/0
+	> PerformPersonTasks(2)
+	Updated: 0/2/0/0
+	Untouched: 3/0/0/0
+      */
+
+
 
     tasks.AddManyTasks();  // добавляю таски чтобы было как в примере выше
     map<string, TasksInfo> persons_tasks = tasks.GetPersonTask();
@@ -227,9 +244,9 @@ int main() {
     for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after"s << quantity << endl;};
 
 
-    cout << "ADD 100 to IVAN : "s << endl;
+    cout << "ADD 2 to IVAN : "s << endl;
 
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 100);
+    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
     cout << "Updated Ivan's tasks: ";
     PrintTasksInfo(updated_tasks);
     cout << "Untouched Ivan's tasks: ";
