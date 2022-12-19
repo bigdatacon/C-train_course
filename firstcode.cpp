@@ -27,9 +27,10 @@ template <typename Term>
 map<Term, int> ComputeTermFreqs(const vector<Term>& terms) {
 */
 
-
-template<typename Term>
-vector<double> ComputeTfIdfs(const vector<vector<Term>> &documents, Term term) {
+template <typename Term, typename Documents >
+vector<double> ComputeTfIdfs (const Documents &documents, const Term &term){
+//template<typename Term>
+//vector<double> ComputeTfIdfs(const vector<vector<Term>> &documents, Term term) {
 	vector<double> TFIDF_VEC;
 	double TFIDF;
 	int document_freq = 0;
