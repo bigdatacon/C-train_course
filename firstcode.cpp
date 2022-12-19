@@ -1,4 +1,13 @@
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
+using namespace std;
 /*
 Задание
 Реализуйте шаблонную функцию ComputeTfIdfs, которая вычисляет TF-IDF заданного слова для каждого документа из набора.
@@ -13,6 +22,42 @@
 Используйте алгоритм count для подсчёта количества вхождений слова в документ.
 Не забывайте перед делением приводить целые числа к double оператором static_cast.
 */
+/*
+template <typename Term>
+map<Term, int> ComputeTermFreqs(const vector<Term>& terms) {
+*/
+
+
+template<typename Term>
+vector<double> ComputeTfIdfs(const vector<vector<Term>> &documents, Term term) {
+	vector<double> TFIDF_VEC;
+	double TFIDF;
+	int document_freq = 0;
+	// высчитываю IDF
+	for (auto document : documents) {
+		for (auto word : document) {
+			if (word == term) {
+				++document_freq;
+			}
+		}
+	}
+	double IDF = log((documents.size() * 1.0) / document_freq);
+
+	// считаю TF для каждого документа
+	for (auto document : documents) {
+		double TF = 0;
+		double frakciya = 1.0 / document.size(); // высчитываю долю одного слова
+		for (auto word : document) {
+			if (word == term) {
+				TF += frakciya;
+			}
+		}
+		TFIDF = TF*IDF;
+		TFIDF_VEC.push_back(TFIDF);
+	}
+	return TFIDF_VEC;
+
+}
 
 int main() {
     const vector<vector<string>> documents = {
