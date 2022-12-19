@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <set>
 using namespace std;
 
 /*
@@ -9,9 +10,9 @@ using namespace std;
 */
 
 template <typename Term >
-ostream& operator<<(ostream& out, const set<Term>& container) {
+ostream& operator<<(ostream& out,  const set<Term>& container) {
     bool first = true;
-    for (const Term& element : container) {
+    for ( const Term& element : container) {
         if (!first){
         out << ", "s;}
         
@@ -26,7 +27,7 @@ ostream& operator<<(ostream& out, const set<Term>& container) {
 int main() {
     /*const vector<int> ages = {10, 5, 2, 12};
     cout << ages << endl;*/
-    const set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
+    const  set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
     cout << cats << endl;
     return 0;
 }
