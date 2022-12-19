@@ -4,36 +4,37 @@
 using namespace std;
 
 /*
-Избавьтесь от дублирования кода. Вынесите общую функциональность вывода в шаблонную функцию Print, принимающую ссылку на поток вывода и объект шаблонного типа, элементы которого нужно вывести. Это означает, что последовательный вывод элементов контейнера теперь должен располагаться внутри функции Print. Вызовите её из операторов вывода вектора и множества.
+Сделайте вывод более нарядным: выводите содержимое вектора в квадратных скобках, а множества — в фигурных. Функция Print должна остаться прежней и не обрамлять вывод в скобки.
 
-Не забудьте назвать вспомогательную функцию Print, первым её аргументом сделать ссылку на поток, а вторым — контейнер шаблонного типа. Точно так же вы делали с набором документов Documents.
+Не правьте функцию Print: достаточно добавить вывод скобок в каждую версию перегруженного operator<<. Не забудьте, что выводить нужно в out, а не в cout.
 */
 
-template <typename Term >
-ostream& operator<<(ostream& out,  const set<Term>& container) {
+
+template <typename Container>
+void Print(ostream& out,  const Container& container) {
     bool first = true;
-    for ( const Term& element : container) {
+    for ( const auto& element : container) {
         if (!first){
         out << ", "s;}
         
         first = false;
         
-        out << element;
+        out <<  element;
     }
-    return out;
+}
+
+    
+    
+template <typename Term >
+ostream& operator<<(ostream& out,  const set<Term>& container) {
+    Print(out, container);
+    return  out;
 }  
 
 template <typename Term >
 ostream& operator<<(ostream& out,  const vector<Term>& container) {
-    bool first = true;
-    for ( const Term& element : container) {
-        if (!first){
-        out << ", "s;}
-        
-        first = false;
-        
-        out << element;
-    }
+    Print(out, container);
+    //return static_cast<string>(out) + "}"s;
     return out;
 }  
    
