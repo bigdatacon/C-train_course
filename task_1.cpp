@@ -105,9 +105,9 @@ public:
     
 
     vector<Document> FindTopDocuments(const string& raw_query,
-                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  SortStatus ) const {
+                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  bool (*SortStatus) (int id, DocumentStatus status, int rating)) const {
         const Query query = ParseQuery(raw_query);
-        auto matched_documents = FindAllDocuments(query, /*status*/ SortStatus);
+        auto matched_documents = FindAllDocuments(query, /*status*/ bool (*SortStatus) (int id, DocumentStatus status, int rating));
 
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
