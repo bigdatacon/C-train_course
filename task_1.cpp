@@ -20,16 +20,24 @@ using namespace std;
 template <typename Key,  typename Value>
 ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
     bool first = true;
+    int sch = 0;
+    int len = container.size();
     for ( const auto& [key, value] : container) {
+    if (first){out << "<"s;}
+    
         if (!first){
+       
         out << ", "s;}
         
         first = false;      
+        
         out << "("s;
         out <<  key ;
         out << " "s;
         out << value;
         out << ")"s;
+        ++ sch;
+    if (sch==len){out << ">"s;}
         
     }
     return  out;
@@ -48,34 +56,15 @@ void Print(ostream& out,  const Container& container) {
     }
 }
 
-
-/*// Пишу отдельный принт для словаря 
-template <typename Key,  typename Value>
-void PrintMap(ostream& out,  const map<Key, Value>& container) {
-    bool first = true;
-    for ( const auto& [key, value] : container) {
-        if (!first){
-        out << ", "s;}
-        
-        first = false;      
-        out << "("s;
-        out <<  key ;
-        out << " "s;
-        out << value;
-        out << ")"s;
-        
-    }
-} 
-
-// пишу отдельный оператор для словаря 
-template <typename Key,  typename Value>
+/*template <typename Key,  typename Value>
 ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
     out << "<"s;
-    PrintMap(out, container);
+    Print(out, container);
     out << ">"s;
     return  out;
-}  
-*/
+} */
+
+
 
     
 template <typename Term >
