@@ -108,9 +108,9 @@ public:
     
 
     vector<Document> FindTopDocuments(const string& raw_query,
-                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  SortStatus) const {
+                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  SortStatus sortstatus) const {
         const Query query = ParseQuery(raw_query);
-        auto matched_documents = FindAllDocuments(query, /*status*/ SortStatus);
+        auto matched_documents = FindAllDocuments(query, /*status*/ SortStatus sortstatus);
 
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
@@ -230,7 +230,7 @@ private:
         return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
     }
 
-    vector<Document> FindAllDocuments(const Query& query, /*DocumentStatus status*/ SortStatus) const {
+    vector<Document> FindAllDocuments(const Query& query, /*DocumentStatus status*/ SortStatus sortstatus) const {
         map<int, double> document_to_relevance;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
@@ -240,7 +240,7 @@ private:
             for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
                 
 
-                if (SortStatus(document_id, documents_.at(document_id).status, documents_.at(document_id).rating ))            
+                if (sortstatus(document_id, documents_.at(document_id).status, documents_.at(document_id).rating ))            
                 /*if (documents_.at(document_id).status == status)*/ {
                     document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 }
