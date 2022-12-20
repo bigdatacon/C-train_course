@@ -1,106 +1,49 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <set>
-#include <map>
+#include <algorithm>
 using namespace std;
 
-/*
-Научитесь выводить словари. Содержимое словаря должно быть заключено в угловые скобки, а каждая пара ключ-значение — в круглые.
-Пусть функция Print выводит словарь без угловых скобок. Ни для каких других типов, кроме векторов, множеств и словарей, вызывать Print не нужно.
-{Белка, Георгий, Мурка, Рюрик}
-[10, 5, 2, 12]
-<(Белка, 5), (Георгий, 2), (Мурка, 10), (Рюрик, 12)> 
-Напишите ещё одну версию operator<< с двумя шаблонными параметрами — для map<Key, Value>.
-Функция Print, итерируясь по словарю, будет пытаться вывести пару — напишите и для неё operator<<.
-При вызове одной функции из другой компилятор «видит» только те из них, что написаны выше.
-Поэтому выше всех должен быть оператор вывода пары, а сразу за ним — универсальная Print.
-*/
+struct Animal {
+    string name;
+    int age;
+    double weight;
+};
 
-// пишу версию оператора для словаря
-template <typename Key,  typename Value>
-ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
-    bool first = true;
-    int sch = 0;
-    int len = container.size();
-    for ( const auto& [key, value] : container) {
-    if (first){out << "<"s;}
-    
-        if (!first){
-       
-        out << ", "s;}
-        
-        first = false;      
-        
-        out << "("s;
-        out <<  key ;
-        out << ", "s;
-        out << value;
-        out << ")"s;
-        ++ sch;
-    if (sch==len){out << ">"s;}
-        
-    }
-    return  out;
-} 
-
-template <typename Container>
-void Print(ostream& out,  const Container& container) {
-    bool first = true;
-    for ( const auto& element : container) {
-        if (!first){
-        out << ", "s;}
-        
-        first = false;
-        
-        out <<  element;
-    }
+template<typename Container, typename KeyMapper>
+void SortBy(Container &container, KeyMapper key_mapper, bool reverse = false) {
+	if (reverse) {
+		sort(container.begin(), container.end(),
+				[key_mapper](const auto &lhs, const auto &rhs) {
+					return key_mapper(lhs) > key_mapper(rhs);
+				});
+	}
+	sort(container.begin(), container.end(),
+			[key_mapper](const auto &lhs, const auto &rhs) {
+				return key_mapper(lhs) < key_mapper(rhs);
+			});
 }
 
-/*template <typename Key,  typename Value>
-ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
-    out << "<"s;
-    Print(out, container);
-    out << ">"s;
-    return  out;
-} */
 
 
-
-    
-template <typename Term >
-ostream& operator<<(ostream& out,  const set<Term>& container) {
-    out << "{"s;
-    Print(out, container);
-    out << "}"s;
-    return  out;
-}  
-
-template <typename Term >
-ostream& operator<<(ostream& out,  const vector<Term>& container) {
-    out << "["s;
-    Print(out, container);
-    out << "]"s;
-    return out;
-}  
-   
+void PrintNames(const vector<Animal>& animals) {
+    for (const Animal& animal : animals) {
+        cout << animal.name << ' ';
+    }
+    cout << endl;
+}
 
 int main() {
-    /*const vector<int> ages = {10, 5, 2, 12};
-    cout << ages << endl;
-    const  set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
-    cout << cats << endl;
-    return 0;*/
-    
-    const set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
-    cout << cats << endl;
-    const vector<int> ages = {10, 5, 2, 12};
-    cout << ages << endl;
-    const map<string, int> cat_ages = {
-                                        {"Мурка"s, 10}, 
-                                        {"Белка"s, 5},
-                                        {"Георгий"s, 2}, 
-                                        {"Рюрик"s, 12}
-                                    };
-    cout << cat_ages<< endl;
+    vector<Animal> animals = {
+        {"Мурка"s,   10, 5},
+        {"Белка"s,   5,  1.5},
+        {"Георгий"s, 2,  4.5},
+        {"Рюрик"s,   12, 3.1},
+    };
+    PrintNames(animals);
+    SortBy(animals, [](const Animal& animal) { return animal.name; }, true);
+    PrintNames(animals);
+    SortBy(animals, [](const Animal& animal) { return animal.weight; });
+    PrintNames(animals);
     return 0;
 }
