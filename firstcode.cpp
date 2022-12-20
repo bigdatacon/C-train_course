@@ -41,7 +41,7 @@ ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
         first = false;      
         out << "("s;
         out <<  key ;
-        out << " "s;
+        out << ", "s;
         out << value;
         out << ")"s;
         
