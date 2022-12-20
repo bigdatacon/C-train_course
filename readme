@@ -1,86 +1,50 @@
-Задание 2. Трекер задач
-Для работы над текущими задачами тимлид Матвей нанял нескольких разработчиков. Чтобы лучше следить за тем, как продвигаются работы, Матвею нужен трекер задач. Каждая задача привязана к определённому разработчику и проходит четыре статуса: NEW → IN_PROGRESS → TESTING → DONE. Матвей хочет быстро узнавать статистику задач своих коллег: сколько задач находится в каждом из статусов.
-Реализуйте:
-Класс TeamTasks, трекер задач. Он может хранить только статистику — сколько задач какого разработчика находится в каком статусе.
-Метод GetPersonTasksInfo класса TeamTasks, принимающий имя разработчика и возвращающий статистику его задач.
-Метод AddNewTask класса TeamTasks. Позволяет добавить одну задачу в статусе NEW указанному разработчику.
-Метод PerformPersonTasks класса TeamTasks. Он принимает имя разработчика и число N и вызывается, когда разработчик выполнил N задач. Считается, что разработчик выполняет вначале задачи с самым низким статусом, и эти задачи переходят в следующий статус.
-Точные сигнатуры методов описаны в заготовке кода.
-Метод PerformPersonTasks принимает параметры: person — имя разработчика, task_count — количество выполненных задач. Его алгоритм таков:
-Рассмотреть все невыполненные задачи разработчика person.
-Упорядочить их по статусам: сначала все задачи в статусе NEW, затем все задачи в статусе IN_PROGRESS и, наконец, задачи в статусе TESTING.
-Рассмотреть первые task_count задач и перевести каждую из них в следующий статус в соответствии с естественным порядком: NEW → IN_PROGRESS → TESTING → DONE.
-Этот метод возвращает пару из двух элементов:
-Словарь со статусами обновившихся задач: количество обновившихся задач по каждому статусу.
-Информацию о невыполненных задачах — тех, статус которых не DONE и не изменился. Также в виде словаря, хранящего количество по статусу.
-Для словаря, хранящего количество задач по статусам, предусмотрен псевдоним TasksInfo.
-Ограничения
-В словари, возвращаемые методом PerformPersonTasks, не добавляйте лишние значения, то есть статусы, имеющие ноль задач.
-В методе PerformPersonTasks не обновляйте статус одной и той же задачи дважды.
-Также в методе PerformPersonTasks второй элемент возвращаемого кортежа не должен содержать задач со статусом DONE.
-Если разработчика с именем person нет, метод PerformPersonTasks возвращает кортеж из двух пустых TasksInfo.
-Как будет тестироваться программа
-Будет проверена корректность класса TeamTasks и его методов.
-Гарантируется, что параметр task_count метода PerformPersonTasks — положительное число. Если task_count превышает текущее количество невыполненных задач разработчика, достаточно считать, что task_count равен количеству невыполненных задач. Дважды обновлять статус какой-либо задачи в этом случае не нужно.
-Гарантируется, что метод GetPersonTasksInfo не будет вызван для разработчика, не имеющего задач.
-Пример работы метода PerformPersonTasks
-Допустим, у конкретного разработчика десять задач со следующими статусами:
-NEW — 3 задачи,
-IN_PROGRESS — 2 задачи,
-TESTING — 4 задачи,
-DONE — 1 задача.
-Поступает команда PerformPersonTasks с параметром task_count, равным 4. Это означает, что нужно обновить статус c NEW до IN_PROGRESS для трёх задач и с IN_PROGRESS до TESTING для одной задачи. Новые статусы задач:
-NEW — нет задач,
-IN_PROGRESS — 4 задачи: 3 обновлённых, 1 старая,
-TESTING — 5 задач: 1 обновлённая, 4 старых,
-DONE — 1 старая.
-В этом случае нужно вернуть кортеж из двух словарей:
-Обновлённые задачи: IN_PROGRESS — 3, TESTING — 1.
-Необновлённые задачи, исключая задачи со статусом DONE: IN_PROGRESS — 1, TESTING — 4.
-Статусы, которым соответствует ноль задач, в словари не добавляем.
-Пример ввода:
-// Принимаем словарь по значению, чтобы иметь возможность
-// обращаться к отсутствующим ключам с помощью [] и получать 0,
-// не меняя при этом исходный словарь
-void PrintTasksInfo(TasksInfo tasks_info) {
-    cout << tasks_info[TaskStatus::NEW] << " new tasks" <<
-        ", " << tasks_info[TaskStatus::IN_PROGRESS] << " tasks in progress" <<
-        ", " << tasks_info[TaskStatus::TESTING] << " tasks are being tested" <<
-        ", " << tasks_info[TaskStatus::DONE] << " tasks are done" << endl;
+Задание 3
+Вернёмся к поисковой системе. Научите метод FindTopDocuments вместо статуса принимать более универсальный фильтр документов — функцию-предикат. Она в свою очередь принимает id документа, статус и рейтинг и возвращает bool. Фильтрация документов должна производиться до отсечения топа из пяти штук.
+Вызов FindTopDocuments без второго аргумента должен осуществлять поиск только по актуальным документам.
+Пример
+void PrintDocument(const Document& document) {
+    cout << "{ "s
+         << "document_id = "s << document.id << ", "s
+         << "relevance = "s << document.relevance << ", "s
+         << "rating = "s << document.rating
+         << " }"s << endl;
 }
 int main() {
-    TeamTasks tasks;
-    tasks.AddNewTask("Ilia");
-    for (int i = 0; i < 3; ++i) {
-        tasks.AddNewTask("Ivan");
+    SearchServer search_server;
+    search_server.SetStopWords("и в на"s);
+    search_server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    search_server.AddDocument(1, "пушистый кот пушистый хвост"s,       DocumentStatus::ACTUAL, {7, 2, 7});
+    search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
+    search_server.AddDocument(3, "ухоженный скворец евгений"s,         DocumentStatus::BANNED, {9});
+    cout << "ACTUAL by default:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
+        PrintDocument(document);
     }
-    cout << "Ilia's tasks: ";
-    PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"));
-    cout << "Ivan's tasks: ";
-    PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"));
-  
-    TasksInfo updated_tasks, untouched_tasks;
-  
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
-  
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
+    cout << "ACTUAL:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
+        PrintDocument(document);
+    }
+    cout << "Even ids:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
+        PrintDocument(document);
+    }
+    return 0;
 } 
-Пример вывода:
-Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done 
+Вывод
+ACTUAL by default:
+{ document_id = 1, relevance = 0.866434, rating = 5 }
+{ document_id = 0, relevance = 0.173287, rating = 2 }
+{ document_id = 2, relevance = 0.173287, rating = -1 }
+ACTUAL:
+{ document_id = 1, relevance = 0.866434, rating = 5 }
+{ document_id = 0, relevance = 0.173287, rating = 2 }
+{ document_id = 2, relevance = 0.173287, rating = -1 }
+Even ids:
+{ document_id = 0, relevance = 0.173287, rating = 2 }
+{ document_id = 2, relevance = 0.173287, rating = -1 } 
 
 
-Подсказка:
-Обновление словаря одновременно с итерированием по нему может привести к непредсказуемым последствиям. Сначала соберите информацию об обновлениях в отдельном временном словаре, а потом примените их к основному словарю.
+ПОДСКАЗКА 
+
+Чтобы можно было вызвать FindTopDocuments с одним аргументом вместо двух, напишите одноимённый метод с одним параметром. В нём вызовите FindTopDocuments с двумя аргументами, второй из которых — предикат нужного вида.
+
