@@ -18,10 +18,12 @@ void SortBy(Container &container, KeyMapper key_mapper, bool reverse = false) {
 					return key_mapper(lhs) > key_mapper(rhs);
 				});
 	}
+	else {
 	sort(container.begin(), container.end(),
 			[key_mapper](const auto &lhs, const auto &rhs) {
 				return key_mapper(lhs) < key_mapper(rhs);
 			});
+	}
 }
 
 
@@ -47,3 +49,9 @@ int main() {
     PrintNames(animals);
     return 0;
 }
+
+/*
+ Мурка Белка Георгий Рюрик
+Рюрик Мурка Георгий Белка
+Белка Рюрик Георгий Мурка
+ * */
