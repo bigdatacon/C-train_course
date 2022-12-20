@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <map>
 using namespace std;
 
 /*
@@ -30,7 +31,50 @@ void Print(ostream& out,  const Container& container) {
     }
 }
 
-    
+// пишу версию оператора для словаря
+/*template <typename Key,  typename Value>
+ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
+    bool first = true;
+    for ( const auto& [key, value] : container) {
+        if (!first){
+        out << ", "s;}
+        
+        first = false;      
+        out << "("s;
+        out <<  key ;
+        out << " "s;
+        out << value;
+        out << ")"s;
+        
+    }
+    return  out;
+} */
+
+template <typename Key,  typename Value>
+void PrintMap(ostream& out,  const map<Key, Value>& container) {
+    bool first = true;
+    for ( const auto& [key, value] : container) {
+        if (!first){
+        out << ", "s;}
+        
+        first = false;      
+        out << "("s;
+        out <<  key ;
+        out << " "s;
+        out << value;
+        out << ")"s;
+        
+    }
+} 
+template <typename Key,  typename Value>
+ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
+    out << "<"s;
+    PrintMap(out, container);
+    out << ">"s;
+    return  out;
+}  
+
+
     
 template <typename Term >
 ostream& operator<<(ostream& out,  const set<Term>& container) {
@@ -50,9 +94,22 @@ ostream& operator<<(ostream& out,  const vector<Term>& container) {
    
 
 int main() {
-    const vector<int> ages = {10, 5, 2, 12};
+    /*const vector<int> ages = {10, 5, 2, 12};
     cout << ages << endl;
     const  set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
     cout << cats << endl;
+    return 0;*/
+    
+    const set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
+    cout << cats << endl;
+    const vector<int> ages = {10, 5, 2, 12};
+    cout << ages << endl;
+    const map<string, int> cat_ages = {
+                                        {"Мурка"s, 10}, 
+                                        {"Белка"s, 5},
+                                        {"Георгий"s, 2}, 
+                                        {"Рюрик"s, 12}
+                                    };
+    cout << cat_ages<< endl;
     return 0;
 }
