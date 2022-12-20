@@ -105,7 +105,7 @@ public:
     
 
     vector<Document> FindTopDocuments(const string& raw_query,
-                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  KeyMapper key_mapper) const {
+                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  SortStatus ) const {
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query, /*status*/ SortStatus);
 
