@@ -57,6 +57,12 @@ enum class DocumentStatus {
     REMOVED,
 };
 
+bool SortStatus(/*id документа, статус и рейтинг*/ int document_id, DocumentStatus status,
+                int rating) {
+    return (status == DocumentStatus::ACTUAL) /*,  (document_id % 2 == 0)*/;
+}
+
+
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -98,14 +104,11 @@ public:
         return documents_.size();
     }*/
     
-    bool SortStatus(/*id документа, статус и рейтинг*/ int document_id, DocumentStatus status,
-                     int rating) {
-        return animal.name;
-    }
+
     
 
     vector<Document> FindTopDocuments(const string& raw_query,
-                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  bool (*SortStatus) (int id, DocumentStatus status, int rating)) const {
+                                      /*DocumentStatus status = DocumentStatus::ACTUAL*/  SortStatus) const {
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query, /*status*/ SortStatus);
 
@@ -227,7 +230,7 @@ private:
         return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
     }
 
-    vector<Document> FindAllDocuments(const Query& query, /*DocumentStatus status*/ bool (*SortStatus) (int id, DocumentStatus status, int rating)) const {
+    vector<Document> FindAllDocuments(const Query& query, /*DocumentStatus status*/ SortStatus) const {
         map<int, double> document_to_relevance;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
@@ -235,7 +238,10 @@ private:
             }
             const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
             for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-                if (documents_.at(document_id).status == status) {
+                
+
+                if (SortStatus(document_id, documents_.at(document_id).status, documents_.at(document_id).rating ))            
+                /*if (documents_.at(document_id).status == status)*/ {
                     document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 }
             }
@@ -279,11 +285,11 @@ int main() {
     for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
         PrintDocument(document);
     }
-    /*cout << "ACTUAL:"s << endl;
+    cout << "ACTUAL:"s << endl;
     for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
         PrintDocument(document);
     }
-    cout << "Even ids:"s << endl;
+    /*cout << "Even ids:"s << endl;
     for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
         PrintDocument(document);
     }*/
