@@ -33,7 +33,7 @@ ostream& operator<<(ostream& out,  const map<Key, Value>& container) {
         
         out << "("s;
         out <<  key ;
-        out << " "s;
+        out << ", "s;
         out << value;
         out << ")"s;
         ++ sch;
