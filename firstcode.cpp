@@ -97,11 +97,11 @@ public:
         return FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });
     }
     
-    // создаю новую версию для DocumentStatus 
+    // создаю новую версию для DocumentStatus
     vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
-        auto lambd = [](){ return status == DocumentStatus::status; };
-        return FindTopDocuments(raw_query, lambd);
+        return FindTopDocuments(raw_query, [&status](int document_id, DocumentStatus st, int rating) { return st == status; });
     }
+
     
  
     int GetDocumentCount() const {
