@@ -1,14 +1,7 @@
-Задание 3
-Вернёмся к поисковой системе. Научите метод FindTopDocuments вместо статуса принимать более универсальный фильтр документов — функцию-предикат. Она в свою очередь принимает id документа, статус и рейтинг и возвращает bool. Фильтрация документов должна производиться до отсечения топа из пяти штук.
-Вызов FindTopDocuments без второго аргумента должен осуществлять поиск только по актуальным документам.
+Задание
+Это задание — ваш итоговый проект второго спринта. Вы будете сдавать его на проверку через репозиторий на GitHub. А пока сохраните решение в своей IDE.
+Верните методу FindTopDocuments возможность быть вызванным со статусом документа вместо лямбды.
 Пример
-void PrintDocument(const Document& document) {
-    cout << "{ "s
-         << "document_id = "s << document.id << ", "s
-         << "relevance = "s << document.relevance << ", "s
-         << "rating = "s << document.rating
-         << " }"s << endl;
-}
 int main() {
     SearchServer search_server;
     search_server.SetStopWords("и в на"s);
@@ -20,8 +13,8 @@ int main() {
     for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
         PrintDocument(document);
     }
-    cout << "ACTUAL:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
+    cout << "BANNED:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, DocumentStatus::BANNED)) {
         PrintDocument(document);
     }
     cout << "Even ids:"s << endl;
@@ -30,21 +23,7 @@ int main() {
     }
     return 0;
 } 
-Вывод
-ACTUAL by default:
-{ document_id = 1, relevance = 0.866434, rating = 5 }
-{ document_id = 0, relevance = 0.173287, rating = 2 }
-{ document_id = 2, relevance = 0.173287, rating = -1 }
-ACTUAL:
-{ document_id = 1, relevance = 0.866434, rating = 5 }
-{ document_id = 0, relevance = 0.173287, rating = 2 }
-{ document_id = 2, relevance = 0.173287, rating = -1 }
-Even ids:
-{ document_id = 0, relevance = 0.173287, rating = 2 }
-{ document_id = 2, relevance = 0.173287, rating = -1 } 
 
-
-ПОДСКАЗКА 
-
-Чтобы можно было вызвать FindTopDocuments с одним аргументом вместо двух, напишите одноимённый метод с одним параметром. В нём вызовите FindTopDocuments с двумя аргументами, второй из которых — предикат нужного вида.
-
+Подсказка: 
+Достаточно написать новый метод — vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const. А в нём одну строчку: создали нужную лямбду и вызвали основную версию одноимённого метода.
+Не забудьте избавиться от дублирования кода: версия FindTopDocuments с одним параметром теперь может вызывать новую версию этого метода — с DocumentStatus.
