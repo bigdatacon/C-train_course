@@ -1,280 +1,281 @@
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
-#include <tuple>
+#include <utility>
 #include <vector>
-
+ 
 using namespace std;
-
-// Перечислимый тип для статуса задачи
-enum class TaskStatus {
-	NEW,          // новая
-	IN_PROGRESS,  // в разработке
-	TESTING,      // на тестировании
-	DONE          // завершена
-};
-
-// Объявляем тип-синоним для map<TaskStatus, int>,
-// позволяющего хранить количество задач каждого статуса
-using TasksInfo = map<TaskStatus, int>;
-
-// cout << TaskStatus.NEW<< endl;
-
-class TeamTasks {
-public:
-
-	// Вернуть person_tasks
-	/*map<string, TasksInfo> GetPersonTask(const string &person){
-		return persons_tasks;
-	}*/
-
-	map<string, TasksInfo> GetPersonTask(){
-		return persons_tasks;
-	}
-
-
-	void AddManyTasks(){
-	    persons_tasks["Ivan"][TaskStatus::NEW] += 5;
-	    persons_tasks["Ivan"][TaskStatus::IN_PROGRESS] -= 2;
-	    persons_tasks["Ivan"][TaskStatus::TESTING] += 4;
-	    //persons_tasks["Ivan"][TaskStatus::DONE] += 7;
-	}
-
-
-	// Получить статистику по статусам задач конкретного разработчика
-	const TasksInfo& GetPersonTasksInfo(const string &person) const {
-		return persons_tasks.at(person);
-
-	}
-	;
-
-	// Добавить новую задачу (в статусе NEW) для конкретного разработчитка
-	void AddNewTask(const string &person) {
-		++persons_tasks[person][TaskStatus::NEW];
-	}
-	;
-
-
-	tuple<TasksInfo, TasksInfo> PerformPersonTasks(const string &person,
-			int task_count) {
-		int left_to_change_task = task_count;
-		int status_number = 0;
-		int next_status = status_number + 1;
-		map<string, TasksInfo> persons_tasks_copy = persons_tasks ;
-
-		updated_tasks[person].clear();
-		untached_tasks[person].clear();
-
-
-		//for (const auto [status, quantity] : persons_tasks.at(person)) {
-		for (const auto [status, quantity] : persons_tasks[person]) {
-			if (status_number < 3) {
-				if (left_to_change_task >= quantity) {
-					AddNewTaskUpdated(person, next_status, quantity);
-					left_to_change_task = left_to_change_task - quantity;
-					persons_tasks_copy[person][(TaskStatus) (status_number)] -=  // тут убрал at
-							quantity;
-					persons_tasks_copy[person][(TaskStatus) (next_status)] +=   // тут убрал at
-							quantity;
-				}
-
-				else {
-					if (left_to_change_task != 0) {
-						if (quantity != 0) {
-							AddNewTaskUpdated(person, next_status,
-									left_to_change_task);
-							int itg_q = quantity - left_to_change_task;
-							AddNewTaskUntached(person, status_number, itg_q);
-
-							persons_tasks_copy[person][(TaskStatus) (status_number)] -=  // тут убрал at
-									left_to_change_task;
-							persons_tasks_copy[person][(TaskStatus) (next_status)] +=  // тут убрал at
-									left_to_change_task;
-							left_to_change_task = 0;
-							int status_for_untached = next_status;
-							// добавляю в untached оставшиеся нетрунутые таски из persons_tasks
-						    while (status_for_untached <=3)
-						    {
-						    	AddNewTaskUntached(person, status_for_untached, static_cast<int>(persons_tasks[person][(TaskStatus) (status_for_untached)]));
-						        ++status_for_untached;
-						    }
-
-
-
-						} else {
-							continue;
-						}
-					} else
-						break;
-
-				}
-
-				++status_number;
-				++next_status;
-
-			} else {break;}
-		}
-
-		untached_tasks[person].erase(TaskStatus::DONE);
-		persons_tasks = persons_tasks_copy; // Отражаю все правки после изменения задач в изначальном словаре
-
-		return make_tuple(updated_tasks[person], untached_tasks[person]);
-
-	}
-	;
-
-private:
-// храним имя разработчика и статусы+количество его задач
-	map<string, TasksInfo> persons_tasks;
-	map<string, TasksInfo> updated_tasks;
-	map<string, TasksInfo> untached_tasks;
-
-
-
-	void AddNewTaskUpdated(const string &person, int status, int quantity) {
-		if (status == 0) {
-			updated_tasks[person][TaskStatus::NEW] += quantity;
-		} else if (status == 1) {
-			updated_tasks[person][TaskStatus::IN_PROGRESS] += quantity;
-		}
-
-		else if (status == 2) {
-			updated_tasks[person][TaskStatus::TESTING] += quantity;
-		}
-
-		else if (status == 3) {
-			updated_tasks[person][TaskStatus::DONE] += quantity;
-		}
-		else if (status == 4) {
-			return;
-		}
-
-	}
-
-	void AddNewTaskUntached(const string &person, int status, int quantity) {
-		if (status == 0) {
-			untached_tasks[person][TaskStatus::NEW] += quantity;
-		} else if (status == 1) {
-			untached_tasks[person][TaskStatus::IN_PROGRESS] += quantity;
-		}
-
-		else if (status == 2) {
-			untached_tasks[person][TaskStatus::TESTING] += quantity;
-		}
-
-		else if (status == 3) {
-			untached_tasks[person][TaskStatus::DONE] += quantity;
-		}
-	}
-	;
-
-
-	TaskStatus get_next_status(TaskStatus status) {
-		if (status == TaskStatus::NEW) {
-			return TaskStatus::IN_PROGRESS;
-		} else if (status == TaskStatus::IN_PROGRESS) {
-			return TaskStatus::TESTING;
-		} else if (status == TaskStatus::TESTING) {
-			return status;
-		}
-	}
+ 
+const int MAX_RESULT_DOCUMENT_COUNT = 5;
+ 
+string ReadLine() {
+    string s;
+    getline(cin, s);
+    return s;
 }
-;
-
-/////////////////////////////////////////////////////////////////////////НЕ ОТНОСИТСЯ ////////////////////////////////
-
-// Принимаем словарь по значению, чтобы иметь возможность
-// обращаться к отсутствующим ключам с помощью [] и получать 0,
-// не меняя при этом исходный словарь.
-void PrintTasksInfo(TasksInfo tasks_info) {
-	cout << tasks_info[TaskStatus::NEW] << " new tasks"s << ", "s
-			<< tasks_info[TaskStatus::IN_PROGRESS] << " tasks in progress"s
-			<< ", "s << tasks_info[TaskStatus::TESTING]
-			<< " tasks are being tested"s << ", "s
-			<< tasks_info[TaskStatus::DONE] << " tasks are done"s << endl;
+ 
+int ReadLineWithNumber() {
+    int result;
+    cin >> result;
+    ReadLine();
+    return result;
 }
-
-
-int main() {
-    TeamTasks tasks;
-    tasks.AddNewTask("Ilia");
-    for (int i = 0; i < 3; ++i) {
-        tasks.AddNewTask("Ivan");
+ 
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            }
+        }
+        else {
+            word += c;
+        }
     }
-    cout << "Ilia's tasks: ";
-    PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"));
-    cout << "Ivan's tasks: ";
-    PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"));
-
-    TasksInfo updated_tasks, untouched_tasks;
-
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
-
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
-
-    /*
-     Tasks: 5/0/2/7
-		> PerformPersonTasks(100)
-		Updated: 0/5/0/2
-		Untouched: 0/0/0/0
-		Tasks: 0/5/0/2
-		А еще 7 где?
-     */
-
-    /*
-     Tasks: 5/0/5/0
-	> PerformPersonTasks(2)
-	Updated: 0/2/0/0
-	Untouched: 3/0/0/0
-      */
-
-
-
-    tasks.AddManyTasks();  // добавляю таски чтобы было как в примере выше
-    map<string, TasksInfo> persons_tasks = tasks.GetPersonTask();
-
-    for (const auto [status, quantity] : persons_tasks["Ivan"]){cout << "quantity after"s << quantity << endl;};
-
-
-    cout << "ADD 2 to IVAN : "s << endl;
-
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan", 2);
-    cout << "Updated Ivan's tasks: ";
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: ";
-    PrintTasksInfo(untouched_tasks);
-
-    map<string, TasksInfo> persons_tasks_all = tasks.GetPersonTask();
-    for (const auto [status, quantity] : persons_tasks_all["Ivan"]){cout << "quantity after all "s << quantity << endl;};
-
+    if (!word.empty()) {
+        words.push_back(word);
+    }
+ 
+    return words;
 }
-
-// правильный вывод
-/*
- Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
- */
-
-
-// мой вывод
-/*
-Ilia's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Ivan's tasks: 3 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 2 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 1 new tasks, 0 tasks in progress, 0 tasks are being tested, 0 tasks are done
-Updated Ivan's tasks: 0 new tasks, 1 tasks in progress, 1 tasks are being tested, 0 tasks are done
-Untouched Ivan's tasks: 0 new tasks, 1 tasks in progress, 0 tasks are being tested, 0 tasks are done
-
-  */
+ 
+struct Document {
+    int id;
+    double relevance;
+    int rating;
+};
+ 
+enum class DocumentStatus {
+    ACTUAL,
+    IRRELEVANT,
+    BANNED,
+    REMOVED,
+};
+ 
+class SearchServer {
+public:
+    void SetStopWords(const string& text) {
+        for (const string& word : SplitIntoWords(text)) {
+            stop_words_.insert(word);
+        }
+    }
+ 
+    void AddDocument(int document_id, const string& document, DocumentStatus status,
+        const vector<int>& ratings) {
+        const vector<string> words = SplitIntoWordsNoStop(document);
+        const double inv_word_count = 1.0 / words.size();
+        for (const string& word : words) {
+            word_to_document_freqs_[word][document_id] += inv_word_count;
+        }
+        documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
+    }
+ 
+    vector<Document> FindTopDocuments(const string& raw_query) const
+    {
+        return FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) {return status == DocumentStatus::ACTUAL; });
+    }
+ 
+    template <typename ConditionalPick>
+    vector<Document> FindTopDocuments(const string& raw_query,
+        ConditionalPick conditional_pick) const {
+        const Query query = ParseQuery(raw_query);
+        auto matched_documents = FindAllDocuments(query, conditional_pick);
+ 
+        sort(matched_documents.begin(), matched_documents.end(),
+            [](const Document& lhs, const Document& rhs) {
+                if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                    return lhs.rating > rhs.rating;
+                }
+                else {
+                    return lhs.relevance > rhs.relevance;
+                }
+            });
+        if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
+            matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
+        }
+        return matched_documents;
+    }
+ 
+    size_t GetDocumentCount() const {
+        return documents_.size();
+    }
+ 
+    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query,
+        int document_id) const {
+        const Query query = ParseQuery(raw_query);
+        vector<string> matched_words;
+        for (const string& word : query.plus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            if (word_to_document_freqs_.at(word).count(document_id)) {
+                matched_words.push_back(word);
+            }
+        }
+        for (const string& word : query.minus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            if (word_to_document_freqs_.at(word).count(document_id)) {
+                matched_words.clear();
+                break;
+            }
+        }
+        return { matched_words, documents_.at(document_id).status };
+    }
+ 
+private:
+    struct DocumentData {
+        int rating;
+        DocumentStatus status;
+    };
+ 
+    set<string> stop_words_;
+    map<string, map<int, double>> word_to_document_freqs_;
+    map<int, DocumentData> documents_;
+ 
+ 
+ 
+    bool IsStopWord(const string& word) const {
+        return stop_words_.count(word) > 0;
+    }
+ 
+    vector<string> SplitIntoWordsNoStop(const string& text) const {
+        vector<string> words;
+        for (const string& word : SplitIntoWords(text)) {
+            if (!IsStopWord(word)) {
+                words.push_back(word);
+            }
+        }
+        return words;
+    }
+ 
+    static int ComputeAverageRating(const vector<int>& ratings) {
+        if (ratings.empty()) {
+            return 0;
+        }
+        int rating_sum = 0;
+        for (const int rating : ratings) {
+            rating_sum += rating;
+        }
+        return rating_sum / static_cast<int>(ratings.size());
+    }
+ 
+    struct QueryWord {
+        string data;
+        bool is_minus;
+        bool is_stop;
+    };
+ 
+    QueryWord ParseQueryWord(string text) const {
+        bool is_minus = false;
+        // Word shouldn't be empty
+        if (text[0] == '-') {
+            is_minus = true;
+            text = text.substr(1);
+        }
+        return { text, is_minus, IsStopWord(text) };
+    }
+ 
+    struct Query {
+        set<string> plus_words;
+        set<string> minus_words;
+    };
+ 
+    Query ParseQuery(const string& text) const {
+        Query query;
+        for (const string& word : SplitIntoWords(text)) {
+            const QueryWord query_word = ParseQueryWord(word);
+            if (!query_word.is_stop) {
+                if (query_word.is_minus) {
+                    query.minus_words.insert(query_word.data);
+                }
+                else {
+                    query.plus_words.insert(query_word.data);
+                }
+            }
+        }
+        return query;
+    }
+ 
+    // Existence required
+    double ComputeWordInverseDocumentFreq(const string& word) const {
+        return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
+    }
+ 
+    template <typename ConditionalPick>
+    vector<Document> FindAllDocuments(const Query& query, ConditionalPick conditional_pick) const {
+        map<int, double> document_to_relevance;
+        for (const string& word : query.plus_words) {
+            if (word_to_document_freqs_.count(word) == 0)
+                continue;
+            const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
+            for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
+                //Сравнение типов на этапе компиляции
+                if constexpr (is_same_v<ConditionalPick, DocumentStatus>)
+                {
+                    //Тип шаблона - энумератор DocumentStatus 
+                    if (conditional_pick == documents_.at(document_id).status)
+                        document_to_relevance[document_id] += term_freq * inverse_document_freq;
+                }
+                else
+                {
+                    //Тип шаблона не энумератор (в данном случае функция-предикат) 
+                    if (conditional_pick(document_id, documents_.at(document_id).status, documents_.at(document_id).rating))
+                        document_to_relevance[document_id] += term_freq * inverse_document_freq;
+                }
+            }
+        }
+ 
+        for (const string& word : query.minus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
+                document_to_relevance.erase(document_id);
+            }
+        }
+ 
+        vector<Document> matched_documents;
+        for (const auto [document_id, relevance] : document_to_relevance) {
+            matched_documents.push_back(
+                { document_id, relevance, documents_.at(document_id).rating });
+        }
+        return matched_documents;
+    }
+};
+ 
+void PrintDocument(const Document& document) {
+    cout << "{ "s
+        << "document_id = "s << document.id << ", "s
+        << "relevance = "s << document.relevance << ", "s
+        << "rating = "s << document.rating << " }"s << endl;
+}
+ 
+int main() {
+    SearchServer search_server;
+    search_server.SetStopWords("и в на"s);
+    search_server.AddDocument(0, "белый кот и модный ошейник"s, DocumentStatus::ACTUAL, { 8, -3 });
+    search_server.AddDocument(1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, { 7, 2, 7 });
+    search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, { 5, -12, 2, 1 });
+    search_server.AddDocument(3, "ухоженный скворец евгений"s, DocumentStatus::BANNED, { 9 });
+    cout << "ACTUAL by default:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
+        PrintDocument(document);
+    }
+    cout << "BANNED:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, DocumentStatus::BANNED)) {
+        PrintDocument(document);
+    }
+    cout << "Even ids:"s << endl;
+    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
+        PrintDocument(document);
+    }
+    return 0;
+}
