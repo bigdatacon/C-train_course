@@ -177,15 +177,52 @@ private:
 // Реализуйте функции и классы, объявленные выше, чтобы эта функция main
 // решала задачу "Автобусные остановки"
 
+/*struct Query {
+    QueryType type;
+    string bus;
+    string stop;
+    vector<string> stops;
+};
+*/
 int main() {
     int query_count;
     Query q;
 
     cin >> query_count;
+    
+
 
     BusManager bm;
     for (int i = 0; i < query_count; ++i) {
         cin >> q;
+        vector<string> query_from_cin = SplitIntoWords(q);
+        Query query;
+        if (query_from_cin[0] == "NEW_BUS"s) {
+            vector<string> bus_stops = slice(query_from_cin, 3);
+            query.type = QueryType::NewBus;
+            query.bus = query_from_cin[1];
+            query.stop = query_from_cin[2];
+            query.stops = bus_stops;
+        }
+        else if (query_from_cin[0] == "BusesForStop"s) {
+            query.type = QueryType::BusesForStop;
+            //query.bus = query_from_cin[1];
+            query.stop = query_from_cin[1];
+            //query.stops = bus_stops;
+        }
+
+        else if (query_from_cin[0] == "StopsForBus"s) {
+            query.type = QueryType::StopsForBus;
+            query.bus = query_from_cin[1];
+            //query.stop = query_from_cin[1];
+            //query.stops = bus_stops;
+        }
+
+        else if (query_from_cin[0] == "AllBuses"s) {
+            continue;
+        }
+
+
         switch (q.type) {
         case QueryType::NewBus:
             bm.AddBus(q.bus, q.stops);
