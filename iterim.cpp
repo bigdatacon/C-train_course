@@ -154,7 +154,7 @@ public:
             cout << "No buses"s << endl;
         }
         else {
-            for (const auto& bus_item : stops_to_buses_) {
+            for (const auto& bus_item : allbusesresponse_) {
                 cout << "Bus "s << bus_item.bus << ": "s;
                 for (const string& stop : bus_item.stops) {
                     cout << stop << " "s;
@@ -169,8 +169,8 @@ public:
 private:
     //map<string, vector<string>>
     BusesForStopResponse    buses_to_stops_;   // stop : vector<bus>
-    StopsForBusResponse stops_to_buses_;    // bus : vector<stops>
-    AllBusesResponse allbusesresponse_;
+    /*StopsForBusResponse stops_to_buses_;    // bus : vector<stops>
+    AllBusesResponse allbusesresponse_;*/
 
 };  
 
