@@ -23,10 +23,10 @@ public:
 
     bool AreSynonyms(const string& first_word, const string& second_word) const {
         // Напишите недостающий код
-        //set syn_1 = synonyms_[first_word];
-        //set syn_2 = synonyms_[second_word];
-        set syn_1 = synonyms_.at(first_word);
-        set syn_2 = synonyms_.at(second_word);
+        set syn_1 = synonyms_[first_word];    // ВНИМАНИЕ ПОЧЕМУ ТУТ ВЫДАЕТ ОШИБКУ а с at. не выдает ? 
+        set syn_2 = synonyms_[second_word];
+        //set syn_1 = synonyms_.at(first_word);
+        //set syn_2 = synonyms_.at(second_word);
         bool first_is_syn_two = syn_2.count(first_word);
         bool second_is_syn_first = syn_1.count(second_word);
         if (first_is_syn_two && second_is_syn_first){return true;}
