@@ -22,6 +22,7 @@ struct Query {
 
 istream& operator>>(istream& is, Query& q) {
     // Реализуйте эту функцию
+    //is>>q;
     return is;
 }
 
@@ -77,7 +78,7 @@ public:
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
-        return   buses_to_stops_[stop]
+        return   buses_to_stops_[stop] //buses_to_stops_.stop
     }
 
     StopsForBusResponse GetStopsForBus(const string& bus) const {
