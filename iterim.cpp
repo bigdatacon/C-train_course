@@ -136,7 +136,8 @@ public:
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
-        set<string> buses_set;
+        //set<string> buses_set;
+        BusesForStopResponse buses_set;
         for (auto [bus, stops] : allbusesresponse_) {
 
             if (stops.count(stop)!=0) { buses_set.insert(bus);  }
@@ -161,7 +162,7 @@ public:
         else {
             for (const auto& bus_item : allbusesresponse_) {
                 cout << "Bus "s << bus_item.bus << ": "s;
-                for (const string& stop : bus_item.stop_for_buses) {
+                for (const string& stop : bus_item.stop_for_buses.stops) {
                     cout << stop << " "s;
                 }
                 cout << endl;
