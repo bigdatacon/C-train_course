@@ -54,9 +54,26 @@ istream& operator>>(istream& is, Query& q) {
     /* Считать строку до знака новой строки */
     getline(is, line);
     vector<string> query_from_cin = SplitIntoWords(line);
-    if (query_from_cin[0] == QueryType::NewBus) {
+    if (query_from_cin[0] == "NEW_BUS"s) {
         vector<string> bus_stops = slice(query_from_cin, 3);
-        AddBus(query_from_cin[1], us_stops)
+        AddBus(query_from_cin[1], bus_stops)
+    }
+    else if (query_from_cin[0] == "BusesForStop"s) {
+        
+        BusesForStopResponse buses_data = GetBusesForStop(query_from_cin[1]);
+        return buses_data;
+    }
+
+    else if (query_from_cin[0] == "StopsForBus"s) {
+
+        StopsForBusResponse stop_data = GetStopsForBus(query_from_cin[1]);
+        return stop_data;
+    }
+
+    else if (query_from_cin[0] == "AllBuses"s) {
+
+        AllBusesResponse all_buses_data = GetAllBuses();
+        return all_buses_data;
     }
 
     return is;
