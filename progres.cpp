@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -37,6 +38,11 @@ int main() {
     for (int i = 0; i < q; ++i) {
         string operation_code;
         cin >> operation_code;
+
+        /*istringstream command(operation_code);
+        string action;
+        command >> action*/
+
 
         if (operation_code == "NEW_BUS"s) {
             string bus;
