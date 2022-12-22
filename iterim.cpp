@@ -72,22 +72,47 @@ class BusManager {
 public:
     void AddBus(const string& bus, const vector<string>& stops) {
         // Реализуйте этот метод
+        allbusesresponse_[bus] = stops;
     }
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
+        return   buses_to_stops_[stop]
     }
 
     StopsForBusResponse GetStopsForBus(const string& bus) const {
         // Реализуйте этот метод
+        return  stops_to_buses_[bus]
+
+
     }
 
     AllBusesResponse GetAllBuses() const {
+
         // Реализуйте этот метод
+        if (allbusesresponse_.empty()) {
+            cout << "No buses"s << endl;
+        }
+        else {
+            for (const auto& bus_item : stops_to_buses_) {
+                cout << "Bus "s << bus_item.bus << ": "s;
+                for (const string& stop : bus_item.stops) {
+                    cout << stop << " "s;
+                }
+                cout << endl;
+
+
+            }
+        }
     }
+
 private:
-    map<string, vector<string>> buses_to_stops_, stops_to_buses_;   
-};
+    //map<string, vector<string>>
+    BusesForStopResponse    buses_to_stops_;   // stop : vector<bus>
+    StopsForBusResponse stops_to_buses_;    // bus : vector<stops>
+    AllBusesResponse allbusesresponse_;
+
+};  
 
 // Реализуйте функции и классы, объявленные выше, чтобы эта функция main
 // решала задачу "Автобусные остановки"
