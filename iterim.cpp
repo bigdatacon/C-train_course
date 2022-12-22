@@ -6,6 +6,34 @@
 
 using namespace std;
 
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            words.push_back(word);
+            word = "";
+        }
+        else {
+            word += c;
+        }
+    }
+    words.push_back(word);
+
+    return words;
+}
+
+// метод получения среза вектора 
+template<typename T>
+std::vector<T> slice(std::vector<T> const& v, int m)
+{
+    auto first = v.cbegin() + m;
+    auto last = v.end();
+
+    std::vector<T> vec(first, last);
+    return vec;
+}
+
 enum class QueryType {
     NewBus,
     BusesForStop,
@@ -22,7 +50,15 @@ struct Query {
 
 istream& operator>>(istream& is, Query& q) {
     // Реализуйте эту функцию
-    //is>>q;
+    string line;
+    /* Считать строку до знака новой строки */
+    getline(is, line);
+    vector<string> query_from_cin = SplitIntoWords(line);
+    if (query_from_cin[0] == QueryType::NewBus) {
+        vector<string> bus_stops = slice(query_from_cin, 3);
+        AddBus(query_from_cin[1], us_stops)
+    }
+
     return is;
 }
 
@@ -78,7 +114,7 @@ public:
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
-        return   buses_to_stops_[stop] //buses_to_stops_.stop
+        return   buses_to_stops_[stop]
     }
 
     StopsForBusResponse GetStopsForBus(const string& bus) const {
