@@ -24,7 +24,7 @@ vector<string> SplitIntoWords(const string& text) {
     return words;
 }
 
-// метод получения среза вектора 
+// метод получения среза вектора
 template<typename T>
 std::vector<T> slice(std::vector<T> const& v, int m)
 {
@@ -55,27 +55,32 @@ istream& operator>>(istream& is, Query& q) {
     /* Считать строку до знака новой строки */
     getline(is, line);
     vector<string> query_from_cin = SplitIntoWords(line);
+    //Query query;
     if (query_from_cin[0] == "NEW_BUS"s) {
         vector<string> bus_stops = slice(query_from_cin, 3);
-        AddBus(query_from_cin[1], bus_stops)
+        q.type = QueryType::NewBus;
+        q.bus = query_from_cin[1];
+        q.stop = query_from_cin[2];
+        q.stops = bus_stops;
     }
     else if (query_from_cin[0] == "BusesForStop"s) {
-        
-        BusesForStopResponse buses_data = GetBusesForStop(query_from_cin[1]);
-        return buses_data;
+        q.type = QueryType::BusesForStop;
+        //query.bus = query_from_cin[1];
+        q.stop = query_from_cin[1];
+        //query.stops = bus_stops;
     }
 
     else if (query_from_cin[0] == "StopsForBus"s) {
-
-        StopsForBusResponse stop_data = GetStopsForBus(query_from_cin[1]);
-        return stop_data;
+        q.type = QueryType::StopsForBus;
+        q.bus = query_from_cin[1];
+        //query.stop = query_from_cin[1];
+        //query.stops = bus_stops;
     }
 
     else if (query_from_cin[0] == "AllBuses"s) {
-
-        AllBusesResponse all_buses_data = GetAllBuses();
-        return all_buses_data;
+    	q.type = QueryType::AllBuses;
     }
+
 
     return is;
 }
@@ -107,14 +112,14 @@ ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
 }
 
 /*
-На запрос ALL_BUSES выведите описания всех автобусов в алфавитном порядке. Описание каждого маршрута bus должно иметь вид Bus bus: stop1 stop2 ..., где stop1 stop2 ... — список 
+На запрос ALL_BUSES выведите описания всех автобусов в алфавитном порядке. Описание каждого маршрута bus должно иметь вид Bus bus: stop1 stop2 ..., где stop1 stop2 ... — список
 остановок автобуса bus в том порядке, в каком они были заданы в соответствующей команде NEW_BUS. Если автобусы отсутствуют, выведите No buses.
 */
 
 struct AllBusesResponse {
     // Наполните полями эту структуру
     string bus;
-   vector<StopsForBusResponse> stop_for_buses;
+    StopsForBusResponse stop_for_buses;
 };
 
 ostream& operator<<(ostream& os, const AllBusesResponse& r) {
@@ -133,7 +138,7 @@ public:
         // Реализуйте этот метод
         set<string> buses_set;
         for (auto [bus, stops] : allbusesresponse_) {
-            
+
             if (stops.count(stop)!=0) { buses_set.insert(bus);  }
         }
 
@@ -156,7 +161,7 @@ public:
         else {
             for (const auto& bus_item : allbusesresponse_) {
                 cout << "Bus "s << bus_item.bus << ": "s;
-                for (const string& stop : bus_item.stops) {
+                for (const string& stop : bus_item.stop_for_buses) {
                     cout << stop << " "s;
                 }
                 cout << endl;
@@ -167,12 +172,9 @@ public:
     }
 
 private:
-    //map<string, vector<string>>
-    BusesForStopResponse    buses_to_stops_;   // stop : vector<bus>
-    /*StopsForBusResponse stops_to_buses_;    // bus : vector<stops>
-    AllBusesResponse allbusesresponse_;*/
+    vector<AllBusesResponse> allbusesresponse_;
 
-};  
+};
 
 // Реализуйте функции и классы, объявленные выше, чтобы эта функция main
 // решала задачу "Автобусные остановки"
@@ -189,39 +191,12 @@ int main() {
     Query q;
 
     cin >> query_count;
-    
+
 
 
     BusManager bm;
     for (int i = 0; i < query_count; ++i) {
         cin >> q;
-        vector<string> query_from_cin = SplitIntoWords(q);
-        Query query;
-        if (query_from_cin[0] == "NEW_BUS"s) {
-            vector<string> bus_stops = slice(query_from_cin, 3);
-            query.type = QueryType::NewBus;
-            query.bus = query_from_cin[1];
-            query.stop = query_from_cin[2];
-            query.stops = bus_stops;
-        }
-        else if (query_from_cin[0] == "BusesForStop"s) {
-            query.type = QueryType::BusesForStop;
-            //query.bus = query_from_cin[1];
-            query.stop = query_from_cin[1];
-            //query.stops = bus_stops;
-        }
-
-        else if (query_from_cin[0] == "StopsForBus"s) {
-            query.type = QueryType::StopsForBus;
-            query.bus = query_from_cin[1];
-            //query.stop = query_from_cin[1];
-            //query.stops = bus_stops;
-        }
-
-        else if (query_from_cin[0] == "AllBuses"s) {
-            continue;
-        }
-
 
         switch (q.type) {
         case QueryType::NewBus:
