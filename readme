@@ -1,29 +1,57 @@
 Задание
-Это задание — ваш итоговый проект второго спринта. Вы будете сдавать его на проверку через репозиторий на GitHub. А пока сохраните решение в своей IDE.
-Верните методу FindTopDocuments возможность быть вызванным со статусом документа вместо лямбды.
-Пример
+Задание
+Перед вами шаблон с заготовками классов, структур и функций. Реализуйте их так, чтобы функция main из заготовки решала задачу «Автобусные остановки».
+Как будет тестироваться ваша программа
+Тренажёр проверит работу программы на тестах для задачи «Автобусные остановки».
+Рекомендации
+Выполняя декомпозицию программы, пишите модульные тесты на получающиеся классы и функции. Для модульного тестирования операций воспользуйтесь классами istringstream и ostringstream, как в примере:
+#include <cassert>
+Задание
+Перед вами шаблон с заготовками классов, структур и функций. Реализуйте их так, чтобы функция main из заготовки решала задачу «Автобусные остановки».
+Как будет тестироваться ваша программа
+Тренажёр проверит работу программы на тестах для задачи «Автобусные остановки».
+Рекомендации
+Выполняя декомпозицию программы, пишите модульные тесты на получающиеся классы и функции. Для модульного тестирования операций воспользуйтесь классами istringstream и ostringstream, как в примере:
+#include <cassert>
+#include <iostream>
+#include <sstream>
+using namespace std;
+struct Point {
+    int x = 0;
+    int y = 0;
+};
+ostream& operator<<(ostream& output, Point p) {
+    output << p.x << ' ' << p.y;
+    return output;
+}
+istream& operator>>(istream& input, Point& p) {
+    input >> p.x >> p.y;
+    return input;
+}
+void TestPointOutput() {
+    Point p = {15, -8};
+    ostringstream output;
+    output << p;
+    // Метод str() возвращает строку с содержимым, выведенным в ostringstream
+    assert(output.str() == "15 -8"s);
+}
+void TestPointInput() {
+    istringstream input;
+    // Метод str(строка) у istringstream позволяет задать содержимое, которое будет считываться из istringstream
+    input.str("-9 33"s);
+    Point p;
+    input >> p;
+    assert(p.x == -9);
+    assert(p.y == 33);
+}
 int main() {
-    SearchServer search_server;
-    search_server.SetStopWords("и в на"s);
-    search_server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
-    search_server.AddDocument(1, "пушистый кот пушистый хвост"s,       DocumentStatus::ACTUAL, {7, 2, 7});
-    search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
-    search_server.AddDocument(3, "ухоженный скворец евгений"s,         DocumentStatus::BANNED, {9});
-    cout << "ACTUAL by default:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s)) {
-        PrintDocument(document);
-    }
-    cout << "BANNED:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, DocumentStatus::BANNED)) {
-        PrintDocument(document);
-    }
-    cout << "Even ids:"s << endl;
-    for (const Document& document : search_server.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
-        PrintDocument(document);
-    }
-    return 0;
+    TestPointOutput();
+    TestPointInput();
 } 
 
+
+
 Подсказка: 
-Достаточно написать новый метод — vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const. А в нём одну строчку: создали нужную лямбду и вызвали основную версию одноимённого метода.
-Не забудьте избавиться от дублирования кода: версия FindTopDocuments с одним параметром теперь может вызывать новую версию этого метода — с DocumentStatus.
+На первом шаге реализуйте оператор чтения структуры Query, примените его и обновите исходный код функции main из теории. Убедитесь, что код по-прежнему работает.
+Затем наполните внутренности структур AllBusesResponse, BusesForStopResponse и AllBusesResponse и перенесите логику обработки запросов из main в BusManager, оставив внутри main только ввод и вывод.
+На последнем этапе реализуйте операторы вывода структур, приведя тело функции main к финальному варианту, который дан в заготовке кода.
