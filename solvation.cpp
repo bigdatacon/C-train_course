@@ -1,134 +1,79 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <tuple>
 #include <vector>
 
 using namespace std;
 
-// Перечислимый тип для статуса задачи
-enum class TaskStatus {
-	NEW,          // новая
-	IN_PROGRESS,  // в разработке
-	TESTING,      // на тестировании
-	DONE          // завершена
-};
-
-// Объявляем тип-синоним для map<TaskStatus, int>,
-// позволяющего хранить количество задач каждого статуса
-using TasksInfo = map<TaskStatus, int>;
-
-class TeamTasks {
-public:
-	// Получить статистику по статусам задач конкретного разработчика
-	const TasksInfo& GetPersonTasksInfo(const string &person) const {
-		return persons_tasks.at(person);
-
-	}
-	;
-
-	// Добавить новую задачу (в статусе NEW) для конкретного разработчитка
-	void AddNewTask(const string &person) {
-		++persons_tasks[person][TaskStatus::NEW];
-	}
-	;
-
-	// Обновить статусы по данному количеству задач конкретного разработчика,
-	// подробности см. ниже
-	/*tuple<TasksInfo, TasksInfo>*/
-	void PerformPersonTasks(const string &person, int task_count) {
-		TasksInfo updated_tasks;
-		TasksInfo untached_tasks;
-		int left_to_change_task = task_count;
-		//int counts = task_count;
-		for (const auto [status, quantity] : persons_tasks[person]) {
-			//cout <<"Persons task quantity: "s << quantity << " status "s<< status <<  endl;
-			cout << static_cast<int>(persons_tasks[person][status]) << endl;
-			cout
-					<< static_cast<int>(persons_tasks[person][static_cast<int>(status)
-							+ 1]) << endl;
-		}
-		TasksInfo persons_tasks_statuses = persons_tasks[person];
-		cout << persons_tasks_statuses[(TaskStatus) (0)] << endl;
-		cout << persons_tasks_statuses[TaskStatus::NEW] << endl;
-		cout << persons_tasks_statuses[TaskStatus::NEW] << endl;
-		cout << static_cast<int>(persons_tasks[person][TaskStatus::NEW])
-				<< endl;
-		cout << static_cast<int>(persons_tasks[person][(TaskStatus) (1)])
-				<< endl;
-
-		cout << static_cast<int>(persons_tasks[person][TaskStatus::NEW])
-				== task_count << endl;
-
-		// Алгоритм 
-		/*for (const auto [status, quantity] : persons_tasks[person]) {
-			if (left_to_change_task >= quantity) {
-				left_to_change_task = left_to_change_task - quantity;
-				updated_tasks[person][static_cast<int>(status) + 1] += quantity;
-
-			} else {
-
-				updated_tasks[person][static_cast<int>(status)] +=
-						left_to_change_task;
-				untached_tasks[person][static_cast<int>(status)] += (quantity
-						- left_to_change_task);
-				left_to_change_task = 0;
-			}
-		}*/
-
-	}
-	;
-
-//    New : 2
-//	IN_PROGRESS : 1
-//	TESTING : 1
-//	DONE : 1
-
-private:
-// храним имя разработчика и статусы+количество его задач
-	map<string, TasksInfo> persons_tasks;
-};
-
-/////////////////////////////////////////////////////////////////////////НЕ ОТНОСИТСЯ ////////////////////////////////
-
-// Принимаем словарь по значению, чтобы иметь возможность
-// обращаться к отсутствующим ключам с помощью [] и получать 0,
-// не меняя при этом исходный словарь.
-void PrintTasksInfo(TasksInfo tasks_info) {
-	cout << tasks_info[TaskStatus::NEW] << " new tasks"s << ", "s
-			<< tasks_info[TaskStatus::IN_PROGRESS] << " tasks in progress"s
-			<< ", "s << tasks_info[TaskStatus::TESTING]
-			<< " tasks are being tested"s << ", "s
-			<< tasks_info[TaskStatus::DONE] << " tasks are done"s << endl;
-}
-
 int main() {
-	TeamTasks tasks;
-	tasks.AddNewTask("Ilia"s);
-	for (int i = 0; i < 3; ++i) {
-		tasks.AddNewTask("Ivan"s);
-	}
-	cout << "Ilia's tasks: "s;
-	PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"s));
-	cout << "Ivan's tasks: "s;
-	PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"s));
+    int q;
+    cin >> q;
 
-	tasks.PerformPersonTasks("Ivan"s, 2);
+    map<string, vector<string>> buses_to_stops, stops_to_buses;
 
-	//tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
+    for (int i = 0; i < q; ++i) {
+        string operation_code;
+        cin >> operation_code;
 
-	/*TasksInfo updated_tasks, untouched_tasks;
+        if (operation_code == "NEW_BUS"s) {
+            string bus;
+            cin >> bus;
+            int stop_count;
+            cin >> stop_count;
+            vector<string>& stops = buses_to_stops[bus];
+            stops.resize(stop_count);
+            for (string& stop : stops) {
+                cin >> stop;
+                stops_to_buses[stop].push_back(bus);
+            }
 
-	 tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
-	 cout << "Updated Ivan's tasks: "s;
-	 PrintTasksInfo(updated_tasks);
-	 cout << "Untouched Ivan's tasks: "s;
-	 PrintTasksInfo(untouched_tasks);
+        } else if (operation_code == "BUSES_FOR_STOP"s) {
+            string stop;
+            cin >> stop;
+            if (stops_to_buses.count(stop) == 0) {
+                cout << "No stop"s << endl;
+            } else {
+                for (const string& bus : stops_to_buses[stop]) {
+                    cout << bus << " "s;
+                }
+                cout << endl;
+            }
 
-	 tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
-	 cout << "Updated Ivan's tasks: "s;
-	 PrintTasksInfo(updated_tasks);
-	 cout << "Untouched Ivan's tasks: "s;
-	 PrintTasksInfo(untouched_tasks);*/
+        } else if (operation_code == "STOPS_FOR_BUS"s) {
+            string bus;
+            cin >> bus;
+            if (buses_to_stops.count(bus) == 0) {
+                cout << "No bus"s << endl;
+            } else {
+                for (const string& stop : buses_to_stops[bus]) {
+                    cout << "Stop "s << stop << ": "s;
+                    if (stops_to_buses[stop].size() == 1) {
+                        cout << "no interchange"s;
+                    } else {
+                        for (const string& other_bus : stops_to_buses[stop]) {
+                            if (bus != other_bus) {
+                                cout << other_bus << " "s;
+                            }
+                        }
+                    }
+                    cout << endl;
+                }
+            }
+
+        } else if (operation_code == "ALL_BUSES"s) {
+            if (buses_to_stops.empty()) {
+                cout << "No buses"s << endl;
+            } else {
+                for (const auto& bus_item : buses_to_stops) {
+                    cout << "Bus "s << bus_item.first << ": "s;
+                    for (const string& stop : bus_item.second) {
+                        cout << stop << " "s;
+                    }
+                    cout << endl;
+                }
+            }
+        }
+    }
+
+    return 0;
 }
-
