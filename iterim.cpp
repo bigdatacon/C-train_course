@@ -132,7 +132,7 @@ class BusManager {
 public:
     void AddBus(const string& bus, const vector<string>& stops) {
         // Реализуйте этот метод
-        allbusesresponse_[bus] = stops;
+        allbusesresponse_.at(bus) = stops;
     }
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
@@ -149,7 +149,7 @@ public:
 
     StopsForBusResponse GetStopsForBus(const string& bus) const {
         // Реализуйте этот метод
-        return  allbusesresponse_[bus];
+        return  allbusesresponse_.at(bus);
 
 
     }
