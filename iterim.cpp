@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 using namespace std;
 
@@ -87,8 +88,7 @@ istream& operator>>(istream& is, Query& q) {
 
 struct BusesForStopResponse {
     // Наполните полями эту структуру
-    string stop;
-    vector<string> buses;
+    set<string> buses_set;
 };
 
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
@@ -98,7 +98,6 @@ ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
 
 struct StopsForBusResponse {
     // Наполните полями эту структуру
-    string bus;
     vector<string> stops;
 };
 
@@ -114,7 +113,8 @@ ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
 
 struct AllBusesResponse {
     // Наполните полями эту структуру
-   vector<StopsForBusResponse> buses;
+    string bus;
+   vector<StopsForBusResponse> stop_for_buses;
 };
 
 ostream& operator<<(ostream& os, const AllBusesResponse& r) {
@@ -131,12 +131,18 @@ public:
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
-        return   buses_to_stops_[stop]
+        set<string> buses_set;
+        for (auto [bus, stops] : allbusesresponse_) {
+            
+            if (stops.count(stop)!=0) { buses_set.insert(bus);  }
+        }
+
+        return buses_set;
     }
 
     StopsForBusResponse GetStopsForBus(const string& bus) const {
         // Реализуйте этот метод
-        return  stops_to_buses_[bus]
+        return  allbusesresponse_[bus];
 
 
     }
