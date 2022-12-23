@@ -142,7 +142,7 @@ public:
         BusesForStopResponse buses_set;
         for (auto [bus, stops] : allbusesresponse_) {
 
-            if (/*stops.count(stop)!=0*/ IsInstanceVec_(stops, stop)) {  buses_set.insert(bus);  }
+            if (/*stops.stop_for_buses.count(stop)!=0*/ IsInstanceVec_(stops.stop_for_buses, stop)) {  buses_set.buses_set.insert(bus);  }
         }
 
         return buses_set;
@@ -164,7 +164,7 @@ public:
         else {
             for (const auto& [bus, stops] : allbusesresponse_) {
                 cout << "Bus "s << bus << ": "s;
-                for (const string& stop : /*bus_item.stop_for_buses.stops*/ stops ) {
+                for (const string& stop : /*bus_item.stop_for_buses.stops*/ stops.stop_for_buses ) {
                     cout << stop << " "s;
                 }
                 cout << endl;
