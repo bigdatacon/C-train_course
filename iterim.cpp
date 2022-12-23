@@ -144,8 +144,9 @@ typedef AllBusesResponse StopsForBusResponse /*AllBusesResponse*/;
     return os;
 }*/
 
-ostream& operator<<(ostream& os, const AllBusesResponse& r) {
+ostream& operator<<(ostream& os, const AllBusesResponse& r)  {
     // Реализуйте эту функцию
+	for (auto el : r.stop_for_buses){cout << el << " "s;};
     return os;
 }
 
@@ -172,7 +173,10 @@ public:
 
     StopsForBusResponse GetStopsForBus(const string& bus) const {
         // Реализуйте этот метод
-        return  allbusesresponse_.at(bus);
+    	StopsForBusResponse empty_struct;
+    	if (allbusesresponse_.size()!=0) {return allbusesresponse_.at(bus);}
+    	else {return empty_struct;}
+        //return  allbusesresponse_.at(bus);
 
 
     }
@@ -187,12 +191,12 @@ public:
         else {
             for (const auto& [bus, stops] : allbusesresponse_) {
 
-                cout << "Bus "s << bus << ": "s;
+                //cout << "Bus "s << bus << ": "s;
                 for (const string& stop : /*bus_item.stop_for_buses.stops*/ stops.stop_for_buses ) {
-                    cout << stop << " "s;
+                    //cout << stop << " "s;
                     stop_for_buses_itg.stop_for_buses.push_back(stop);
                 }
-                cout << endl;
+                //cout << endl;
 
 
             }
