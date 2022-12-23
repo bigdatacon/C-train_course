@@ -178,6 +178,8 @@ private:
 */
 
 int main() {
+    cout << "START "s << endl;
+
     int query_count;
     Query q;
 
@@ -197,7 +199,7 @@ int main() {
             cout << "q.type :"s /*<< (q.type == Query::NewBus)*/ << endl;
             cout << "q.bus :"s << q.bus << endl;
             cout << "q.stops[0]: " << q.stops[0] << endl;
-            cout << "q.stops[1]: " << q.stops[1] << endl;
+            cout << "q.stops[2]: " << q.stops[2] << endl;
             //cout << "q.stops[4]: "<< q.stops[4] << endl ; - так не выбрасывает исключение а просто завершает работу программы
             //cout << "q.stops[4]: " << q.stops.at(4) << endl;
 
@@ -205,9 +207,9 @@ int main() {
 
             // Внимание вот от сюда не работает  --!!!! То есть не рабоатет allbusesrespons[q.bus] = q.stops;  и allbusesrespons.emplace(q.bus,  q.stops);
             //allbusesrespons[q.bus] = q.stops;
-            //allbusesresponse.emplace(make_pair(q.bus,  q.stops));
+            allbusesresponse.emplace(make_pair(q.bus,  q.stops));
 
-            //for (auto [k, v] : allbusesresponse){cout << "k : "s << k << endl; }
+            for (auto [k, v] : allbusesresponse){cout << "k HERE!!!!!!! : "s << k << endl; }
 
 
             //bm.AddBus(q.bus, q.stops);
