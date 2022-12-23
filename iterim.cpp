@@ -49,6 +49,21 @@ struct Query {
     vector<string> stops;
 };
 
+/*
+ 10
+ALL_BUSES
+BUSES_FOR_STOP Marushkino
+STOPS_FOR_BUS 32K
+NEW_BUS 32 3 Tolstopaltsevo Marushkino Vnukovo
+NEW_BUS 32K 6 Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+BUSES_FOR_STOP Vnukovo
+NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
+STOPS_FOR_BUS 272
+ALL_BUSES
+ * */
+
+
 istream& operator>>(istream& is, Query& q) {
     // Реализуйте эту функцию
     string line;
@@ -63,21 +78,21 @@ istream& operator>>(istream& is, Query& q) {
         q.stop = query_from_cin[2];
         q.stops = bus_stops;
     }
-    else if (query_from_cin[0] == "BusesForStop"s) {
+    else if (query_from_cin[0] == "BUSES_FOR_STOP"s) {
         q.type = QueryType::BusesForStop;
         //query.bus = query_from_cin[1];
         q.stop = query_from_cin[1];
         //query.stops = bus_stops;
     }
 
-    else if (query_from_cin[0] == "StopsForBus"s) {
+    else if (query_from_cin[0] == "STOPS_FOR_BUS"s) {
         q.type = QueryType::StopsForBus;
         q.bus = query_from_cin[1];
         //query.stop = query_from_cin[1];
         //query.stops = bus_stops;
     }
 
-    else if (query_from_cin[0] == "AllBuses"s) {
+    else if (query_from_cin[0] == "ALL_BUSES"s) {
     	q.type = QueryType::AllBuses;
     }
 
