@@ -124,10 +124,10 @@ struct AllBusesResponse {
 
 typedef AllBusesResponse StopsForBusResponse /*AllBusesResponse*/;
 
-ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
+/*ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
     // Реализуйте эту функцию
     return os;
-}
+}*/
 
 ostream& operator<<(ostream& os, const AllBusesResponse& r) {
     // Реализуйте эту функцию
