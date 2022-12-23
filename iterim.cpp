@@ -101,20 +101,19 @@ ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     return os;
 }
 
-struct StopsForBusResponse {
+/*struct StopsForBusResponse {
     // Наполните полями эту структуру
     vector<string> stops;
-};
+};*/
 
-ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
-    // Реализуйте эту функцию
-    return os;
-}
+
 
 /*
 На запрос ALL_BUSES выведите описания всех автобусов в алфавитном порядке. Описание каждого маршрута bus должно иметь вид Bus bus: stop1 stop2 ..., где stop1 stop2 ... — список
 остановок автобуса bus в том порядке, в каком они были заданы в соответствующей команде NEW_BUS. Если автобусы отсутствуют, выведите No buses.
 */
+
+
 
 struct AllBusesResponse {
     // Наполните полями эту структуру
@@ -122,6 +121,13 @@ struct AllBusesResponse {
     //StopsForBusResponse stop_for_buses;
     vector<string> stop_for_buses;
 };
+
+typedef AllBusesResponse StopsForBusResponse /*AllBusesResponse*/;
+
+ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
+    // Реализуйте эту функцию
+    return os;
+}
 
 ostream& operator<<(ostream& os, const AllBusesResponse& r) {
     // Реализуйте эту функцию
@@ -133,7 +139,8 @@ public:
     void AddBus(const string& bus, const vector<string>& stops) {
         // Реализуйте этот метод
         //allbusesresponse_.at(bus) = stops;
-        allbusesresponse_.emplace(make_pair(bus, stops));
+        //allbusesresponse_.emplace(make_pair(bus, stops));
+        allbusesresponse_.emplace(pair<string, AllBusesResponse>(bus, {stops}));
     }
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
@@ -142,7 +149,7 @@ public:
         BusesForStopResponse buses_set;
         for (auto [bus, stops] : allbusesresponse_) {
 
-            if (/*stops.stop_for_buses.count(stop)!=0*/ IsInstanceVec_(stops.stop_for_buses, stop)) {  buses_set.buses_set.insert(bus);  }
+            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(stops.stop_for_buses, stop)) {  buses_set.buses_set.insert(bus);  }
         }
 
         return buses_set;
@@ -178,7 +185,7 @@ private:
     //vector<AllBusesResponse> allbusesresponse_;
     map<string, AllBusesResponse> allbusesresponse_;
 
-    bool IsInstanceVec_(const vector<string> stops, string el){
+    bool IsInstanceVec_(const vector<string> stops, string el) const {
     	for (auto str : stops){if (str==el) {return true;}
     	}
     	return false;
@@ -227,4 +234,3 @@ int main() {
         }
     }
 }
-
