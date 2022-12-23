@@ -162,9 +162,9 @@ public:
             cout << "No buses"s << endl;
         }
         else {
-            for (const auto& bus_item : allbusesresponse_) {
-                cout << "Bus "s << bus_item.bus << ": "s;
-                for (const string& stop : bus_item.stop_for_buses.stops) {
+            for (const auto& [bus, stops] : allbusesresponse_) {
+                cout << "Bus "s << bus << ": "s;
+                for (const string& stop : /*bus_item.stop_for_buses.stops*/ stops ) {
                     cout << stop << " "s;
                 }
                 cout << endl;
@@ -227,4 +227,3 @@ int main() {
         }
     }
 }
-
