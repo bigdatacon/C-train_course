@@ -178,7 +178,7 @@ private:
 */
 
 int main() {
-    cout << "START "s << endl;
+    cout << "START44 "s << endl;
 
     int query_count;
     Query q;
@@ -207,9 +207,9 @@ int main() {
 
             // Внимание вот от сюда не работает  --!!!! То есть не рабоатет allbusesrespons[q.bus] = q.stops;  и allbusesrespons.emplace(q.bus,  q.stops);
             //allbusesrespons[q.bus] = q.stops;
-            allbusesresponse.emplace(make_pair(q.bus,  q.stops));
+            //allbusesresponse.emplace(make_pair(q.bus, q.stops));
 
-            for (auto [k, v] : allbusesresponse){cout << "k HERE!!!!!!! : "s << k << endl; }
+            //for (auto [k, v] : allbusesresponse) { cout << "k HERE!!!!!!! : "s << k << endl; }
 
 
             //bm.AddBus(q.bus, q.stops);
