@@ -119,7 +119,7 @@ ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
 
 struct AllBusesResponse {
     // Наполните полями эту структуру
-    string bus;
+    //string bus;
     StopsForBusResponse stop_for_buses;
 };
 
@@ -174,7 +174,8 @@ public:
     }
 
 private:
-    vector<AllBusesResponse> allbusesresponse_;
+    //vector<AllBusesResponse> allbusesresponse_;
+    map<string, AllBusesResponse> allbusesresponse_;
 
 };
 
