@@ -116,10 +116,10 @@ ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     return os;
 }
 
-/*struct StopsForBusResponse {
+struct StopsForBusResponse {
     // Наполните полями эту структуру
     vector<string> stops;
-};*/
+};
 
 
 
@@ -137,12 +137,13 @@ struct AllBusesResponse {
     vector<string> stop_for_buses;
 };
 
-typedef AllBusesResponse StopsForBusResponse /*AllBusesResponse*/;
+//typedef AllBusesResponse StopsForBusResponse /*AllBusesResponse*/;
 
-/*ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
+ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
     // Реализуйте эту функцию
+	for (auto el : r.stops){cout << el << " "s;};
     return os;
-}*/
+}
 
 ostream& operator<<(ostream& os, const AllBusesResponse& r)  {
     // Реализуйте эту функцию
@@ -181,7 +182,9 @@ public:
     StopsForBusResponse GetStopsForBus(const string& bus) const {
         // Реализуйте этот метод
     	StopsForBusResponse empty_struct;
-    	if (allbusesresponse_.size()!=0) {return allbusesresponse_.at(bus);}
+    	if (allbusesresponse_.size()!=0) {
+    		empty_struct.stops = allbusesresponse_.at(bus);
+    		return empty_struct; }
     	else {return empty_struct;}
         //return  allbusesresponse_.at(bus);
 
