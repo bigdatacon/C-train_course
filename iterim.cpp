@@ -163,22 +163,28 @@ public:
     }
 
     AllBusesResponse GetAllBuses() const {
-
+    	//vector<string> stop_for_buses_itg;
+    	AllBusesResponse stop_for_buses_itg;
         // Реализуйте этот метод
         if (allbusesresponse_.empty()) {
             cout << "No buses"s << endl;
         }
         else {
             for (const auto& [bus, stops] : allbusesresponse_) {
+
                 cout << "Bus "s << bus << ": "s;
                 for (const string& stop : /*bus_item.stop_for_buses.stops*/ stops.stop_for_buses ) {
                     cout << stop << " "s;
+                    stop_for_buses_itg.stop_for_buses.push_back(stop);
                 }
                 cout << endl;
 
 
             }
         }
+        //AllBusesResponse response = {allbusesresponse_.keys()};
+        //AllBusesResponse response = {allbusesresponse_.values()};
+        return stop_for_buses_itg;
     }
 
 private:
