@@ -196,7 +196,7 @@ int main() {
         switch (q.type) {
             //cout << "q.type :"s << q.type << endl;
         case QueryType::NewBus:
-            cout << "q.type :"s /*<< (q.type == Query::NewBus)*/ << endl;
+            cout << "q.type VERS :"s << (q.type == QueryType::NewBus) << endl;
             cout << "q.bus :"s << q.bus << endl;
             cout << "q.stops[0]: " << q.stops[0] << endl;
             cout << "q.stops[2]: " << q.stops[2] << endl;
@@ -215,17 +215,17 @@ int main() {
             //bm.AddBus(q.bus, q.stops);
             break;
         case QueryType::BusesForStop:
-            cout << "q.type :"s << endl;
+            cout << "q.type BusesForStop :"s << endl;
             //cout << "q.type :"s << q.type << endl;
             //cout << bm.GetBusesForStop(q.stop) << endl;
             break;
         case QueryType::StopsForBus:
-            cout << "q.type :"s << endl;
+            cout << "q.type  StopsForBus:"s << endl;
             //cout << "q.type :"s << q.type << endl;
             //cout << bm.GetStopsForBus(q.bus) << endl;
             break;
         case QueryType::AllBuses:
-            cout << "q.type :"s << endl;
+            cout << "q.type  AllBuses:"s << endl;
             //cout << "q.type :"s << q.type << endl;
             //cout << bm.GetAllBuses() << endl;
             break;
