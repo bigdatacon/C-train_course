@@ -78,7 +78,7 @@ istream& operator>>(istream& is, Query& q) {
     }
 
     else if (query_from_cin[0] == "AllBuses"s) {
-    	q.type = QueryType::AllBuses;
+        q.type = QueryType::AllBuses;
     }
 
 
@@ -133,28 +133,20 @@ public:
         // Реализуйте этот метод
         allbusesresponse_.at(bus) = stops;
     }
-
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
         //set<string> buses_set;
         BusesForStopResponse buses_set;
         for (auto [bus, stops] : allbusesresponse_) {
-
             if (stops.count(stop)!=0) { buses_set.insert(bus);  }
         }
-
         return buses_set;
     }
-
     StopsForBusResponse GetStopsForBus(const string& bus) const {
         // Реализуйте этот метод
         return  allbusesresponse_.at(bus);
-
-
     }
-
     AllBusesResponse GetAllBuses() const {
-
         // Реализуйте этот метод
         if (allbusesresponse_.empty()) {
             cout << "No buses"s << endl;
@@ -166,16 +158,12 @@ public:
                     cout << stop << " "s;
                 }
                 cout << endl;
-
-
             }
         }
     }
-
 private:
     //vector<AllBusesResponse> allbusesresponse_;
     map<string, AllBusesResponse> allbusesresponse_;
-
 };*/
 
 // Реализуйте функции и классы, объявленные выше, чтобы эта функция main
@@ -201,41 +189,42 @@ int main() {
         // пытаюсь распечатать
 
 
-        for (auto el : q.stops) {cout << "q.stop vec : "  << el << endl;}
+        for (auto el : q.stops) { cout << "q.stop vec : " << el << endl; }
 
         switch (q.type) {
-        //cout << "q.type :"s << q.type << endl;
+            //cout << "q.type :"s << q.type << endl;
         case QueryType::NewBus:
-        	cout << "q.type :"s /*<< (q.type == Query::NewBus)*/<<  endl;
-        	cout << "q.bus :"s << q.bus << endl;
-        	cout << "q.stops[0]: "<< q.stops[0] << endl ;
-        	//cout << "q.stops[4]: "<< q.stops[4] << endl ; - так не выбрасывает исключение а просто завершает работу программы
-        	cout << "q.stops[4]: "<< q.stops.at(4) << endl ;
-        	
-        	
-        	
-        	// Внимание вот от сюда не работает  --!!!! То есть не рабоатет allbusesrespons[q.bus] = q.stops;  и allbusesrespons.emplace(q.bus,  q.stops);
-        	//allbusesrespons[q.bus] = q.stops;
-        	//allbusesrespons.emplace(q.bus,  q.stops);
+            cout << "q.type :"s /*<< (q.type == Query::NewBus)*/ << endl;
+            cout << "q.bus :"s << q.bus << endl;
+            cout << "q.stops[0]: " << q.stops[0] << endl;
+            cout << "q.stops[1]: " << q.stops[1] << endl;
+            //cout << "q.stops[4]: "<< q.stops[4] << endl ; - так не выбрасывает исключение а просто завершает работу программы
+            //cout << "q.stops[4]: " << q.stops.at(4) << endl;
 
-        	//for (auto [k, v] : allbusesrespons){cout << "k : "s << k << endl; }
+
+
+            // Внимание вот от сюда не работает  --!!!! То есть не рабоатет allbusesrespons[q.bus] = q.stops;  и allbusesrespons.emplace(q.bus,  q.stops);
+            //allbusesrespons[q.bus] = q.stops;
+            //allbusesresponse.emplace(make_pair(q.bus,  q.stops));
+
+            //for (auto [k, v] : allbusesresponse){cout << "k : "s << k << endl; }
 
 
             //bm.AddBus(q.bus, q.stops);
             break;
         case QueryType::BusesForStop:
-        	cout << "q.type :"s << endl;
-        	//cout << "q.type :"s << q.type << endl;
+            cout << "q.type :"s << endl;
+            //cout << "q.type :"s << q.type << endl;
             //cout << bm.GetBusesForStop(q.stop) << endl;
             break;
         case QueryType::StopsForBus:
-        	cout << "q.type :"s << endl;
-        	//cout << "q.type :"s << q.type << endl;
+            cout << "q.type :"s << endl;
+            //cout << "q.type :"s << q.type << endl;
             //cout << bm.GetStopsForBus(q.bus) << endl;
             break;
         case QueryType::AllBuses:
-        	cout << "q.type :"s << endl;
-        	//cout << "q.type :"s << q.type << endl;
+            cout << "q.type :"s << endl;
+            //cout << "q.type :"s << q.type << endl;
             //cout << bm.GetAllBuses() << endl;
             break;
         }
@@ -246,15 +235,10 @@ int main() {
 /*int main() {
     int query_count;
     Query q;
-
     cin >> query_count;
-
-
-
     BusManager bm;
     for (int i = 0; i < query_count; ++i) {
         cin >> q;
-
         switch (q.type) {
         case QueryType::NewBus:
             bm.AddBus(q.bus, q.stops);
