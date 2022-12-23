@@ -120,7 +120,8 @@ ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
 struct AllBusesResponse {
     // Наполните полями эту структуру
     //string bus;
-    StopsForBusResponse stop_for_buses;
+    //StopsForBusResponse stop_for_buses;
+    vector<string> stop_for_buses;
 };
 
 ostream& operator<<(ostream& os, const AllBusesResponse& r) {
@@ -132,7 +133,8 @@ class BusManager {
 public:
     void AddBus(const string& bus, const vector<string>& stops) {
         // Реализуйте этот метод
-        allbusesresponse_.at(bus) = stops;
+        //allbusesresponse_.at(bus) = stops;
+        allbusesresponse_.emplace(make_pair(bus, stops));
     }
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
@@ -141,7 +143,7 @@ public:
         BusesForStopResponse buses_set;
         for (auto [bus, stops] : allbusesresponse_) {
 
-            if (stops.count(stop)!=0) { buses_set.insert(bus);  }
+            if (/*stops.count(stop)!=0*/ IsInstanceVec_(stops, stop)) {  buses_set.insert(bus);  }
         }
 
         return buses_set;
@@ -177,6 +179,12 @@ private:
     //vector<AllBusesResponse> allbusesresponse_;
     map<string, AllBusesResponse> allbusesresponse_;
 
+    bool IsInstanceVec_(const vector<string> stops, string el){
+    	for (auto str : stops){if (str==el) {return true;}
+    	}
+    	return false;
+    }
+
 };
 
 // Реализуйте функции и классы, объявленные выше, чтобы эта функция main
@@ -189,6 +197,9 @@ private:
     vector<string> stops;
 };
 */
+
+
+
 int main() {
     int query_count;
     Query q;
