@@ -20,7 +20,7 @@ using namespace std;
 
 
 /*
- 10
+11
 ALL_BUSES
 BUSES_FOR_STOP Marushkino
 STOPS_FOR_BUS 32K
