@@ -157,7 +157,7 @@ struct AllBusesResponse {
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
 	cout << "BusesForStopResponse"s << endl;
-	for (auto el : r.buses) {cout << "bus : "s << el << ", ";}
+	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}
     return os;
 }
 
@@ -168,12 +168,13 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 
 		if (!v.empty()){
 
-		cout << " stop : "s << k << " "s;
+		cout << "Stop "s << k << ": "s;
 		for (auto exempl : v) {
-			cout << " bus : "s << exempl << " "s;
+			cout /*<< " bus : "s*/ << exempl << " "s;
 		}
 		}
-		else {cout << "no interchange, "s;}
+		else {cout << "Stop "s<< k << ": no interchange"s;}
+		cout << endl;
 	}
 	;
 	return os;
