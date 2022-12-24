@@ -307,7 +307,7 @@ int main() {
             cout << bm.GetAllBuses() << endl;
             break;
         default:
-        cout « "Invalid query" « endl;
+        cout << "Invalid query" << endl;
 
         }
     }
