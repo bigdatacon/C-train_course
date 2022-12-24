@@ -20,7 +20,7 @@ using namespace std;
 
 
 /*
-11
+12
 ALL_BUSES
 BUSES_FOR_STOP Marushkino
 STOPS_FOR_BUS 32K
@@ -30,6 +30,7 @@ BUSES_FOR_STOP Vnukovo
 NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
 NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
 STOPS_FOR_BUS 272
+ALL_BUSES
 ALL_BUSES
  * */
 
@@ -188,6 +189,8 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	return os;
 }
 
+//Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
 	// Реализуйте эту функцию
 	cout << "AllBusesResponse"s << endl;
@@ -197,10 +200,11 @@ ostream& operator<<(ostream &os, const AllBusesResponse &r) {
 
 
 	for (auto [k, v] : r.stop_for_buses) {
-		cout << " bus : "s << k << " "s;
+		cout << "Bus "s << k << ":"s;
 		for (auto exempl : v) {
-			cout << " stop : "s << exempl << " "s;
+			cout << exempl << " "s;
 		}
+		cout << endl;
 	}
 	;
 	}
