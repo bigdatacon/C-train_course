@@ -223,7 +223,7 @@ public:
 		// Реализуйте этот метод
 		StopsForBusResponse empty_struct;
 
-		if (allbusesresponse_.stop_for_buses.size() != 0) {
+		if (allbusesresponse_.stop_for_buses.count(bus) > 0) {
 			vector<string> stop_for_buses_into = allbusesresponse_.stop_for_buses.at(bus);
 			for (string str : stop_for_buses_into) {
 				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
@@ -240,9 +240,8 @@ public:
 
 			}
 
-		} else {
-			return empty_struct;
 		}
+		return empty_struct;
 	}
 
 
