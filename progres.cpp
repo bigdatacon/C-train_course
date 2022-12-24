@@ -114,14 +114,14 @@ istream& operator>>(istream& is, Query& q) {
 
 struct BusesForStopResponse {
     // Наполните полями эту структуру
-    vector<string> buses_set;
+    vector<string> buses;
 };
 
 
 
 struct StopsForBusResponse {
     // Наполните полями эту структуру
-    vector<string> stops;
+	vector<pair<string, vector<string>>> stops_and_bus;
 };
 
 
@@ -135,14 +135,20 @@ struct AllBusesResponse {
 
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
-	for (auto el : r.buses_set) {cout << "stop : "s << el << ", ";}
+	for (auto el : r.buses) {cout << "stop : "s << el << ", ";}
     return os;
 }
 
-ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
-    // Реализуйте эту функцию
-	for (auto el : r.stops){cout <<" stop : "s  <<  el << " "s;};
-    return os;
+ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
+	// Реализуйте эту функцию
+	for (auto [k, v] : r.stops_and_bus) {
+		cout << " stop : "s << k << " "s;
+		for (auto exempl : v) {
+			cout << " bus : "s << exempl << " "s;
+		}
+	}
+	;
+	return os;
 }
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
@@ -174,21 +180,35 @@ public:
         BusesForStopResponse buses_set;
         for (auto el : allbusesresponse_) {
 
-            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.stop_for_buses, stop)) {  buses_set.buses_set.push_back(el.bus);  }
+            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.stop_for_buses, stop)) {  buses_set.buses.push_back(el.bus);  }
         }
 
         return buses_set;
     }
 
-    StopsForBusResponse GetStopsForBus(const string& bus) const {
-        // Реализуйте этот метод
-    	StopsForBusResponse empty_struct;
-    	if (allbusesresponse_.size()!=0) {
-    		return allbusesresponse_.at(bus); }
-    	else {return empty_struct;}
-        //return  allbusesresponse_.at(bus);
 
-    }
+    //vector<pair<string, vector<string>>> stops_and_bus;
+	StopsForBusResponse GetStopsForBus(const string &bus) const {
+		// Реализуйте этот метод
+		StopsForBusResponse empty_struct;
+
+		if (allbusesresponse_.size() != 0) {
+			vector<string> stop_for_buses_into = allbusesresponse_.at(bus);
+			for (string str : stop_for_buses_into) {
+				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
+				if (bus_for_next_stop.buses.size()!=0) {
+					empty_struct.stops_and_bus.push_back(
+							make_pair(str, bus_for_next_stop));
+				}
+				continue;
+
+			}
+
+		} else {
+			return empty_struct;
+		}
+	}
+
 
     AllBusesResponse GetAllBuses() const {
         return allbusesresponse_;
