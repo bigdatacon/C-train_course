@@ -202,7 +202,7 @@ public:
 				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
 				if (bus_for_next_stop.buses.size()!=0) {
 					empty_struct.stops_and_bus.push_back(
-							make_pair(str, bus_for_next_stop));
+							make_pair(str, bus_for_next_stop.buses));
 				}
 				continue;
 
