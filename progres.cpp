@@ -18,7 +18,7 @@ using namespace std;
 остановок автобуса bus в том порядке, в каком они были заданы в соответствующей команде NEW_BUS. Если автобусы отсутствуют, выведите No buses.
 */
 
-
+//
 /*
 10
 ALL_BUSES
@@ -31,7 +31,7 @@ NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
 NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
 STOPS_FOR_BUS 272
 ALL_BUSES
-
+ALL_BUSES
 
  * */
 
@@ -87,7 +87,6 @@ enum class QueryType {
     BusesForStop,
     StopsForBus,
     AllBuses,
-	//InvalidQuery,
 };
 
 struct Query {
@@ -162,7 +161,7 @@ struct AllBusesResponse {
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
 	//cout << "BusesForStopResponse"s << endl;
-	if (r.buses.empty()){cout << "No stop";}
+	if (r.buses.empty()){cout << "No bus";}
 	else {
 	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}}
     return os;
@@ -171,7 +170,7 @@ ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
 ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
 	//cout << "StopsForBusResponse"s << endl;
-	if (r.stops_and_bus.empty()){cout << "No bus";}
+	if (r.stops_and_bus.empty()){cout << "No stop ";}
 	else {
 
 	for (auto [k, v] : r.stops_and_bus) {
@@ -291,32 +290,31 @@ private:
 };
 ////
 
+// Реализуйте функции и классы, объявленные выше, чтобы эта функция main
+// решала задачу "Автобусные остановки"
+
 int main() {
     int query_count;
     Query q;
+
     cin >> query_count;
-    string line;
-    getline(cin, line);
+
     BusManager bm;
     for (int i = 0; i < query_count; ++i) {
         cin >> q;
-
         switch (q.type) {
-        case QueryType::NewBus:
-            bm.AddBus(q.bus, q.stops);
-            break;
-        case QueryType::BusesForStop:
-            cout << bm.GetBusesForStop(q.stop) << endl;
-            break;
-        case QueryType::StopsForBus:
-            cout << bm.GetStopsForBus(q.bus) << endl;
-            break;
-        case QueryType::AllBuses:
-            cout << bm.GetAllBuses() << endl;
-            break;
-        /*default:
-        cout << "Invalid query" << endl;*/
-
+            case QueryType::NewBus:
+                bm.AddBus(q.bus, q.stops);
+                break;
+            case QueryType::BusesForStop:
+                cout << bm.GetBusesForStop(q.stop) << endl;
+                break;
+            case QueryType::StopsForBus:
+                cout << bm.GetStopsForBus(q.bus) << endl;
+                break;
+            case QueryType::AllBuses:
+                cout << bm.GetAllBuses() << endl;
+                break;
         }
     }
 }
