@@ -164,10 +164,15 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
 	cout << "StopsForBusResponse"s << endl;
 	for (auto [k, v] : r.stops_and_bus) {
+
+		if (!v.empty()){
+
 		cout << " stop : "s << k << " "s;
 		for (auto exempl : v) {
 			cout << " bus : "s << exempl << " "s;
 		}
+		}
+		else {cout << "no interchange, "s;}
 	}
 	;
 	return os;
