@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 using namespace std;
 
@@ -31,6 +32,25 @@ NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
 STOPS_FOR_BUS 272
 ALL_BUSES
  * */
+
+// ОТВЕТ
+
+/*
+ No buses
+No stop
+No bus
+32 32K
+Stop Vnukovo: 32 32K 950
+Stop Moskovsky: no interchange
+Stop Rumyantsevo: no interchange
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+ * */
+
+
 
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
@@ -127,36 +147,62 @@ struct StopsForBusResponse {
 
 struct AllBusesResponse {
     // Наполните полями эту структуру
-    string bus;
+    //string bus;
     //StopsForBusResponse stop_for_buses;
-    vector<string> stop_for_buses;
+    //vector<string> stop_for_buses;
+    map<string, vector<string>> stop_for_buses;
 };
 
 
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
-	for (auto el : r.buses) {cout << "stop : "s << el << ", ";}
+	cout << "BusesForStopResponse"s << endl;
+	if (r.buses.empty()){cout << "No bus";}
+	else {
+	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}}
     return os;
 }
 
 ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
+	cout << "StopsForBusResponse"s << endl;
+	if (r.stops_and_bus.empty()){cout << "No stop ";}
+	else {
+
 	for (auto [k, v] : r.stops_and_bus) {
-		cout << " stop : "s << k << " "s;
+
+		if (!v.empty()){
+
+		cout << "Stop "s << k << ": "s;
 		for (auto exempl : v) {
-			cout << " bus : "s << exempl << " "s;
+			cout /*<< " bus : "s*/ << exempl << " "s;
 		}
+		}
+		else {cout << "Stop "s<< k << ": no interchange"s;}
+		cout << endl;
 	}
 	;
+	}
 	return os;
 }
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
 	// Реализуйте эту функцию
+	cout << "AllBusesResponse"s << endl;
 
-	cout << r.bus << " :"s;
-	for (auto stop : r.stop_for_buses) {cout <<"stop: "s << stop << " , "s;};
-return os;
+	if (r.stop_for_buses.empty()){cout << "No buses";}
+	else {
+
+
+	for (auto [k, v] : r.stop_for_buses) {
+		cout << " bus : "s << k << " "s;
+		for (auto exempl : v) {
+			cout << " stop : "s << exempl << " "s;
+		}
+	}
+	;
+	}
+	return os;
 }
 
 
@@ -166,11 +212,11 @@ public:
     void AddBus(const string& bus, const vector<string>& stops) {
         // Реализуйте этот метод
     	AllBusesResponse element;
-    	element.bus = bus;
-    	element.stop_for_buses = stops;
+    	//element.bus = bus;
+    	//element.stop_for_buses = stops;
 
     	//allbusesresponse_.push_back(element.bus, element.stop_for_buses);
-    	allbusesresponse_.push_back(element);
+    	allbusesresponse_.stop_for_buses.emplace(bus, stops);
 
     }
 
@@ -178,11 +224,10 @@ public:
         // Реализуйте этот метод
         //set<string> buses_set;
         BusesForStopResponse buses_set;
-        for (auto el : allbusesresponse_) {
+        for (auto el : allbusesresponse_.stop_for_buses) {
 
-            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.stop_for_buses, stop)) {  buses_set.buses.push_back(el.bus);  }
+            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.second, stop)) {buses_set.buses.push_back(el.first);}
         }
-
         return buses_set;
     }
 
@@ -192,21 +237,25 @@ public:
 		// Реализуйте этот метод
 		StopsForBusResponse empty_struct;
 
-		if (allbusesresponse_.size() != 0) {
-			vector<string> stop_for_buses_into = allbusesresponse_.at(bus);
+		if (allbusesresponse_.stop_for_buses.count(bus) > 0) {
+			vector<string> stop_for_buses_into = allbusesresponse_.stop_for_buses.at(bus);
 			for (string str : stop_for_buses_into) {
 				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
+				eliminateZeroes(bus_for_next_stop, bus);
 				if (bus_for_next_stop.buses.size()!=0) {
 					empty_struct.stops_and_bus.push_back(
-							make_pair(str, bus_for_next_stop));
+							make_pair(str, bus_for_next_stop.buses));
 				}
-				continue;
+				else {
+					vector<string> empty_vec;
+					empty_struct.stops_and_bus.push_back(
+						make_pair(str, empty_vec));}
+				//continue;
 
 			}
 
-		} else {
-			return empty_struct;
 		}
+		return empty_struct;
 	}
 
 
@@ -215,12 +264,21 @@ public:
     }
 
 private:
-    vector<AllBusesResponse> allbusesresponse_;
+    AllBusesResponse allbusesresponse_;
     bool IsInstanceVec_(const vector<string> stops, string el) const {
     	for (auto str : stops){if (str==el) {return true;}
     	}
     	return false;
     }
+
+    BusesForStopResponse & eliminateZeroes( BusesForStopResponse &answers , string el ) const
+    {
+
+        answers.buses.erase(remove( answers.buses.begin(), answers.buses.end(), el ), answers.buses.end() );
+
+        return answers;
+    }
+
 
 };
 
