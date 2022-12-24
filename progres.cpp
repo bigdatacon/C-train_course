@@ -147,10 +147,9 @@ ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
 	// Реализуйте эту функцию
-	for (auto el : r) {
-		cout << el.bus << " :"s;
-	for (auto stop : r.stop_for_buses {cout <<"stop: "s << stop << " , "s;})
-};
+
+	cout << r.bus << " :"s;
+	for (auto stop : r.stop_for_buses) {cout <<"stop: "s << stop << " , "s;};
 return os;
 }
 
