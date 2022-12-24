@@ -171,23 +171,25 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 //Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
-	// Реализуйте эту функцию
-	//cout << "AllBusesResponse"s << endl;
+  // Реализуйте эту функцию
+  //cout << "AllBusesResponse"s << endl;
 
-	if (r.stop_for_buses.empty()){cout << "No buses";}
-	else {
-
-
-	for (auto [k, v] : r.stop_for_buses) {
-		cout << "Bus "s << k << ": "s;
-		for (auto exempl : v) {
-			cout << exempl << " "s;
-		}
-		cout << endl;
-	}
-	;
-	}
-	return os;
+  if (r.stop_for_buses.empty()){
+    cout << "No buses";
+  } else {
+    bool first = true;
+    for (auto [k, v] : r.stop_for_buses) {
+      if (!first) {
+        cout << endl;
+      }
+      first = false;
+      cout << "Bus "s << k << ": "s;
+      for (auto exempl : v) {
+        cout << exempl << " "s;
+      }
+    }
+  }
+  return os;
 }
 
 
