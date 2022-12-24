@@ -85,6 +85,7 @@ enum class QueryType {
     BusesForStop,
     StopsForBus,
     AllBuses,
+	InvalidQuery,
 };
 
 struct Query {
@@ -127,6 +128,7 @@ istream& operator>>(istream& is, Query& q) {
     else if (query_from_cin[0] == "ALL_BUSES"s) {
     	q.type = QueryType::AllBuses;
     }
+    else {q.type = QueryType::InvalidQuery;}
     return is;
 }
 
@@ -304,6 +306,9 @@ int main() {
         case QueryType::AllBuses:
             cout << bm.GetAllBuses() << endl;
             break;
+        default:
+        cout « "Invalid query" « endl;
+
         }
     }
 }
