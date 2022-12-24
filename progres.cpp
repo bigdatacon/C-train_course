@@ -31,7 +31,7 @@ NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
 NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
 STOPS_FOR_BUS 272
 ALL_BUSES
-ALL_BUSES
+
 
  * */
 
@@ -87,7 +87,7 @@ enum class QueryType {
     BusesForStop,
     StopsForBus,
     AllBuses,
-	InvalidQuery,
+	//InvalidQuery,
 };
 
 struct Query {
@@ -162,7 +162,7 @@ struct AllBusesResponse {
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
 	//cout << "BusesForStopResponse"s << endl;
-	if (r.buses.empty()){cout << "No bus";}
+	if (r.buses.empty()){cout << "No stop";}
 	else {
 	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}}
     return os;
@@ -171,7 +171,7 @@ ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
 ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
 	//cout << "StopsForBusResponse"s << endl;
-	if (r.stops_and_bus.empty()){cout << "No stop ";}
+	if (r.stops_and_bus.empty()){cout << "No bus";}
 	else {
 
 	for (auto [k, v] : r.stops_and_bus) {
