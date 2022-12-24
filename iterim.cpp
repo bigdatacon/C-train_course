@@ -222,6 +222,11 @@ public:
 			vector<string> stop_for_buses_into = allbusesresponse_.stop_for_buses.at(bus);
 			for (string str : stop_for_buses_into) {
 				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
+				//bus_for_next_stop.buses.erase(std::remove(bus_for_next_stop.buses.begin(), bus_for_next_stop.buses.end(), bus), bus_for_next_stop.buses.end());
+				//std::erase(bus_for_next_stop.buses, bus);
+				//for (auto el : bus_for_next_stop.buses){ if (el==bus){bus_for_next_stop.buses.erase(bus);}}
+
+
 				if (bus_for_next_stop.buses.size()!=0) {
 					empty_struct.stops_and_bus.push_back(
 							make_pair(str, bus_for_next_stop.buses));
