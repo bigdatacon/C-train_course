@@ -32,7 +32,7 @@ STOPS_FOR_BUS 272
 ALL_BUSES
  * */
 
-// ОТВЕТ 
+// ОТВЕТ
 
 /*
  No buses
@@ -155,12 +155,14 @@ struct AllBusesResponse {
 
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
+	cout << "BusesForStopResponse"s << endl;
 	for (auto el : r.buses) {cout << "bus : "s << el << ", ";}
     return os;
 }
 
 ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
+	cout << "StopsForBusResponse"s << endl;
 	for (auto [k, v] : r.stops_and_bus) {
 		cout << " stop : "s << k << " "s;
 		for (auto exempl : v) {
@@ -173,6 +175,7 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
 	// Реализуйте эту функцию
+	cout << "AllBusesResponse"s << endl;
 	for (auto [k, v] : r.stop_for_buses) {
 		cout << " bus : "s << k << " "s;
 		for (auto exempl : v) {
