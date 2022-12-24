@@ -293,6 +293,8 @@ int main() {
     int query_count;
     Query q;
     cin >> query_count;
+    string line;
+    getline(cin, line);
     BusManager bm;
     for (int i = 0; i < query_count; ++i) {
         cin >> q;
