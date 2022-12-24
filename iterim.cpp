@@ -7,6 +7,31 @@
 
 using namespace std;
 
+
+/*
+На запрос BUSES_FOR_STOP stop выведите через пробел список автобусов, проезжающих через эту остановку, в том порядке, в котором они создавались командами NEW_BUS. Если остановка stop не существует, выведите No stop.
+На запрос STOPS_FOR_BUS bus выведите описания остановок маршрута bus в отдельных строках в том порядке, в котором они были заданы в соответствующей команде NEW_BUS. Описание каждой остановки stop должно иметь вид Stop stop: bus1 bus2 ...,
+*/
+/*
+На запрос ALL_BUSES выведите описания всех автобусов в алфавитном порядке. Описание каждого маршрута bus должно иметь вид Bus bus: stop1 stop2 ..., где stop1 stop2 ... — список
+остановок автобуса bus в том порядке, в каком они были заданы в соответствующей команде NEW_BUS. Если автобусы отсутствуют, выведите No buses.
+*/
+
+
+/*
+ 10
+ALL_BUSES
+BUSES_FOR_STOP Marushkino
+STOPS_FOR_BUS 32K
+NEW_BUS 32 3 Tolstopaltsevo Marushkino Vnukovo
+NEW_BUS 32K 6 Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+BUSES_FOR_STOP Vnukovo
+NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
+STOPS_FOR_BUS 272
+ALL_BUSES
+ * */
+
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
     string word;
@@ -49,19 +74,6 @@ struct Query {
     vector<string> stops;
 };
 
-/*
- 10
-ALL_BUSES
-BUSES_FOR_STOP Marushkino
-STOPS_FOR_BUS 32K
-NEW_BUS 32 3 Tolstopaltsevo Marushkino Vnukovo
-NEW_BUS 32K 6 Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
-BUSES_FOR_STOP Vnukovo
-NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
-NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
-STOPS_FOR_BUS 272
-ALL_BUSES
- * */
 
 
 istream& operator>>(istream& is, Query& q) {
@@ -95,121 +107,119 @@ istream& operator>>(istream& is, Query& q) {
     else if (query_from_cin[0] == "ALL_BUSES"s) {
     	q.type = QueryType::AllBuses;
     }
-
-
     return is;
 }
 
-
-/*
-На запрос BUSES_FOR_STOP stop выведите через пробел список автобусов, проезжающих через эту остановку, в том порядке, в котором они создавались командами NEW_BUS. Если остановка stop не существует, выведите No stop.
-На запрос STOPS_FOR_BUS bus выведите описания остановок маршрута bus в отдельных строках в том порядке, в котором они были заданы в соответствующей команде NEW_BUS. Описание каждой остановки stop должно иметь вид Stop stop: bus1 bus2 ...,
-*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Вспомогательыне функции/инфо закончились
 
 struct BusesForStopResponse {
     // Наполните полями эту структуру
-    set<string> buses_set;
+    vector<string> buses;
 };
 
-ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
-    // Реализуйте эту функцию
-    return os;
-}
 
-/*struct StopsForBusResponse {
+
+struct StopsForBusResponse {
     // Наполните полями эту структуру
-    vector<string> stops;
-};*/
-
-
-
-/*
-На запрос ALL_BUSES выведите описания всех автобусов в алфавитном порядке. Описание каждого маршрута bus должно иметь вид Bus bus: stop1 stop2 ..., где stop1 stop2 ... — список
-остановок автобуса bus в том порядке, в каком они были заданы в соответствующей команде NEW_BUS. Если автобусы отсутствуют, выведите No buses.
-*/
-
+	vector<pair<string, vector<string>>> stops_and_bus;
+};
 
 
 struct AllBusesResponse {
     // Наполните полями эту структуру
     //string bus;
     //StopsForBusResponse stop_for_buses;
-    vector<string> stop_for_buses;
+    //vector<string> stop_for_buses;
+    map<string, vector<string>> stop_for_buses;
 };
 
-typedef AllBusesResponse StopsForBusResponse /*AllBusesResponse*/;
 
-/*ostream& operator<<(ostream& os, const StopsForBusResponse& r) {
+ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
-    return os;
-}*/
-
-ostream& operator<<(ostream& os, const AllBusesResponse& r)  {
-    // Реализуйте эту функцию
-	for (auto el : r.stop_for_buses){cout << el << " "s;};
+	for (auto el : r.buses) {cout << "stop : "s << el << ", ";}
     return os;
 }
+
+ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
+	// Реализуйте эту функцию
+	for (auto [k, v] : r.stops_and_bus) {
+		cout << " stop : "s << k << " "s;
+		for (auto exempl : v) {
+			cout << " bus : "s << exempl << " "s;
+		}
+	}
+	;
+	return os;
+}
+
+ostream& operator<<(ostream &os, const AllBusesResponse &r) {
+	// Реализуйте эту функцию
+	for (auto [k, v] : r.stop_for_buses) {
+		cout << " bus : "s << k << " "s;
+		for (auto exempl : v) {
+			cout << " stop : "s << exempl << " "s;
+		}
+	}
+	;
+	return os;
+}
+
+
 
 class BusManager {
 public:
     void AddBus(const string& bus, const vector<string>& stops) {
         // Реализуйте этот метод
-        //allbusesresponse_.at(bus) = stops;
-        //allbusesresponse_.emplace(make_pair(bus, stops));
-        allbusesresponse_.emplace(pair<string, AllBusesResponse>(bus, {stops}));
+    	AllBusesResponse element;
+    	//element.bus = bus;
+    	//element.stop_for_buses = stops;
+
+    	//allbusesresponse_.push_back(element.bus, element.stop_for_buses);
+    	allbusesresponse_.stop_for_buses.emplace(bus, stops);
+
     }
 
     BusesForStopResponse GetBusesForStop(const string& stop) const {
         // Реализуйте этот метод
         //set<string> buses_set;
         BusesForStopResponse buses_set;
-        for (auto [bus, stops] : allbusesresponse_) {
+        for (auto el : allbusesresponse_.stop_for_buses) {
 
-            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(stops.stop_for_buses, stop)) {  buses_set.buses_set.insert(bus);  }
+            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.second, stop)) {buses_set.buses.push_back(el.first);}
         }
-
         return buses_set;
     }
 
-    StopsForBusResponse GetStopsForBus(const string& bus) const {
-        // Реализуйте этот метод
-    	StopsForBusResponse empty_struct;
-    	if (allbusesresponse_.size()!=0) {return allbusesresponse_.at(bus);}
-    	else {return empty_struct;}
-        //return  allbusesresponse_.at(bus);
 
+    //vector<pair<string, vector<string>>> stops_and_bus;
+	StopsForBusResponse GetStopsForBus(const string &bus) const {
+		// Реализуйте этот метод
+		StopsForBusResponse empty_struct;
 
-    }
+		if (allbusesresponse_.stop_for_buses.size() != 0) {
+			vector<string> stop_for_buses_into = allbusesresponse_.stop_for_buses.at(bus);
+			for (string str : stop_for_buses_into) {
+				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
+				if (bus_for_next_stop.buses.size()!=0) {
+					empty_struct.stops_and_bus.push_back(
+							make_pair(str, bus_for_next_stop));
+				}
+				continue;
+
+			}
+
+		} else {
+			return empty_struct;
+		}
+	}
+
 
     AllBusesResponse GetAllBuses() const {
-    	//vector<string> stop_for_buses_itg;
-    	AllBusesResponse stop_for_buses_itg;
-        // Реализуйте этот метод
-        if (allbusesresponse_.empty()) {
-            cout << "No buses"s << endl;
-        }
-        else {
-            for (const auto& [bus, stops] : allbusesresponse_) {
-
-                //cout << "Bus "s << bus << ": "s;
-                for (const string& stop : /*bus_item.stop_for_buses.stops*/ stops.stop_for_buses ) {
-                    //cout << stop << " "s;
-                    stop_for_buses_itg.stop_for_buses.push_back(stop);
-                }
-                //cout << endl;
-
-
-            }
-        }
-        //AllBusesResponse response = {allbusesresponse_.keys()};
-        //AllBusesResponse response = {allbusesresponse_.values()};
-        return stop_for_buses_itg;
+        return allbusesresponse_;
     }
 
 private:
-    //vector<AllBusesResponse> allbusesresponse_;
-    map<string, AllBusesResponse> allbusesresponse_;
-
+    AllBusesResponse allbusesresponse_;
     bool IsInstanceVec_(const vector<string> stops, string el) const {
     	for (auto str : stops){if (str==el) {return true;}
     	}
@@ -218,27 +228,10 @@ private:
 
 };
 
-// Реализуйте функции и классы, объявленные выше, чтобы эта функция main
-// решала задачу "Автобусные остановки"
-
-/*struct Query {
-    QueryType type;
-    string bus;
-    string stop;
-    vector<string> stops;
-};
-*/
-
-
-
 int main() {
     int query_count;
     Query q;
-
     cin >> query_count;
-
-
-
     BusManager bm;
     for (int i = 0; i < query_count; ++i) {
         cin >> q;
