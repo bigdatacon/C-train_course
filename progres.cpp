@@ -127,9 +127,10 @@ istream& operator>>(istream& is, Query& q) {
     }
 
     else if (query_from_cin[0] == "ALL_BUSES"s) {
-    	q.type = QueryType::AllBuses;
+      q.type = QueryType::AllBuses;
+    } else if (query_from_cin[0] == ""s) {
+        return is >> q;
     }
-    else {q.type = QueryType::InvalidQuery;}
     return is;
 }
 
@@ -287,7 +288,7 @@ private:
 
 
 };
-//
+///
 
 int main() {
     int query_count;
