@@ -31,6 +31,7 @@ NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
 NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
 STOPS_FOR_BUS 272
 ALL_BUSES
+ALL_BUSES
 
  * */
 
@@ -160,7 +161,7 @@ struct AllBusesResponse {
 
 ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
     // Реализуйте эту функцию
-	cout << "BusesForStopResponse"s << endl;
+	//cout << "BusesForStopResponse"s << endl;
 	if (r.buses.empty()){cout << "No bus";}
 	else {
 	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}}
@@ -169,7 +170,7 @@ ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
 
 ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
-	cout << "StopsForBusResponse"s << endl;
+	//cout << "StopsForBusResponse"s << endl;
 	if (r.stops_and_bus.empty()){cout << "No stop ";}
 	else {
 
@@ -194,7 +195,7 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
 	// Реализуйте эту функцию
-	cout << "AllBusesResponse"s << endl;
+	//cout << "AllBusesResponse"s << endl;
 
 	if (r.stop_for_buses.empty()){cout << "No buses";}
 	else {
@@ -288,7 +289,7 @@ private:
 
 
 };
-///
+////
 
 int main() {
     int query_count;
@@ -313,8 +314,8 @@ int main() {
         case QueryType::AllBuses:
             cout << bm.GetAllBuses() << endl;
             break;
-        default:
-        cout << "Invalid query" << endl;
+        /*default:
+        cout << "Invalid query" << endl;*/
 
         }
     }
