@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -292,7 +293,7 @@ void TestAddDocument() {
     cout << "Print document"s << endl;
     for (auto doc : document) {
     PrintDocument(doc);}
-    //assert(server.GetSynonymCount("melody"s) == 0);
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0] == { document_id = 0, relevance = 0, rating = 2 });
 }
 
 
