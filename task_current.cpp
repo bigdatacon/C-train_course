@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -287,7 +288,7 @@ void TestAddDocument() {
     SearchServer server;
     server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
     //search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
-    Document document = search_server.FindTopDocuments("белый кот и модный ошейник"s);
+    Document document = server.FindTopDocuments("белый кот и модный ошейник"s);
        
     cout << "Print document"s << endl;
     PrintDocument(document);
