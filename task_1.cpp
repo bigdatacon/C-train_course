@@ -7,6 +7,12 @@
 #include <algorithm>
 
 using namespace std;
+// СКРИНШОТ 
+
+/*
+https://disk.yandex.ru/i/ozVj7uMPW3FzBQ
+*/
+
 
 //Вывод мой
 /*
