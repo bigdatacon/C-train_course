@@ -305,8 +305,9 @@ public:
 			for (string str : stop_for_buses_into) {
 				BusesForStopResponse buses_set_ordered_two;
 				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
-				buses_set_ordered_two.buses = VectorCompar(bus_for_next_stop);
-				eliminateZeroes(bus_for_next_stop, bus);
+				buses_set_ordered_two.buses = VectorCompar(bus_for_next_stop.buses);
+				eliminateZeroes(buses_set_ordered_two, bus);
+				//eliminateZeroes(bus_for_next_stop, bus);
 				if (bus_for_next_stop.buses.size()!=0) {
 					empty_struct.stops_and_bus.push_back(
 							make_pair(str, buses_set_ordered_two.buses));
