@@ -9,20 +9,6 @@
 using namespace std;
 
 /*
-9
-NEW_BUS 32 3 Tolstopaltsevo Marushkino Vnukovo
-NEW_BUS 32K 6 Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
-NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
-NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
-STOPS_FOR_BUS 272
-STOPS_FOR_BUS 950
-BUSES_FOR_STOP Marushkino
-BUSES_FOR_STOP Vnukovo
-BUSES_FOR_STOP Solntsevo
-*/
-
-
-/*
  10
 ALL_BUSES
 BUSES_FOR_STOP Marushkino
@@ -55,6 +41,36 @@ Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
 
 */
 
+/*
+No buses
+No stop
+No bus
+32 32K
+Stop Vnukovo: 32 32K 950
+Stop Moskovsky: no interchange
+Stop Rumyantsevo: no interchange
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+ */
+
+// ВЫВОД по заданию
+/*
+No buses
+No stop
+No bus
+32 32K
+Stop Vnukovo: 32 32K 950
+Stop Moskovsky: no interchange
+Stop Rumyantsevo: no interchange
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+*/
 
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
@@ -261,6 +277,7 @@ public:
 
     	//allbusesresponse_.push_back(element.bus, element.stop_for_buses);
     	allbusesresponse_.stop_for_buses.emplace(bus, stops);
+    	buses_order_.push_back(bus);
 
     }
 
@@ -268,11 +285,13 @@ public:
         // Реализуйте этот метод
         //set<string> buses_set;
         BusesForStopResponse buses_set;
+        BusesForStopResponse buses_set_ordered;
         for (auto el : allbusesresponse_.stop_for_buses) {
 
             if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.second, stop)) {buses_set.buses.push_back(el.first);}
         }
-        return buses_set;
+        buses_set_ordered.buses = VectorCompar(buses_set.buses);
+        return buses_set_ordered;
     }
 
 
@@ -309,6 +328,7 @@ public:
 
 private:
     AllBusesResponse allbusesresponse_;
+    vector<string> buses_order_;
     bool IsInstanceVec_(const vector<string> stops, string el) const {
     	for (auto str : stops){if (str==el) {return true;}
     	}
@@ -321,6 +341,49 @@ private:
         answers.buses.erase(remove( answers.buses.begin(), answers.buses.end(), el ), answers.buses.end() );
 
         return answers;
+    }
+
+    vector<string> VectorCompar(const vector<string> & main_v) const {
+		map<int, string> result_map;
+		vector<string> result_vec;
+		int i_border = main_v.size() - 1;
+		int j_border = main_v.size();
+		for (int i=0; i < i_border; ++i) {
+			for (int j=1;  j <j_border; ++j) {
+				string first_el =main_v[i];
+				string second_el =main_v[j];
+				int index_first = getIndex(buses_order_, first_el);
+				int index_second = getIndex(buses_order_, second_el);
+				result_map.emplace(index_first, first_el);
+				result_map.emplace(index_second, second_el);
+			}
+		}
+
+		for (auto el : result_map) {
+			result_vec.push_back(el.second);
+		}
+		return result_vec;
+	}
+
+    int getIndex(vector<string> v, string K) const
+    {
+        auto it = find(v.begin(), v.end(), K);
+        int index;
+        // If element was found
+        if (it != v.end())
+        {
+
+            // calculating the index
+            // of K
+            index = it - v.begin();
+            //cout << index << endl;
+        }
+        else {
+            // If the element is not
+            // present in the vector
+        	index = -1;
+        }
+        return index;
     }
 
 
