@@ -7,11 +7,21 @@
 #include <algorithm>
 
 using namespace std;
-// СКРИНШОТ 
 
 /*
-https://disk.yandex.ru/i/ozVj7uMPW3FzBQ
-*/
+ 10
+ALL_BUSES
+BUSES_FOR_STOP Marushkino
+STOPS_FOR_BUS 32K
+NEW_BUS 32 3 Tolstopaltsevo Marushkino Vnukovo
+NEW_BUS 32K 6 Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+BUSES_FOR_STOP Vnukovo
+NEW_BUS 950 6 Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
+STOPS_FOR_BUS 272
+ALL_BUSES
+ALL_BUSES
+ * */
 
 
 //Вывод мой
@@ -19,19 +29,32 @@ https://disk.yandex.ru/i/ozVj7uMPW3FzBQ
 No buses
 No stop
 No bus
-32 32K 
-Stop Vnukovo: 32 32K 950 
+32 32K
+Stop Vnukovo: 32 32K 950
 Stop Moskovsky: no interchange
 Stop Rumyantsevo: no interchange
-Stop Troparyovo: 950 
-Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo 
-Bus 32: Tolstopaltsevo Marushkino Vnukovo 
-Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo 
-Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo 
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
 
 */
 
-
+/*
+No buses
+No stop
+No bus
+32 32K
+Stop Vnukovo: 32 32K 950
+Stop Moskovsky: no interchange
+Stop Rumyantsevo: no interchange
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+ */
 
 // ВЫВОД по заданию
 /*
@@ -154,13 +177,25 @@ struct AllBusesResponse {
 };
 
 
-ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
-    // Реализуйте эту функцию
+ostream& operator<<(ostream &os, const BusesForStopResponse &r) {
+	// Реализуйте эту функцию
 	//cout << "BusesForStopResponse"s << endl;
-	if (r.buses.empty()){cout << "No stop";}
-	else {
-	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}}
-    return os;
+	if (r.buses.empty()) {
+		cout << "No stop";
+	} else {
+		int size_v = r.buses.size();
+		int sch = 1;
+		for (auto el : r.buses) {
+			if (sch < size_v) {
+				cout /*<< "bus : "s */<< el << " ";
+			} else {
+				cout << el;
+			}
+			++sch;
+		}
+
+	}
+	return os;
 }
 
 
@@ -181,8 +216,14 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 		if (!v.empty()){
 
 		cout << "Stop "s << k << ": "s;
+	      int size_v = v.size();
+	      int sch = 1;
 		for (auto exempl : v) {
-			cout /*<< " bus : "s*/ << exempl << " "s;
+	    	//cout << "sch_stop :"s << sch << "size_v_stop :"s << size_v << endl;
+	    	if (sch<size_v) {
+			cout /*<< " bus : "s*/ << exempl << " "s;}
+	    	else {cout<< exempl;}
+	    	++sch;
 		}
 		}
 		else {cout << "Stop "s<< k << ": no interchange"s;}
@@ -209,8 +250,15 @@ ostream& operator<<(ostream &os, const AllBusesResponse &r) {
       }
       first = false;
       cout << "Bus "s << k << ": "s;
+      int size_v = v.size();
+      int sch = 1;
+
       for (auto exempl : v) {
-        cout << exempl << " "s;
+    	//cout << "sch :"s << sch << "size_v :"s << size_v << endl;
+    	if (sch<size_v) {
+        cout << exempl << " "s;}
+    	else {cout << exempl;}
+        ++sch;
       }
     }
   }
