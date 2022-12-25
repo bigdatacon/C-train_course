@@ -8,19 +8,8 @@
 
 using namespace std;
 
-
 /*
-На запрос BUSES_FOR_STOP stop выведите через пробел список автобусов, проезжающих через эту остановку, в том порядке, в котором они создавались командами NEW_BUS. Если остановка stop не существует, выведите No stop.
-На запрос STOPS_FOR_BUS bus выведите описания остановок маршрута bus в отдельных строках в том порядке, в котором они были заданы в соответствующей команде NEW_BUS. Описание каждой остановки stop должно иметь вид Stop stop: bus1 bus2 ...,
-*/
-/*
-На запрос ALL_BUSES выведите описания всех автобусов в алфавитном порядке. Описание каждого маршрута bus должно иметь вид Bus bus: stop1 stop2 ..., где stop1 stop2 ... — список
-остановок автобуса bus в том порядке, в каком они были заданы в соответствующей команде NEW_BUS. Если автобусы отсутствуют, выведите No buses.
-*/
-
-//
-/*
-10
+ 10
 ALL_BUSES
 BUSES_FOR_STOP Marushkino
 STOPS_FOR_BUS 32K
@@ -32,13 +21,12 @@ NEW_BUS 272 4 Vnukovo Moskovsky Rumyantsevo Troparyovo
 STOPS_FOR_BUS 272
 ALL_BUSES
 ALL_BUSES
-
  * */
 
-// ОТВЕТ
 
+//Вывод мой
 /*
- No buses
+No buses
 No stop
 No bus
 32 32K
@@ -50,9 +38,39 @@ Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
 Bus 32: Tolstopaltsevo Marushkino Vnukovo
 Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
 Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
- * */
 
+*/
 
+/*
+No buses
+No stop
+No bus
+32 32K
+Stop Vnukovo: 32 32K 950
+Stop Moskovsky: no interchange
+Stop Rumyantsevo: no interchange
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+ */
+
+// ВЫВОД по заданию
+/*
+No buses
+No stop
+No bus
+32 32K
+Stop Vnukovo: 32 32K 950
+Stop Moskovsky: no interchange
+Stop Rumyantsevo: no interchange
+Stop Troparyovo: 950
+Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
+Bus 32: Tolstopaltsevo Marushkino Vnukovo
+Bus 32K: Tolstopaltsevo Marushkino Vnukovo Peredelkino Solntsevo Skolkovo
+Bus 950: Kokoshkino Marushkino Vnukovo Peredelkino Solntsevo Troparyovo
+*/
 
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
@@ -87,6 +105,7 @@ enum class QueryType {
     BusesForStop,
     StopsForBus,
     AllBuses,
+
 };
 
 struct Query {
@@ -158,32 +177,57 @@ struct AllBusesResponse {
 };
 
 
-ostream& operator<<(ostream& os, const BusesForStopResponse& r) {
-    // Реализуйте эту функцию
+ostream& operator<<(ostream &os, const BusesForStopResponse &r) {
+	// Реализуйте эту функцию
 	//cout << "BusesForStopResponse"s << endl;
-	if (r.buses.empty()){cout << "No bus";}
-	else {
-	for (auto el : r.buses) {cout /*<< "bus : "s */<< el << " ";}}
-    return os;
+	if (r.buses.empty()) {
+		cout << "No stop";
+	} else {
+		int size_v = r.buses.size();
+		int sch = 1;
+		for (auto el : r.buses) {
+			if (sch < size_v) {
+				cout /*<< "bus : "s */<< el << " ";
+			} else {
+				cout << el;
+			}
+			++sch;
+		}
+
+	}
+	return os;
 }
+
+
 
 ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 	// Реализуйте эту функцию
 	//cout << "StopsForBusResponse"s << endl;
-	if (r.stops_and_bus.empty()){cout << "No stop ";}
+	if (r.stops_and_bus.empty()){cout << "No bus";}
 	else {
-
+		bool first = true;
 	for (auto [k, v] : r.stops_and_bus) {
+
+	    if (!first) {
+	      cout << endl;
+	    }
+	    first = false;
 
 		if (!v.empty()){
 
 		cout << "Stop "s << k << ": "s;
+	      int size_v = v.size();
+	      int sch = 1;
 		for (auto exempl : v) {
-			cout /*<< " bus : "s*/ << exempl << " "s;
+	    	//cout << "sch_stop :"s << sch << "size_v_stop :"s << size_v << endl;
+	    	if (sch<size_v) {
+			cout /*<< " bus : "s*/ << exempl << " "s;}
+	    	else {cout<< exempl;}
+	    	++sch;
 		}
 		}
 		else {cout << "Stop "s<< k << ": no interchange"s;}
-		cout << endl;
+		//cout << endl;
 	}
 	;
 	}
@@ -193,23 +237,32 @@ ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
 //Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
 
 ostream& operator<<(ostream &os, const AllBusesResponse &r) {
-	// Реализуйте эту функцию
-	//cout << "AllBusesResponse"s << endl;
+  // Реализуйте эту функцию
+  //cout << "AllBusesResponse"s << endl;
 
-	if (r.stop_for_buses.empty()){cout << "No buses";}
-	else {
+  if (r.stop_for_buses.empty()){
+    cout << "No buses";
+  } else {
+    bool first = true;
+    for (auto [k, v] : r.stop_for_buses) {
+      if (!first) {
+        cout << endl;
+      }
+      first = false;
+      cout << "Bus "s << k << ": "s;
+      int size_v = v.size();
+      int sch = 1;
 
-
-	for (auto [k, v] : r.stop_for_buses) {
-		cout << "Bus "s << k << ": "s;
-		for (auto exempl : v) {
-			cout << exempl << " "s;
-		}
-		cout << endl;
-	}
-	;
-	}
-	return os;
+      for (auto exempl : v) {
+    	//cout << "sch :"s << sch << "size_v :"s << size_v << endl;
+    	if (sch<size_v) {
+        cout << exempl << " "s;}
+    	else {cout << exempl;}
+        ++sch;
+      }
+    }
+  }
+  return os;
 }
 
 
@@ -224,6 +277,7 @@ public:
 
     	//allbusesresponse_.push_back(element.bus, element.stop_for_buses);
     	allbusesresponse_.stop_for_buses.emplace(bus, stops);
+    	buses_order_.push_back(bus);
 
     }
 
@@ -231,11 +285,13 @@ public:
         // Реализуйте этот метод
         //set<string> buses_set;
         BusesForStopResponse buses_set;
+        BusesForStopResponse buses_set_ordered;
         for (auto el : allbusesresponse_.stop_for_buses) {
 
             if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.second, stop)) {buses_set.buses.push_back(el.first);}
         }
-        return buses_set;
+        buses_set_ordered.buses = VectorCompar(buses_set.buses);
+        return buses_set_ordered;
     }
 
 
@@ -247,11 +303,13 @@ public:
 		if (allbusesresponse_.stop_for_buses.count(bus) > 0) {
 			vector<string> stop_for_buses_into = allbusesresponse_.stop_for_buses.at(bus);
 			for (string str : stop_for_buses_into) {
+				BusesForStopResponse buses_set_ordered_two;
 				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
+				buses_set_ordered_two.buses = VectorCompar(bus_for_next_stop);
 				eliminateZeroes(bus_for_next_stop, bus);
 				if (bus_for_next_stop.buses.size()!=0) {
 					empty_struct.stops_and_bus.push_back(
-							make_pair(str, bus_for_next_stop.buses));
+							make_pair(str, buses_set_ordered_two.buses));
 				}
 				else {
 					vector<string> empty_vec;
@@ -272,6 +330,7 @@ public:
 
 private:
     AllBusesResponse allbusesresponse_;
+    vector<string> buses_order_;
     bool IsInstanceVec_(const vector<string> stops, string el) const {
     	for (auto str : stops){if (str==el) {return true;}
     	}
@@ -286,10 +345,52 @@ private:
         return answers;
     }
 
+    vector<string> VectorCompar(const vector<string> & main_v) const {
+		map<int, string> result_map;
+		vector<string> result_vec;
+		int i_border = main_v.size() - 1;
+		int j_border = main_v.size();
+		for (int i=0; i < i_border; ++i) {
+			for (int j=1;  j <j_border; ++j) {
+				string first_el =main_v[i];
+				string second_el =main_v[j];
+				int index_first = getIndex(buses_order_, first_el);
+				int index_second = getIndex(buses_order_, second_el);
+				result_map.emplace(index_first, first_el);
+				result_map.emplace(index_second, second_el);
+			}
+		}
+
+		for (auto el : result_map) {
+			result_vec.push_back(el.second);
+		}
+		return result_vec;
+	}
+
+    int getIndex(vector<string> v, string K) const
+    {
+        auto it = find(v.begin(), v.end(), K);
+        int index;
+        // If element was found
+        if (it != v.end())
+        {
+
+            // calculating the index
+            // of K
+            index = it - v.begin();
+            //cout << index << endl;
+        }
+        else {
+            // If the element is not
+            // present in the vector
+        	index = -1;
+        }
+        return index;
+    }
+
 
 };
 ////
-
 // Реализуйте функции и классы, объявленные выше, чтобы эта функция main
 // решала задачу "Автобусные остановки"
 
