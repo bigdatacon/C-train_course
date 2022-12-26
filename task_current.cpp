@@ -358,7 +358,28 @@ void TestRatingDocument() {
 }
 
 //7. Фильтрация результатов поиска с использованием предиката, задаваемого пользователем.
-void TestFiltrDocument() {
+void TestFiltrocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(2, "полосатый пес в крапинку со шнурками на ботинках"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(3, "черный пес с пятном белым"s,        DocumentStatus::IRRELEVANT, {8, 4});
+    server.AddDocument(4, "желтый кот с серым ошейником"s,        DocumentStatus::BANNED, {8, 8});
+
+    //cout << "Even ids:"s << endl;
+    vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; });
+
+    /*for (auto doc : document) {
+        PrintDocument(doc);
+    };
+
+    cout << "document.size() : "s << document.size() << endl;*/
+
+    assert(document.size() == 2);
+}
+
+//8 Поиск документов, имеющих заданный статус.
+void TestFiltrSTATDocument() {
     SearchServer server;
     server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
     server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
@@ -370,14 +391,14 @@ void TestFiltrDocument() {
     for (auto doc : document) {
     PrintDocument(doc);}*/
 
-    cout << "IRRELEVANT:"s << endl;
+    //cout << "IRRELEVANT:"s << endl;
 
     /*for (const Document& document : server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
         PrintDocument(document);
     }*/
 
     vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::IRRELEVANT; });
-    cout << document.size();
+    //cout << document.size();
     vector<Document> document_2 = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });   // ничего не находит
     /*for (auto doc : document) {
         PrintDocument(doc);}
@@ -387,9 +408,6 @@ void TestFiltrDocument() {
 
     assert(document.size() == 1 && document_2.size()==3);
 }
-
-
-//8 Поиск документов, имеющих заданный статус.
 
 
 //9 Корректное вычисление релевантности найденных документов.
@@ -422,8 +440,9 @@ void TestSearchServer() {
     TestMatchDoc();
     TestSortDocument();
     TestRatingDocument();
-    TestFiltrDocument();
+    TestFiltrSTATDocument();
 
+    TestFiltrocument();
     TestRelevanceDocument();
 
     // Не забудьте вызывать остальные тесты здесь
