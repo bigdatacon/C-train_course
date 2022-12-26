@@ -1,357 +1,184 @@
-#include <cassert>
+
 #include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-#include <set>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace std;
 
+// -------- Начало модульных тестов поисковой системы ----------
 
-
-vector<string> SplitIntoWords(const string& text) {
-    vector<string> words;
-    string word;
-    for (const char c : text) {
-        if (c == ' ') {
-            words.push_back(word);
-            word = "";
-        }
-        else {
-            word += c;
-        }
-    }
-    words.push_back(word);
-
-    return words;
-}
-
-// метод получения среза вектора
-template<typename T>
-std::vector<T> slice(std::vector<T> const& v, int m)
-{
-    auto first = v.cbegin() + m;
-    auto last = v.end();
-
-    std::vector<T> vec(first, last);
-    return vec;
-}
-
-enum class QueryType {
-    NewBus,
-    BusesForStop,
-    StopsForBus,
-    AllBuses,
-
-};
-
-struct Query {
-    QueryType type;
-    string bus;
-    string stop;
-    vector<string> stops;
-};
-
-
-
-istream& operator>>(istream& is, Query& q) {
-    // Реализуйте эту функцию
-    string line;
-    /* Считать строку до знака новой строки */
-    getline(is, line);
-    vector<string> query_from_cin = SplitIntoWords(line);
-    //Query query;
-    if (query_from_cin[0] == "NEW_BUS"s) {
-        vector<string> bus_stops = slice(query_from_cin, 3);
-        q.type = QueryType::NewBus;
-        q.bus = query_from_cin[1];
-        q.stop = query_from_cin[2];
-        q.stops = bus_stops;
-    }
-    else if (query_from_cin[0] == "BUSES_FOR_STOP"s) {
-        q.type = QueryType::BusesForStop;
-        //query.bus = query_from_cin[1];
-        q.stop = query_from_cin[1];
-        //query.stops = bus_stops;
-    }
-
-    else if (query_from_cin[0] == "STOPS_FOR_BUS"s) {
-        q.type = QueryType::StopsForBus;
-        q.bus = query_from_cin[1];
-        //query.stop = query_from_cin[1];
-        //query.stops = bus_stops;
-    }
-
-    else if (query_from_cin[0] == "ALL_BUSES"s) {
-      q.type = QueryType::AllBuses;
-    } else if (query_from_cin[0] == ""s) {
-        return is >> q;
-    }
-    return is;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Вспомогательыне функции/инфо закончились
-
-struct BusesForStopResponse {
-    // Наполните полями эту структуру
-    vector<string> buses;
-};
-
-
-
-struct StopsForBusResponse {
-    // Наполните полями эту структуру
-	vector<pair<string, vector<string>>> stops_and_bus;
-};
-
-
-struct AllBusesResponse {
-    // Наполните полями эту структуру
-    //string bus;
-    //StopsForBusResponse stop_for_buses;
-    //vector<string> stop_for_buses;
-    map<string, vector<string>> stop_for_buses;
-};
-
-
-ostream& operator<<(ostream &os, const BusesForStopResponse &r) {
-	// Реализуйте эту функцию
-	//cout << "BusesForStopResponse"s << endl;
-	if (r.buses.empty()) {
-		cout << "No stop";
-	} else {
-		int size_v = r.buses.size();
-		int sch = 1;
-		for (auto el : r.buses) {
-			if (sch < size_v) {
-				cout /*<< "bus : "s */<< el << " ";
-			} else {
-				cout << el;
-			}
-			++sch;
-		}
-
-	}
-	return os;
-}
-
-
-
-ostream& operator<<(ostream &os, const StopsForBusResponse &r) {
-	// Реализуйте эту функцию
-	//cout << "StopsForBusResponse"s << endl;
-	if (r.stops_and_bus.empty()){cout << "No bus";}
-	else {
-		bool first = true;
-	for (auto [k, v] : r.stops_and_bus) {
-
-	    if (!first) {
-	      cout << endl;
-	    }
-	    first = false;
-
-		if (!v.empty()){
-
-		cout << "Stop "s << k << ": "s;
-	      int size_v = v.size();
-	      int sch = 1;
-		for (auto exempl : v) {
-	    	//cout << "sch_stop :"s << sch << "size_v_stop :"s << size_v << endl;
-	    	if (sch<size_v) {
-			cout /*<< " bus : "s*/ << exempl << " "s;}
-	    	else {cout<< exempl;}
-	    	++sch;
-		}
-		}
-		else {cout << "Stop "s<< k << ": no interchange"s;}
-		//cout << endl;
-	}
-	;
-	}
-	return os;
-}
-
-//Bus 272: Vnukovo Moskovsky Rumyantsevo Troparyovo
-
-ostream& operator<<(ostream &os, const AllBusesResponse &r) {
-  // Реализуйте эту функцию
-  //cout << "AllBusesResponse"s << endl;
-
-  if (r.stop_for_buses.empty()){
-    cout << "No buses";
-  } else {
-    bool first = true;
-    for (auto [k, v] : r.stop_for_buses) {
-      if (!first) {
-        cout << endl;
-      }
-      first = false;
-      cout << "Bus "s << k << ": "s;
-      int size_v = v.size();
-      int sch = 1;
-
-      for (auto exempl : v) {
-    	//cout << "sch :"s << sch << "size_v :"s << size_v << endl;
-    	if (sch<size_v) {
-        cout << exempl << " "s;}
-    	else {cout << exempl;}
-        ++sch;
-      }
-    }
-  }
-  return os;
-}
-
-
-
-class BusManager {
-public:
-    void AddBus(const string& bus, const vector<string>& stops) {
-        // Реализуйте этот метод
-    	AllBusesResponse element;
-    	//element.bus = bus;
-    	//element.stop_for_buses = stops;
-
-    	//allbusesresponse_.push_back(element.bus, element.stop_for_buses);
-    	allbusesresponse_.stop_for_buses.emplace(bus, stops);
-    	buses_order_.push_back(bus);
-
-    }
-
-    BusesForStopResponse GetBusesForStop(const string& stop) const {
-        // Реализуйте этот метод
-        //set<string> buses_set;
-        BusesForStopResponse buses_set;
-        BusesForStopResponse buses_set_ordered;
-        for (auto el : allbusesresponse_.stop_for_buses) {
-
-            if (/*stops.stop_for_buses.count(stop)!=0 */ IsInstanceVec_(el.second, stop)) {buses_set.buses.push_back(el.first);}
-        }
-        buses_set_ordered.buses = VectorCompar(buses_set.buses);
-        return buses_set_ordered;
-    }
-
-
-    //vector<pair<string, vector<string>>> stops_and_bus;
-	StopsForBusResponse GetStopsForBus(const string &bus) const {
-		// Реализуйте этот метод
-		StopsForBusResponse empty_struct;
-
-		if (allbusesresponse_.stop_for_buses.count(bus) > 0) {
-			vector<string> stop_for_buses_into = allbusesresponse_.stop_for_buses.at(bus);
-			for (string str : stop_for_buses_into) {
-				BusesForStopResponse bus_for_next_stop = GetBusesForStop(str);
-				eliminateZeroes(bus_for_next_stop, bus);
-				if (bus_for_next_stop.buses.size()!=0) {
-					empty_struct.stops_and_bus.push_back(
-							make_pair(str, bus_for_next_stop.buses));
-				}
-				else {
-					vector<string> empty_vec;
-					empty_struct.stops_and_bus.push_back(
-						make_pair(str, empty_vec));}
-				//continue;
-
-			}
-
-		}
-		return empty_struct;
-	}
-
-
-    AllBusesResponse GetAllBuses() const {
-        return allbusesresponse_;
-    }
-
-private:
-    AllBusesResponse allbusesresponse_;
-    vector<string> buses_order_;
-    bool IsInstanceVec_(const vector<string> stops, string el) const {
-    	for (auto str : stops){if (str==el) {return true;}
-    	}
-    	return false;
-    }
-
-    BusesForStopResponse & eliminateZeroes( BusesForStopResponse &answers , string el ) const
+// Тест проверяет, что поисковая система исключает стоп-слова при добавлении документов
+void TestExcludeStopWordsFromAddedDocumentContent() {
+    const int doc_id = 42;
+    const string content = "cat in the city"s;
+    const vector<int> ratings = {1, 2, 3};
+    // Сначала убеждаемся, что поиск слова, не входящего в список стоп-слов,
+    // находит нужный документ
     {
-
-        answers.buses.erase(remove( answers.buses.begin(), answers.buses.end(), el ), answers.buses.end() );
-
-        return answers;
+        SearchServer server;
+        server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
+        const auto found_docs = server.FindTopDocuments("in"s);
+        assert(found_docs.size() == 1);
+        const Document& doc0 = found_docs[0];
+        assert(doc0.id == doc_id);
     }
 
-    vector<string> VectorCompar(const vector<string> & main_v) const {
-		map<int, string> result_map;
-		vector<string> result_vec;
-		int i_border = main_v.size() - 1;
-		int j_border = main_v.size();
-		for (int i=0; i < i_border; ++i) {
-			for (int j=1;  j <j_border; ++j) {
-				string first_el =main_v[i];
-				string second_el =main_v[j];
-				int index_first = getIndex(buses_order_, first_el);
-				int index_second = getIndex(buses_order_, second_el);
-				result_map.emplace(index_first, first_el);
-				result_map.emplace(index_second, second_el);
-			}
-		}
-
-		for (auto el : result_map) {
-			result_vec.push_back(el.second);
-		}
-		return result_vec;
-	}
-
-    int getIndex(vector<string> v, string K) const
+    // Затем убеждаемся, что поиск этого же слова, входящего в список стоп-слов,
+    // возвращает пустой результат
     {
-        auto it = find(v.begin(), v.end(), K);
-        int index;
-        // If element was found
-        if (it != v.end())
-        {
-
-            // calculating the index
-            // of K
-            index = it - v.begin();
-            //cout << index << endl;
-        }
-        else {
-            // If the element is not
-            // present in the vector
-        	index = -1;
-        }
-        return index;
+        SearchServer server;
+        server.SetStopWords("in the"s);
+        server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
+        assert(server.FindTopDocuments("in"s).empty());
     }
+}
+
+//1. Добавление документов. Добавленный документ должен находиться по поисковому запросу, который содержит слова из документа.
+void TestAddDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id == 0);
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance == 0);
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 2);
+}
+
+//2. Поддержка стоп-слов. Стоп-слова исключаются из текста документов
+void TestExcludeStopWord() {
+    SearchServer server;
+    server.SetStopWords("и в на"s);
+    server.AddDocument(0, "белый кот и в на модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    vector<Document> document = server.FindTopDocuments("и в на"s);
+    assert(document.size() == 0);
+}
+
+//3. Поддержка минус-слов. Документы, содержащие минус-слова поискового запроса, не должны включаться в результаты поиска.
+void TestMinusWord() {
+    SearchServer server;
+    //server.SetStopWords("и в на"s);
+    server.AddDocument(0, "белый кот модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    server.AddDocument(1, "черный пес бульдог"s,        DocumentStatus::ACTUAL, {8, -7});
+    tuple<vector<string>, DocumentStatus> match_data =  server.MatchDocument("белый кот модный -ошейник"s, 0);
+    tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес -бульдог"s, 1);
+    int size_vec_1 = get<0>(match_data).size();
+    int size_vec_2 = get<0>(match_data_2).size();
+
+    assert(size_vec_1 == 0);  // проверяю что с минус словом ничего не попало
+    assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
+}
+
+// 4. Матчинг документов. При матчинге документа по поисковому запросу должны быть возвращены все слова из поискового запроса,
+//присутствующие в документе. Если есть соответствие хотя бы по одному минус-слову, должен возвращаться пустой список слов.
+void TestMatchDoc() {
+    SearchServer server;
+    //server.SetStopWords("и в на"s);
+    server.AddDocument(0, "белый кот модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    server.AddDocument(1, "черный пес бульдог"s,        DocumentStatus::ACTUAL, {8, -7});
+    tuple<vector<string>, DocumentStatus> match_data =  server.MatchDocument("белый кот модный ошейник"s, 0);
+
+    tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес -бульдог"s, 1);
+    int size = tuple_size<decltype(match_data)>::value;
+    int size_vec = get<0>(match_data).size();
+    string result_string = ""s;
+    for (auto el : get<0>(match_data)){cout << el<< " "s ;  result_string+=el; result_string+=" "s;}
+    int size_vec_2 = get<0>(match_data_2).size();
+
+    assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
 
 
-};
-////
-// Реализуйте функции и классы, объявленные выше, чтобы эта функция main
-// решала задачу "Автобусные остановки"
+}
+
+// 5. Сортировка найденных документов по релевантности. Возвращаемые при поиске документов результаты должны быть отсортированы в порядке убывания релевантности.
+
+void TestSortDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    server.AddDocument(1, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, -7});
+    vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance);
+
+}
+
+//6. Вычисление рейтинга документов. Рейтинг добавленного документа равен среднему арифметическому оценок документа.
+void TestRatingDocument() {
+    SearchServer server;
+    server.AddDocument(1, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    vector<Document> document = server.FindTopDocuments("белый пес модный"s);
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+}
+
+//7. Фильтрация результатов поиска с использованием предиката, задаваемого пользователем.
+void TestFiltrocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(2, "полосатый пес в крапинку со шнурками на ботинках"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(3, "черный пес с пятном белым"s,        DocumentStatus::IRRELEVANT, {8, 4});
+    server.AddDocument(4, "желтый кот с серым ошейником"s,        DocumentStatus::BANNED, {8, 8});
+    vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; });
+
+    assert(document.size() == 2);
+}
+
+//8 Поиск документов, имеющих заданный статус.
+void TestFiltrSTATDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(2, "полосатый пес в крапинку со шнурками на ботинках"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(3, "черный пес с пятном белым"s,        DocumentStatus::IRRELEVANT, {8, 4});
+    server.AddDocument(4, "желтый кот с серым ошейником"s,        DocumentStatus::BANNED, {8, 8});
+    vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::IRRELEVANT; });
+    vector<Document> document_2 = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });   // ничего не находит
+    assert(document.size() == 1 && document_2.size()==3);
+}
+
+
+//9 Корректное вычисление релевантности найденных документов.
+// Внимание релевантность как то не так считатет????
+void TestRelevanceDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 2});
+
+    vector<Document> document = server.FindTopDocuments("белый пес модный"s);
+    assert( (server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049 ) < 0.00001 );
+}
+
+
+
+
+/*
+Разместите код остальных тестов здесь
+*/
+
+// Функция TestSearchServer является точкой входа для запуска тестов
+void TestSearchServer() {
+    TestExcludeStopWordsFromAddedDocumentContent();
+    TestAddDocument();
+    TestExcludeStopWord();
+    TestMinusWord();
+    TestMatchDoc();
+    TestSortDocument();
+    TestRatingDocument();
+    TestFiltrSTATDocument();
+
+    TestFiltrocument();
+    TestRelevanceDocument();
+
+    // Не забудьте вызывать остальные тесты здесь
+}
+
+// --------- Окончание модульных тестов поисковой системы -----------
 
 int main() {
-    int query_count;
-    Query q;
-
-    cin >> query_count;
-
-    BusManager bm;
-    for (int i = 0; i < query_count; ++i) {
-        cin >> q;
-        switch (q.type) {
-            case QueryType::NewBus:
-                bm.AddBus(q.bus, q.stops);
-                break;
-            case QueryType::BusesForStop:
-                cout << bm.GetBusesForStop(q.stop) << endl;
-                break;
-            case QueryType::StopsForBus:
-                cout << bm.GetStopsForBus(q.bus) << endl;
-                break;
-            case QueryType::AllBuses:
-                cout << bm.GetAllBuses() << endl;
-                break;
-        }
-    }
+    TestSearchServer();
+    // Если вы видите эту строку, значит все тесты прошли успешно
+    cout << "Search server testing finished"s << endl;
 }
