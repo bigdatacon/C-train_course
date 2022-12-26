@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -305,7 +306,22 @@ void TestExcludeStopWord() {
     assert(document.size() == 0);
 }
 
-// 3. Матчинг документов. При матчинге документа по поисковому запросу должны быть возвращены все слова из поискового запроса,
+//3. Поддержка минус-слов. Документы, содержащие минус-слова поискового запроса, не должны включаться в результаты поиска.
+void TestMinusWord() {
+    SearchServer server;
+    //server.SetStopWords("и в на"s);
+    server.AddDocument(0, "белый кот модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    server.AddDocument(1, "черный пес бульдог"s,        DocumentStatus::ACTUAL, {8, -7});
+    tuple<vector<string>, DocumentStatus> match_data =  server.MatchDocument("белый кот модный -ошейник"s, 0);
+    tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес -бульдог"s, 1);
+    int size_vec_1 = get<0>(match_data).size();
+    int size_vec_2 = get<0>(match_data_2).size();
+
+    assert(size_vec_1 == 0);  // проверяю что с минус словом ничего не попало
+    assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
+}
+
+// 4. Матчинг документов. При матчинге документа по поисковому запросу должны быть возвращены все слова из поискового запроса,
 //присутствующие в документе. Если есть соответствие хотя бы по одному минус-слову, должен возвращаться пустой список слов.
 void TestMatchDoc() {
     SearchServer server;
@@ -345,6 +361,7 @@ void TestSearchServer() {
     //TestExcludeStopWordsFromAddedDocumentContent();
     TestAddDocument();
     TestExcludeStopWord();
+    TestMinusWord();
     TestMatchDoc();
     // Не забудьте вызывать остальные тесты здесь
 }
@@ -356,4 +373,3 @@ int main() {
     // Если вы видите эту строку, значит все тесты прошли успешно
     cout << "Search server testing finished"s << endl;
 }
-
