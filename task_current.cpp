@@ -361,18 +361,18 @@ void TestRatingDocument() {
 
 //8 Поиск документов, имеющих заданный статус.
 
+
 //9 Корректное вычисление релевантности найденных документов.
-// Внимание релевантность как то не так считатет???? 
+// Внимание релевантность как то не так считатет????
 void TestRelevanceDocument() {
     SearchServer server;
     server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
     server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
     vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    cout << "Print document in RelevanceDocument: "s << endl;
-
+    //cout << "Print document in RelevanceDocument: "s << endl;
     for (auto doc : document) {
     PrintDocument(doc);}
-    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+    assert( (server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049 ) < 0.00001 );
 }
 
 
