@@ -358,6 +358,36 @@ void TestRatingDocument() {
 }
 
 //7. Фильтрация результатов поиска с использованием предиката, задаваемого пользователем.
+void TestFiltrDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(2, "полосатый пес в крапинку со шнурками на ботинках"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(3, "черный пес с пятном белым"s,        DocumentStatus::IRRELEVANT, {8, 4});
+    server.AddDocument(4, "желтый кот с серым ошейником"s,        DocumentStatus::BANNED, {8, 8});
+    /*vector<Document> document = server.FindTopDocuments("белый пес модный"s);
+    cout << "Print document in TestFiltrDocument: "s << endl;
+    for (auto doc : document) {
+    PrintDocument(doc);}*/
+
+    cout << "IRRELEVANT:"s << endl;
+
+    /*for (const Document& document : server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
+        PrintDocument(document);
+    }*/
+
+    vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::IRRELEVANT; });
+    cout << document.size();
+    vector<Document> document_2 = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });   // ничего не находит
+    /*for (auto doc : document) {
+        PrintDocument(doc);}
+    cout << "ACTUAL:"s << endl;
+    for (auto doc : document_2) {
+        PrintDocument(doc);}*/
+
+    assert(document.size() == 1 && document_2.size()==3);
+}
+
 
 //8 Поиск документов, имеющих заданный статус.
 
@@ -367,11 +397,12 @@ void TestRatingDocument() {
 void TestRelevanceDocument() {
     SearchServer server;
     server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
-    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 2});
+
     vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    //cout << "Print document in RelevanceDocument: "s << endl;
+    /*cout << "Print document in TestFiltrDocument: "s << endl;
     for (auto doc : document) {
-    PrintDocument(doc);}
+    PrintDocument(doc);}*/
     assert( (server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049 ) < 0.00001 );
 }
 
@@ -391,7 +422,10 @@ void TestSearchServer() {
     TestMatchDoc();
     TestSortDocument();
     TestRatingDocument();
+    TestFiltrDocument();
+
     TestRelevanceDocument();
+
     // Не забудьте вызывать остальные тесты здесь
 }
 
