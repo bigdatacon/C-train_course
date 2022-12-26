@@ -329,7 +329,7 @@ void TestMatchDoc() {
     int size = tuple_size<decltype(match_data)>::value;
     int size_vec = get<0>(match_data).size();
     string result_string = ""s;
-    for (auto el : get<0>(match_data)){cout << el<< " "s ;  result_string+=el; result_string+=" "s;}
+    //for (auto el : get<0>(match_data)){cout << el<< " "s ;  result_string+=el; result_string+=" "s;}
     int size_vec_2 = get<0>(match_data_2).size();
 
     assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
@@ -353,7 +353,6 @@ void TestRatingDocument() {
     SearchServer server;
     server.AddDocument(1, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
     vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    cout << "Print document in TestRatingDocument: "s << endl;
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
 }
 
@@ -365,15 +364,7 @@ void TestFiltrocument() {
     server.AddDocument(2, "полосатый пес в крапинку со шнурками на ботинках"s,        DocumentStatus::ACTUAL, {8, 14});
     server.AddDocument(3, "черный пес с пятном белым"s,        DocumentStatus::IRRELEVANT, {8, 4});
     server.AddDocument(4, "желтый кот с серым ошейником"s,        DocumentStatus::BANNED, {8, 8});
-
-    //cout << "Even ids:"s << endl;
     vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; });
-
-    /*for (auto doc : document) {
-        PrintDocument(doc);
-    };
-
-    cout << "document.size() : "s << document.size() << endl;*/
 
     assert(document.size() == 2);
 }
@@ -386,26 +377,8 @@ void TestFiltrSTATDocument() {
     server.AddDocument(2, "полосатый пес в крапинку со шнурками на ботинках"s,        DocumentStatus::ACTUAL, {8, 14});
     server.AddDocument(3, "черный пес с пятном белым"s,        DocumentStatus::IRRELEVANT, {8, 4});
     server.AddDocument(4, "желтый кот с серым ошейником"s,        DocumentStatus::BANNED, {8, 8});
-    /*vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    cout << "Print document in TestFiltrDocument: "s << endl;
-    for (auto doc : document) {
-    PrintDocument(doc);}*/
-
-    //cout << "IRRELEVANT:"s << endl;
-
-    /*for (const Document& document : server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; })) {
-        PrintDocument(document);
-    }*/
-
     vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::IRRELEVANT; });
-    //cout << document.size();
     vector<Document> document_2 = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });   // ничего не находит
-    /*for (auto doc : document) {
-        PrintDocument(doc);}
-    cout << "ACTUAL:"s << endl;
-    for (auto doc : document_2) {
-        PrintDocument(doc);}*/
-
     assert(document.size() == 1 && document_2.size()==3);
 }
 
@@ -418,9 +391,6 @@ void TestRelevanceDocument() {
     server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 2});
 
     vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    /*cout << "Print document in TestFiltrDocument: "s << endl;
-    for (auto doc : document) {
-    PrintDocument(doc);}*/
     assert( (server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049 ) < 0.00001 );
 }
 
