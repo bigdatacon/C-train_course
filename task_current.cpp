@@ -287,10 +287,6 @@ void TestAddDocument() {
     SearchServer server;
     server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
     vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
-    cout << "Print document"s << endl;
-    for (auto doc : document) {
-    PrintDocument(doc);}
-
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id == 0);
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance == 0);
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 2);
@@ -325,26 +321,19 @@ void TestMinusWord() {
 void TestMatchDoc() {
     SearchServer server;
     //server.SetStopWords("и в на"s);
-
     server.AddDocument(0, "белый кот модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
     server.AddDocument(1, "черный пес бульдог"s,        DocumentStatus::ACTUAL, {8, -7});
     tuple<vector<string>, DocumentStatus> match_data =  server.MatchDocument("белый кот модный ошейник"s, 0);
-    //tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес бульдог"s, 1);
+
     tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес -бульдог"s, 1);
     int size = tuple_size<decltype(match_data)>::value;
     int size_vec = get<0>(match_data).size();
-
-    //cout << "size match_data : " << size <<"size_v : "s << size_vec << endl;
     string result_string = ""s;
     for (auto el : get<0>(match_data)){cout << el<< " "s ;  result_string+=el; result_string+=" "s;}
-    cout << " result_string : " << result_string << endl;
-
     int size_vec_2 = get<0>(match_data_2).size();
-    //cout << "size match_data_2 : " << size_vec_2 << endl;
 
     assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
-    string string_itg = result_string.substr(0, result_string.size()-1);
-    cout << "string_itg :" << string_itg << " input :" << "белый кот модный ошейник"s <<   endl;
+
 
 }
 
@@ -355,17 +344,37 @@ void TestSortDocument() {
     server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
     server.AddDocument(1, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, -7});
     vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
-    cout << "Print document in TestSortDocument: "s << endl;
-    for (auto doc : document) {
-    PrintDocument(doc);}
-    /*cout << "find 0 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[0].id << endl;
-    cout << "find 0 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance << endl;
-
-    cout << "find 0 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[1].id << endl;
-    cout << "find 1 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance << endl;*/
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance);
 
 }
+
+//6. Вычисление рейтинга документов. Рейтинг добавленного документа равен среднему арифметическому оценок документа.
+void TestRatingDocument() {
+    SearchServer server;
+    server.AddDocument(1, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    vector<Document> document = server.FindTopDocuments("белый пес модный"s);
+    cout << "Print document in TestRatingDocument: "s << endl;
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+}
+
+//7. Фильтрация результатов поиска с использованием предиката, задаваемого пользователем.
+
+//8 Поиск документов, имеющих заданный статус.
+
+//9 Корректное вычисление релевантности найденных документов.
+// Внимание релевантность как то не так считатет???? 
+void TestRelevanceDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, 3});
+    server.AddDocument(1, "белый пес старомодный"s,        DocumentStatus::ACTUAL, {8, 14});
+    vector<Document> document = server.FindTopDocuments("белый пес модный"s);
+    cout << "Print document in RelevanceDocument: "s << endl;
+
+    for (auto doc : document) {
+    PrintDocument(doc);}
+    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+}
+
 
 
 
@@ -381,6 +390,8 @@ void TestSearchServer() {
     TestMinusWord();
     TestMatchDoc();
     TestSortDocument();
+    TestRatingDocument();
+    TestRelevanceDocument();
     // Не забудьте вызывать остальные тесты здесь
 }
 
