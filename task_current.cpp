@@ -1,5 +1,4 @@
 
-
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -346,7 +345,25 @@ void TestMatchDoc() {
     assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
     string string_itg = result_string.substr(0, result_string.size()-1);
     cout << "string_itg :" << string_itg << " input :" << "белый кот модный ошейник"s <<   endl;
-    assert(string_itg == "белый кот модный ошейник");  // проверяю что с минус словом ничего не попало
+
+}
+
+// 5. Сортировка найденных документов по релевантности. Возвращаемые при поиске документов результаты должны быть отсортированы в порядке убывания релевантности.
+
+void TestSortDocument() {
+    SearchServer server;
+    server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    server.AddDocument(1, "белый пес модный"s,        DocumentStatus::ACTUAL, {8, -7});
+    vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
+    cout << "Print document in TestSortDocument: "s << endl;
+    for (auto doc : document) {
+    PrintDocument(doc);}
+    /*cout << "find 0 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[0].id << endl;
+    cout << "find 0 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance << endl;
+
+    cout << "find 0 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[1].id << endl;
+    cout << "find 1 :  "s <<server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance << endl;*/
+    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance);
 
 }
 
@@ -363,6 +380,7 @@ void TestSearchServer() {
     TestExcludeStopWord();
     TestMinusWord();
     TestMatchDoc();
+    TestSortDocument();
     // Не забудьте вызывать остальные тесты здесь
 }
 
