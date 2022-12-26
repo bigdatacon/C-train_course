@@ -286,18 +286,54 @@ void PrintDocument(const Document& document) {
 void TestAddDocument() {
     SearchServer server;
     server.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
-    //search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
     vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
-
     cout << "Print document"s << endl;
     for (auto doc : document) {
     PrintDocument(doc);}
-    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0] == { document_id = 0, relevance = 0, rating = 2 });
 
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id == 0);
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance == 0);
     assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 2);
 }
+
+//2. Поддержка стоп-слов. Стоп-слова исключаются из текста документов
+void TestExcludeStopWord() {
+    SearchServer server;
+    server.SetStopWords("и в на"s);
+    server.AddDocument(0, "белый кот и в на модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    vector<Document> document = server.FindTopDocuments("и в на"s);
+    assert(document.size() == 0);
+}
+
+// 3. Матчинг документов. При матчинге документа по поисковому запросу должны быть возвращены все слова из поискового запроса,
+//присутствующие в документе. Если есть соответствие хотя бы по одному минус-слову, должен возвращаться пустой список слов.
+void TestMatchDoc() {
+    SearchServer server;
+    //server.SetStopWords("и в на"s);
+
+    server.AddDocument(0, "белый кот модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    server.AddDocument(1, "черный пес бульдог"s,        DocumentStatus::ACTUAL, {8, -7});
+    tuple<vector<string>, DocumentStatus> match_data =  server.MatchDocument("белый кот модный ошейник"s, 0);
+    //tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес бульдог"s, 1);
+    tuple<vector<string>, DocumentStatus> match_data_2 =  server.MatchDocument("черный пес -бульдог"s, 1);
+    int size = tuple_size<decltype(match_data)>::value;
+    int size_vec = get<0>(match_data).size();
+
+    //cout << "size match_data : " << size <<"size_v : "s << size_vec << endl;
+    string result_string = ""s;
+    for (auto el : get<0>(match_data)){cout << el<< " "s ;  result_string+=el; result_string+=" "s;}
+    cout << " result_string : " << result_string << endl;
+
+    int size_vec_2 = get<0>(match_data_2).size();
+    //cout << "size match_data_2 : " << size_vec_2 << endl;
+
+    assert(size_vec_2 == 0);  // проверяю что с минус словом ничего не попало
+    string string_itg = result_string.substr(0, result_string.size()-1);
+    cout << "string_itg :" << string_itg << " input :" << "белый кот модный ошейник"s <<   endl;
+    assert(string_itg == "белый кот модный ошейник");  // проверяю что с минус словом ничего не попало
+
+}
+
 
 
 /*
@@ -308,6 +344,8 @@ void TestAddDocument() {
 void TestSearchServer() {
     //TestExcludeStopWordsFromAddedDocumentContent();
     TestAddDocument();
+    TestExcludeStopWord();
+    TestMatchDoc();
     // Не забудьте вызывать остальные тесты здесь
 }
 
@@ -318,3 +356,4 @@ int main() {
     // Если вы видите эту строку, значит все тесты прошли успешно
     cout << "Search server testing finished"s << endl;
 }
+
