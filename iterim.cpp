@@ -1,42 +1,29 @@
-#include <cassert>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-const string& FindMinStr(const string& a, const string& b, const string& c) {
-    if (a <= b && a <= c) {
-        return a;
-    } else if (b <= a && b <= c) {
-        return b;
-    }
-    return c;
+/*
+Разработайте шаблонную функцию RunTestImpl и использующий её макрос RUN_TEST. Они должны запускать тесты и выводить сообщения об их завершении в стандартный поток ошибок.
+*/
+
+/*
+Чтобы узнать имя функции, получите строковое представление параметра func так же, как получаете строковое значение аргументов в макросе ASSERT_EQUAL. Передайте его в функцию RunTestImpl вторым параметром. В качестве первого параметра функция RunTestImpl должна принимать функцию-тест. Для этого функцию RunTestImpl сделайте шаблонной — компилятор сможет самостоятельно вывести тип первого аргумента.
+Чтобы проверить, как работает фреймворк, попробуйте внести логические ошибки в методы класса Synonyms, например:
+*/
+
+
+
+template </*напишите недостающий код*/>
+void RunTestImpl(/*Напишите недостающий код*/) {
+    /* Напишите недостающий код */
 }
 
-void TestFindMinStr() {
-    assert(FindMinStr("alpha"s, "beta"s, "gamma"s) == "alpha"s);
-    assert(FindMinStr("beta"s, "alpha"s, "gamma"s) == "alpha"s);
-    assert(FindMinStr("gamma"s, "beta"s, "alpha"s) == "alpha"s);
+#define RUN_TEST(func)  // напишите недостающий код
 
-    assert(FindMinStr("alpha"s, "beta"s, "alpha"s) == "alpha"s);
-    assert(FindMinStr("beta"s, "alpha"s, "alpha"s) == "alpha"s);
-    assert(FindMinStr("alpha"s, "alpha"s, "beta"s) == "alpha"s);
-
-    assert(FindMinStr("alpha"s, "alpha"s, "alpha"s) == "alpha"s);
-
-    assert(FindMinStr(""s, "alpha"s, "beta"s) == ""s);
-    assert(FindMinStr("beta"s, ""s, "alpha"s) == ""s);
-    assert(FindMinStr("beta"s, "alpha"s, ""s) == ""s);
-
-    cout << "TestFindMinStr is OK"s << endl;
+void Test1() {
 }
 
 int main() {
-    TestFindMinStr();
-
-    string a, b, c;
-
-    cin >> a >> b >> c;
-
-    cout << FindMinStr(a, b, c) << endl;
+    RUN_TEST(Test1);
 }
