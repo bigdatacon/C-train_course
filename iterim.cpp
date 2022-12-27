@@ -1,27 +1,22 @@
 #include <iostream>
 #include <string>
+#include <cassert>
 
 using namespace std;
 
-/*
-Разработайте шаблонную функцию RunTestImpl и использующий её макрос RUN_TEST. Они должны запускать тесты и выводить сообщения об их завершении в стандартный поток ошибок.
-*/
-
-/*
-Чтобы узнать имя функции, получите строковое представление параметра func так же, как получаете строковое значение аргументов в макросе ASSERT_EQUAL. Передайте его в функцию RunTestImpl вторым параметром. В качестве первого параметра функция RunTestImpl должна принимать функцию-тест. Для этого функцию RunTestImpl сделайте шаблонной — компилятор сможет самостоятельно вывести тип первого аргумента.
-Чтобы проверить, как работает фреймворк, попробуйте внести логические ошибки в методы класса Synonyms, например:
-*/
 
 
-
-template </*напишите недостающий код*/>
-void RunTestImpl(/*Напишите недостающий код*/) {
-    /* Напишите недостающий код */
+template <typename T>
+void RunTestImpl(const T & func, const string & name) {
+    cerr << "Starting tests for " << name << endl;
+    func();
+    cerr << "Ending tests for " << name << endl;
 }
 
-#define RUN_TEST(func)  // напишите недостающий код
+#define RUN_TEST(func) RunTestImpl(func, #func)
 
 void Test1() {
+    cerr << "A message from Test1()" << endl;
 }
 
 int main() {
