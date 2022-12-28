@@ -1,161 +1,61 @@
-
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
+#include <algorithm>
+#include <cmath>
 #include <map>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
+
+#include "search_server.h"
 
 using namespace std;
 
-template <typename T, typename U>
-void AssertEqualImpl(const T& t, const U& u, const string& t_str, const string& u_str, const string& file,
-                     const string& func, unsigned line, const string& hint) {
-    if (t != u) {
-        cout << boolalpha;
-        cout << file << "("s << line << "): "s << func << ": "s;
-        cout << "ASSERT_EQUAL("s << t_str << ", "s << u_str << ") failed: "s;
-        cout << t << " != "s << u << "."s;
-        if (!hint.empty()) {
-            cout << " Hint: "s << hint;
-        }
-        cout << endl;
-        abort();
+/* Подставьте вашу реализацию класса SearchServer сюда */
+
+/*
+   Подставьте сюда вашу реализацию макросов
+   ASSERT, ASSERT_EQUAL, ASSERT_EQUAL_HINT, ASSERT_HINT и RUN_TEST
+*/
+
+// -------- Начало модульных тестов поисковой системы ----------
+
+// Тест проверяет, что поисковая система исключает стоп-слова при добавлении документов
+void TestExcludeStopWordsFromAddedDocumentContent() {
+    const int doc_id = 42;
+    const string content = "cat in the city"s;
+    const vector<int> ratings = {1, 2, 3};
+    {
+        SearchServer server;
+        server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
+        const auto found_docs = server.FindTopDocuments("in"s);
+        ASSERT_EQUAL(found_docs.size(), 1u);
+        const Document& doc0 = found_docs[0];
+        ASSERT_EQUAL(doc0.id, doc_id);
+    }
+
+    {
+        SearchServer server;
+        server.SetStopWords("in the"s);
+        server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
+        ASSERT_HINT(server.FindTopDocuments("in"s).empty(),
+                    "Stop words must be excluded from documents"s);
     }
 }
 
-#define ASSERT_EQUAL(a, b) AssertEqualImpl((a), (b), #a, #b, __FILE__, __FUNCTION__, __LINE__, ""s)
+/*
+Разместите код остальных тестов здесь
+*/
 
-#define ASSERT_EQUAL_HINT(a, b, hint) AssertEqualImpl((a), (b), #a, #b, __FILE__, __FUNCTION__, __LINE__, (hint))
-
-void AssertImpl(bool value, const string& expr_str, const string& file, const string& func, unsigned line,
-                const string& hint) {
-    if (!value) {
-        cout << file << "("s << line << "): "s << func << ": "s;
-        cout << "ASSERT("s << expr_str << ") failed."s;
-        if (!hint.empty()) {
-            cout << " Hint: "s << hint;
-        }
-        cout << endl;
-        abort();
-    }
+// Функция TestSearchServer является точкой входа для запуска тестов
+void TestSearchServer() {
+    RUN_TEST(TestExcludeStopWordsFromAddedDocumentContent);
+    // Не забудьте вызывать остальные тесты здесь
 }
 
-#define ASSERT(expr) AssertImpl(!!(expr), #expr, __FILE__, __FUNCTION__, __LINE__, ""s)
-
-#define ASSERT_HINT(expr, hint) AssertImpl(!!(expr), #expr, __FILE__, __FUNCTION__, __LINE__, (hint))
-
-vector<int> TakeEvens(const vector<int>& numbers) {
-    vector<int> evens;
-    for (int x : numbers) {
-        if (x % 2 == 0) {
-            evens.push_back(x);
-        }
-    }
-    return evens;
-}
-
-map<string, int> TakeAdults(const map<string, int>& people) {
-    map<string, int> adults;
-    for (const auto& [name, age] : people) {
-        if (age >= 18) {
-            adults[name] = age;
-        }
-    }
-    return adults;
-}
-
-bool IsPrime(int n) {
-    if (n < 2) {
-        return false;
-    }
-    int i = 2;
-    while (i * i <= n) {
-        if (n % i == 0) {
-            return false;
-        }
-        ++i;
-    }
-    return true;
-}
-
-set<int> TakePrimes(const set<int>& numbers) {
-    set<int> primes;
-    for (int number : numbers) {
-        if (IsPrime(number)) {
-            primes.insert(number);
-        }
-    }
-    return primes;
-}
-
-ostream& operator<<(ostream &os, const  set<int> &r) {
-	if (r.empty()) {
-		cout << "No data in set ";
-	} else {
-        
-        cout << "{"s;
-        bool first = true;
-		for (auto el : r) {
-            if (first) {cout << el;
-                       first = false;}
-            else {   
-            cout << ", "s<< el;};}
-        cout << "}"s;
-		}
-	return os;
-}
-
-ostream& operator<<(ostream &os, const  vector<int> &r) {
-	if (r.empty()) {
-		cout << "No data in vector ";
-	} else {
-        cout << "["s;
-        bool first = true;
-		for (auto el : r) {
-            if (first) {cout << el;
-                        first = false;}
-            else {
-            cout << ", "s << el ;};}
-        cout << "]"s;
-		}
-	return os;
-}
-
-ostream& operator<<(ostream &os, const  map<string, int> &r) {
-	if (r.empty()) {
-		cout << "No data in set ";
-	} else {
-        cout << "{"s;
-        bool first = true;
-		for (auto [k, v] : r) {
-            if (first) {cout << k << ": "s << v;
-                        first = false;}
-            else {
-            cout << ", " << k << ": "s << v ;};}
-        cout << "}"s;
-		}
-	return os;
-}
-
+// --------- Окончание модульных тестов поисковой системы -----------
 
 int main() {
-    {
-        const set<int> numbers = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        const set<int> expected_primes = {2, 3, 5, 7, 11, 13};
-        ASSERT_EQUAL(TakePrimes(numbers), expected_primes);
-    }
-    
-    {
-        const map<string, int> people = {{"Ivan"s, 19}, {"Sergey"s, 16}, {"Alexey"s, 18}};
-        const map<string, int> expected_adults = {{"Alexey"s, 18}, {"Ivan"s, 19}};
-        ASSERT_EQUAL(TakeAdults(people), expected_adults);
-    }
-    
-    {
-        const vector<int> numbers = {3, 2, 1, 0, 3, 6};
-        const vector<int> expected_evens = {2, 0, 6};
-        ASSERT_EQUAL(TakeEvens(numbers), expected_evens);
-    }
-}  
+    TestSearchServer();
+    // Если вы видите эту строку, значит все тесты прошли успешно
+    cout << "Search server testing finished"s << endl;
+}
