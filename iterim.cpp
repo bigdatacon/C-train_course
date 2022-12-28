@@ -390,8 +390,8 @@ void TestMinusWord() {
     int size_vec_1 = get<0>(match_data).size();
     int size_vec_2 = get<0>(match_data_2).size();
 
-    assert(size_vec_1 == 0);
-    assert(size_vec_2 == 0);
+    //assert(size_vec_1 == 0);
+    //assert(size_vec_2 == 0);
 
     ASSERT_EQUAL(size_vec_1 , 0);
     ASSERT_EQUAL_HINT(size_vec_1, 0, " EXPR MUST BE EQUAL "s);
@@ -404,7 +404,6 @@ void TestMinusWord() {
 
     ASSERT_HINT(size_vec_1 == 0, " EXPR MUST BE EQUAL ");
     ASSERT_HINT(size_vec_2 == 0, " EXPR MUST BE EQUAL ");
-
 }
 
 // 4. 
@@ -418,10 +417,11 @@ void TestMatchDoc() {
     tuple<vector<string>, DocumentStatus> match_data_2 = server.MatchDocument("черный пес -бульдог"s, 1);
     string result_string = ""s;
     int size_vec_2 = get<0>(match_data_2).size();
-
-    assert(size_vec_2 == 0);
-
-
+    //assert(size_vec_2 == 0);
+    ASSERT_EQUAL(size_vec_2, 0);
+    ASSERT_EQUAL_HINT(size_vec_2, 0, " EXPR MUST BE EQUAL "s);
+    ASSERT(size_vec_2 == 0);
+    ASSERT_HINT(size_vec_2 == 0, " EXPR MUST BE EQUAL ");
 }
 
 // 5. 
@@ -430,8 +430,9 @@ void TestSortDocument() {
     server.AddDocument(0, "белый кот и модный ошейник"s, DocumentStatus::ACTUAL, { 8, -3 });
     server.AddDocument(1, "белый пес модный"s, DocumentStatus::ACTUAL, { 8, -7 });
     vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
-    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance);
-
+    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance);
+    ASSERT(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance);
+    ASSERT_HINT(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance > server.FindTopDocuments("белый кот и модный ошейник"s)[1].relevance, " First EXPR MUST BE Larger ");
 }
 
 //6. 
@@ -439,7 +440,13 @@ void TestRatingDocument() {
     SearchServer server;
     server.AddDocument(1, "белый пес модный"s, DocumentStatus::ACTUAL, { 8, 3 });
     vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+
+    ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating , 5);
+    ASSERT_EQUAL_HINT(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating , 5, " EXPR MUST BE EQUAL "s);
+    ASSERT(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5);
+    ASSERT_HINT(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 5, " EXPR MUST BE EQUAL ");
+
 }
 
 //7.
@@ -452,7 +459,12 @@ void TestFiltrocument() {
     server.AddDocument(4, "желтый кот с серым ошейником"s, DocumentStatus::BANNED, { 8, 8 });
     vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; });
 
-    assert(document.size() == 2);
+    //assert(document.size() == 2);
+
+    ASSERT_EQUAL(document.size() , 2);
+    ASSERT_EQUAL_HINT(document.size(), 2, " EXPR MUST BE EQUAL "s);
+    ASSERT(document.size() == 2);
+    ASSERT_HINT(document.size() == 2, " EXPR MUST BE EQUAL ");
 
     /*SearchServer server;
     server.AddDocument(0, "Р±РµР»С‹Р№ РїРµСЃ РјРѕРґРЅС‹Р№"s, DocumentStatus::ACTUAL, { 8, 3 });
@@ -475,7 +487,11 @@ void TestFiltrSTATDocument() {
     server.AddDocument(4, "желтый кот с серым ошейником"s, DocumentStatus::BANNED, { 8, 8 });
     vector<Document> document = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::IRRELEVANT; });
     vector<Document> document_2 = server.FindTopDocuments("пушистый ухоженный пес"s, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });   // ничего не находит
-    assert(document.size() == 1 && document_2.size() == 3);
+    //assert(document.size() == 1 && document_2.size() == 3);
+
+
+    ASSERT(document.size() == 1 && document_2.size() == 3);
+    ASSERT_HINT(document.size() == 1 && document_2.size() == 3, " EXPR MUST BE EQUAL ");
 
 
     /*SearchServer server;
@@ -497,7 +513,10 @@ void TestRelevanceDocument() {
     server.AddDocument(1, "белый пес старомодный"s, DocumentStatus::ACTUAL, { 8, 2 });
 
     vector<Document> document = server.FindTopDocuments("белый пес модный"s);
-    assert((server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049) < 0.00001);
+    //assert((server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049) < 0.00001);
+
+    ASSERT((server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049) < 0.00001);
+    ASSERT_HINT((server.FindTopDocuments("белый пес модный"s)[0].relevance - 0.231049) < 0.00001, " EXPR MUST BE EQUAL ");
 }
 
 
