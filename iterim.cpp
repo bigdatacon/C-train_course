@@ -356,9 +356,14 @@ void TestAddDocument() {
     SearchServer server;
     server.AddDocument(0, "белый кот и модный ошейник"s, DocumentStatus::ACTUAL, { 8, -3 });
     vector<Document> document = server.FindTopDocuments("белый кот и модный ошейник"s);
-    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id == 0);
-    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance == 0);
-    assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 2);
+    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id == 0);
+    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance == 0);
+    //assert(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 2);
+
+    ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id , 0);
+    ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance , 0);
+    ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating , 2);
+
 }
 
 //2. 
@@ -487,7 +492,7 @@ void TestRelevanceDocument() {
 void TestSearchServer() {
     RUN_TEST(TestExcludeStopWordsFromAddedDocumentContent);
     TestAddDocument();
-    TestExcludeStopWord();
+    /*TestExcludeStopWord();
     TestMinusWord();
     TestMatchDoc();
     TestSortDocument();
@@ -495,7 +500,7 @@ void TestSearchServer() {
     TestFiltrSTATDocument();
 
     TestFiltrocument();
-    TestRelevanceDocument();
+    TestRelevanceDocument();*/
 
     // Не забудьте вызывать остальные тесты здесь
 }
