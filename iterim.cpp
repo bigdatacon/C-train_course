@@ -362,7 +362,7 @@ void TestAddDocument() {
 
     ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].id , 0);
     ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].relevance , 0);
-    ASSERT_EQUAL(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating , 2);
+    ASSERT(server.FindTopDocuments("белый кот и модный ошейник"s)[0].rating == 2);
 
 }
 
@@ -372,7 +372,11 @@ void TestExcludeStopWord() {
     server.SetStopWords("и в на"s);
     server.AddDocument(0, "белый кот и в на модный ошейник"s, DocumentStatus::ACTUAL, { 8, -3 });
     vector<Document> document = server.FindTopDocuments("и в на"s);
-    assert(document.size() == 0);
+    //assert(document.size() == 0);
+
+    ASSERT_EQUAL(document.size() , 0);
+    ASSERT_EQUAL_HINT(document.size(), 0, " EXPR MUST BE EQUAL "s);
+    ASSERT(document.size() == 0);
 }
 
 //3. 
@@ -388,6 +392,19 @@ void TestMinusWord() {
 
     assert(size_vec_1 == 0);
     assert(size_vec_2 == 0);
+
+    ASSERT_EQUAL(size_vec_1 , 0);
+    ASSERT_EQUAL_HINT(size_vec_1, 0, " EXPR MUST BE EQUAL "s);
+
+    ASSERT_EQUAL(size_vec_2, 0);
+    ASSERT_EQUAL_HINT(size_vec_2, 0, " EXPR MUST BE EQUAL "s);
+
+    ASSERT(size_vec_1 == 0);
+    ASSERT(size_vec_2 == 0);
+
+    ASSERT_HINT(size_vec_1 == 0, " EXPR MUST BE EQUAL ");
+    ASSERT_HINT(size_vec_2 == 0, " EXPR MUST BE EQUAL ");
+
 }
 
 // 4. 
@@ -492,7 +509,7 @@ void TestRelevanceDocument() {
 void TestSearchServer() {
     RUN_TEST(TestExcludeStopWordsFromAddedDocumentContent);
     TestAddDocument();
-    /*TestExcludeStopWord();
+    TestExcludeStopWord();
     TestMinusWord();
     TestMatchDoc();
     TestSortDocument();
@@ -500,7 +517,7 @@ void TestSearchServer() {
     TestFiltrSTATDocument();
 
     TestFiltrocument();
-    TestRelevanceDocument();*/
+    TestRelevanceDocument();
 
     // Не забудьте вызывать остальные тесты здесь
 }
