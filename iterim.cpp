@@ -26,8 +26,8 @@ public:
     Rational(int numerator, int denominator ) {
         int num_input = numerator;
         int denom_input = denominator;       
-        if (denom_input<0 && num_input > 0 ){num_input = -num_input;}
-        else if (num_input < 0 && denom_input> 0){denom_input = -denom_input;}
+        if (denom_input<0 && num_input > 0 ){num_input = -num_input; denom_input = -denom_input;}
+        else if (num_input < 0 && denom_input> 0){denom_input = -denom_input; num_input = -num_input;}
         
         int deviser = gcd(num_input, denom_input);
         numerator_ = num_input/deviser;
