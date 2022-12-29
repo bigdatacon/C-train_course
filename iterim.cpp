@@ -25,13 +25,17 @@ public:
     // Параметризованный конструктор
     Rational(int numerator, int denominator ) {
         int num_input = numerator;
-        int denom_input = denominator;       
-        if (denom_input<0 && num_input > 0 ){num_input = -num_input; denom_input = -denom_input;}
-        else if (num_input < 0 && denom_input> 0){denom_input = -denom_input; num_input = -num_input;}
+        int denom_input = denominator;   
+        
+        int num_base = numerator;
+        int denom_base = denominator; 
+        
+        if (denom_input<0 && num_input > 0 ){num_input = -num_input; /*denom_input = -denom_input;*/}
+        else if (num_input < 0 && denom_input> 0){denom_input = -denom_input; /* num_input = -num_input;*/ }
         
         int deviser = gcd(num_input, denom_input);
-        numerator_ = num_input/deviser;
-        denominator_ = denom_input/deviser;
+        numerator_ = num_base/deviser;
+        denominator_ = denom_base/deviser;
     }
     
     int Numerator() const {
