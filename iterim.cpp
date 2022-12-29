@@ -26,7 +26,8 @@ public:
     Rational(int numerator, int denominator ) {
         int num_input = numerator;
         int denom_input = denominator;       
-        if (denom_input<0){num_input = -num_input;}
+        if (denom_input<0 && num_input > 0 ){num_input = -num_input;}
+        else if (num_input < 0 && denom_input> 0){denom_input = -denom_input;}
         
         int deviser = gcd(num_input, denom_input);
         numerator_ = num_input/deviser;
@@ -63,5 +64,6 @@ int main() {
     numbers.push_back(Rational{3});
     numbers.push_back(3);
     Rational sum = Add(Rational{1,6}, one_third);
-    cout << "SUM : " << sum.Numerator() << endl;
+    cout << "SUM : " << sum.Numerator() <<" "s << sum.Denominator()  <<  endl;
     // Выведет 1/2
+}
