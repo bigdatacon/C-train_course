@@ -25,7 +25,8 @@ int ReadLineWithNumber() {
     return result;
 }
  
-vector<string> SplitIntoWords(const string& text) {
+// старая реализация без проверки что слово не пробел 
+/*vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
     string word;
     for (const char c : text) {
@@ -39,7 +40,27 @@ vector<string> SplitIntoWords(const string& text) {
     words.push_back(word);
     
     return words;
+}*/
+
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            if (!word.empty()) {
+            words.push_back(word);}
+            word = "";
+        } else {
+            word += c;
+        }
+    }
+    words.push_back(word);
+    
+    return words;
 }
+
+
+
     
 struct Document {
     int id;
@@ -292,7 +313,7 @@ int main() {
     SearchServer search_server3("  и  в на   "s);
     
     //старый вариант проверки 
-    search_server1.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
+    /*search_server1.AddDocument(0, "белый кот и модный ошейник"s,        DocumentStatus::ACTUAL, {8, -3});
     search_server1.AddDocument(1, "пушистый кот пушистый хвост"s,       DocumentStatus::ACTUAL, {7, 2, 7});
     search_server1.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL, {5, -12, 2, 1});
     search_server1.AddDocument(3, "ухоженный скворец евгений"s,         DocumentStatus::BANNED, {9});
@@ -307,6 +328,6 @@ int main() {
     cout << "Even ids:"s << endl;
     for (const Document& document : search_server1.FindTopDocuments("пушистый ухоженный кот"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
         PrintDocument(document);
-    }
+    }*/
     return 0;
 } 
