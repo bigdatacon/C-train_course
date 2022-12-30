@@ -48,8 +48,8 @@ vector<string> SplitIntoWords(const string& text) {
     for (const char c : text) {
         if (c == ' ') {
             if (!word.empty()) {
-            words.push_back(word);}
-            word = "";
+            words.push_back(word); word = "";}
+            
         } else {
             word += c;
         }
