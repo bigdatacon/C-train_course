@@ -70,11 +70,3 @@ istream& operator>>(istream& input, Rational& r) {
     return input;
 } 
 
-int main() {
-    int numerator, denominator;
-    cin >> numerator >> denominator;
-    Rational r;
-    //Rational one_third(1, 3); // Дробь 1/3
-    cout << "Fract : " << r  <<  endl;
-    // Выведет 1/2
-}
