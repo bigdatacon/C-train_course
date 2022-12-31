@@ -1,11 +1,15 @@
 #include <numeric>
 #include <ostream>
 #include <istream>
+#include <cmath>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <numeric>
 
 using namespace std;
 /*Задание
 Реализуйте для класса Rational операции ввода и вывода в формате числитель/знаменатель. Гарантируется, что данные во входном потоке будут корректными.
-
 Не забудьте в операциях ввода и вывода возвращать ссылку на поток, переданный в качестве первого аргумента. Это позволит объединить несколько операций вывода в цепочки:
 cout << rational1 << " "s << rational2; 
 */
@@ -53,7 +57,7 @@ private:
 ostream& operator<<(ostream& output, Rational& r) {
     //char slash = "/"s;  - так не работает 
     //output << r.Numerator() << slash << r.Denominator();
-    output << r.Numerator() << "/"s << r.Denominator();  // так не проходит проверку 
+    output << r.Numerator() << "/" << r.Denominator();  // так не проходит проверку 
     
     return output;
 }
@@ -65,3 +69,10 @@ istream& operator>>(istream& input, Rational& r) {
     r = Rational{numerator, denominator};
     return input;
 } 
+
+int main() {
+
+    Rational one_third(1, 3); // Дробь 1/3
+    cout << "Fract : " << one_third  <<  endl;
+    // Выведет 1/2
+}
