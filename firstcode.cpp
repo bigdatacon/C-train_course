@@ -40,19 +40,19 @@ public:
         return denominator_;
     }
     
-    Rational operator+(Rational left, Rational right) {
-    const int numerator = left.Numerator() * right.Denominator() 
-                  + right.Numerator() * left.Denominator();
-    const int denominator = left.Denominator() * right.Denominator();
+     Rational operator+(Rational left /*, Rational right*/) {
+    const int numerator = left.Numerator() * /*right.*/Denominator() 
+                  + /*right.*/Numerator() * left.Denominator();
+    const int denominator = left.Denominator() * /*right.*/Denominator();
 
     return {numerator, denominator};
     }
 
 
-    Rational operator-(Rational left, Rational right) {
-        const int numerator = left.Numerator() * right.Denominator() 
-                      - right.Numerator() * left.Denominator();
-        const int denominator = left.Denominator() * right.Denominator();
+     Rational operator-(Rational left /*, Rational right*/) {
+        const int numerator = left.Numerator() * /*right.*/ Denominator() 
+                      - /*right.*/Numerator() * left.Denominator();
+        const int denominator = left.Denominator() * /*right.*/Denominator();
 
         return {numerator, denominator};
     }
@@ -60,12 +60,12 @@ public:
 
     // Операция унарного плюса возвращает копию переданного экземпляра
     Rational operator+(Rational r) {
-        return r;
+        return r  /*{Numerator() , Denominator()}*/;
     }
 
     // Операция унарного минуса возвращает вектор с противоположным направлением
-    Rational operator-(Rational r) {
-        return {-r.Numerator() , -r.Denominator()};
+    Rational operator-(/*Rational r*/) {
+        return {-Numerator() , -Denominator()};
     }
 
 private:
