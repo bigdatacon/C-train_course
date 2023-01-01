@@ -1,29 +1,92 @@
 Условие задачи
 Задание
-Замените способ настройки стоп-слов в классе SearchServer. Вместо метода SetStopWords разработайте параметризованные конструкторы, принимающие стоп-слова в следующих форматах:
-в виде строки, где стоп-слова разделены пробелами. В начале, в конце строки и между стоп-словами может быть произвольное количество пробелов.
-в виде произвольной коллекции строк, такой как vector или set. Пустые строки и слова-дубликаты внутри коллекции должны игнорироваться. Чтобы не дублировать код, примените шаблоны.
-Пример инициализации класса SearchServer:
-// инициализируем поисковую систему, передавая стоп-слова в контейнере vector
-const vector<string> stop_words_vector = {"и"s, "в"s, "на"s, ""s, "в"s};
-SearchServer search_server1(stop_words_vector);
-// инициализируем поисковую систему передавая стоп-слова в контейнере set
-const set<string> stop_words_set = {"и"s, "в"s, "на"s};
-SearchServer search_server2(stop_words_set);
-// инициализируем поисковую систему строкой со стоп-словами, разделёнными пробелами
-SearchServer search_server3("  и  в на   "s); 
-В структуре Document реализуйте:
-конструктор по умолчанию, который инициализирует поля структуры нулевыми значениями;
-параметризованный конструктор, позволяющий задать значения id документа, релевантности и рейтинга.
-
-Подсказка: 
-Конструктор, как и обычная функция, бывает шаблонным. Шаблонный конструктор может принимать коллекцию стоп-слов, находящихся в разных коллекциях — в вашем случае, в vector и set:
+Сделайте поисковую систему надёжнее, добавив в методы AddDocument, MatchDocument и FindTopDocuments обработку следующих ошибок:
+Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
+Отсутствие в поисковом запросе текста после символа «минус», например кот -.
+Наличие спецсимволов — то есть символов с кодами в диапазоне от 0 до 31 включительно — в тексте документов и поискового запроса.
+Попытка добавить документ с отрицательным id.
+Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
+Обновите сигнатуру методов MatchDocument и FindTopDocuments, чтобы они сообщали об успехе выполнения возвратом значения типа bool, а результаты поиска и сопоставления документов возвращали через выходной параметр result, принимаемый по ссылке. В случае, если методы выполнились с ошибкой, основная функция не должна выводить результаты их работы в стандартный поток вывода. 
+Метод AddDocument должен возвращать значение типа bool: в случае успеха — true, а если запрос неудачный — false. Чтобы не забыть проверить результат этих методов, пометьте их атрибутом [[nodiscard]].
+Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру. В случае, если порядковый номер документа выходит за пределы от [0; кол-во документов), метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
 class SearchServer {
 public:
-    template <typename StringCollection>
-    explicit SearchServer(const StringCollection& stop_words) {
+    // Defines an invalid document id
+    // You can refer to this constant as SearchServer::INVALID_DOCUMENT_ID
+    inline static constexpr int INVALID_DOCUMENT_ID = -1;
+    ...
+    [[nodiscard]] bool AddDocument(int document_id, const string& document, DocumentStatus status,
+                                   const vector<int>& ratings) {
+        ...
+    }
+    template <typename DocumentPredicate>
+    [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate,
+                                        vector<Document>& result) const {
+        ...
+    }
+    [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentStatus status,
+                                        vector<Document>& result) const {
+        ...
+    }
+    [[nodiscard]] bool FindTopDocuments(const string& raw_query, vector<Document>& result) const {
+        ...
+    }
+    [[nodiscard]] bool MatchDocument(const string& raw_query, int document_id,
+                                     tuple<vector<string>, DocumentStatus>& result) const {
+        ...
+    }
+    int GetDocumentId(int index) const {
         ...
     }
     ...
-};  
-Доработайте функцию SplitIntoWords: исключите из неё возврат пустых слов. Реализуйте параметризованный конструктор, который принимает строку со стоп-словами.
+}; 
+Пример использования класса поисковой системы с обновлённым интерфейсом:
+void PrintDocument(const Document& document) {
+    cout << "{ "s
+         << "document_id = "s << document.id << ", "s
+         << "relevance = "s << document.relevance << ", "s
+         << "rating = "s << document.rating << " }"s << endl;
+}
+int main() {
+    SearchServer search_server("и в на"s);
+    // Явно игнорируем результат метода AddDocument, чтобы избежать предупреждения
+    // о неиспользуемом результате его вызова
+    (void) search_server.AddDocument(1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, {7, 2, 7});
+    if (!search_server.AddDocument(1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, {1, 2})) {
+        cout << "Документ не был добавлен, так как его id совпадает с уже имеющимся"s << endl;
+    }
+    if (!search_server.AddDocument(-1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, {1, 2})) {
+        cout << "Документ не был добавлен, так как его id отрицательный"s << endl;
+    }
+    if (!search_server.AddDocument(3, "большой пёс скво\x12рец"s, DocumentStatus::ACTUAL, {1, 3, 2})) {
+        cout << "Документ не был добавлен, так как содержит спецсимволы"s << endl;
+    }
+    vector<Document> documents;
+    if (search_server.FindTopDocuments("--пушистый"s, documents)) {
+        for (const Document& document : documents) {
+            PrintDocument(document);
+        }
+    } else {
+        cout << "Ошибка в поисковом запросе"s << endl;
+    }
+} 
+
+
+
+Подсказка: 
+Внесите необходимые изменения в методы парсинга поискового запроса и документа, чтобы они могли сообщить вызываемому коду о наличии ошибки возвратом булевых значений.
+Чтобы проверить, что слово не содержит спецсимволы, добавьте в класс поисковой системы статический метод IsValidWord, проверяющий при помощи стандартного алгоритма none_of, что ни один из символов строки не содержит символов с кодами от 0 до пробела (не включая пробел).
+
+class SearchServer {
+    ...
+private:
+    ...
+    static bool IsValidWord(const string& word) {
+        // A valid word must not contain special characters
+        return none_of(word.begin(), word.end(), [](char c) {
+            return c >= '\0' && c < ' ';
+        });
+    }
+    ...
+};
+
