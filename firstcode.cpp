@@ -82,14 +82,6 @@ Rational operator/=(Rational right) {
     // return *this позволяет вернуть ссылку на текущий объект
     return *this;
 }
-    
-// мой новый код тут 
-/*Rational operator+(Rational right) {
-    Rational left = { numerator_, denominator_};
-    return left += right;;
-}*/
-    
-
 private:
     void Normalize() {
         if (denominator_ < 0) {
@@ -121,16 +113,22 @@ istream& operator>>(istream& input, Rational& rational) {
 }
 
 Rational operator+(Rational left, Rational right) {
-    const int numerator = left.Numerator() * right.Denominator() + right.Numerator() * left.Denominator();
-    const int denominator = left.Denominator() * right.Denominator();
-    return {numerator, denominator};
+    return left += right;   
 }
 
 Rational operator-(Rational left, Rational right) {
-    const int numerator = left.Numerator() * right.Denominator() - right.Numerator() * left.Denominator();
-    const int denominator = left.Denominator() * right.Denominator();
-    return {numerator, denominator};
+    return left -= right;
 }
+
+Rational operator*(Rational left, Rational right) {
+    return left *= right;   
+}
+
+Rational operator/(Rational left, Rational right) {
+    return left /= right;   
+}
+
+
 
 Rational operator+(Rational value) {
     return value;
