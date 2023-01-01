@@ -46,6 +46,8 @@ vector<string> SplitIntoWords(const string& text) {
     return words;
 }
 
+
+
 struct Document {
     Document() = default;
 
@@ -115,6 +117,11 @@ public:
         documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
         return true;
     }
+    
+
+    /*Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
+        Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
+
 
     /*
     template <typename DocumentPredicate>
@@ -277,6 +284,17 @@ private:
         }
         return { text, is_minus, IsStopWord(text) };
     }
+
+    // проверка что в слове нет 2 минусов подряд и что после минуса есть текст 
+    bool ChekTwoMinusorEmptyWord(string text) const {
+        // Word shouldn't be empty
+        if (text[0] == '-' && text[1] == '-') {
+            return false;
+        }
+        else if (text[0] == '-' && text.size() == 1) { return false; }
+        else { return true; }
+    }
+
 
     struct Query {
         set<string> plus_words;
