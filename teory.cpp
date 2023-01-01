@@ -1,26 +1,39 @@
+#include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <map>
+#include <set>
 #include <string>
-#include <cassert>
+#include <utility>
+#include <vector>
+#include <iterator>
 
 using namespace std;
 
+string getKeyAtIndex(int index, map<string, int> myMap) {
+    map<string, int>::const_iterator end = myMap.end();
 
+    int counter = 0;
+    for (map<string, int>::const_iterator it = myMap.begin(); it != end; ++it) {
+        counter++;
 
-template <typename T>
-void RunTestImpl(const T & func, const string & name) {
-    //cerr << "Starting tests for " << name << endl;
-    func();
-    cerr << "Ending tests for " << name << endl;
+        if (counter == index)
+            return it->first;
+    }
 }
 
-#define RUN_TEST(func) RunTestImpl(func, #func)
-
-void Test1() {
-    //cerr << "A message from Test1()" << endl;
-    assert(2==2);
-}
 
 int main() {
-    RUN_TEST(Test1);
+    std::map<string, int> myMap;
+    myMap["banana"] = 1;
+    myMap["apple"] = 1;
+    myMap["orange"] = 1;
+
+
+    string k = getKeyAtIndex(1, myMap);
+    cout << "HERE K : "s << k << endl;
+
+
 }
+
 
