@@ -105,7 +105,10 @@ public:
         //4.  Попытка добавить документ с отрицательным id.
         if (document_id < 0) { return false; }
        // 6. Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
+        if (documents_.count(document_id) > 0) { return false; }
         //if (documents_.at(document_id)) { return false; }   - дает ошибку не пойму почему
+        //if (documents_[document_id]) { return false; }
+
 
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
@@ -154,21 +157,18 @@ public:
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentStatus status,
                                         vector<Document>& result) const {
 
-    	if (raw_query.empty()){return false;}
-    	else{
 
     	return FindTopDocuments(
-            raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
+            raw_query, [status /*, result*/ ](int document_id, DocumentStatus document_status, int rating /*, vector<Document>& result*/) {
                 return document_status == status;
             });
-    	}
+
     }
 
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, vector<Document>& result) const {
-    	if (raw_query.empty()){return false;}
-    	else{
-        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
-    	}
+
+        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL, result);
+
     }
 
 
