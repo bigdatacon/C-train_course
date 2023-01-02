@@ -118,6 +118,7 @@ public:
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
+        docs_ids_.push_back(document_id);
         return true;
     }
 
@@ -208,7 +209,7 @@ public:
     Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру. В случае, если порядковый номер      документа выходит за пределы от [0; кол-во документов), метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
     */
 
-    int GetDocumentId(int index) const {
+   /* int GetDocumentId(int index) const {
         //map<int, DocumentData> documents_;
         if (index< 0 || index > GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
         else {
@@ -224,7 +225,22 @@ public:
                     return it->first;
             }
         }
+    }*/
+
+
+    int GetDocumentId(int index) const {
+        //map<int, DocumentData> documents_;
+        if (index< 0 || index > GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
+        else {
+        	if ( find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end() )
+        		{return docs_ids_.at(index); }
+        	else {
+        		return SearchServer::INVALID_DOCUMENT_ID;
+            }
+        }
     }
+
+
 
 
     // старая реализация
@@ -300,6 +316,7 @@ public:
     }
 
 private:
+    vector<int> docs_ids_;  // вектор документов
     struct DocumentData {
         int rating;
         DocumentStatus status;
