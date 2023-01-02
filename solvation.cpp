@@ -153,14 +153,22 @@ public:
 
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentStatus status,
                                         vector<Document>& result) const {
-        return FindTopDocuments(
+
+    	if (raw_query.empty()){return false;}
+    	else{
+
+    	return FindTopDocuments(
             raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
                 return document_status == status;
             });
+    	}
     }
 
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, vector<Document>& result) const {
+    	if (raw_query.empty()){return false;}
+    	else{
         return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
+    	}
     }
 
 
