@@ -159,9 +159,9 @@ public:
 
 
     	return FindTopDocuments(
-            raw_query, [status /*, result*/ ](int document_id, DocumentStatus document_status, int rating /*, vector<Document>& result*/) {
+            raw_query, [status ](int document_id, DocumentStatus document_status, int rating ) {
                 return document_status == status;
-            });
+            }, result);
 
     }
 
