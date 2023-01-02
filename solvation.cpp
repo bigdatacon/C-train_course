@@ -150,7 +150,7 @@ public:
         return true;
     }
 
-    /*
+
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentStatus status,
                                         vector<Document>& result) const {
         return FindTopDocuments(
@@ -158,6 +158,7 @@ public:
                 return document_status == status;
             });
     }
+
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, vector<Document>& result) const {
         return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
     }
@@ -165,6 +166,13 @@ public:
 
     [[nodiscard]] bool MatchDocument(const string& raw_query, int document_id,
                                      tuple<vector<string>, DocumentStatus>& result) const {
+
+        /*Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
+            Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
+        //ChekTwoMinusorEmptyWord
+
+    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
+
         const Query query = ParseQuery(raw_query);
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
@@ -184,8 +192,9 @@ public:
                 break;
             }
         }
-        return { matched_words, documents_.at(document_id).status };
-    }*/
+        result = { matched_words, documents_.at(document_id).status };
+        return true;
+    }
 
     /*
     Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру. В случае, если порядковый номер      документа выходит за пределы от [0; кол-во документов), метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
@@ -435,7 +444,7 @@ int main() {
     if (!search_server.AddDocument(3, "большой пёс скво\x12рец"s, DocumentStatus::ACTUAL, { 1, 3, 2 })) {
         cout << "Документ не был добавлен, так как содержит спецсимволы"s << endl;
     }
-    /*vector<Document> documents;
+    vector<Document> documents;
     if (search_server.FindTopDocuments("--пушистый"s, documents)) {
         for (const Document& document : documents) {
             PrintDocument(document);
@@ -443,5 +452,5 @@ int main() {
     }
     else {
         cout << "Ошибка в поисковом запросе"s << endl;
-    }*/
+    }
 }
