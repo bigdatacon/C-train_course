@@ -183,12 +183,16 @@ public:
         /*Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
             Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
         //ChekTwoMinusorEmptyWord
-
-    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
+         if (document_id < 0) { return false; }
+       // 6. Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
+        if (documents_.count(document_id) > 0) { return false; }
 
         const Query query = ParseQuery(raw_query);
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
+            if (!ChekTwoMinusorEmptyWord(word)){return false;} // стандартная проверка для + и минус слов
+            if ( IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
+            
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
             }
@@ -197,6 +201,8 @@ public:
             }
         }
         for (const string& word : query.minus_words) {
+            if (!ChekTwoMinusorEmptyWord(word)){return false;} // стандартная проверка для + и минус слов
+            if ( IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
             }
