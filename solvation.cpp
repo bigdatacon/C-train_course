@@ -113,7 +113,7 @@ public:
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
-            if (IsValidWord(word)) { return false; }  // 3. Наличие спецсимволов — то есть символов с кодами в диапазоне от 0 до 31 включительно — в тексте документов и поискового запроса.
+            if (!IsValidWord(word)) { return false; }  // 3. Наличие спецсимволов — то есть символов с кодами в диапазоне от 0 до 31 включительно — в тексте документов и поискового запроса.
 
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
@@ -136,7 +136,7 @@ public:
     	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
         
         //Дополнительно проверяю что слово в поисковом запросе валидно 
-       for (const string& word : SplitIntoWordsNoStop(raw_query)){if ( IsValidWord(word)){return false;} }
+       for (const string& word : SplitIntoWordsNoStop(raw_query)){if ( !IsValidWord(word)){return false;} }
         
 
         const Query query = ParseQuery(raw_query);
@@ -191,7 +191,7 @@ public:
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
             if (!ChekTwoMinusorEmptyWord(word)){return false;} // стандартная проверка для + и минус слов
-            if ( IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
+            if ( !IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
             
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
@@ -202,7 +202,7 @@ public:
         }
         for (const string& word : query.minus_words) {
             if (!ChekTwoMinusorEmptyWord(word)){return false;} // стандартная проверка для + и минус слов
-            if ( IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
+            if (!IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
             }
