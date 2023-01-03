@@ -133,7 +133,7 @@ public:
             Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
         //ChekTwoMinusorEmptyWord
 
-    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
+    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word) /*|| IsValidWord(word)*/){return false;} }
 
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query, document_predicate);
@@ -230,7 +230,7 @@ public:
 
     int GetDocumentId(int index) const {
         //map<int, DocumentData> documents_;
-        if (index< 0 || index > GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
+        if (index< 0 || index >= GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
         else {
         	if ( find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end() )
         		{return docs_ids_.at(index); }
@@ -479,4 +479,3 @@ int main() {
         cout << "Ошибка в поисковом запросе"s << endl;
     }
 }
-
