@@ -122,9 +122,6 @@ public:
         return true;
     }
 
-
-
-
     template <typename DocumentPredicate>
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate,
                                         vector<Document>& result) const {
@@ -134,8 +131,10 @@ public:
         //ChekTwoMinusorEmptyWord
 
     	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
+            	for (const string& word : SplitIntoWordsNoStop(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
         
         //Дополнительно проверяю что слово в поисковом запросе валидно 
+        for (const string& word : SplitIntoWords(raw_query)){if ( !IsValidWord(word)){return false;} }
        for (const string& word : SplitIntoWordsNoStop(raw_query)){if ( !IsValidWord(word)){return false;} }
         
 
