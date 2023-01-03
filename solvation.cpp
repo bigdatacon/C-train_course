@@ -133,7 +133,11 @@ public:
             Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
         //ChekTwoMinusorEmptyWord
 
-    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word) /*|| IsValidWord(word)*/){return false;} }
+    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
+        
+        //Дополнительно проверяю что слово в поисковом запросе валидно 
+       for (const string& word : SplitIntoWordsNoStop(raw_query)){if ( IsValidWord(word)){return false;} }
+        
 
         const Query query = ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query, document_predicate);
