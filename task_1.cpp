@@ -106,9 +106,6 @@ public:
         if (document_id < 0) { return false; }
        // 6. Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
         if (documents_.count(document_id) > 0) { return false; }
-        //if (documents_.at(document_id)) { return false; }   - дает ошибку не пойму почему
-        //if (documents_[document_id]) { return false; }
-
 
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
@@ -130,11 +127,12 @@ public:
             Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
         //ChekTwoMinusorEmptyWord
 
+        //делаю на всякий случай проверку как для всей строки так и для строки без стоп слов
     	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
-            	for (const string& word : SplitIntoWordsNoStop(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
+        for (const string& word : SplitIntoWordsNoStop(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
         
         //Дополнительно проверяю что слово в поисковом запросе валидно 
-        for (const string& word : SplitIntoWords(raw_query)){if ( !IsValidWord(word)){return false;} }
+       for (const string& word : SplitIntoWords(raw_query)){if ( !IsValidWord(word)){return false;} }
        for (const string& word : SplitIntoWordsNoStop(raw_query)){if ( !IsValidWord(word)){return false;} }
         
 
@@ -214,9 +212,7 @@ public:
         return true;
     }
 
-    /*
-    Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру. В случае, если порядковый номер      документа выходит за пределы от [0; кол-во документов), метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
-    */
+   
     int GetDocumentId(int index) const {
         //map<int, DocumentData> documents_;
         if (index< 0 || index >= GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
@@ -228,7 +224,6 @@ public:
             }
         }
     }
-
 
     int GetDocumentCount() const {
         return documents_.size();
@@ -288,10 +283,11 @@ private:
     // проверка что в слове нет 2 минусов подряд и что после минуса есть текст
     bool ChekTwoMinusorEmptyWord(string text) const {
         // Word shouldn't be empty
-        if (text[0] == '-' && text[1] == '-') {
-            return false;
-        }
-        else if (text[0] == '-' && text.size() == 1) { return false; }
+        /*сейчас так не скажу, но должна быть проверка на запрос в котором идёт тире и потом пробел, должны прекратить работу и если последний символ в запросе тоже тире*/
+        char ch = text.back();
+        if (ch=='-'){ return false; }  // проверка что строка не оканчивается на "-"
+        if (text[0] == '-' && text[1] == '-') {return false;} // проверка что строка не начинается с 2 пробелов
+        else if (text[0] == '-' && (text.size() == 1 || text.length()==1)) { return false; } // слово состоит только из 1 "-"
         else { return true; }
     }
 
