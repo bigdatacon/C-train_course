@@ -102,19 +102,18 @@ public:
 
     [[nodiscard]] bool AddDocument(int document_id, const string& document, DocumentStatus status,
         const vector<int>& ratings) {
-        //4.  Попытка добавить документ с отрицательным id.
-        if (document_id < 0) { return false; }
-       // 6. Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
-        if (documents_.count(document_id) > 0) { return false; }
-        //if (documents_.at(document_id)) { return false; }   - дает ошибку не пойму почему
-        //if (documents_[document_id]) { return false; }
-
-
+            
+        		//проверка на содержание спец символов 
+		bool b = ChekTwoMinusorEmptyWord(document);
+		if (!b)
+			return false;
+        
+        	if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false) 
+			return false;
+        
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
-            if (!IsValidWord(word)) { return false; }  // 3. Наличие спецсимволов — то есть символов с кодами в диапазоне от 0 до 31 включительно — в тексте документов и поискового запроса.
-
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
@@ -125,17 +124,10 @@ public:
     template <typename DocumentPredicate>
     [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate,
                                         vector<Document>& result) const {
-
-        /*Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
-            Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
-        //ChekTwoMinusorEmptyWord
-
-    	for (const string& word : SplitIntoWords(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
-            	for (const string& word : SplitIntoWordsNoStop(raw_query)){if (!ChekTwoMinusorEmptyWord(word)){return false;} }
         
-        //Дополнительно проверяю что слово в поисковом запросе валидно 
-        for (const string& word : SplitIntoWords(raw_query)){if ( !IsValidWord(word)){return false;} }
-       for (const string& word : SplitIntoWordsNoStop(raw_query)){if ( !IsValidWord(word)){return false;} }
+        bool b = ChekTwoMinusorEmptyWord(raw_query);
+		if (!b)
+			return false;
         
 
         const Query query = ParseQuery(raw_query);
@@ -178,19 +170,13 @@ public:
 
     [[nodiscard]] bool MatchDocument(const string& raw_query, int document_id,
                                      tuple<vector<string>, DocumentStatus>& result) const {
-
-        /*Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
-            Отсутствие в поисковом запросе текста после символа «минус», например кот -.*/
-        //ChekTwoMinusorEmptyWord
-         if (document_id < 0) { return false; }
-       // 6. Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
-        if (documents_.count(document_id) > 0) { return false; }
-
+        
+        bool b = ChekTwoMinusorEmptyWord(raw_query);
+		if (!b)
+			return false;
         const Query query = ParseQuery(raw_query);
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
-            if (!ChekTwoMinusorEmptyWord(word)){return false;} // стандартная проверка для + и минус слов
-            if ( !IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
             
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
@@ -200,8 +186,6 @@ public:
             }
         }
         for (const string& word : query.minus_words) {
-            if (!ChekTwoMinusorEmptyWord(word)){return false;} // стандартная проверка для + и минус слов
-            if (!IsValidWord(word)){return false;} // стандартная проверка для + и минус слов
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
             }
@@ -214,29 +198,7 @@ public:
         return true;
     }
 
-    /*
-    Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру. В случае, если порядковый номер      документа выходит за пределы от [0; кол-во документов), метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
-    */
-
-   /* int GetDocumentId(int index) const {
-        //map<int, DocumentData> documents_;
-        if (index< 0 || index > GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
-        else {
-
-
-            map<int, DocumentData> ::const_iterator end = documents_.end();
-
-            int counter = 0;
-            for (map<int, DocumentData>::const_iterator it = documents_.begin(); it != end; ++it) {
-                counter++;
-
-                if (counter == index)
-                    return it->first;
-            }
-        }
-    }*/
-
-
+   
     int GetDocumentId(int index) const {
         //map<int, DocumentData> documents_;
         if (index< 0 || index >= GetDocumentCount()) { return SearchServer::INVALID_DOCUMENT_ID; }
@@ -248,77 +210,6 @@ public:
             }
         }
     }
-
-
-
-
-    // старая реализация
-    /*void AddDocument(int document_id, const string& document, DocumentStatus status,
-                     const vector<int>& ratings) {
-        const vector<string> words = SplitIntoWordsNoStop(document);
-        const double inv_word_count = 1.0 / words.size();
-        for (const string& word : words) {
-            word_to_document_freqs_[word][document_id] += inv_word_count;
-        }
-        documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
-    }*/
-
-    /*template <typename DocumentPredicate>
-    vector<Document> FindTopDocuments(const string& raw_query,
-        DocumentPredicate document_predicate) const {
-        const Query query = ParseQuery(raw_query);
-        auto matched_documents = FindAllDocuments(query, document_predicate);
-
-        sort(matched_documents.begin(), matched_documents.end(),
-            [](const Document& lhs, const Document& rhs) {
-                if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
-                    return lhs.rating > rhs.rating;
-                }
-                else {
-                    return lhs.relevance > rhs.relevance;
-                }
-            });
-        if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-            matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-        }
-        return matched_documents;
-    }
-
-    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
-        return FindTopDocuments(
-            raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
-                return document_status == status;
-            });
-    }
-
-    vector<Document> FindTopDocuments(const string& raw_query) const {
-        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
-    }
-
-
-    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query,
-        int document_id) const {
-        const Query query = ParseQuery(raw_query);
-        vector<string> matched_words;
-        for (const string& word : query.plus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
-                continue;
-            }
-            if (word_to_document_freqs_.at(word).count(document_id)) {
-                matched_words.push_back(word);
-            }
-        }
-        for (const string& word : query.minus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
-                continue;
-            }
-            if (word_to_document_freqs_.at(word).count(document_id)) {
-                matched_words.clear();
-                break;
-            }
-        }
-        return { matched_words, documents_.at(document_id).status };
-    }*/
 
     int GetDocumentCount() const {
         return documents_.size();
@@ -377,13 +268,30 @@ private:
 
     // проверка что в слове нет 2 минусов подряд и что после минуса есть текст
     bool ChekTwoMinusorEmptyWord(string text) const {
-        // Word shouldn't be empty
-        if (text[0] == '-' && text[1] == '-') {
-            return false;
-        }
-        else if (text[0] == '-' && text.size() == 1) { return false; }
-        else { return true; }
+        if (text.empty()) return false;
+        if (IsValidWord(text) == false) return false;
+        char ch = text.back();
+        if (ch=='-'){ return false; }  // проверка что строка не оканчивается на "-"
+        for (int i=0; i < text.size()-1; ++i)
+        {if (text[i]=='-' && (text[i+1]=='-' || text[i+1]==' ' )) return false;}
+        return true; 
     }
+    
+    
+    /*	bool ChekTwoMinusorEmptyWord(const string& raw_query) const
+	{
+		if (IsValidWord(raw_query) == false) return false;
+		for (int i = 0; i < raw_query.size() - 1; ++i)
+		{
+			if (raw_query[i] == '-' && (raw_query[i + 1] == '-' || raw_query[i + 1] == ' '))
+				return false;
+		}
+		if (raw_query[raw_query.size() - 1] == '-')
+			return false;
+		return true;
+	}*/
+    
+    
 
 
     struct Query {
