@@ -1,34 +1,60 @@
 Условие задачи
 Задание
 Задание
-Упростите код поисковой системы, используя класс optional для возврата значений.
-Для этого обновите сигнатуру методов MatchDocument и FindTopDocuments, чтобы они возвращали результаты в виде опционального значения.
-В случае ошибки эти методы должны возвращать значение nullopt, а результаты их работы не должны выводиться в стандартный поток вывода.
-Метод AddDocument по-прежнему должен возвращать значение типа bool: true в случае успеха и false в случае неудачи:
-
+Это задание — итоговый проект четвертого спринта. Вы будете сдавать его на проверку через репозиторий на GitHub.
+Доработайте класс SearchServer. Примените механизм исключений и реализуйте в SearchServer обработку проблем.
+Конструкторы класса SearchServer должны выбрасывать исключение invalid_argument, если любое из переданных стоп-слов содержит недопустимые символы, то есть символы с кодами от 0 до 31. Такого требования не было в предыдущих заданиях, так как известные вам на тот момент способы обработки ошибок не позволяли эффективно решить эту задачу в конструкторе.
+Метод AddDocument больше не должен использовать возврат значения типа bool для сообщения об успехе или ошибке. Вместо этого он должен выбрасывать исключение invalid_argument в следующих ситуациях:
+  
+Попытка добавить документ с отрицательным id;
+Попытка добавить документ c id ранее добавленного документа;
+Наличие недопустимых символов (с кодами от 0 до 31) в тексте добавляемого документа.
+Методы FindDocument вместо возврата optional<vector<Document>> должны возвращать vector<Document> и выбрасывать исключение invalid_argument в следующих ситуациях:
+  
+В словах поискового запроса есть недопустимые символы с кодами от 0 до 31;
+Наличие более чем одного минуса перед словами, которых не должно быть в искомых документах, например, пушистый --кот. В середине слов минусы разрешаются, например: иван-чай.
+Отсутствие текста после символа «минус» в поисковом запросе: пушистый -.
+Метод MatchDocument должен возвращать tuple<vector<string>, DocumentStatus>, выбрасывая исключение invalid_argument в тех же ситуациях, что и метод FindDocument.
+Метод GetDocumentId должен выбрасывать исключение out_of_range, если индекс переданного документа выходит за пределы допустимого диапазона (0; количество документов).
+Обновлённая сигнатура класса SearchServer приведена ниже:
 class SearchServer {
 public:
-    ...
-    bool AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
+    template <typename StringContainer>
+    explicit SearchServer(const StringContainer& stop_words) {
+        ...
+    }
+    explicit SearchServer(const string& stop_words_text) {
+    }
+    void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
         ...
     }
     template <typename DocumentPredicate>
-    optional<vector<Document>> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
+    vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
         ...
     }
-    optional<vector<Document>> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
+    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
         ...
     }
-    optional<vector<Document>> FindTopDocuments(const string& raw_query) const {
+    vector<Document> FindTopDocuments(const string& raw_query) const {
         ...
     }
-    optional<tuple<vector<string>, DocumentStatus>> MatchDocument(const string& raw_query, int document_id) const {
+    int GetDocumentCount() const {
+        ...
+    }
+    int GetDocumentId(int index) const {
+        ...
+    }
+    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
         ...
     }
     ...
-};
+}; 
+
+
 
 
 Подсказка: 
-Внесите изменения в методы парсинга поискового запроса и документа, чтобы методы могли возвратом опциональных значений сообщить вызываемому коду, что есть ошибки.
+Выбор стратегии обработки ошибок влияет на архитектуру класса в целом. Поэтому выбирайте стратегию на этапе проектирования класса. Обработка ошибок с использованием кодов ошибок или optional пронизывает все методы класса — от публичных до приватных.
+При переходе на механизм обработки исключений внесите изменения в сигнатуру методов, которые ранее возвращали код ошибки. Чтобы упростить себе задачу, сначала переведите на механизм исключений публичные методы, потом приватные методы, от которых зависят только что переведённые публичные. Когда внесёте изменения в очередной метод, проверьте, что программа компилируется и корректно работает. 
+При реализации обработки ошибок в методе GetDocumentId вам может пригодиться то, что метод at в классе vector выбрасывает исключение out_of_range, если передать в качестве индекса недопустимое значение.
 
