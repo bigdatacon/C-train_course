@@ -1,24 +1,18 @@
 #include <iostream>
 #include <numeric>
 #include <stdexcept>
+#include <string>
 
 using namespace std;
 /*
 Задание
-Сделайте класс Rational более надёжным, запретив операцию деления на ноль. Доработайте Rational так, чтобы при попытке деления дроби на 0 оператором 
-/ либо /= выбрасывалось исключение invalid_argument. Следующий код иллюстрирует обработку данного типа исключений:
+Класс Rational уже умеет сообщать об ошибках деления на ноль, но всё ещё разрешает создавать дроби с нулевым знаменателем. Доработайте конструктор класса
+Rational так, чтобы при попытке сконструировать дробь с нулевым знаменателем, выбрасывалось исключение типа domain_error.
 
-Подсказка 
-Добавьте в оператор /= проверку делителя на равенство нулю с выбрасыванием соответствующего исключения. Если вы реализовали операцию / на основе /=,
-этого будет достаточно для решения задачи. 
-Если нет — добавьте аналогичную проверку и в операцию /.
-
+Добавьте проверку знаменателя на равенство нулю с выбрасыванием соответствующего исключения в параметризованный конструктор, принимающий числитель и знаменатель дроби. 
+Это сделает невозможным конструирование дроби с нулевым знаменателем.
 */
 
-#include <iostream>
-#include <numeric>
-
-using namespace std;
 
 class Rational {
 public:
@@ -31,8 +25,7 @@ public:
 
     Rational(int numerator, int denominator)
         : numerator_(numerator)
-        , denominator_(denominator)
-    {
+        , denominator_(denominator) {
         Normalize();
     }
 
@@ -66,6 +59,9 @@ public:
     }
 
     Rational& operator/=(Rational right) {
+        if (right.numerator_ == 0) {
+            throw invalid_argument("Division by zero");
+        }
         numerator_ *= right.denominator_;
         denominator_ *= right.numerator_;
         Normalize();
@@ -101,8 +97,6 @@ istream& operator>>(istream& input, Rational& rational) {
     return input;
 }
 
-// Unary plus and minus
-
 Rational operator+(Rational value) {
     return value;
 }
@@ -110,8 +104,6 @@ Rational operator+(Rational value) {
 Rational operator-(Rational value) {
     return {-value.Numerator(), value.Denominator()};
 }
-
-// Binary arithmetic operations
 
 Rational operator+(Rational left, Rational right) {
     return left += right;
@@ -129,11 +121,8 @@ Rational operator/(Rational left, Rational right) {
     return left /= right;
 }
 
-// Comparison operators
-
 bool operator==(Rational left, Rational right) {
-    return left.Numerator() == right.Numerator() &&
-           left.Denominator() == right.Denominator();
+    return left.Numerator() == right.Numerator() && left.Denominator() == right.Denominator();
 }
 
 bool operator!=(Rational left, Rational right) {
@@ -141,13 +130,11 @@ bool operator!=(Rational left, Rational right) {
 }
 
 bool operator<(Rational left, Rational right) {
-    return left.Numerator() * right.Denominator() < 
-           left.Denominator() * right.Numerator();
+    return left.Numerator() * right.Denominator() < left.Denominator() * right.Numerator();
 }
 
 bool operator>(Rational left, Rational right) {
-    return left.Numerator() * right.Denominator() >
-           left.Denominator() * right.Numerator();
+    return left.Numerator() * right.Denominator() > left.Denominator() * right.Numerator();
 }
 
 bool operator>=(Rational left, Rational right) {
@@ -158,21 +145,16 @@ bool operator<=(Rational left, Rational right) {
     return !(left > right);
 }
 
+// ========== для примера ========
 
 int main() {
     try {
-        const Rational three_fifth{3, 5};
-        const Rational zero;
-        cout << three_fifth << " / " << zero << " = " << (three_fifth / zero) << endl;
-    } catch (const invalid_argument& e) {
-        cout << "Ошибка: "s << e.what() << endl;
-    }
-    try {
-        Rational value{3, 5};
-        value /= Rational();
+        // При попытке сконструировать дробь с нулевым знаменателем
+        // должно выброситься исключение domain_error
+        const Rational invalid_value{1, 0};
         // Следующая строка не должна выполниться
-        cout << value << endl;
-    } catch (const invalid_argument& e) {
+        cout << invalid_value << endl;
+    } catch (const domain_error& e) {
         cout << "Ошибка: "s << e.what() << endl;
     }
 }
