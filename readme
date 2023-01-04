@@ -1,92 +1,34 @@
 Условие задачи
 Задание
-Сделайте поисковую систему надёжнее, добавив в методы AddDocument, MatchDocument и FindTopDocuments обработку следующих ошибок:
-Указание в поисковом запросе более чем одного минуса перед словами, которых не должно быть в документах, например: кот --пушистый. В середине слов минусы разрешаются, например: иван-чай.
-Отсутствие в поисковом запросе текста после символа «минус», например кот -.
-Наличие спецсимволов — то есть символов с кодами в диапазоне от 0 до 31 включительно — в тексте документов и поискового запроса.
-Попытка добавить документ с отрицательным id.
-Попытка добавить документ с id, совпадающим с id документа, который добавился ранее.
-Обновите сигнатуру методов MatchDocument и FindTopDocuments, чтобы они сообщали об успехе выполнения возвратом значения типа bool, а результаты поиска и сопоставления документов возвращали через выходной параметр result, принимаемый по ссылке. В случае, если методы выполнились с ошибкой, основная функция не должна выводить результаты их работы в стандартный поток вывода. 
-Метод AddDocument должен возвращать значение типа bool: в случае успеха — true, а если запрос неудачный — false. Чтобы не забыть проверить результат этих методов, пометьте их атрибутом [[nodiscard]].
-Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру. В случае, если порядковый номер документа выходит за пределы от [0; кол-во документов), метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
+Задание
+Упростите код поисковой системы, используя класс optional для возврата значений.
+Для этого обновите сигнатуру методов MatchDocument и FindTopDocuments, чтобы они возвращали результаты в виде опционального значения.
+В случае ошибки эти методы должны возвращать значение nullopt, а результаты их работы не должны выводиться в стандартный поток вывода.
+Метод AddDocument по-прежнему должен возвращать значение типа bool: true в случае успеха и false в случае неудачи:
+
 class SearchServer {
 public:
-    // Defines an invalid document id
-    // You can refer to this constant as SearchServer::INVALID_DOCUMENT_ID
-    inline static constexpr int INVALID_DOCUMENT_ID = -1;
     ...
-    [[nodiscard]] bool AddDocument(int document_id, const string& document, DocumentStatus status,
-                                   const vector<int>& ratings) {
+    bool AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
         ...
     }
     template <typename DocumentPredicate>
-    [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate,
-                                        vector<Document>& result) const {
+    optional<vector<Document>> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
         ...
     }
-    [[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentStatus status,
-                                        vector<Document>& result) const {
+    optional<vector<Document>> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
         ...
     }
-    [[nodiscard]] bool FindTopDocuments(const string& raw_query, vector<Document>& result) const {
+    optional<vector<Document>> FindTopDocuments(const string& raw_query) const {
         ...
     }
-    [[nodiscard]] bool MatchDocument(const string& raw_query, int document_id,
-                                     tuple<vector<string>, DocumentStatus>& result) const {
+    optional<tuple<vector<string>, DocumentStatus>> MatchDocument(const string& raw_query, int document_id) const {
         ...
-    }
-    int GetDocumentId(int index) const {
-        ...
-    }
-    ...
-}; 
-Пример использования класса поисковой системы с обновлённым интерфейсом:
-void PrintDocument(const Document& document) {
-    cout << "{ "s
-         << "document_id = "s << document.id << ", "s
-         << "relevance = "s << document.relevance << ", "s
-         << "rating = "s << document.rating << " }"s << endl;
-}
-int main() {
-    SearchServer search_server("и в на"s);
-    // Явно игнорируем результат метода AddDocument, чтобы избежать предупреждения
-    // о неиспользуемом результате его вызова
-    (void) search_server.AddDocument(1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, {7, 2, 7});
-    if (!search_server.AddDocument(1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, {1, 2})) {
-        cout << "Документ не был добавлен, так как его id совпадает с уже имеющимся"s << endl;
-    }
-    if (!search_server.AddDocument(-1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, {1, 2})) {
-        cout << "Документ не был добавлен, так как его id отрицательный"s << endl;
-    }
-    if (!search_server.AddDocument(3, "большой пёс скво\x12рец"s, DocumentStatus::ACTUAL, {1, 3, 2})) {
-        cout << "Документ не был добавлен, так как содержит спецсимволы"s << endl;
-    }
-    vector<Document> documents;
-    if (search_server.FindTopDocuments("--пушистый"s, documents)) {
-        for (const Document& document : documents) {
-            PrintDocument(document);
-        }
-    } else {
-        cout << "Ошибка в поисковом запросе"s << endl;
-    }
-} 
-
-
-
-Подсказка: 
-Внесите необходимые изменения в методы парсинга поискового запроса и документа, чтобы они могли сообщить вызываемому коду о наличии ошибки возвратом булевых значений.
-Чтобы проверить, что слово не содержит спецсимволы, добавьте в класс поисковой системы статический метод IsValidWord, проверяющий при помощи стандартного алгоритма none_of, что ни один из символов строки не содержит символов с кодами от 0 до пробела (не включая пробел).
-
-class SearchServer {
-    ...
-private:
-    ...
-    static bool IsValidWord(const string& word) {
-        // A valid word must not contain special characters
-        return none_of(word.begin(), word.end(), [](char c) {
-            return c >= '\0' && c < ' ';
-        });
     }
     ...
 };
+
+
+Подсказка: 
+Внесите изменения в методы парсинга поискового запроса и документа, чтобы методы могли возвратом опциональных значений сообщить вызываемому коду, что есть ошибки.
 
