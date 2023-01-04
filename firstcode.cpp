@@ -1,5 +1,6 @@
 #include <iostream>
 #include <numeric>
+#include <stdexcept>
 
 using namespace std;
 /*
