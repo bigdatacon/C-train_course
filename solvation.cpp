@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 #include <iterator>
-
+#include <optional>
 
 using namespace std;
 
@@ -117,7 +117,7 @@ public:
         docs_ids_.push_back(document_id);
         return true;
     }
-    
+
 
     template <typename DocumentPredicate>
     optional<vector<Document>> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
