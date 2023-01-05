@@ -96,11 +96,43 @@ public:
     }
 
     // новая реализация
-
-    // Defines an invalid document id
+        // Defines an invalid document id
     // You can refer to this constant as SearchServer::INVALID_DOCUMENT_ID
     inline static constexpr int INVALID_DOCUMENT_ID = -1;
+    
+    
+    template <typename StringContainer>
+    explicit SearchServer(const StringContainer& stop_words) {
+        ...
+    }
+    explicit SearchServer(const string& stop_words_text) {
+    }
+    void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
+        ...
+    }
+    template <typename DocumentPredicate>
+    vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
+        ...
+    }
+    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
+        ...
+    }
+    vector<Document> FindTopDocuments(const string& raw_query) const {
+        ...
+    }
+    int GetDocumentCount() const {
+        ...
+    }
+    int GetDocumentId(int index) const {
+        ...
+    }
+    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
+        ...
+    }
+    
 
+
+    /*
     bool AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
         bool b = ChekTwoMinusorEmptyWord(document);
         if (!b)
@@ -199,6 +231,7 @@ public:
     int GetDocumentCount() const {
         return documents_.size();
     }
+    */
 
 private:
     vector<int> docs_ids_;  // вектор документов
@@ -261,9 +294,9 @@ private:
         {
             if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ')) return false;
         }
-        return true;
+        return true; 
     }
-
+  
     struct Query {
         set<string> plus_words;
         set<string> minus_words;
