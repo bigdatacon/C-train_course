@@ -100,18 +100,56 @@ public:
     // новая реализация
     inline static constexpr int INVALID_DOCUMENT_ID = -1;
 
+    //invalid_argument
     void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
-        ...
+        bool b = ChekTwoMinusorEmptyWord(document);
+        if (!b)
+            throw invalid_argument("invalid_argument");
+
+        if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
+            throw invalid_argument("invalid_argument");
+
+        const vector<string> words = SplitIntoWordsNoStop(document);
+        const double inv_word_count = 1.0 / words.size();
+        for (const string& word : words) {
+            word_to_document_freqs_[word][document_id] += inv_word_count;
+        }
+        documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
+        docs_ids_.push_back(document_id);
+    
     }
     template <typename DocumentPredicate>
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-        ...
+        bool b = ChekTwoMinusorEmptyWord(raw_query);
+        if (!b)
+            throw invalid_argument("invalid_argument");
+
+
+        const Query query = ParseQuery(raw_query);
+        auto matched_documents = FindAllDocuments(query, document_predicate);
+
+        sort(matched_documents.begin(), matched_documents.end(),
+            [](const Document& lhs, const Document& rhs) {
+                if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                    return lhs.rating > rhs.rating;
+                }
+                else {
+                    return lhs.relevance > rhs.relevance;
+                }
+            });
+        if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
+            matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
+        }
+        return matched_documents;
     }
     vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
-        ...
+        return FindTopDocuments(
+            raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
+                return document_status == status;
+            });
     }
     vector<Document> FindTopDocuments(const string& raw_query) const {
-        ...
+        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
     }
 
     int GetDocumentCount() const {
@@ -140,7 +178,30 @@ public:
 
     }
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-        ...
+        bool b = ChekTwoMinusorEmptyWord(raw_query);
+        if (!b)
+            throw invalid_argument("invalid_argument");
+        const Query query = ParseQuery(raw_query);
+        vector<string> matched_words;
+        for (const string& word : query.plus_words) {
+
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            if (word_to_document_freqs_.at(word).count(document_id)) {
+                matched_words.push_back(word);
+            }
+        }
+        for (const string& word : query.minus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            if (word_to_document_freqs_.at(word).count(document_id)) {
+                matched_words.clear();
+                break;
+            }
+        }
+        return make_tuple(matched_words, documents_.at(document_id).status);
     }
 
 
