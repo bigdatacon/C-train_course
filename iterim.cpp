@@ -20,9 +20,7 @@ const int MAX_RESULT_DOCUMENT_COUNT = 5;
 Стоит использовать явные названия для переменных.
 Можно не проверять документы на два минуса. */
 
-/*104 if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false) 
-можно не перебирать все индексы 
-в documents_.  все индексы хранятся как ключи.*/
+
 
 /*120             throw invalid_argument("invalid_argument"); 
 Не стоит дублировать проверку перед каждым вызовом ParseQuery */
@@ -38,6 +36,9 @@ const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 
 /*СДЕЛАНО */
+/*104 if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false) 
+можно не перебирать все индексы 
+в documents_.  все индексы хранятся как ключи.*/
 /*157             if (find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end()) 
 Не нужно проверять, что есть такой индекс, достаточно просто вернуть  docs_ids_.at(index); */
 /*247         if (IsValidWord(text) == false) return false; 
