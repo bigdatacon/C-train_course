@@ -243,20 +243,28 @@ private:
     }
 
     bool ChekTwoMinusorEmptyWord(string text) const {
-        /*Замечание : Стоит проверять что двух минусов нет только в начале слова.*/
-
         if (text.empty()) return false;
         /*Замечание if (!IsValidWord(text)) return false; */
-        /*if (!IsValidWord(text)) return false;*/
-        if (IsValidWord(text) == false) return false;
+        if (!IsValidWord(text)) return false;
+        //if (IsValidWord(text) == false) return false;
+
         /*Замечание : такие проверки лучше производить с готовыми словами в ParseQueryWord -- если принять это замечание то проверка не "- " в конце слова не будет производиться в AddDocument*/
+
         char ch = text.back();
         if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-"
-        if (text[0] == '-' && (text[1] == '-'))  return false; 
+
+        /*Замечание : Стоит проверять что двух минусов нет только в начале слова.*/
+        if (text[0] == '-' && (text[1] == '-'))  return false;
+
         for (int i = 0; i < text.size() - 1; ++i)
         {
-            if (/*text[i] == '-' && (text[i + 1] == '-' ||*/ text[i + 1] == ' ') /*)*/ return false;
+            if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ') ) return false;
         }
+
+        /* {
+            if (text[i + 1] == '-' || text[i + 1] == ' ')  return false;
+        }*/
+
         return true;
     }
 
