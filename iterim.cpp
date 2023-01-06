@@ -134,7 +134,10 @@ public:
         if (!b)
             throw invalid_argument("invalid_argument");
 
-        if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
+        /*if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
+            throw invalid_argument("invalid_argument");*/
+
+        if (document_id < 0 || documents_.count(document_id) > 0 || !IsValidWord(document))
             throw invalid_argument("invalid_argument");
 
         const vector<string> words = SplitIntoWordsNoStop(document);
