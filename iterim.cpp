@@ -152,16 +152,21 @@ public:
     }
 
     int GetDocumentId(int index) const {
+        /*Не нужно проверять, что есть такой индекс, достаточно просто вернуть  docs_ids_.at(index); */
+        if (index < 0 || index >= GetDocumentCount()) { throw out_of_range("index out_of_range"); }
+        return docs_ids_.at(index);
+
+        /*
         if (index < 0 || index >= GetDocumentCount()) { throw out_of_range("index out_of_range"); }
         else {
             if (find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end())
             {
                 return docs_ids_.at(index);
             }
-            else {
+             {
                 throw out_of_range("index out_of_range");
             }
-        }
+        }*/
 
     }
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
