@@ -14,20 +14,6 @@ using namespace std;
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
-/*НЕ СДЕЛАНО */
-
-/*120             throw invalid_argument("invalid_argument");
-Не стоит дублировать проверку перед каждым вызовом ParseQuery */
-
-/*168         bool b = ChekTwoMinusorEmptyWord(raw_query);
-Не стоит дублировать проверку перед каждым вызовом ParseQuery */
-
-/*249         if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-"
-такие проверки лучше производить с готовыми словами в ParseQueryWord*/   // ????Как это сделать если ParseQueryWord возвращает структура и там чтобы bool вернуть нужно много правок вносить и использовать 
-//optional что сложно
-
-
-
 
 /*СДЕЛАНО */
 /*104 if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
@@ -45,6 +31,15 @@ if (!IsValidWord(text)) return false; */
 Можно не проверять документы на два минуса. */
 
 
+/*120             throw invalid_argument("invalid_argument");
+Не стоит дублировать проверку перед каждым вызовом ParseQuery */
+
+/*168         bool b = ChekTwoMinusorEmptyWord(raw_query);
+Не стоит дублировать проверку перед каждым вызовом ParseQuery */
+
+/*249         if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-"
+такие проверки лучше производить с готовыми словами в ParseQueryWord*/   // ????Как это сделать если ParseQueryWord возвращает структура и там чтобы bool вернуть нужно много правок вносить и использовать 
+//optional что сложно
 
 string ReadLine() {
 	string s;
@@ -130,10 +125,15 @@ public:
 
 
 	void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
+		/*bool b = ChekTwoMinusorEmptyWord(document);
+		Стоит использовать явные названия для переменных.*/
 		bool valid_doc = ChekTwoMinusorEmptyWord(document) && IsValidWord(document);
 		if (!valid_doc) {
 			throw invalid_argument("invalid_document");
 		}
+		/*104 if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
+		можно не перебирать все индексы
+		в documents_.  все индексы хранятся как ключи.*/  // Вернул count так как if приводит к bool
 		if (document_id < 0 || documents_.count(document_id) > 0)
 			throw invalid_argument("this document ID already used");
 		const vector<string> words = SplitIntoWordsNoStop(document);
@@ -147,11 +147,7 @@ public:
 
 	template <typename DocumentPredicate>
 	vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-		bool /*b*/ valid_doc = ChekTwoMinusorEmptyWord(raw_query);
-		if (!valid_doc)
-			throw invalid_argument("invalid_argument");
-
-
+		/*Не стоит дублировать проверку перед каждым вызовом ParseQuery */ // убрал , перенес проверку в ParseQuery
 		const Query query = ParseQuery(raw_query);
 		auto matched_documents = FindAllDocuments(query, document_predicate);
 
@@ -187,26 +183,9 @@ public:
 		/*Не нужно проверять, что есть такой индекс, достаточно просто вернуть  docs_ids_.at(index); */
 		if (index < 0 || index >= GetDocumentCount()) { throw out_of_range("index out_of_range"); }
 		return docs_ids_.at(index);
-
-		/*
-		if (index < 0 || index >= GetDocumentCount()) { throw out_of_range("index out_of_range"); }
-		else {
-			if (find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end())
-			{
-				return docs_ids_.at(index);
-			}
-			 {
-				throw out_of_range("index out_of_range");
-			}
-		}*/
-
 	}
 	tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-		//bool b = ChekTwoMinusorEmptyWord(raw_query);
-		bool valid_doc = ChekTwoMinusorEmptyWord(raw_query);
-		//if (!b)
-		if (!valid_doc)
-			throw invalid_argument("invalid_argument");
+		/*Не стоит дублировать проверку перед каждым вызовом ParseQuery */ // убрал , перенес проверку в ParseQuery
 		const Query query = ParseQuery(raw_query);
 		vector<string> matched_words;
 		for (const string& word : query.plus_words) {
@@ -284,7 +263,7 @@ private:
 	bool ChekTwoMinusorEmptyWord(string text) const {
 		if (text.empty()) return false;
 		/*Замечание if (!IsValidWord(text)) return false; */
-		if (!IsValidWord(text)) return false;
+		if (!IsValidWord(text)) return false;  // функция ChekTwoMinusorEmptyWord уже содержит в себе проверку IsValidWord
 		char ch = text.back();
 		if (ch == '-' || ch == ' ') { return false; }  // проверка что строка не оканчивается на "-"
 		/*Замечание : Стоит проверять что двух минусов нет только в начале слова.*/
@@ -301,6 +280,8 @@ private:
 	Query ParseQuery(const string& text) const {
 		Query query;
 		for (const string& word : SplitIntoWords(text)) {
+			/*249         if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-"
+			такие проверки лучше производить с готовыми словами в ParseQueryWord*/
 			if (!ChekTwoMinusorEmptyWord(word)) {
 				throw "Not a valid query";
 			}
