@@ -16,19 +16,19 @@ const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 /*НЕ СДЕЛАНО */
 
-/* 100       bool b = ChekTwoMinusorEmptyWord(document); 
+/* 100       bool b = ChekTwoMinusorEmptyWord(document);
 Стоит использовать явные названия для переменных.
 Можно не проверять документы на два минуса. */
 
 
 
-/*120             throw invalid_argument("invalid_argument"); 
+/*120             throw invalid_argument("invalid_argument");
 Не стоит дублировать проверку перед каждым вызовом ParseQuery */
 
-/*168         bool b = ChekTwoMinusorEmptyWord(raw_query); 
+/*168         bool b = ChekTwoMinusorEmptyWord(raw_query);
 Не стоит дублировать проверку перед каждым вызовом ParseQuery */
 
-/*249         if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-" 
+/*249         if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-"
 такие проверки лучше производить с готовыми словами в ParseQueryWord*/   // ????Как это сделать если ParseQueryWord возвращает структура и там чтобы bool вернуть нужно много правок вносить и использовать 
 //optional что сложно
 
@@ -36,14 +36,14 @@ const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 
 /*СДЕЛАНО */
-/*104 if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false) 
-можно не перебирать все индексы 
+/*104 if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
+можно не перебирать все индексы
 в documents_.  все индексы хранятся как ключи.*/
-/*157             if (find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end()) 
+/*157             if (find(docs_ids_.begin(), docs_ids_.end(), index) != docs_ids_.end())
 Не нужно проверять, что есть такой индекс, достаточно просто вернуть  docs_ids_.at(index); */
-/*247         if (IsValidWord(text) == false) return false; 
+/*247         if (IsValidWord(text) == false) return false;
 if (!IsValidWord(text)) return false; */
-/*252             if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ')) return false; 
+/*252             if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ')) return false;
 Стоит проверять что двух минусов нет только в начале слова.*/
 
 
@@ -119,7 +119,7 @@ public:
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words)
         : stop_words_(MakeUniqueNonEmptyStrings(stop_words)) {
-        for (auto i : stop_words_) { if (IsValidWord(i) == false) throw invalid_argument("invalid_argument"); }
+        for (auto i : stop_words_) { if (!IsValidWord(i)) throw invalid_argument("invalid_argument"); }
     }
 
     explicit SearchServer(const string& stop_words_text)
@@ -300,7 +300,7 @@ private:
 
         for (int i = 0; i < text.size() - 1; ++i)
         {
-            if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ') ) return false;
+            if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ')) return false;
         }
 
         /* {
