@@ -16,12 +16,6 @@ const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 /*НЕ СДЕЛАНО */
 
-/* 100       bool b = ChekTwoMinusorEmptyWord(document);
-Стоит использовать явные названия для переменных.
-Можно не проверять документы на два минуса. */
-
-
-
 /*120             throw invalid_argument("invalid_argument");
 Не стоит дублировать проверку перед каждым вызовом ParseQuery */
 
@@ -45,6 +39,10 @@ const int MAX_RESULT_DOCUMENT_COUNT = 5;
 if (!IsValidWord(text)) return false; */
 /*252             if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ')) return false;
 Стоит проверять что двух минусов нет только в начале слова.*/
+
+/* 100       bool b = ChekTwoMinusorEmptyWord(document);
+Стоит использовать явные названия для переменных.
+Можно не проверять документы на два минуса. */
 
 
 
@@ -130,17 +128,14 @@ public:
 
 	inline static constexpr int INVALID_DOCUMENT_ID = -1;
 
+
 	void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
-		bool b = ChekTwoMinusorEmptyWord(document);
-		if (!b)
-			throw invalid_argument("invalid_argument");
-
-		/*if (document_id < 0 || count(docs_ids_.begin(), docs_ids_.end(), document_id) != 0 || IsValidWord(document) == false)
-			throw invalid_argument("invalid_argument");*/
-
-		if (document_id < 0 || documents_.count(document_id) > 0 || !IsValidWord(document))
-			throw invalid_argument("invalid_argument");
-
+		bool valid_doc = ChekTwoMinusorEmptyWord(document) && IsValidWord(document);
+		if (!valid_doc) {
+			throw invalid_argument("invalid_document");
+		}
+		if (document_id < 0 || documents_.count(document_id) > 0)
+			throw invalid_argument("this document ID already used");
 		const vector<string> words = SplitIntoWordsNoStop(document);
 		const double inv_word_count = 1.0 / words.size();
 		for (const string& word : words) {
@@ -148,12 +143,12 @@ public:
 		}
 		documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 		docs_ids_.push_back(document_id);
-
 	}
+
 	template <typename DocumentPredicate>
 	vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-		bool b = ChekTwoMinusorEmptyWord(raw_query);
-		if (!b)
+		bool /*b*/ valid_doc = ChekTwoMinusorEmptyWord(raw_query);
+		if (!valid_doc)
 			throw invalid_argument("invalid_argument");
 
 
@@ -207,8 +202,10 @@ public:
 
 	}
 	tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-		bool b = ChekTwoMinusorEmptyWord(raw_query);
-		if (!b)
+		//bool b = ChekTwoMinusorEmptyWord(raw_query);
+		bool valid_doc = ChekTwoMinusorEmptyWord(raw_query);
+		//if (!b)
+		if (!valid_doc)
 			throw invalid_argument("invalid_argument");
 		const Query query = ParseQuery(raw_query);
 		vector<string> matched_words;
@@ -288,24 +285,10 @@ private:
 		if (text.empty()) return false;
 		/*Замечание if (!IsValidWord(text)) return false; */
 		if (!IsValidWord(text)) return false;
-		//if (IsValidWord(text) == false) return false;
-
-		/*Замечание : такие проверки лучше производить с готовыми словами в ParseQueryWord -- если принять это замечание то проверка не "- " в конце слова не будет производиться в AddDocument*/
-
 		char ch = text.back();
-		if (ch == '-') { return false; }  // проверка что строка не оканчивается на "-"
-
+		if (ch == '-' || ch == ' ') { return false; }  // проверка что строка не оканчивается на "-"
 		/*Замечание : Стоит проверять что двух минусов нет только в начале слова.*/
 		if (text[0] == '-' && (text[1] == '-'))  return false;
-
-		for (int i = 0; i < text.size() - 1; ++i)
-		{
-			if (text[i] == '-' && (text[i + 1] == '-' || text[i + 1] == ' ')) return false;
-		}
-
-		/* {
-			if (text[i + 1] == '-' || text[i + 1] == ' ')  return false;
-		}*/
 
 		return true;
 	}
