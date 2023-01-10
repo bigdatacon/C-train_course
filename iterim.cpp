@@ -18,17 +18,24 @@ struct Lang {
     int age;
 };
 
+ostream & operator<< (ostream & os, const Lang &lang) {  return os << lang.name << " " << lang.age;}
+
 int main() {
     vector<Lang> langs = {{"Python"s, 29}, {"Java"s, 24}, {"C#"s, 20}, {"Ruby"s, 25}, {"C++"s, 37}};
     // Выведите первый язык, начинающийся на J, используя алгоритм find_if
-    auto is_tru = [](Lang i){ 
-        auto f = i->name;
-        //return i.name[0] == 'J';
+    /*auto is_tru = [](Lang i){ 
+        auto f = i.name;
         return f[0] == 'J';
     };
 
-    //auto result3 = find_if(begin(langs), end(langs), is_tru);
     auto result3 = find_if(langs.begin(), langs.end(), is_tru);
-    //cout <<*result3 << endl;
-    cout <<*result3 << endl;
+    cout <<*result3 << endl;*/
+    
+    for (auto it = langs.begin(); it != langs.end(); it++) {
+        if (it->name[0] == 'J') {
+            cout << *it << endl;
+        }
+    }
+
+    return 0;
 }
