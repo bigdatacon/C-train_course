@@ -44,27 +44,27 @@ public:
 	// вы можете дописывать необходимые для вашего решения методы
 	void MoveDisks(int disks_num, Tower& destination, Tower& buffer) {
 		if (destination.GetDisksNum() < disks_num) {
-			if (GetDisksNum() == 1) {
+			/*if (GetDisksNum() == 1) {
 				if (buffer.GetDisksNum() > 0) {
 					destination.AddToTop(buffer.GetDisks().back());  // сначала перекидываю диск с buffer
-					buffer.PopBack(););    // удаляю диск с 1 башни 
+					buffer.PopBack();    // удаляю диск с 1 башни 
 					destination.AddToTop(GetDisks().back()); // перекидываю диск с первой башни 
-					PopBack(););  // удаляю диск с 1 башни 
+					PopBack();  // удаляю диск с 1 башни 
 				}
 				else {
 					destination.AddToTop(GetDisks().back());  // перекидываю диск с первой башни
-					PopBack(););
+					PopBack();
 				}     // удаляю диск с 1 башни 
 			}
 			else if (GetDisksNum() == 0) {
 				if (buffer.GetDisksNum() > 0) {
 					destination.AddToTop(buffer.GetDisks().back());  // сначала перекидываю диск с buffer
-					buffer.PopBack(););    // удаляю диск с 1 башни 
+					buffer.PopBack();    // удаляю диск с 1 башни 
 					destination.AddToTop(GetDisks().back()); // перекидываю диск с первой башни 
-					PopBack(););  // удаляю диск с 1 башни 
+					PopBack();  // удаляю диск с 1 башни 
 				}
 				}
-			else {
+			else {*/
 
 				int current_disk = disks_.back(); // беру последний элемент 
 				PopBack(); // удаляю последний элемент
@@ -76,20 +76,24 @@ public:
 				buffer.AddToTop(current_disk);
 				destination.AddToTop(sec_current_disk);
 
-				buffer.PopBack(); // удаляю первый элемент из buffer и переношу его обратно на 1 башню 
-				AddToTop(current_disk);
+				if (GetDisksNum() > 1) {
 
-				destination.PopBack(); // удаляю предпоследний сверху диск с destination и переношу его на буффер 
-				buffer.AddToTop(sec_current_disk);
+					buffer.PopBack(); // удаляю первый элемент из buffer и переношу его обратно на 1 башню 
+					AddToTop(current_disk);
+
+					destination.PopBack(); // удаляю предпоследний сверху диск с destination и переношу его на буффер 
+					buffer.AddToTop(sec_current_disk);
+				}
+				else {
+					destination.AddToTop(buffer.GetDisks().back());  // сначала перекидываю диск с buffer
+					buffer.PopBack();   // удаляю диск с 1 башни 
+					destination.AddToTop(GetDisks().back()); // перекидываю диск с первой башни 
+					PopBack();  // удаляю диск с 1 башни 
+				}
 
 				// в целом тут цикл заканчивается так как в след итерации с 1 башни диск перенесется на буфер, а нижний на destination
 				//далее верхний с буфера  перенесется на 1 башню 
-			}
-
-
-
-
-
+			/* }*/
 		}
 	}
 private:
