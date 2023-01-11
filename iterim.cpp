@@ -1,41 +1,48 @@
+// разработайте сигнатуру фунции MakeVector по аналогии с функцией MakeSet из урока
+#include <algorithm>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
-#include <iterator>
-#include <algorithm>
-/*
-Задание 2
-Как вы помните, итераторы даны нам для гибкости кода и для простоты внесения изменений. Пусть теперь вектор будет хранить не просто строки, а структуры. Найдите первый и единственный в данном случае язык, начинающийся на “J”. Попробуйте самостоятельно разобраться, как правильно вывести результат на экран. Всё так же продолжайте считать, что искомый элемент в контейнере есть.
-
-Java, 24 
-Чтобы получить доступ к отдельным полям структуры через итератор, используйте ->.
-*/
 
 using namespace std;
 
-struct Lang {
-    string name;
-    int age;
-};
+template <typename It>
+void PrintRange(It range_begin, It range_end) {
+    for (auto it = range_begin; it != range_end; ++it) {
+        cout << *it << " "s;
+    }
+    cout << endl;
+}
 
-ostream & operator<< (ostream & os, const Lang &lang) {  return os << lang.name << " " << lang.age;}
+template <typename It>
+auto MakeSet(It range_begin, It range_end) {
+    return set(range_begin, range_end);
+}
+
+template <typename It>
+auto MakeVector(It range_begin, It range_end) {
+    return vector(range_begin, range_end);
+}
+
+
+
+template <typename Container, typename Iterator>
+void EraseAndPrint(Container& container, Iterator iter_beyond, Iterator p1,  Iterator p2) {
+
+    auto res = container.erase(container.begin() +iter_beyond);
+	PrintRange(container.begin(), res);
+    PrintRange(res, container.end());
+    
+    auto res_2 = container.erase(container.begin() +p1, container.begin() +p2);
+    PrintRange(container.begin(), res_2);
+    PrintRange(res_2, container.end());
+}
+
+
 
 int main() {
-    vector<Lang> langs = {{"Python"s, 29}, {"Java"s, 24}, {"C#"s, 20}, {"Ruby"s, 25}, {"C++"s, 37}};
-    // Выведите первый язык, начинающийся на J, используя алгоритм find_if
-    /*auto is_tru = [](Lang i){ 
-        auto f = i.name;
-        return f[0] == 'J';
-    };
-
-    auto result3 = find_if(langs.begin(), langs.end(), is_tru);
-    cout <<*result3 << endl;*/
-    
-    for (auto it = langs.begin(); it != langs.end(); it++) {
-        if (it->name[0] == 'J') {
-            cout << *it << endl;
-        }
-    }
-
+    vector<string> langs = {"Python"s, "Java"s, "C#"s, "Ruby"s, "C++"s};
+    EraseAndPrint(langs, 0, 0, 2);
     return 0;
 }
