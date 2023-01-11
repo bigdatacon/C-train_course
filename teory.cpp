@@ -1,371 +1,91 @@
-#include <algorithm>
-#include <cmath>
+// авторское решение с башнями
+
 #include <iostream>
-#include <map>
-#include <set>
-#include <string>
-#include <utility>
+#include <stdexcept>
 #include <vector>
 
 using namespace std;
 
-const int MAX_RESULT_DOCUMENT_COUNT = 5;
-
-string ReadLine() {
-	string s;
-	getline(cin, s);
-	return s;
-}
-
-int ReadLineWithNumber() {
-	int result;
-	cin >> result;
-	ReadLine();
-	return result;
-}
-
-vector<string> SplitIntoWords(const string& text) {
-	vector<string> words;
-	string word;
-	for (const char c : text) {
-		if (c == ' ') {
-			if (!word.empty()) {
-				words.push_back(word);
-				word.clear();
-			}
-		}
-		else {
-			word += c;
-		}
-	}
-	if (!word.empty()) {
-		words.push_back(word);
-	}
-
-	return words;
-}
-
-struct Document {
-	Document() = default;
-
-	Document(int id, double relevance, int rating)
-		: id(id)
-		, relevance(relevance)
-		, rating(rating) {
-	}
-
-	int id = 0;
-	double relevance = 0.0;
-	int rating = 0;
-};
-
-template <typename StringContainer>
-set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
-	set<string> non_empty_strings;
-	for (const string& str : strings) {
-		if (!str.empty()) {
-			non_empty_strings.insert(str);
-		}
-	}
-	return non_empty_strings;
-}
-
-enum class DocumentStatus {
-	ACTUAL,
-	IRRELEVANT,
-	BANNED,
-	REMOVED,
-};
-
-class SearchServer {
+class Tower {
 public:
-	// Defines an invalid document id
-	// You can refer to this constant as SearchServer::INVALID_DOCUMENT_ID
-	inline static constexpr int INVALID_DOCUMENT_ID = -1;
+    // конструктор и метод SetDisks нужны, чтобы правильно создать башни
+    Tower(int disks_num) {
+        FillTower(disks_num);
+    }
 
-	template <typename StringContainer>
-	explicit SearchServer(const StringContainer& stop_words)
-		: stop_words_(MakeUniqueNonEmptyStrings(stop_words)) {
-	}
+    void SetDisks(int disks_num) {
+        FillTower(disks_num);
+    }
 
-	explicit SearchServer(const string& stop_words_text)
-		: SearchServer(
-			SplitIntoWords(stop_words_text))  // Invoke delegating constructor from string container
-	{
-	}
-	//void AddDocument(int document_id, const string& document, DocumentStatus status,const vector<int>& ratings)
-	[[nodiscard]] bool AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
-		//negative id documents and already existing, спец символы
-		if (document_id < 0 || count(id_documents_.begin(), id_documents_.end(), document_id) != 0 || IsValidWord(document) == false) 
-			return false;
-		//add id in vector id
-		id_documents_.push_back(document_id);
+    int GetDisksNum() const {
+        return disks_.size();
+    }
 
-		const vector<string> words = SplitIntoWordsNoStop(document);
-		const double inv_word_count = 1.0 / words.size();
-		for (const string& word : words) {
-			word_to_document_freqs_[word][document_id] += inv_word_count;
-		}
-		documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
-		return true;
-	}
+    // перемещаем 1 диск с текущей башни на destination
+    void MoveTopTo(Tower& destination) {
+        int top_disk_num = disks_.size() - 1;
+        try {
+            destination.AddToTop(disks_[top_disk_num]);
+        } catch (const invalid_argument& e) {
+            cout << e.what() << '\n';
+            throw;
+        }
 
-	//template <typename DocumentPredicate>
-	//vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const 
-	template <typename DocumentPredicate>
-	[[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate, vector<Document>& result) const
-	{
-		//проверка на содержание спец символов 
-		bool b = ParsingInPropriety(raw_query);
-		if (!b)
-			return false;
-		const Query query = ParseQuery(raw_query);
-		auto matched_documents = FindAllDocuments(query, document_predicate);
+        disks_.pop_back();
+    }
 
-		sort(matched_documents.begin(), matched_documents.end(),
-			[](const Document& lhs, const Document& rhs) {
-			if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
-				return lhs.rating > rhs.rating;
-			}
-			else {
-				return lhs.relevance > rhs.relevance;
-			}
-		});
-		if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-			matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-		}
-		result = matched_documents;
-		return true;
-	}
+    // добавляем диск на верх собственной башни
+    void AddToTop(int disk) {
+        int top_disk_num = disks_.size() - 1;
+        if (0 != disks_.size() && disk >= disks_[top_disk_num]) {
+            throw invalid_argument("Невозможно поместить большой диск на маленький");
+        } else {
+            disks_.push_back(disk);
+        }
+    }
 
-	//vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const 
-	[[nodiscard]] bool FindTopDocuments(const string& raw_query, DocumentStatus status, vector<Document>& result) const
-	{
-		return FindTopDocuments(raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
-			return document_status == status;
-		}, result);
-	}
-
-	//vector<Document> FindTopDocuments(const string& raw_query) const
-	[[nodiscard]] bool FindTopDocuments(const string& raw_query, vector<Document>& result) const
-	{
-		return FindTopDocuments(raw_query, DocumentStatus::ACTUAL, result);
-	}
-
-	int GetDocumentCount() const {
-		return documents_.size();
-	}
-
-	//tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query,int document_id) const 
-	[[nodiscard]] bool MatchDocument(const string& raw_query, int document_id, tuple<vector<string>, DocumentStatus>& result) const
-	{
-		bool b = ParsingInPropriety(raw_query);
-		if (!b)
-			return false;
-		const Query query = ParseQuery(raw_query);
-		vector<string> matched_words;
-		for (const string& word : query.plus_words) {
-			if (word_to_document_freqs_.count(word) == 0) {
-				continue;
-			}
-			if (word_to_document_freqs_.at(word).count(document_id)) {
-				matched_words.push_back(word);
-			}
-		}
-		for (const string& word : query.minus_words) {
-			if (word_to_document_freqs_.count(word) == 0) {
-				continue;
-			}
-			if (word_to_document_freqs_.at(word).count(document_id)) {
-				matched_words.clear();
-				break;
-			}
-		}
-		result = { matched_words, documents_.at(document_id).status };
-		return true;//{ matched_words, documents_.at(document_id).status };
-	}
-	/*
- Также добавьте метод GetDocumentId, позволяющий получить идентификатор документа по его порядковому номеру.
- В случае, если порядковый номер документа выходит за пределы от [0; кол-во документов),
- метод должен вернуть значение SearchServer::INVALID_DOCUMENT_ID:
-	*/
-	int GetDocumentId(int index) const {
-		if (!id_documents_.empty()) {
-			if (index >= 0 && index <= id_documents_.size() - 1)
-				return id_documents_[index];
-			else return INVALID_DOCUMENT_ID;
-		}
-		else {
-			return INVALID_DOCUMENT_ID;
-		}
-	}
+    void MoveDisks(int disks_num, Tower& destination, Tower& buffer) {
+        // наше условие завершения - не осталось больше дисков, чтобы перемещать их
+        if (0 < disks_num) {
+            // сначала отложим все диски, кроме верхнего, на дополнительный
+            // стержень, используя destination в качестве буфера
+            MoveDisks(disks_num - 1, buffer, destination);
+            // переложим оставшийся самый большой диск в destination
+            MoveTopTo(destination);
+            // теперь нам нужно переложить диски, оказавшиеся в буфере,
+            // в destination, используя изначальный стержжень, как буфер
+            buffer.MoveDisks(disks_num - 1, destination, *this);
+        }
+    }
 
 private:
-	struct DocumentData {
-		int rating;
-		DocumentStatus status;
-	};
-	const set<string> stop_words_;
-	map<string, map<int, double>> word_to_document_freqs_;
-	map<int, DocumentData> documents_;
-	vector<int> id_documents_;
+    vector<int> disks_;
 
-	bool IsStopWord(const string& word) const {
-		return stop_words_.count(word) > 0;
-	}
-
-	vector<string> SplitIntoWordsNoStop(const string& text) const {
-		vector<string> words;
-		for (const string& word : SplitIntoWords(text)) {
-			if (!IsStopWord(word)) {
-				words.push_back(word);
-			}
-		}
-		return words;
-	}
-
-	static int ComputeAverageRating(const vector<int>& ratings) {
-		if (ratings.empty()) {
-			return 0;
-		}
-		int rating_sum = 0;
-		for (const int rating : ratings) {
-			rating_sum += rating;
-		}
-		return rating_sum / static_cast<int>(ratings.size());
-	}
-
-	struct QueryWord {
-		string data;
-		bool is_minus;
-		bool is_stop;
-	};
-
-	QueryWord ParseQueryWord(string text) const {
-		bool is_minus = false;
-		// Word shouldn't be empty
-		if (text[0] == '-') {
-			is_minus = true;
-			text = text.substr(1);
-		}
-		return { text, is_minus, IsStopWord(text) };
-	}
-
-	struct Query {
-		set<string> plus_words;
-		set<string> minus_words;
-	};
-
-	Query ParseQuery(const string& text) const {
-		Query query;
-		for (const string& word : SplitIntoWords(text)) {
-			const QueryWord query_word = ParseQueryWord(word);
-			if (!query_word.is_stop) {
-				if (query_word.is_minus) {
-					query.minus_words.insert(query_word.data);
-				}
-				else {
-					query.plus_words.insert(query_word.data);
-				}
-			}
-		}
-		return query;
-	}
-
-	// Existence required
-	double ComputeWordInverseDocumentFreq(const string& word) const {
-		return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
-	}
-
-	template <typename DocumentPredicate>
-	vector<Document> FindAllDocuments(const Query& query,
-		DocumentPredicate document_predicate) const {
-		map<int, double> document_to_relevance;
-		for (const string& word : query.plus_words) {
-			if (word_to_document_freqs_.count(word) == 0) {
-				continue;
-			}
-			const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
-			for (const auto[document_id, term_freq] : word_to_document_freqs_.at(word)) {
-				const auto& document_data = documents_.at(document_id);
-				if (document_predicate(document_id, document_data.status, document_data.rating)) {
-					document_to_relevance[document_id] += term_freq * inverse_document_freq;
-				}
-			}
-		}
-
-		for (const string& word : query.minus_words) {
-			if (word_to_document_freqs_.count(word) == 0) {
-				continue;
-			}
-			for (const auto[document_id, _] : word_to_document_freqs_.at(word)) {
-				document_to_relevance.erase(document_id);
-			}
-		}
-
-		vector<Document> matched_documents;
-		for (const auto[document_id, relevance] : document_to_relevance) {
-			matched_documents.push_back(
-				{ document_id, relevance, documents_.at(document_id).rating });
-		}
-		return matched_documents;
-	}
-	/*
-проверяющий при помощи стандартного алгоритма none_of,что ни один из символов строки не содержит символов
-с кодами от 0 до пробела (не включая пробел).
-*/
-	static bool IsValidWord(const string& word) {
-		// A valid word must not contain special characters
-		return none_of(word.begin(), word.end(), [](char c) {
-			return c >= '\0' && c < ' ';
-		});
-	}
-	bool ParsingInPropriety(const string& raw_query) const
-	{
-		if (IsValidWord(raw_query) == false) return false;
-		for (int i = 0; i < raw_query.size() - 1; ++i)
-		{
-			if (raw_query[i] == '-' && (raw_query[i + 1] == '-' || raw_query[i + 1] == ' '))
-				return false;
-		}
-		if (raw_query[raw_query.size() - 1] == '-')
-			return false;
-		return true;
-	}
+    // используем приватный метод FillTower, чтобы избежать дубликации кода
+    void FillTower(int disks_num) {
+        for (int i = disks_num; i > 0; i--) {
+            disks_.push_back(i);
+        }
+    }
 };
 
-// ==================== для примера =========================
-void PrintDocument(const Document& document) {
-	cout << "{ "s
-		<< "document_id = "s << document.id << ", "s
-		<< "relevance = "s << document.relevance << ", "s
-		<< "rating = "s << document.rating << " }"s << endl;
+void SolveHanoi(vector<Tower>& towers) {
+    int disks_num = towers[0].GetDisksNum();
+    towers[0].MoveDisks(disks_num, towers[2], towers[1]);
 }
 
 int main() {
-	setlocale(LC_ALL, "Russian");
-	SearchServer search_server("и в на"s);
-	// Явно игнорируем результат метода AddDocument, чтобы избежать предупреждения
-	// о неиспользуемом результате его вызова
-	(void)search_server.AddDocument(1, "пушистый кот пушистый хвост иван-чай"s, DocumentStatus::ACTUAL, { 7, 2, 7 });
-	if (!search_server.AddDocument(1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, { 1, 2 })) {
-		cout << "Документ не был добавлен, так как его id совпадает с уже имеющимся"s << endl;
-	}
-	if (!search_server.AddDocument(-1, "пушистый пёс и модный ошейник"s, DocumentStatus::ACTUAL, { 1, 2 })) {
-		cout << "Документ не был добавлен, так как его id отрицательный"s << endl;
-	}
-	if (!search_server.AddDocument(3, "большой пёс скво\x12рец"s, DocumentStatus::ACTUAL, { 1, 3, 2 })) {
-		cout << "Документ не был добавлен, так как содержит спецсимволы"s << endl;
-	}
-	vector<Document> documents;
-	if (search_server.FindTopDocuments("иван-чай пушистый -"s, documents)) {//иван-чай - --пушистый
-		for (const Document& document : documents) {
-			PrintDocument(document);
-		}
-	}
-	else {
-		cout << "Ошибка в поисковом запросе"s << endl;
-	}
-	//system("pause");
-	return 0;
+    int towers_num = 3;
+    int disks_num = 3;
+    vector<Tower> towers;
+    // добавим в вектор три пустые башни
+    for (int i = 0; i < towers_num; ++i) {
+        towers.push_back(0);
+    }
+    // добавим на первую башню три кольца
+    towers[0].SetDisks(disks_num);
+
+    SolveHanoi(towers);
+
+    return 0;
 }
