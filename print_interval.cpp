@@ -15,7 +15,7 @@ void PrintRange(It range_begin, It range_end){
         cout << endl;
     }
 
-template<typename Container, typename Type>
+/*template<typename Container, typename Type>
 void FindAndPrint(Container container, Type range) {
  
 	auto it = find_if(container.begin(), container.end(), [&range](const Type& type) {return range == type; });
@@ -25,7 +25,17 @@ void FindAndPrint(Container container, Type range) {
 		PrintRange(it, container.end());
 	}
  
+}*/
+
+template<typename Container, typename Type>
+void FindAndPrint(Container container, Type range) {
+ 
+	auto it = find_if(container.begin(), container.end(), [&range](const Type& type) {return range == type; });
+	PrintRange(container.begin(), it);
+    PrintRange(it, container.end());
+ 
 }
+
 
 int main() {
     set<int> test = {1, 1, 1, 2, 3, 4, 5, 5};
