@@ -1,56 +1,52 @@
-// разработайте сигнатуру фунции MakeVector по аналогии с функцией MakeSet из урока
-#include <algorithm>
 #include <iostream>
-#include <set>
-#include <string>
+#include <stdexcept>
 #include <vector>
 
 using namespace std;
 
-template <typename It>
-void PrintRange(It range_begin, It range_end) {
-    for (auto it = range_begin; it != range_end; ++it) {
-        cout << *it << " "s;
+class Tower {
+public:
+    // конструктор и метод SetDisks нужны, чтобы правильно создать башни
+    Tower(int disks_num) {
+        FillTower(disks_num);
     }
-    cout << endl;
-}
 
-template <typename It>
-auto MakeSet(It range_begin, It range_end) {
-    return set(range_begin, range_end);
-}
+    int GetDisksNum() const {
+        return disks_.size();
+    }
 
-template <typename It>
-auto MakeVector(It range_begin, It range_end) {
-    return vector(range_begin, range_end);
-}
+    void SetDisks(int disks_num) {
+        FillTower(disks_num);
+    }
 
+    // добавляем диск на верх собственной башни
+    // обратите внимание на исключение, которое выбрасывается этим методом
+    void AddToTop(int disk) {
+        int top_disk_num = disks_.size() - 1;
+        if (0 != disks_.size() && disk >= disks_[top_disk_num]) {
+            throw invalid_argument("Невозможно поместить большой диск на маленький");
+        } else {
+            // допишите этот метод и используйте его в вашем решении
+        }
+    }
 
+    // вы можете дописывать необходимые для вашего решения методы
 
-/*template <typename Container, typename Iterator>
-void EraseAndPrint(Container& container, Iterator iter_beyond) {
+private:
+    vector<int> disks_;
 
-    container.erase(iter_beyond);
-	PrintRange(container.begin(), iter_beyond);
-    PrintRange(iter_beyond, container.end());
-}*/
+    // используем приватный метод FillTower, чтобы избежать дубликации кода
+    void FillTower(int disks_num) {
+        for (int i = disks_num; i > 0; i--) {
+            disks_.push_back(i);
+        }
+    }
+};
 
+void SolveHanoi(vector<Tower>& towers) {
+    int disks_num = towers[0].GetDisksNum();
 
-template <typename Container, typename Iterator>
-void EraseAndPrint(Container& container, Iterator iter_beyond) {
-
-    auto res = container.erase(iter_beyond);
-	PrintRange(container.begin(), res);
-    PrintRange(res, container.end());
-}
-
-
-
-int main() {
-    vector<string> langs = {"Python"s, "Java"s, "C#"s, "Ruby"s, "C++"s};
-    EraseAndPrint(langs, langs.begin());
-    
-
-    
-    return 0;
+    // допишите функцию, чтобы на towers[0] было 0 дисков,
+    // на towers[1] 0 дисков,
+    // и на towers[2] было disks_num дисков
 }
