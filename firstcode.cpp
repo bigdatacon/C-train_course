@@ -7,6 +7,12 @@
 
 using namespace std;
 
+/*
+Напишите функцию-шаблон EraseAndPrint. Она должна принимать контейнер и итератор на позицию, которую надо удалить.
+После этого EraseAndPrint должна выводить на первой строчке часть контейнера до удалённого элемента,
+а на второй строчке — часть контейнера после удалённого элемента.
+*/
+
 template <typename It>
 void PrintRange(It range_begin, It range_end) {
     for (auto it = range_begin; it != range_end; ++it) {
