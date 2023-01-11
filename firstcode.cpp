@@ -1,22 +1,46 @@
+// разработайте сигнатуру фунции MakeVector по аналогии с функцией MakeSet из урока
 #include <algorithm>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-/*
-Задание 1
-Научимся применять новый алгоритм find_if. Результат его работы — итератор, указывающий на первый элемент в контейнере, для которого выполняется некое условие. В качестве параметров он принимает итератор на начало контейнера, итератор на конец и лямбда-функцию, аналогично алгоритму count_if. Воспользуйтесь алгоритмом find_if и найдите в заданном векторе языков программирования первый язык, начинающийся на “C”. Чтобы получить доступ к элементу контейнера через итератор, примените оператор *:
-cout << *it << endl; 
-Считайте, что искомый элемент в контейнере существует.
-Пример вывода:
-С# 
+template <typename It>
+void PrintRange(It range_begin, It range_end) {
+    for (auto it = range_begin; it != range_end; ++it) {
+        cout << *it << " "s;
+    }
+    cout << endl;
+}
 
-Чтобы правильно вызвать find_if, пригодятся лямбда-функции. Вернитесь к уроку о них, если возникли сложности.
-*/
+template <typename It>
+auto MakeSet(It range_begin, It range_end) {
+    return set(range_begin, range_end);
+}
+
+template <typename It>
+auto MakeVector(It range_begin, It range_end) {
+    return vector(range_begin, range_end);
+}
+
+
+
+template <typename Container, typename Iterator>
+void EraseAndPrint(Container& container, Iterator iter_beyond) {
+	if (iter_beyond>= container.begin() && iter_beyond <= container.end()){
+    container.erase(iter_beyond);
+	PrintRange(container.begin(), iter_beyond);
+    PrintRange(iter_beyond, container.end());
+}
+}
 
 int main() {
     vector<string> langs = {"Python"s, "Java"s, "C#"s, "Ruby"s, "C++"s};
-    // Выведите первый язык, начинающийся на C, используя алгоритм find_if
+    EraseAndPrint(langs, langs.begin());
+    
+
+    
+    return 0;
 }
