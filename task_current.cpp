@@ -1,114 +1,131 @@
-/*
-Задание
-Замените встроенный макрос assert на макросы ASSERT_EQUAL, ASSERT_EQUAL_HINT, ASSERT и ASSERT_HINT из вашего фреймворка.
-Вам пригодится решение задания из урока «Юнит-тестирование класса». Используйте его в качестве заготовки кода.
-
-Подсказка
-Миссия выполнима. С этим заданием вы справитесь и без подсказки.
-*/
-
-
-
-// Скопируйте сюда решения задания из урока «Юнит-тестирование класса».
-#include <cassert>
 #include <iostream>
-#include <map>
-#include <set>
-#include <sstream>
-#include <string>
+#include <stdexcept>
+#include <vector>
 
 using namespace std;
 
-class Synonyms {
+class Tower {
 public:
-    void Add(const string& first_word, const string& second_word) {
-        synonyms_[first_word].insert(second_word);
-        synonyms_[second_word].insert(first_word);
-    }
+	// конструктор и метод SetDisks нужны, чтобы правильно создать башни
+	Tower(int disks_num) {
+		FillTower(disks_num);
+	}
 
-    size_t GetSynonymCount(const string& word) const {
-        if (synonyms_.count(word) != 0) {
-            return synonyms_.at(word).size();
-        }
-        return 0;
-    }
+	int GetDisksNum() const {
+		return disks_.size();
+	}
 
-    bool AreSynonyms(const string& first_word, const string& second_word) const {
-        // Напишите недостающий код
-        //set syn_1 = synonyms_[first_word];    // ВНИМАНИЕ ПОЧЕМУ ТУТ ВЫДАЕТ ОШИБКУ а с at. не выдает ? 
-        //set syn_2 = synonyms_[second_word];
-        set syn_1 = synonyms_.at(first_word);
-        set syn_2 = synonyms_.at(second_word);
-        bool first_is_syn_two = syn_2.count(first_word);
-        bool second_is_syn_first = syn_1.count(second_word);
-        if (first_is_syn_two && second_is_syn_first){return true;}
-        
-        return false;
-    }
+	void SetDisks(int disks_num) {
+		FillTower(disks_num);
+	}
 
+	vector<int> GetDisks() {
+		return  disks_;
+	}
+
+	void PopBack() {
+		disks_.pop_back();
+
+	}
+
+	// добавляем диск на верх собственной башни
+	// обратите внимание на исключение, которое выбрасывается этим методом
+	void AddToTop(int disk) {
+		int top_disk_num = disks_.size() - 1;
+		if (0 != disks_.size() && disk >= disks_[top_disk_num]) {
+			throw invalid_argument("Невозможно поместить большой диск на маленький");
+		}
+		else {
+			// допишите этот метод и используйте его в вашем решении
+			disks_.push_back(disk);
+		}
+	}
+
+	// вы можете дописывать необходимые для вашего решения методы
+	void MoveDisks(int disks_num, Tower& destination, Tower& buffer) {
+		if (destination.GetDisksNum() < disks_num) {
+			if (GetDisksNum() == 1) {
+				if (buffer.GetDisksNum() > 0) {
+					destination.AddToTop(buffer.GetDisks().back());  // сначала перекидываю диск с buffer
+					buffer.PopBack(););    // удаляю диск с 1 башни 
+					destination.AddToTop(GetDisks().back()); // перекидываю диск с первой башни 
+					PopBack(););  // удаляю диск с 1 башни 
+				}
+				else {
+					destination.AddToTop(GetDisks().back());  // перекидываю диск с первой башни
+					PopBack(););
+				}     // удаляю диск с 1 башни 
+			}
+			else if (GetDisksNum() == 0) {
+				if (buffer.GetDisksNum() > 0) {
+					destination.AddToTop(buffer.GetDisks().back());  // сначала перекидываю диск с buffer
+					buffer.PopBack(););    // удаляю диск с 1 башни 
+					destination.AddToTop(GetDisks().back()); // перекидываю диск с первой башни 
+					PopBack(););  // удаляю диск с 1 башни 
+				}
+				}
+			else {
+
+				int current_disk = disks_.back(); // беру последний элемент 
+				PopBack(); // удаляю последний элемент
+
+				int sec_current_disk = disks_.back(); // беру предпоследний элемент 
+				PopBack(); // удаляю предпоследний элемент
+
+				// добавляю верхний диск на буффер а второй диск на destination 
+				buffer.AddToTop(current_disk);
+				destination.AddToTop(sec_current_disk);
+
+				buffer.PopBack(); // удаляю первый элемент из buffer и переношу его обратно на 1 башню 
+				AddToTop(current_disk);
+
+				destination.PopBack(); // удаляю предпоследний сверху диск с destination и переношу его на буффер 
+				buffer.AddToTop(sec_current_disk);
+
+				// в целом тут цикл заканчивается так как в след итерации с 1 башни диск перенесется на буфер, а нижний на destination
+				//далее верхний с буфера  перенесется на 1 башню 
+			}
+
+
+
+
+
+		}
+	}
 private:
-    map<string, set<string>> synonyms_;
+	vector<int> disks_;
+
+	// используем приватный метод FillTower, чтобы избежать дубликации кода
+	void FillTower(int disks_num) {
+		for (int i = disks_num; i > 0; i--) {
+			disks_.push_back(i);
+		}
+	}
 };
 
-void TestAddingSynonymsIncreasesTheirCount() {
-    Synonyms synonyms;
-    assert(synonyms.GetSynonymCount("music"s) == 0);
-    assert(synonyms.GetSynonymCount("melody"s) == 0);
 
-    synonyms.Add("music"s, "melody"s);
-    assert(synonyms.GetSynonymCount("music"s) == 1);
-    assert(synonyms.GetSynonymCount("melody"s) == 1);
+void SolveHanoi(vector<Tower>& towers) {
+	int disks_num = towers[0].GetDisksNum();
 
-    synonyms.Add("music"s, "tune"s);
-    assert(synonyms.GetSynonymCount("music"s) == 2);
-    assert(synonyms.GetSynonymCount("tune"s) == 1);
-    assert(synonyms.GetSynonymCount("melody"s) == 1);
-    
-  
-    //assert(synonyms.AreSynonyms("music"s, "tune"s) == 1); // на всякий случай с 1 проверю    
+	// допишите функцию, чтобы на towers[0] было 0 дисков,
+	// на towers[1] 0 дисков,
+	// и на towers[2] было disks_num дисков
+	// запускаем рекурсию
+	 // просим переложить все диски на последнюю башню
+	 // с использованием средней башни как буфера
+	towers[0].MoveDisks(disks_num, towers[2], towers[1]);
 }
 
-void TestAreSynonyms() {
-    // Напишите недостающий код
-      //Тесты на проверку что синонимы
-    Synonyms synonyms;
-    assert(synonyms.AreSynonyms("music"s, "tune"s) == true);
-}
-
-void TestSynonyms() {
-    TestAddingSynonymsIncreasesTheirCount();
-    TestAreSynonyms();
-}
 
 int main() {
-    TestSynonyms();
-
-    Synonyms synonyms;
-
-    string line;
-    while (getline(cin, line)) {
-        istringstream command(line);
-        string action;
-        command >> action;
-
-        if (action == "ADD"s) {
-            string first_word, second_word;
-            command >> first_word >> second_word;
-            synonyms.Add(first_word, second_word);
-        } else if (action == "COUNT"s) {
-            string word;
-            command >> word;
-            cout << synonyms.GetSynonymCount(word) << endl;
-        } else if (action == "CHECK"s) {
-            string first_word, second_word;
-            command >> first_word >> second_word;
-            if (synonyms.AreSynonyms(first_word, second_word)) {
-                cout << "YES"s << endl;
-            } else {
-                cout << "NO"s << endl;
-            }
-        } else if (action == "EXIT"s) {
-            break;
-        }
-    }
+	int towers_num = 3;
+	int disks_num = 3;
+	vector<Tower> towers;
+	// добавим в вектор три пустые башни
+	for (int i = 0; i < towers_num; ++i) {
+		towers.push_back(0);
+	}
+	// добавим на первую башню три кольца
+	towers[0].SetDisks(disks_num);
+	SolveHanoi(towers);
 }
