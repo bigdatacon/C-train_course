@@ -118,7 +118,7 @@ public:
 			PopBack();  // удаляю диск с 1 башни }
 			//0 0 1
 		}
-		//MoveDisks(GetDisksNum(), destination, buffer);
+		//MoveDisks(GetDisksNum(), destination, buffer);  -- если прописать рекурсию здесь то падет 
 	}
 private:
 	vector<int> disks_;
