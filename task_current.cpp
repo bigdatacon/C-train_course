@@ -95,6 +95,7 @@ public:
 				//далее верхний с буфера  перенесется на 1 башню 
 			/* }*/
 		}
+		MoveDisks(GetDisksNum(), destination, buffer);
 	}
 private:
 	vector<int> disks_;
