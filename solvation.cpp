@@ -33,37 +33,21 @@ int main() {
 using namespace std;
 
 
-uint64_t Factorial(int num) {
-    int factorial = 1;
-    if (0 != num) {
-        factorial = Factorial(num - 1) * num;
-    }
-    return factorial;
-} 
-
-/*int Fibonacci(int i) {
-    if (0 == i) {
-        return 0;
-    }
-    if (1 == i) {
-        return 1;
-    }
-    return Fibonacci(i - 1) + Fibonacci(i - 2);
-}*/
-
-
 bool IsPowOfTwo(int i) {
-    bool res = i % 2 == 0;
     bool ispow = false;
+    bool res = (i % 2) == 0 && ( (i/2) % 2 ==0); // проерка что число делится на 2 и что остаток от деления тоже делится на 2 без остатка 
+   
      if (i<=0) {
         return false;
     }
-    if (!res) {return false;} // проверка что числе вообще четное и целое 
+    if (!res) {return false;} // проверка что числе  вообще четное и целое 
     if (1 == i) {
         return true;
     }
     
-    if (i > 1 && res ){ ispow =  (i/2) %2 ==0; }
+    //if (i > 1 && res ){ ispow =  (i/2) %2 ==0; }
+    if (i > 1 && res ){ ispow =  IsPowOfTwo(i/2) %2 ==0; 
+    }
     return ispow;
     
 
