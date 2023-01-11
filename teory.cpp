@@ -1,5 +1,7 @@
 // авторское решение с башнями
 
+// авторское решение с башнями
+
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -26,7 +28,8 @@ public:
         int top_disk_num = disks_.size() - 1;
         try {
             destination.AddToTop(disks_[top_disk_num]);
-        } catch (const invalid_argument& e) {
+        }
+        catch (const invalid_argument& e) {
             cout << e.what() << '\n';
             throw;
         }
@@ -39,7 +42,8 @@ public:
         int top_disk_num = disks_.size() - 1;
         if (0 != disks_.size() && disk >= disks_[top_disk_num]) {
             throw invalid_argument("Невозможно поместить большой диск на маленький");
-        } else {
+        }
+        else {
             disks_.push_back(disk);
         }
     }
@@ -58,6 +62,8 @@ public:
         }
     }
 
+    void PrintDisks() { for (auto el : disks_) { cout << el << " "; } }
+
 private:
     vector<int> disks_;
 
@@ -73,19 +79,23 @@ void SolveHanoi(vector<Tower>& towers) {
     int disks_num = towers[0].GetDisksNum();
     towers[0].MoveDisks(disks_num, towers[2], towers[1]);
 }
-
 int main() {
-    int towers_num = 3;
-    int disks_num = 3;
-    vector<Tower> towers;
-    // добавим в вектор три пустые башни
-    for (int i = 0; i < towers_num; ++i) {
-        towers.push_back(0);
-    }
-    // добавим на первую башню три кольца
-    towers[0].SetDisks(disks_num);
+	int towers_num = 5;
+	int disks_num = 5;
+	//int towers_num = 3;
+	//int disks_num = 3;
+	vector<Tower> towers;
+	// добавим в вектор три пустые башни
+	for (int i = 0; i < towers_num; ++i) {
+		towers.push_back(0);
+	}
+	// добавим на первую башню три кольца
+	towers[0].SetDisks(disks_num);
+	SolveHanoi(towers);
 
-    SolveHanoi(towers);
+	//cout << towers[0] << endl;  -- почему этот оператор не работает 
+	towers[0].PrintDisks();
+	towers[1].PrintDisks();
+	towers[2].PrintDisks();
 
-    return 0;
 }
