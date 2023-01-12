@@ -1,62 +1,94 @@
-
 #include <algorithm>
 #include <iostream>
-#include <set>
-#include <string>
+#include <numeric>
+#include <sstream>
 #include <vector>
 
 using namespace std;
-/* самостоятельно напишите код, требуемый по условию задачи */
 /*
-Задание 2
-Напишите рекурсивную функцию IsPowOfTwo, которая возвращает true, если число — неотрицательная степень двойки, или false, если оно таковым не будет. Операцией возведения в степень в этой задаче пользоваться нельзя. Единица является нулевой степенью двойки ($2^0 = 1)$, и ответ должен быть true.
-Пример использования
-int main() {
-    int result = IsPowOfTwo(1024);
-    cout << result << endl;
-} 
+Задание 1
+Напишите функцию GetPermutations, которая получает в качестве аргумента итератор на начало контейнера и итератор на его конец и возвращает вектор строк со всеми возможными перестановками элементов этого контейнера. Элементы перестановок разделяйте пробелами.
+Мы немного обновили для вашего удобства функцию PrintRange. Теперь это функция  PrintRangeToString, и она печатает не на экран, а в строку. Используйте в решении эту обновлённую версию.
+Порядок, в котором функция возвратит перестановки не важен.
+
 Пример вывода
-В случае true на экран выводится 1, в случае false — 0. В нашем случае 1024 — это  степень двойки.
-1 
-
-Подсказка 
-Какие параметры принимает функция? Проверяемое число.
-Какие действия должна совершить функция на каждом шаге? Если число — степень двойки, оно должно делиться на два. Результат деления тоже должен быть степенью двойки. Проверить остаток от деления на два можно, используя оператор %.
-Каково условие завершения? Действуйте аналогично предыдущей задаче.
-
+3 2 1
+3 1 2
+2 3 1
+2 1 3
+1 3 2
+1 2 3 
 */
 
 
-
-#include <iostream>
-
-using namespace std;
-
-
-bool IsPowOfTwo(int i) {
-    bool ispow = false;
-    bool res = (i % 2) == 0 && ( (i/2) % 2 ==0); // проерка что число делится на 2 и что остаток от деления тоже делится на 2 без остатка 
-   
-     if (i<=0) {
-        return false;
+// функция, записывающая элементы диапазона в строку
+template <typename It>
+string PrintRangeToString(It range_begin, It range_end) {
+    // удобный тип ostringstream -> https://ru.cppreference.com/w/cpp/io/basic_ostringstream
+    ostringstream out;
+    for (auto it = range_begin; it != range_end; ++it) {
+        out << *it << " "s;
     }
-    if (!res) {return false;} // проверка что числе  вообще четное и целое 
-    if (1 == i) {
-        return true;
-    }
+    out << endl;
+    // получаем доступ к строке с помощью метода str для ostringstream
+    return out.str();
+}
+ 
+// Мое решение 
+template <typename It>
+vector<string> GetPermutations(It range_begin, It range_end){
+    vector<string> result;
+    string s=PrintRangeToString(range_begin,  range_end);
+    std::sort(s.begin(), s.end());
+    do {
+        //std::cout << s << '\n';
+        result.push_back(s);
+    } while(std::next_permutation(s.begin(), s.end()));
+    return result;
     
-    //if (i > 1 && res ){ ispow =  (i/2) %2 ==0; }
-    if (i > 1 && res ){ ispow =  IsPowOfTwo(i/2) %2 ==0; 
-    }
-    return ispow;
-    
-
 }
 
 
+// не мое 
+/*
+string w(string s){
+    string q="";
+    bool e=true;
+    for(char t:s){
+        if(!e){
+            q+=" ";
+            q+=t;
+        }else{
+            q+=t;
+            e=false;
+        }
+    }
+    return q;
+}
+
+template<typename It>
+vector<string> GetPermutations(It range_begin, It range_end){
+    vector<string> qwe;
+    string s=PrintRangeToString(range_begin,  range_end);
+    sort(s.begin(), s.end(), greater<char>());
+    do {
+        qwe.push_back(s);
+    } while(prev_permutation(s.begin(), s.end()));
+    for(string& s:qwe){
+        s=w(s);
+    }
+    return qwe;
+} */
 
 
 int main() {
-    int result = IsPowOfTwo(1024);
-    cout << result << endl;
+    vector<int> permutation(3);
+    // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
+    // Заполняет диапазон последовательно возрастающими значениями
+    iota(permutation.begin(), permutation.end(), 1);
+    auto result = GetPermutations(permutation.begin(), permutation.end());
+    for (const auto& s : result) {
+        cout << s;
+    }
+    return 0;
 }
