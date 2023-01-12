@@ -50,8 +50,8 @@ string w(string s) {
             }
         }
         //std::cout << "eto string: out: "s << q << '\n';
-    q.pop_back();
-    q.pop_back();
+    q.pop_back(); // удаляю пробел в конце 
+    q.pop_back(); // удаляю  2 пробел в конце 
     return q;
 }
 
@@ -68,7 +68,7 @@ string ww(string s) {
             }
         }
         //std::cout << "eto string: out: "s << q << '\n';
-    q.pop_back();
+    q.pop_back(); // удаляю пробел в конце 
     return q;
 }
 
@@ -77,7 +77,7 @@ vector<string> ToNormal(set<string> iterim_res){
     for (auto e : iterim_res) { 
     string q = ""s;
     for (auto ch : e) {q+=ch; q+=' ';};
-    q.pop_back();
+    q.pop_back(); // удаляю пробел в конце
     result.push_back(q); result.push_back("\n"s); /*cout << "here to vector : " << e << endl;*/ }
     //for (auto e : result) { cout << "here in vector : " << e << endl; };
     return result;
@@ -99,8 +99,8 @@ vector<string> GetPermutations(It range_begin, It range_end) {
     } while (std::next_permutation(s.begin(), s.end()));
     for (auto e : iterim_res) { result.push_back(e); result.push_back("\n"s); /*cout << "here to vector : " << e << endl;*/ };
     //for (auto e : result) { cout << "here in vector : " << e << endl; };
-    vector<string> result_new = ToNormal(iterim_res) ;
-    result.pop_back();
+    vector<string> result_new = ToNormal(iterim_res) ; // добавляю пробел между цифрами в строке
+    //result.pop_back(); 
     return /*result*/ result_new;
 
 }
