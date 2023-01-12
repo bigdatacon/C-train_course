@@ -3,6 +3,7 @@
 #include <numeric>
 #include <sstream>
 #include <vector>
+#include <set>
 
 using namespace std;
 /*
@@ -48,6 +49,7 @@ string w(string s){
             continue;
         }
         }
+        std::cout << "eto string: out: "s << q << '\n';
     }
     return q;
 }
@@ -56,13 +58,16 @@ string w(string s){
 template <typename It>
 vector<string> GetPermutations(It range_begin, It range_end){
     vector<string> result;
+    set<string> iterim_res;
     string s=PrintRangeToString(range_begin,  range_end);
     std::sort(s.begin(), s.end());
     do {
-        //std::cout << s << '\n';
-        result.push_back(w(s));
+        std::cout << "eto string: input: "s << s << '\n';
+        //result.push_back(w(s));
+        iterim_res.insert(w(s));
         //result.push_back(s);
     } while(std::next_permutation(s.begin(), s.end()));
+    for (auto e: iterim_res) {result.push_back(e);};
     return result;
     
 }
