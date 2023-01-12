@@ -18,7 +18,7 @@ using namespace std;
 2 3 1
 2 1 3
 1 3 2
-1 2 3 
+1 2 3
 */
 
 
@@ -34,42 +34,41 @@ string PrintRangeToString(It range_begin, It range_end) {
     // получаем доступ к строке с помощью метода str для ostringstream
     return out.str();
 }
- 
-// Мое решение 
 
-string w(string s){
-    string q="";
-    while (q.length()<3){
-    for(char t:s){
-        
-        if(t!= ' '){
-            q+=t;
-            q+=' ';
-        }else{
-            continue;
+
+string ww(string s) {
+    string q = "";
+
+        for (char t : s) {
+
+            if (t != ' ') {
+                q += t;
+            }
+            else {
+                continue;
+            }
         }
-        }
-        std::cout << "eto string: out: "s << q << '\n';
-    }
+        //std::cout << "eto string: out: "s << q << '\n';
+    q.pop_back();
     return q;
 }
 
 
 template <typename It>
-vector<string> GetPermutations(It range_begin, It range_end){
+vector<string> GetPermutations(It range_begin, It range_end) {
     vector<string> result;
     set<string> iterim_res;
-    string s=PrintRangeToString(range_begin,  range_end);
+    string s = PrintRangeToString(range_begin, range_end);
+    s = ww(s);
     std::sort(s.begin(), s.end());
     do {
-        std::cout << "eto string: input: "s << s << '\n';
-        //result.push_back(w(s));
-        iterim_res.insert(w(s));
-        //result.push_back(s);
-    } while(std::next_permutation(s.begin(), s.end()));
-    for (auto e: iterim_res) {result.push_back(e);};
+        iterim_res.insert(s);
+        //cout << "here s : " << s << endl;
+    } while (std::next_permutation(s.begin(), s.end()));
+    for (auto e : iterim_res) { result.push_back(e); cout << "here to vector : " << e << endl; };
+    for (auto e : result) { cout << "here in vector : " << e << endl; };
     return result;
-    
+
 }
 
 
