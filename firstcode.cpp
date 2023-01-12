@@ -1,52 +1,94 @@
+#include <algorithm>
 #include <iostream>
-#include <stdexcept>
+#include <numeric>
+#include <sstream>
 #include <vector>
 
 using namespace std;
+/*
+Задание 1
+Напишите функцию GetPermutations, которая получает в качестве аргумента итератор на начало контейнера и итератор на его конец и возвращает вектор строк со всеми возможными перестановками элементов этого контейнера. Элементы перестановок разделяйте пробелами.
+Мы немного обновили для вашего удобства функцию PrintRange. Теперь это функция  PrintRangeToString, и она печатает не на экран, а в строку. Используйте в решении эту обновлённую версию.
+Порядок, в котором функция возвратит перестановки не важен.
 
-class Tower {
-public:
-    // конструктор и метод SetDisks нужны, чтобы правильно создать башни
-    Tower(int disks_num) {
-        FillTower(disks_num);
+Пример вывода
+3 2 1
+3 1 2
+2 3 1
+2 1 3
+1 3 2
+1 2 3 
+*/
+
+
+// функция, записывающая элементы диапазона в строку
+template <typename It>
+string PrintRangeToString(It range_begin, It range_end) {
+    // удобный тип ostringstream -> https://ru.cppreference.com/w/cpp/io/basic_ostringstream
+    ostringstream out;
+    for (auto it = range_begin; it != range_end; ++it) {
+        out << *it << " "s;
     }
+    out << endl;
+    // получаем доступ к строке с помощью метода str для ostringstream
+    return out.str();
+}
+ 
+// Мое решение 
+template <typename It>
+vector<string> GetPermutations(It range_begin, It range_end){
+    vector<string> result;
+    string s=PrintRangeToString(range_begin,  range_end);
+    std::sort(s.begin(), s.end());
+    do {
+        //std::cout << s << '\n';
+        result.push_back(s);
+    } while(std::next_permutation(s.begin(), s.end()));
+    return result;
+    
+}
 
-    int GetDisksNum() const {
-        return disks_.size();
-    }
 
-    void SetDisks(int disks_num) {
-        FillTower(disks_num);
-    }
-
-    // добавляем диск на верх собственной башни
-    // обратите внимание на исключение, которое выбрасывается этим методом
-    void AddToTop(int disk) {
-        int top_disk_num = disks_.size() - 1;
-        if (0 != disks_.size() && disk >= disks_[top_disk_num]) {
-            throw invalid_argument("Невозможно поместить большой диск на маленький");
-        } else {
-            // допишите этот метод и используйте его в вашем решении
+// не мое 
+/*
+string w(string s){
+    string q="";
+    bool e=true;
+    for(char t:s){
+        if(!e){
+            q+=" ";
+            q+=t;
+        }else{
+            q+=t;
+            e=false;
         }
     }
+    return q;
+}
 
-    // вы можете дописывать необходимые для вашего решения методы
-
-private:
-    vector<int> disks_;
-
-    // используем приватный метод FillTower, чтобы избежать дубликации кода
-    void FillTower(int disks_num) {
-        for (int i = disks_num; i > 0; i--) {
-            disks_.push_back(i);
-        }
+template<typename It>
+vector<string> GetPermutations(It range_begin, It range_end){
+    vector<string> qwe;
+    string s=PrintRangeToString(range_begin,  range_end);
+    sort(s.begin(), s.end(), greater<char>());
+    do {
+        qwe.push_back(s);
+    } while(prev_permutation(s.begin(), s.end()));
+    for(string& s:qwe){
+        s=w(s);
     }
-};
+    return qwe;
+} */
 
-void SolveHanoi(vector<Tower>& towers) {
-    int disks_num = towers[0].GetDisksNum();
 
-    // допишите функцию, чтобы на towers[0] было 0 дисков,
-    // на towers[1] 0 дисков,
-    // и на towers[2] было disks_num дисков
+int main() {
+    vector<int> permutation(3);
+    // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
+    // Заполняет диапазон последовательно возрастающими значениями
+    iota(permutation.begin(), permutation.end(), 1);
+    auto result = GetPermutations(permutation.begin(), permutation.end());
+    for (const auto& s : result) {
+        cout << s;
+    }
+    return 0;
 }
