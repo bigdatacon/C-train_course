@@ -23,11 +23,7 @@ using namespace std;
 Найдите подходящий алгоритм, который соединяет два отсортированных диапазона.
 */
 
-/*template <typename RandomIt>
-void MergeSort(RandomIt range_begin, RandomIt range_end)*/
-
-
-
+/// НАШЕЛ В ИНТЕРНЕТЕ 
 /*template<typename T>
 void merge(vector<T> &vec, vector<T> &v1, vector<T> &v2) {
     auto siz1 = v1.size();
@@ -78,6 +74,31 @@ void bubbleSort(vector<int>& a)
     }
 }
 
+
+template <typename RandomIt>
+void MergeSort(RandomIt range_begin, RandomIt range_end){
+    vector<int> vec;
+    
+    auto iter = (vec.begin() + vec.end()) / 2;  // определяю середину вектора 
+    vector<int> v1(vec.begin(), iter);   // создаю вектор до середины 
+    vector<int> v2(iter, vec.end());    // создаю вектора от середины 
+    bubbleSort(v1);   // сортирую подвекторы пузырьков 
+    bubbleSort(v2);
+    
+    auto siz1 = v1.size();
+    auto siz2 = v2.size();
+    size_t p1 = 0;
+    size_t p2 = 0;
+    while (p1 < siz1 && p2 < siz2) {
+        if (v1.at(p1) < v2.at(p2))
+            vec.push_back(v1.at(p1);
+            ++p1; ++p2;
+        else
+            vec.push_back(v2.at(p2));
+            ++p1; ++p2;
+    }
+}
+
 template <typename It>
 void PrintRange(It range_begin, It range_end){
     for (auto it = range_begin; it != range_end; it++) {
@@ -123,7 +144,7 @@ int main() {
     // Выводим вектор до сортировки
     PrintRange(test_vector.begin(), test_vector.end());
     // Сортируем вектор с помощью сортировки слиянием
-    //MergeSort(test_vector.begin(), test_vector.end());
+    MergeSort(test_vector.begin(), test_vector.end());
     // Выводим результат
     PrintRange(test_vector.begin(), test_vector.end());
     PrintRange(new_vector.begin(), new_vector.end());
