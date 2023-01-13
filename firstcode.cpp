@@ -18,6 +18,21 @@ using namespace std;
 2 1 3
 1 3 2
 1 2 3 
+
+
+ПОДСКАЗКА 
+Разберитесь с этими строками-ребусами и найдёте алгоритмы, которые помогут вам решить задачу.
+o r s t
+r e e a t r g
+n o i t a t u m r e p _ v e r p
+n o i t a t u m r e p _ v e p r
+n o i t a t u m r e p _ r v p e
+n o i t a t u m r e p _ r v e p
+n o i t a t u m r e p _ r p v e
+n o i t a t u m r e p _ r p e v
+n o i t a t u m r e p _ r e v p
+n o i t a t u m r e p _ r e p v
+n o i t a t u m r e p _ p v r e 
 */
 
 
