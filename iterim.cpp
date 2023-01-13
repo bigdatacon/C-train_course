@@ -16,7 +16,6 @@ using namespace std;
 Объединить две части так, чтобы сортировка сохранилась.
 Пункт два в свою очередь решается теми же шагами. Этот алгоритм может быть реализован как рекурсивно, так и итеративно (с применением цикла).
 Не используйте стандартный алгоритм сортировки sort и всех его «родственников» — это будет слишком просто.
-
 Предположим, наш диапазон состоит из двух элементов.
 Разделите его пополам. В каждой части получилось по одному элементу.
 Каждая из половин уже отсортирована, ведь она состоит всего из одного элемента.
@@ -30,30 +29,24 @@ void merge(vector<T> &vec, vector<T> &v1, vector<T> &v2) {
     auto siz2 = v2.size();
     size_t p1 = 0;
     size_t p2 = 0;
-
     while (p1 < siz1 && p2 < siz2) {
         if (v1.at(p1) < v2.at(p2))
             vec.push_back(v1.at(p1++));
         else
             vec.push_back(v2.at(p2++));
     }
-
     while (p1 < siz1) vec.push_back(v1.at(p1++));
     while (p2 < siz2) vec.push_back(v2.at(p2++));
 }
-
 template<typename T>
 void MergeSort(vector<T> &vec) {
     if (vec.size() <= 1)
         return;
-
     auto iter = vec.begin() + vec.size() / 2;
     vector<T> v1(vec.begin(), iter);
     vector<T> v2(iter, vec.end());
-
     MergeSort(v1);
     MergeSort(v2);
-
     vec.clear();
     merge(vec, v1, v2);
 }*/
@@ -131,6 +124,10 @@ void MergeSort(RandomIt range_begin, RandomIt range_end){
     }
     }
     
+        // Копируем временный вектор в исходный
+    for (auto it = range_begin; it != range_end; it++) {
+        *it = vec[it - range_begin];
+    }
     
     /*while (p1 < siz1 && p2 < siz2) {
         if (v1.at(p1) < v2.at(p2))
@@ -164,21 +161,11 @@ int main() {
     // random_shuffle   -> https://ru.cppreference.com/w/cpp/algorithm/random_shuffle
     // Перемешивает элементы в случайном порядке
     random_shuffle(test_vector.begin(), test_vector.end());
-    vector<int> new_vector = SliceVec(test_vector.begin(), test_vector.end());
-    vector<int> new_vector2 = SliceVec2(test_vector, 0, test_vector.size()/2);
-    vector<int> new_vector3 = SliceVec2(test_vector, test_vector.size()/2, test_vector.size());
     // Выводим вектор до сортировки
     PrintRange(test_vector.begin(), test_vector.end());
     // Сортируем вектор с помощью сортировки слиянием
-    //MergeSort(test_vector.begin(), test_vector.end());
+    MergeSort(test_vector.begin(), test_vector.end());
     // Выводим результат
     PrintRange(test_vector.begin(), test_vector.end());
-    PrintRange(new_vector.begin(), new_vector.end());
-    PrintRange(new_vector2.begin(), new_vector2.end());
-    PrintRange(new_vector3.begin(), new_vector3.end());
-    
-    bubbleSort(new_vector3);
-    PrintRange(new_vector3.begin(), new_vector3.end());
-    
     return 0;
 }
