@@ -92,9 +92,11 @@ void MergeSort(RandomIt range_begin, RandomIt range_end){
     while (p1 < siz1 && p2 < siz2) {
         if (v1.at(p1) < v2.at(p2))
             vec.push_back(v1.at(p1);
+            vec.push_back(v1.at(p2);
             ++p1; ++p2;
         else
             vec.push_back(v2.at(p2));
+            vec.push_back(v1.at(p1);
             ++p1; ++p2;
     }
 }
@@ -144,7 +146,7 @@ int main() {
     // Выводим вектор до сортировки
     PrintRange(test_vector.begin(), test_vector.end());
     // Сортируем вектор с помощью сортировки слиянием
-    MergeSort(test_vector.begin(), test_vector.end());
+    //MergeSort(test_vector.begin(), test_vector.end());
     // Выводим результат
     PrintRange(test_vector.begin(), test_vector.end());
     PrintRange(new_vector.begin(), new_vector.end());
