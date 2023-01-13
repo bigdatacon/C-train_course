@@ -37,48 +37,10 @@ string PrintRangeToString(It range_begin, It range_end) {
 // Мое решение 
 template <typename It>
 vector<string> GetPermutations(It range_begin, It range_end){
-    vector<string> result;
-    string s=PrintRangeToString(range_begin,  range_end);
-    std::sort(s.begin(), s.end());
-    do {
-        //std::cout << s << '\n';
-        result.push_back(s);
-    } while(std::next_permutation(s.begin(), s.end()));
-    return result;
+
     
 }
 
-
-// не мое 
-/*
-string w(string s){
-    string q="";
-    bool e=true;
-    for(char t:s){
-        if(!e){
-            q+=" ";
-            q+=t;
-        }else{
-            q+=t;
-            e=false;
-        }
-    }
-    return q;
-}
-
-template<typename It>
-vector<string> GetPermutations(It range_begin, It range_end){
-    vector<string> qwe;
-    string s=PrintRangeToString(range_begin,  range_end);
-    sort(s.begin(), s.end(), greater<char>());
-    do {
-        qwe.push_back(s);
-    } while(prev_permutation(s.begin(), s.end()));
-    for(string& s:qwe){
-        s=w(s);
-    }
-    return qwe;
-} */
 
 
 int main() {
