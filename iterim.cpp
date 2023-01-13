@@ -97,10 +97,12 @@ vector<int> SliceVec2(vector<int> vector_input, int it_begin, int it_end)
 
 template <typename RandomIt>
 void MergeSort(RandomIt range_begin, RandomIt range_end){
-
+    
     if (range_end == range_begin + 1) {
         return;
     }
+    vector<int> vec; // определяю промежуточный вектора для соединения половинок 
+    
     // Получаем количество элементов между итераорами
     int count = range_end - range_begin;
     // Находим середину контейнера
@@ -115,16 +117,31 @@ void MergeSort(RandomIt range_begin, RandomIt range_end){
     auto siz2 = v2.size();
     size_t p1 = 0;
     size_t p2 = 0;
-    while (p1 < siz1 && p2 < siz2) {
+    
+    for (auto p1 = 0; p1 <siz1 ; ++p1){
+    for (auto p2 = 0; p2 <siz2 ; ++p2){
         if (v1.at(p1) < v2.at(p2))
-            vec.push_back(v1.at(p1);
-            vec.push_back(v1.at(p2);
+            vec.push_back(v1.at(p1));
+            vec.push_back(v1.at(p2));
             ++p1; ++p2;
         else
             vec.push_back(v2.at(p2));
-            vec.push_back(v1.at(p1);
+            vec.push_back(v1.at(p1));
             ++p1; ++p2;
     }
+    }
+    
+    
+    /*while (p1 < siz1 && p2 < siz2) {
+        if (v1.at(p1) < v2.at(p2))
+            vec.push_back(v1.at(p1));
+            vec.push_back(v1.at(p2));
+            ++p1; ++p2;
+        else
+            vec.push_back(v2.at(p2));
+            vec.push_back(v1.at(p1));
+            ++p1; ++p2;
+    }*/
 }
 
 template <typename It>
