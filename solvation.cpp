@@ -1,3 +1,5 @@
+
+
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -11,7 +13,6 @@ using namespace std;
 Напишите функцию GetPermutations, которая получает в качестве аргумента итератор на начало контейнера и итератор на его конец и возвращает вектор строк со всеми возможными перестановками элементов этого контейнера. Элементы перестановок разделяйте пробелами.
 Мы немного обновили для вашего удобства функцию PrintRange. Теперь это функция  PrintRangeToString, и она печатает не на экран, а в строку. Используйте в решении эту обновлённую версию.
 Порядок, в котором функция возвратит перестановки не важен.
-
 Пример вывода
 3 2 1
 3 1 2
@@ -78,7 +79,8 @@ vector<string> ToNormal(set<string> iterim_res){
     string q = ""s;
     for (auto ch : e) {q+=ch; q+=' ';};
     q.pop_back(); // удаляю пробел в конце
-    result.push_back(q); result.push_back("\n"s); /*cout << "here to vector : " << e << endl;*/ }
+    result.push_back(q); result.push_back("\n"s);  /*cout << "here to vector : " << e << endl;*/ }
+    result.pop_back(); // удаляю символ переноса строкаи в конце 
     //for (auto e : result) { cout << "here in vector : " << e << endl; };
     return result;
 }
@@ -118,3 +120,4 @@ int main() {
     }
     return 0;
 }
+
