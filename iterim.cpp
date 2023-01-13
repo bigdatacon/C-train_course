@@ -74,14 +74,40 @@ void bubbleSort(vector<int>& a)
     }
 }
 
+template <typename It_Begin, typename It_End>
+vector<int> SliceVec(It_Begin it_begin, It_End it_end)
+{
+    vector<int> vec;
+    for (auto i = it_begin; i < it_end; ++i){
+        vec.push_back(*i);
+    }
+        
+	return vec;
+}
+
+vector<int> SliceVec2(vector<int> vector_input, int it_begin, int it_end)
+{
+    vector<int> vec;
+    for (auto i = it_begin; i < it_end; ++i){
+        vec.push_back(vector_input[i]);
+    }
+        
+	return vec;
+}
 
 template <typename RandomIt>
 void MergeSort(RandomIt range_begin, RandomIt range_end){
-    vector<int> vec;
-    
-    auto iter = (vec.begin() + vec.end()) / 2;  // определяю середину вектора 
-    vector<int> v1(vec.begin(), iter);   // создаю вектор до середины 
-    vector<int> v2(iter, vec.end());    // создаю вектора от середины 
+
+    if (range_end == range_begin + 1) {
+        return;
+    }
+    // Получаем количество элементов между итераорами
+    int count = range_end - range_begin;
+    // Находим середину контейнера
+    auto range_middle = range_begin + count / 2;
+    // создаю подвекторы 
+    vector<int> v1 = SliceVec(range_begin, range_middle);
+    vector<int> v2 = SliceVec(range_middle, range_end);
     bubbleSort(v1);   // сортирую подвекторы пузырьков 
     bubbleSort(v2);
     
@@ -110,26 +136,7 @@ void PrintRange(It range_begin, It range_end){
         cout << endl;
     }
 
-template <typename It_Begin, typename It_End>
-vector<int> SliceVec(It_Begin it_begin, It_End it_end)
-{
-    vector<int> vec;
-    for (auto i = it_begin; i < it_end; ++i){
-        vec.push_back(*i);
-    }
-        
-	return vec;
-}
 
-vector<int> SliceVec2(vector<int> vector_input, int it_begin, int it_end)
-{
-    vector<int> vec;
-    for (auto i = it_begin; i < it_end; ++i){
-        vec.push_back(vector_input[i]);
-    }
-        
-	return vec;
-}
 
 
 int main() {
