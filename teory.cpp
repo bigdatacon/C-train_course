@@ -62,6 +62,11 @@ public:
         }
     }
 
+    ostream& operator << (ostream& os){
+	    for (auto el : disks_) { cout << el << " "; }
+	    return os;
+    }
+	
     void PrintDisks() { for (auto el : disks_) { cout << el << " "; } }
 
 private:
