@@ -80,7 +80,8 @@ vector<string> ToNormal(set<string> iterim_res){
     for (auto ch : e) {q+=ch; q+=' ';};
     q.pop_back(); // удаляю пробел в конце
     result.push_back(q); /*result.push_back("\n"s);*/  /*cout << "here to vector : " << e << endl;*/ }
-    result.pop_back(); // удаляю символ переноса строкаи в конце 
+    //result.pop_back(); // удаляю символ переноса строкаи в конце 
+    cout <<  result.size()<< endl;
     for (auto e : result) { cout << "here in vector : " << e << "  size : " << e.length() <<  endl; };
     return result;
 }
@@ -116,7 +117,7 @@ int main() {
     iota(permutation.begin(), permutation.end(), 1);
     auto result = GetPermutations(permutation.begin(), permutation.end());
     for (const auto& s : result) {
-        cout << s;
+        cout << s /*<< endl*/;
     }
     return 0;
 }
