@@ -6,66 +6,40 @@
 
 using namespace std;
 /*
-Задание 1
-Напишите функцию GetPermutations, которая получает в качестве аргумента итератор на начало контейнера и итератор на его конец и возвращает вектор строк со всеми возможными перестановками элементов этого контейнера. Элементы перестановок разделяйте пробелами.
-Мы немного обновили для вашего удобства функцию PrintRange. Теперь это функция  PrintRangeToString, и она печатает не на экран, а в строку. Используйте в решении эту обновлённую версию.
-Порядок, в котором функция возвратит перестановки не важен.
+Задание 2
+Напишите функцию-шаблон MergeSort. Она должна принимать итераторы категории произвольного доступа, указывающие на начало и конец контейнера, который нужно отсортировать. Сортируйте по возрастанию. Считайте определённой операцию сравнения между элементами. 
+Есть много разных способов сортировать, но в этой задаче реализуйте сортировку методом слияния. Алгоритм такой сортировки:
+Разделить контейнер на две примерно равные части;
+Отсортировать каждую из этих частей;
+Объединить две части так, чтобы сортировка сохранилась.
+Пункт два в свою очередь решается теми же шагами. Этот алгоритм может быть реализован как рекурсивно, так и итеративно (с применением цикла).
+Не используйте стандартный алгоритм сортировки sort и всех его «родственников» — это будет слишком просто.
 
-Пример вывода
-3 2 1
-3 1 2
-2 3 1
-2 1 3
-1 3 2
-1 2 3 
-
-
-ПОДСКАЗКА 
-Разберитесь с этими строками-ребусами и найдёте алгоритмы, которые помогут вам решить задачу.
-o r s t
-r e e a t r g
-n o i t a t u m r e p _ v e r p
-n o i t a t u m r e p _ v e p r
-n o i t a t u m r e p _ r v p e
-n o i t a t u m r e p _ r v e p
-n o i t a t u m r e p _ r p v e
-n o i t a t u m r e p _ r p e v
-n o i t a t u m r e p _ r e v p
-n o i t a t u m r e p _ r e p v
-n o i t a t u m r e p _ p v r e 
+Предположим, наш диапазон состоит из двух элементов.
+Разделите его пополам. В каждой части получилось по одному элементу.
+Каждая из половин уже отсортирована, ведь она состоит всего из одного элемента.
+Найдите подходящий алгоритм, который соединяет два отсортированных диапазона.
 */
 
+template <typename RandomIt>
+void MergeSort(RandomIt range_begin, RandomIt range_end)
 
-// функция, записывающая элементы диапазона в строку
-template <typename It>
-string PrintRangeToString(It range_begin, It range_end) {
-    // удобный тип ostringstream -> https://ru.cppreference.com/w/cpp/io/basic_ostringstream
-    ostringstream out;
-    for (auto it = range_begin; it != range_end; ++it) {
-        out << *it << " "s;
-    }
-    out << endl;
-    // получаем доступ к строке с помощью метода str для ostringstream
-    return out.str();
-}
- 
-// Мое решение 
-template <typename It>
-vector<string> GetPermutations(It range_begin, It range_end){
-
-    
-}
 
 
 
 int main() {
-    vector<int> permutation(3);
+    vector<int> test_vector(10);
     // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
     // Заполняет диапазон последовательно возрастающими значениями
-    iota(permutation.begin(), permutation.end(), 1);
-    auto result = GetPermutations(permutation.begin(), permutation.end());
-    for (const auto& s : result) {
-        cout << s;
-    }
+    iota(test_vector.begin(), test_vector.end(), 1);
+    // random_shuffle   -> https://ru.cppreference.com/w/cpp/algorithm/random_shuffle
+    // Перемешивает элементы в случайном порядке
+    random_shuffle(test_vector.begin(), test_vector.end());
+    // Выводим вектор до сортировки
+    PrintRange(test_vector.begin(), test_vector.end());
+    // Сортируем вектор с помощью сортировки слиянием
+    MergeSort(test_vector.begin(), test_vector.end());
+    // Выводим результат
+    PrintRange(test_vector.begin(), test_vector.end());
     return 0;
 }
