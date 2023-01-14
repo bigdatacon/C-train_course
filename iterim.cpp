@@ -111,7 +111,18 @@ void MergeSort(RandomIt range_begin, RandomIt range_end){
     size_t p1 = 0;
     size_t p2 = 0;
     
-    for (auto p1 = 0; p1 <siz1 ; ++p1){
+    
+    while (vec.size() < siz1 + siz2) {
+        if (p1 < siz1 && v1.at(p1) < v2.at(p2)) {
+            vec.push_back(v1.at(p1));
+            ++p1;
+        } else {
+            vec.push_back(v2.at(p2));
+            ++p2;
+        }
+    }
+    
+    /*for (auto p1 = 0; p1 <siz1 ; ++p1){
     for (auto p2 = 0; p2 <siz2 ; ++p2){
         if (v1.at(p1) < v2.at(p2))
             vec.push_back(v1.at(p1));
@@ -122,7 +133,7 @@ void MergeSort(RandomIt range_begin, RandomIt range_end){
             vec.push_back(v1.at(p1));
             ++p1; ++p2;
     }
-    }
+    }*/
     
         // Копируем временный вектор в исходный
     for (auto it = range_begin; it != range_end; it++) {
