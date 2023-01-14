@@ -1,3 +1,5 @@
+https://disk.yandex.ru/i/64SpJ35c4lbo8A
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
