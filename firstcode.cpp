@@ -22,6 +22,7 @@ using namespace std;
 
 set<int>::const_iterator /*void*/ FindNearestElement(const set<int>& numbers, int border) {
     // set<int>::const_iterator — тип итераторов для константного множества целых чисел
+    // если множество не пустое 
     if (!numbers.empty()){
     set<int>::const_iterator some_set;
     auto it = lower_bound(numbers.begin(), numbers.end(), border);
@@ -38,9 +39,9 @@ set<int>::const_iterator /*void*/ FindNearestElement(const set<int>& numbers, in
     //some_set.insert(distance(numbers.begin(), it));
     //return *it;
     cout << "return some wrong : ";
-    return numbers.end();
+    return numbers.end();  // тут нужно вернуть либо *it либо *it_min Но не работает
     }
-    else 
+    else  // если множество пустое возвращаю последний элемент 
     cout << "return some wrong : ";
     return numbers.end();
    
