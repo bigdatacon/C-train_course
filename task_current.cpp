@@ -61,9 +61,13 @@ struct Document {
     int rating = 0;
 };
  
- ostream& operator << (ostream& out, const Document search){
-    return out << "{ " << search.id << ", " << search.relevance << ", " << search.rating << " }";
+ostream& operator << (ostream& out, const Document search){
+    return out << "{ document_id = " << search.id << ", relevance = " << search.relevance << ", rating = " << search.rating << " }";
  }
+
+ /*ostream& operator << (ostream& out, const Document search){
+    return out << "{ " << search.id << ", " << search.relevance << ", " << search.rating << " }";
+ }*/
 
 
 
@@ -317,19 +321,16 @@ private:
  
 };
  
- template <typename Iterator>
+template <typename Iterator>
+struct IteratorRange{
+    Iterator begin;
+    Iterator end;
+    IteratorRange(Iterator begin, Iterator end):begin(begin), end(end){}
+};
+ 
+template <typename Iterator>
     class Paginator {
     public:
- 
-    struct IteratorRange{
-        Iterator begin;
-        Iterator end;
-        IteratorRange(Iterator begin, Iterator end):begin(begin), end(end){}
-    /*ostream& operator << (ostream& out){
-        for (auto i = begin; i < end; i++) out << *i << " ";
-        return out;
-   }*/
-    };
  
     Paginator(Iterator begin, Iterator end, int size)
         :page_size_(size){
@@ -355,7 +356,7 @@ private:
  
     private:
     int page_size_;
-    vector<IteratorRange> pages_;
+    vector<IteratorRange<Iterator>> pages_;
     }; 
  
 template <typename Container>
@@ -364,11 +365,12 @@ auto Paginate(const Container& c, size_t page_size) {
 }
 
 template<typename Iterator>
-ostream& operator << (ostream& out, const typename Paginator<Iterator>::IteratorRange p){
-    for (auto i = p.begin; i < p.end; i++) 
-    {cout << *i << " ";};
+ostream& operator<< (ostream& out, IteratorRange<Iterator> p){
+    for (auto i = p.begin; i < p.end; i++) {
+        out << *i << " ";
+    }
     return out;
- }
+}
 
 
 
@@ -384,10 +386,7 @@ int main() {
     const auto pages = Paginate(search_results, page_size);
     // Выводим найденные документы по страницам
     for (auto page = pages.begin(); page != pages.end(); ++page) {
-        for (auto i = page->begin; i < page->end; i++) 
-        {
-            cout << *i << " ";
-        };
+        cout << *page << endl;
         cout << "Page break"s << endl;
     }
 } 
