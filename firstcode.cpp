@@ -27,9 +27,9 @@
 
 void PrintSpacesPositions(string& str) {
     // напишите реализацию
-    for (auto it = range.begin(); it != range.end(); ++it) {
-        auto it = find(my_map.begin(), my_map.end(), 1); 
-        cout << "position : " << *it;
+    for (auto it = str.begin(); it != str.end(); ++it) {
+        auto itе = find(str.begin(), str.end(), 1); 
+        cout << "position : " << *itе;
     }
 
 }
