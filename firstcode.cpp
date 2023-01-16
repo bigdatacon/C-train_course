@@ -18,14 +18,15 @@ using namespace std;
 }*/
 
 
-/*set<int>::const_iterator*/ void FindNearestElement(const set<int>& numbers, int border) {
+set<int>::const_iterator /*void*/ FindNearestElement(const set<int>& numbers, int border) {
     // set<int>::const_iterator — тип итераторов для константного множества целых чисел
-    //set<int>::const_iterator some_set;
+    set<int>::const_iterator some_set;
     auto it = lower_bound(numbers.begin(), numbers.end(), border);
     cout << "Номер позиции в векторе "s << distance(numbers.begin(), it) << endl;
     cout << "Значение элемента "s << *it << endl; 
     //some_set.insert(it);
-    //return some_set;
+    some_set.insert(distance(numbers.begin(), it));
+    return some_set;
     //return it;
     
 }
