@@ -2,6 +2,8 @@
 #include <string>
 #include <algorithm>
 #include <set>
+#include <cstdlib>
+#include <cmath>
 
 using namespace std;
 /*
@@ -20,22 +22,37 @@ using namespace std;
 
 set<int>::const_iterator /*void*/ FindNearestElement(const set<int>& numbers, int border) {
     // set<int>::const_iterator — тип итераторов для константного множества целых чисел
+    if (!numbers.empty()){
     set<int>::const_iterator some_set;
     auto it = lower_bound(numbers.begin(), numbers.end(), border);
     cout << "Номер позиции в векторе "s << distance(numbers.begin(), it) << endl;
     cout << "Значение элемента "s << *it << endl; 
+        
+    auto it_min  = lower_bound(numbers.begin(), it-1, it), border); // Если возможно, сделайте шаг назад и найдите ближайший элемент с меньшей стороны. 
+    
+        //Останется только сравнить, насколько они отстают от border, и выбрать ближайший
+    if (abs(border- it))>(abs(border- it_min)){cout << "Значение меньшего элемента "s << *it_min << endl; }
+        else {cout << "Значение меньшего элемента "s << *it << endl;}
+        
     //some_set.insert(it);
     //some_set.insert(distance(numbers.begin(), it));
     //return *it;
-    return numbers.begin();
+    cout << "return some wrong : ";
+    return numbers.end();
+    }
+    else 
+    cout << "return some wrong : ";
+    return numbers.end();
    
     
 }
 
 
 int main() {
-    set<int> numbers = {1, 4, 6};
-    cout << *FindNearestElement(numbers, 4) << " ";
+    set<int> numbers = {7,3,1 ,4, 6};
+    //set<int> numbers = {};
+    //set<int> numbers = {1, 4, 6};
+    //cout << *FindNearestElement(numbers, 4) << " ";
     cout << *FindNearestElement(numbers, 0) << " ";
     /*
     cout << *FindNearestElement(numbers, 0) << " " << *FindNearestElement(numbers, 3) << " "
