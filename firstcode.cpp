@@ -25,9 +25,10 @@ set<int>::const_iterator /*void*/ FindNearestElement(const set<int>& numbers, in
     cout << "Номер позиции в векторе "s << distance(numbers.begin(), it) << endl;
     cout << "Значение элемента "s << *it << endl; 
     //some_set.insert(it);
-    some_set.insert(distance(numbers.begin(), it));
-    return some_set;
-    //return it;
+    //some_set.insert(distance(numbers.begin(), it));
+    //return *it;
+    return numbers.begin();
+   
     
 }
 
@@ -35,6 +36,7 @@ set<int>::const_iterator /*void*/ FindNearestElement(const set<int>& numbers, in
 int main() {
     set<int> numbers = {1, 4, 6};
     cout << *FindNearestElement(numbers, 4) << " ";
+    cout << *FindNearestElement(numbers, 0) << " ";
     /*
     cout << *FindNearestElement(numbers, 0) << " " << *FindNearestElement(numbers, 3) << " "
          << *FindNearestElement(numbers, 5) << " " << *FindNearestElement(numbers, 6) << " "
