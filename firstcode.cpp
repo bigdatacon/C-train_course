@@ -1,42 +1,45 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <set>
+
+using namespace std;
 /*
-Задание
-Выведите позиции всех пробелов в строке. Чтобы найти пробелы, примените функцию find.
+Задание 1
+Напишите функцию FindNearestElement для множества целых чисел numbers и данного числа border. Она должна возвращать итератор на элемент множества, ближайший к border. Если ближайших элементов несколько, верните итератор на наименьший из них. Если множество пустое, верните итератор на конец. Для поиска примените методы поиска по множеству. Они более эффективны, чем простой перебор элементов.
 
-Подсказка 
-Вам пригодится цикл for. Начальным значением итератора будет первый пробел, который можно найти функцией find от начала до конца строки. Условием выхода из цикла будет равенство итератора концу строки. А шагом цикла может быть поиск второго пробела функцией find. Только начинать поиск надо со следующей за найденным пробелом позиции Для операций с итератором можно использовать next и distance.
-Пример вывода
-
-2
-8
-12
-16
-20
-24
-28
-31
+Ближайшим элементом может оказаться элемент меньше, чем border, сам border или элемент больше border. Используйте lower_bound, чтобы найти позицию элемента, который будет не меньше, чем border. Найденный элемент будет равным border или ближайшим с бó‎льшей стороны. Если возможно, сделайте шаг назад и найдите ближайший элемент с меньшей стороны. Останется только сравнить, насколько они отстают от border, и выбрать ближайший. Когда вы в начале контейнера, шагать назад не получится. 
+Используйте метод контейнера lower_bound, а не общую функцию, чтобы ускорить свой код.
 */
 
-/*
-Остался последний пункт. Чтобы сделать перебор по всем подходящим элементам, нужно:
-Применить find и найти первый подходящий элемент в интервале от begin до end.  find вернёт итератор на нужную позицию.
-Найти второй подходящий элемент, начиная со следующей позиции от найденной на прошлом шаге и до end.
-Повторять поиск до тех пор, пока find не вернёт end.
-Зафиксируем в таблице и перейдём к заданию, где вы реализуете такой алгоритм на практике.
-*/
+// первоначальная функция 
+/*set<int>::const_iteratorFindNearestElement(const set<int>& numbers, int border) {
+    // set<int>::const_iterator — тип итераторов для константного множества целых чисел
+}*/
 
 
-void PrintSpacesPositions(string& str) {
-    // напишите реализацию
-    for (auto it = str.begin(); it != str.end(); ++it) {
-        auto itе = find(str.begin(), str.end(), 1); 
-        cout << "position : " << *itе;
-    }
-
+/*set<int>::const_iterator*/ void FindNearestElement(const set<int>& numbers, int border) {
+    // set<int>::const_iterator — тип итераторов для константного множества целых чисел
+    //set<int>::const_iterator some_set;
+    auto it = lower_bound(numbers.begin(), numbers.end(), border);
+    cout << "Номер позиции в векторе "s << distance(numbers.begin(), it) << endl;
+    cout << "Значение элемента "s << *it << endl; 
+    //some_set.insert(it);
+    //return some_set;
+    //return it;
+    
 }
 
 
 int main() {
-    string str = "He said: one and one and one is three"s;
-    PrintSpacesPositions(str);
+    set<int> numbers = {1, 4, 6};
+    cout << *FindNearestElement(numbers, 4) << " ";
+    /*
+    cout << *FindNearestElement(numbers, 0) << " " << *FindNearestElement(numbers, 3) << " "
+         << *FindNearestElement(numbers, 5) << " " << *FindNearestElement(numbers, 6) << " "
+         << *FindNearestElement(numbers, 100) << endl;
+    set<int> empty_set;
+    cout << (FindNearestElement(empty_set, 8) == end(empty_set)) << endl;
+    */
     return 0;
 }
