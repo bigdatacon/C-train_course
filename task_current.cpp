@@ -1,8 +1,3 @@
-/*
-Перегрузка оператора должна быть снаружи, это не метод выводимого класса. 
-У Document правильно сделано. Прикладывайте ошибку пожалуйста в следующий раз и уберите пожалуйста код)
-*/
-
 
 #include <algorithm>
 #include <cmath>
@@ -327,24 +322,25 @@ private:
     public:
  
     struct IteratorRange{
-    Iterator begin;
-    Iterator end;
-    IteratorRange(Iterator begin, Iterator end):begin(begin), end(end){}
+        Iterator begin;
+        Iterator end;
+        IteratorRange(Iterator begin, Iterator end):begin(begin), end(end){}
     /*ostream& operator << (ostream& out){
         for (auto i = begin; i < end; i++) out << *i << " ";
         return out;
    }*/
-};
+    };
  
     Paginator(Iterator begin, Iterator end, int size)
         :page_size_(size){
             vector test(begin, end);
             Iterator temp = begin; 
-            for (auto i = begin + size; i < end; i + size){
-                pages_.push_back(IteratorRange(temp, i));
-                temp = i;
+            for (; temp + size < end; temp += size){
+                pages_.push_back(IteratorRange(temp, temp + size));
             }
-            if (temp < end) pages_.push_back(IteratorRange(temp, end));
+            if (temp < end) {
+                pages_.push_back(IteratorRange(temp, end));
+            }
         }
  
     auto begin() const {
@@ -366,9 +362,10 @@ template <typename Container>
 auto Paginate(const Container& c, size_t page_size) {
     return Paginator(begin(c), end(c), page_size);
 }
- 
- ostream& operator << (ostream& out, const Paginator p){
-    for (auto i = p.begin(); i < p.end(); i++) 
+
+template<typename Iterator>
+ostream& operator << (ostream& out, const typename Paginator<Iterator>::IteratorRange p){
+    for (auto i = p.begin; i < p.end; i++) 
     {cout << *i << " ";};
     return out;
  }
@@ -387,7 +384,10 @@ int main() {
     const auto pages = Paginate(search_results, page_size);
     // Выводим найденные документы по страницам
     for (auto page = pages.begin(); page != pages.end(); ++page) {
-        cout << *page << endl;
+        for (auto i = page->begin; i < page->end; i++) 
+        {
+            cout << *i << " ";
+        };
         cout << "Page break"s << endl;
     }
 } 
