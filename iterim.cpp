@@ -97,8 +97,8 @@ public:
 		else {
 			bool new_min = element < min_element_;
 			if (new_min) {
-                elements_minimus_.push_back({element, element});
-				min_element_ = element;
+                 min_element_ = element;
+                elements_minimus_.push_back({element, min_element_});
 			}
 			else { elements_minimus_.push_back({element, min_element_}); }
 
