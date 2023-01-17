@@ -122,6 +122,13 @@ public:
 			// но если он вам нужен, то можете его реализовать
 			elements_.Print();
 		}
+        
+        void Print_mins() const {
+			// работу этого метода мы проверять не будем,
+			// но если он вам нужен, то можете его реализовать
+			for (auto el : elements_minimus_) {cout << "first: " << el.first << " second :" << el.second << " ";}
+		}
+        
 		uint64_t Size() const {
 			return elements_.size();
 		}
@@ -159,6 +166,7 @@ private:
 		// печатаем стек и его минимум, постепенно убирая из стека элементы
 		while (!stack.IsEmpty()) {
 			stack.Print();
+            stack.Print_mins();
 			cout << "Минимум = "s << stack.PeekMin() << endl;
 			stack.Pop();
 		}
