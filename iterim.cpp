@@ -8,8 +8,6 @@ using namespace std;
 /*
 Задание 1
 Удобно, когда IsEmpty не пересчитывает все элементы, а другим способом отвечает, пуст стек или нет. В этом задании вы сделаете подобный трюк. Напишите реализацию класса StackMin, у которого кроме стандартных методов класса Stack будет дополнительный метод PeekMin. Он должен уметь вернуть минимальный по значению на данный момент элемент в стеке. Важно организовать стек так, чтобы для поиска минимума не пришлось перебирать все элементы в стеке. Перебора элементов не должно быть ни в методе PeekMin, ни в каком другом. Возьмите эту заготовку класса и дополните её своей реализацией:
-
-
 Подсказка
 Когда нужно что-то вернуть без пересчётов и вычислений, обычно эту информацию нужно где-то хранить. Просто добавить в private член класса minimum будет недостаточно. Посмотрим на такой случай:
 Добавим в стек 1. minimum_ станет равен 1.
@@ -24,8 +22,6 @@ using namespace std;
 Добавим в стек 1. Минимум тот же. Сохраняем: элемент 1 — минимум 1.
 Добавляем 2. Сохраняем: элемент 2 — минимум 1.
 Вытаскиваем 2. На вершине оказалось «элемент 1 — минимум 1». И нет проблем дальше вытаскивать следующий элемент и отвечать на запрос про текущий минимум.
-
-
 Вывод:
 5 2 4 3 1
 Минимум = 1
@@ -95,26 +91,24 @@ public:
 		if (first) {
 			min_element_ = element;
 			elements_.Push(element);
-			elements_minimus_.emplace(element, min_element_);
+			elements_minimus_.push_back({element, min_element_});
 			first = false;
 		}
 		else {
 			bool new_min = element < min_element_;
 			if (new_min) {
-				elements_minimus_.emplace(element, element);
+                elements_minimus_.push_back({element, element});
 				min_element_ = element;
 			}
-			else { elements_minimus_.emplace(element, min_element_); }
+			else { elements_minimus_.push_back({element, min_element_}); }
 
 		}
 	}
 		void Pop() {
 			// напишите реализацию метода
 			//elements_.pop_back();
-            auto el_to_del = elements_.Pop();
 			elements_.Pop();
-            auto pair_to_del = elements_minimus_.find(el_to_del);
-            elements_minimus_.erase(pair_to_del);
+            elements_minimus_.pop_back();
             
 		}
 		const Type& Peek() const {
@@ -136,19 +130,17 @@ public:
 		}
 		const Type& PeekMin() const {
 			// напишите реализацию метода
-			auto iter_end = elements_minimus_.end();
-			return iter_end->second;
+			return elements_minimus_.back().second;
 		}
 		Type& PeekMin() {
 			// напишите реализацию метода
-			auto iter_end = elements_minimus_.end();
-			return iter_end->second;
+			return elements_minimus_.back().second;
 		}
 private:
 	Stack<Type> elements_;
 	// возможно, здесь вам понадобится что-то изменить
 	Type min_element_;  // задаю начальный максимум нулем
-	map<Type, Type> elements_minimus_;
+	vector<map<Type, Type>> elements_minimus_;
 
 	};
 
