@@ -93,7 +93,7 @@ public:
     //elements_.push_back(element);
     elements_.Push(element);
     bool new_bigger = element> max_element_;
-    if (new_bigger){elements_maximums_.emplace(element, element);}
+    if (new_bigger){elements_maximums_.emplace(element, element); max_element_ = element; }
     else {elements_maximums_.emplace(element, max_element_);};
     
     }
