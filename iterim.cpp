@@ -91,7 +91,7 @@ public:
 	void Push(const Type& element) {
 		// напишите реализацию метода
 		//elements_.push_back(element);
-		bool first = true;
+		bool first = true;  // для первого добавления минимальный элемент это 1 элемент списка 
 		if (first) {
 			min_element_ = element;
 			elements_.Push(element);
