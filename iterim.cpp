@@ -111,7 +111,11 @@ public:
 		void Pop() {
 			// напишите реализацию метода
 			//elements_.pop_back();
+            auto el_to_del = elements_.Pop();
 			elements_.Pop();
+            auto pair_to_del = elements_minimus_.find(el_to_del);
+            elements_minimus_.erase(pair_to_del);
+            
 		}
 		const Type& Peek() const {
 			return elements_.Peek();
