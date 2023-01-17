@@ -92,7 +92,7 @@ public:
     // напишите реализацию метода
     //elements_.push_back(element);
     elements_.Push(element);
-    bool new_bigger = element> max_element_;
+    bool new_bigger = element< max_element_;
     if (new_bigger){elements_maximums_.emplace(element, element); max_element_ = element; }
     else {elements_maximums_.emplace(element, max_element_);};
     
@@ -134,8 +134,6 @@ private:
     Type max_element_ = 0;  // задаю начальный максимум нулем
     //Type max_element_ ;  // задаю начальный максимум нулем
     map<Type, Type> elements_maximums_;
-    
-    
     // возможно, здесь вам понадобится что-то изменить
 };
 
