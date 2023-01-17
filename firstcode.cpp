@@ -1,49 +1,37 @@
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <set>
-#include <cstdlib>
-#include <cmath>
+/*
+Задание 2
+Напишите функцию FindStartsWith, которая
+принимает отсортированный набор строк в виде итераторов range_begin, range_end и один символ prefix;
+возвращает полуинтервал [range_begin, range_end) строк в виде пары итераторов. Эти строки начинаются с символа prefix.
+Если итоговый диапазон пуст, его границы должны указывать на место в контейнере, куда можно без нарушения порядка сортировки вставить любую строку, начинающуюся с символа prefix — подобно алгоритму equal_range. Гарантируется, что строки состоят лишь из строчных латинских букв, а символ prefix — строчная латинская буква.
 
-using namespace std;
+ПОДСКАЗКА 
+Символы, которые относятся к типу данных char, можно складывать с числами. Вычитать из них числа тоже можно. Так вы получите следующие или предыдущие буквы в алфавитном порядке. Например, для строки s выражение -s[0] заменит её первую букву на предыдущую.
+Выражение 'a' + 1 имеет тип int. Поэтому может понадобиться привести его к типу char, применив static_cast.
 
+Пример вывода
 
+moscow murmansk
+2 2
+3 3 
+*/
 
-set<int>::const_iterator /*void*/ FindNearestElement2(const set<int>& numbers, int border) {
-    if (numbers.empty()) {
-        // Сначала проверяем, что множество пустое
-        return numbers.end();
-    }
-    // Ищем наименьший элемент больший, либо равный border
-    auto it_min = lower_bound(numbers.begin(), numbers.end(), border);
-    // Ищем наибольший элемент меньший, либо равный border
-    // Для этого обращаем предикат сравнения и идем по множеству в обратном порядке
-    // (begin() ... end() перебирают его от меньшего к большему а
-    // rbegin() ... rend() от большего к меньшему).
-    auto it_max = lower_bound(numbers.rbegin(), numbers.rend(), border, [](int a, int b){return a > b;});
-    if (it_min == numbers.end()) {
-        // Не найдено элементов больше border - возвращаем ближайший меньше
-        return numbers.find(*it_max);
-    }
-    if (it_max == numbers.rend()) {
-        // Не найдено элементов меньше border - возвращаем ближайший больше
-        return it_min;
-    }
-    // Сравниваем расстояния от найденных элементов до border и возвращаем тот что ближе
-    if (border - * it_max <= * it_min - border) {
-        return numbers.find(*it_max);
-    } else {
-        return it_min;
-    }
+template <typename RandomIt>
+pair<RandomIt, RandomIt> FindStartsWith(RandomIt range_begin, RandomIt range_end, char prefix) {
+    // напишите реализацию
 }
+
 
 int main() {
-    set<int> numbers = {1, 4, 6};
-    cout << *FindNearestElement(numbers, 0) << " " << *FindNearestElement(numbers, 3) << " "
-         << *FindNearestElement(numbers, 5) << " " << *FindNearestElement(numbers, 6) << " "
-         << *FindNearestElement(numbers, 100) << endl;
-    set<int> empty_set;
-    cout << (FindNearestElement(empty_set, 8) == end(empty_set)) << endl;
+    const vector<string> sorted_strings = {"moscow", "murmansk", "vologda"};
+    const auto m_result = FindStartsWith(begin(sorted_strings), end(sorted_strings), 'm');
+    for (auto it = m_result.first; it != m_result.second; ++it) {
+        cout << *it << " ";
+    }
+    cout << endl;
+    const auto p_result = FindStartsWith(begin(sorted_strings), end(sorted_strings), 'p');
+    cout << (p_result.first - begin(sorted_strings)) << " " << (p_result.second - begin(sorted_strings)) << endl;
+    const auto z_result = FindStartsWith(begin(sorted_strings), end(sorted_strings), 'z');
+    cout << (z_result.first - begin(sorted_strings)) << " " << (z_result.second - begin(sorted_strings)) << endl;
     return 0;
 }
-
