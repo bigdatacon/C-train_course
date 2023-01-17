@@ -132,6 +132,7 @@ public:
 private:
     Stack<Type> elements_;
     Type max_element_ = 0;  // задаю начальный максимум нулем
+    //Type max_element_ ;  // задаю начальный максимум нулем
     map<Type, Type> elements_maximums_;
     
     
