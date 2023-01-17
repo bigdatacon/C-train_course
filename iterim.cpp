@@ -90,10 +90,12 @@ public:
         else {
             for (auto el : in_stack_) { out_stack_.Push(el); }  // добавляю элементы в outstack 
             out_stack_.Pop(); // беру последний элемент из outstack 
+            in_stack_.erase(in_stack_.begin());  // удаляю первый элемент из вектора instack
         }
     }
     Type& Front() {
         // напишите реализацию
+        
         return Pop();
     }
     uint64_t Size() const {
