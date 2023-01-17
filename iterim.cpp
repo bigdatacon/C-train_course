@@ -62,6 +62,7 @@ public:
     void Print() const {
         // напишите реализацию
         for (auto el : elements_){cout << el << " ";}
+        cout <<  endl;
     }
     uint64_t Size() const {
         // напишите реализацию
