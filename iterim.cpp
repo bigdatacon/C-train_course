@@ -140,7 +140,8 @@ private:
 	Stack<Type> elements_;
 	// возможно, здесь вам понадобится что-то изменить
 	Type min_element_;  // задаю начальный максимум нулем
-	vector<map<Type, Type>> elements_minimus_;
+    //vector<map<Type, Type>> elements_minimus_;
+    vector<pair<Type, Type>> elements_minimus_;
 
 	};
 
