@@ -1,7 +1,20 @@
 Задание 1
-Задание 2
-Теперь стены пора красить. Вызовите маляра Билла. Напишите класс Painter, который сможет покрасить стены.
+Задание 1
+Выделите в отдельный файл wall.cpp определения методов класса Wall.
+Пример
+  double w = 3.5;
+  double h = 2.45;
+  Wall wall(w, h);
+  // wall.GetWidth() == w
+  // wall.GetHeight() == h
+  wall.SetColor(Wall::Color::BLUE);
+  // wall.GetColor() == Wall::Color::BLUE
+  // wall.GetWidth() == w
+  // wall.GetHeight() == h 
 
 Подсказка 
 
-Не забудьте добавить #include. Используйте новый метод класса Wall , чтобы изменить цвет.
+Ещё один пример определения метода класса Wall:
+double Wall::GetHeight() const {
+    return height_;
+} 
