@@ -48,19 +48,7 @@ vector<string> SplitIntoWords(const string& text) {
     return words;
 }
 
-struct Document {
-    Document() = default;
 
-    Document(int id, double relevance, int rating)
-        : id(id)
-        , relevance(relevance)
-        , rating(rating) {
-    }
-
-    int id = 0;
-    double relevance = 0.0;
-    int rating = 0;
-};
 
 ostream& operator<<(ostream& out, const Document& document) {
     out << "{ "s
@@ -81,12 +69,7 @@ set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
     return non_empty_strings;
 }
 
-enum class DocumentStatus {
-    ACTUAL,
-    IRRELEVANT,
-    BANNED,
-    REMOVED,
-};
+
 
 class SearchServer {
 public:
