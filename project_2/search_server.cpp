@@ -114,15 +114,10 @@
         return rating_sum / static_cast<int>(ratings.size());
     }
 
-    struct QueryWord {
-        std::string data;
-        bool is_minus;
-        bool is_stop;
-    };
 
-    QueryWord SearchServer::ParseQueryWord(const std::string& text) const {
+    SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) const {
         if (text.empty()) {
-            throw invalid_argument("Query word is empty"s);
+            throw std::invalid_argument("Query word is empty");
         }
         std::string word = text;
         bool is_minus = false;
@@ -131,18 +126,15 @@
             word = word.substr(1);
         }
         if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
-            throw invalid_argument("Query word "s + text + " is invalid");
+            throw std::invalid_argument("Query word "s + text + " is invalid");
         }
 
         return {word, is_minus, IsStopWord(word)};
     }
 
-    struct Query {
-        std::set<std::string> plus_words;
-        std::set<std::string> minus_words;
-    };
 
-    Query SearchServer::ParseQuery(const std::string& text) const {
+
+    SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
         Query result;
         for (const std::string& word : SplitIntoWords(text)) {
             const auto query_word = ParseQueryWord(word);
