@@ -1,7 +1,8 @@
-//Вставьте сюда своё решение из урока «Очередь запросов» темы «Стек, очередь, дек».‎
-
+//Вставьте сюда своё решение из урока «Очередь запросов» темы «Стек, очередь, дек».
+#pragma once
 #include "document.h"
 #include "string_processing.h"
+#include "read_input_functions.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -14,62 +15,52 @@
 #include <deque>
 
 
-    void SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
-        if ((document_id < 0) || (documents_.count(document_id) > 0)) {
-            throw invalid_argument("Invalid document_id"s);
+class SearchServer {
+public:
+    template <typename StringContainer>
+    explicit SearchServer(const StringContainer& stop_words)
+        : stop_words_(MakeUniqueNonEmptyStrings(stop_words))  // Extract non-empty stop words
+    {
+        if (!all_of(stop_words_.begin(), stop_words_.end(), IsValidWord)) {
+            throw invalid_argument("Some of stop words are invalid"s);
         }
-        const auto words = SplitIntoWordsNoStop(document);
-
-        const double inv_word_count = 1.0 / words.size();
-        for (const std::string& word : words) {
-            word_to_document_freqs_[word][document_id] += inv_word_count;
-        }
-        documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
-        document_ids_.push_back(document_id);
     }
 
-    std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentStatus status) const {
-        return FindTopDocuments(raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
-            return document_status == status;
-        });
-    }
+    explicit SearchServer(const std::string& stop_words_text);
 
-    std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query) const {
-        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
-    }
+    void AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings); 
 
-    int SearchServer::GetDocumentCount() const {
-        return documents_.size();
-    }
-
-    int SearchServer::GetDocumentId(int index) const {
-        return document_ids_.at(index);
-    }
-
-    std::tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query, int document_id) const {
+    template <typename DocumentPredicate>
+    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const {
         const auto query = ParseQuery(raw_query);
-        std::vector<string> matched_words;
-        for (const std::string& word : query.plus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
-                continue;
+
+        auto matched_documents = FindAllDocuments(query, document_predicate);
+
+        sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
+            if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                return lhs.rating > rhs.rating;
+            } else {
+                return lhs.relevance > rhs.relevance;
             }
-            if (word_to_document_freqs_.at(word).count(document_id)) {
-                matched_words.push_back(word);
-            }
+        });
+        if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
+            matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
-        for (const std::string& word : query.minus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
-                continue;
-            }
-            if (word_to_document_freqs_.at(word).count(document_id)) {
-                matched_words.clear();
-                break;
-            }
-        }
-        return {matched_words, documents_.at(document_id).status};
+
+        return matched_documents;
     }
 
+    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus status) const;
 
+    std::vector<Document> FindTopDocuments(const std::string& raw_query) const ;
+
+    int GetDocumentCount() const ;
+
+    int GetDocumentId(int index) const ;
+
+    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
+    
+private:
     struct DocumentData {
         int rating;
         DocumentStatus status;
@@ -79,87 +70,61 @@
     std::map<int, DocumentData> documents_;
     std::vector<int> document_ids_;
 
-    bool SearchServer::IsStopWord(const std::string& word) const {
-        return stop_words_.count(word) > 0;
-    }
+    bool IsStopWord(const std::string& word) const ;
 
-    /*static*/ bool SearchServer::IsValidWord(const std::string& word) {
-        // A valid word must not contain special characters
-        return none_of(word.begin(), word.end(), [](char c) {
-            return c >= '\0' && c < ' ';
-        });
-    }
+    static bool IsValidWord(const std::string& word) ;
 
-    std::vector<string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
-        std::vector<std::string> words;
-        for (const std::string& word : SplitIntoWords(text)) {
-            if (!IsValidWord(word)) {
-                throw invalid_argument("Word "s + word + " is invalid"s);
-            }
-            if (!IsStopWord(word)) {
-                words.push_back(word);
-            }
-        }
-        return words;
-    }
+    std::vector<std::string> SplitIntoWordsNoStop(const std::string& text) const ;
 
-    /*static*/ int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
-        if (ratings.empty()) {
-            return 0;
-        }
-        int rating_sum = 0;
-        for (const int rating : ratings) {
-            rating_sum += rating;
-        }
-        return rating_sum / static_cast<int>(ratings.size());
-    }
-
+    static int ComputeAverageRating(const std::vector<int>& ratings) ;
+    
     struct QueryWord {
-        string data;
+        std::string data;
         bool is_minus;
         bool is_stop;
     };
 
-    QueryWord SearchServer::ParseQueryWord(const std::string& text) const {
-        if (text.empty()) {
-            throw invalid_argument("Query word is empty"s);
-        }
-        std::string word = text;
-        bool is_minus = false;
-        if (word[0] == '-') {
-            is_minus = true;
-            word = word.substr(1);
-        }
-        if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
-            throw invalid_argument("Query word "s + text + " is invalid");
-        }
-
-        return {word, is_minus, IsStopWord(word)};
-    }
+    QueryWord ParseQueryWord(const std::string& text) const ;
 
     struct Query {
         std::set<std::string> plus_words;
         std::set<std::string> minus_words;
     };
 
-    Query SearchServer::ParseQuery(const std::string& text) const {
-        Query result;
-        for (const std::string& word : SplitIntoWords(text)) {
-            const auto query_word = ParseQueryWord(word);
-            if (!query_word.is_stop) {
-                if (query_word.is_minus) {
-                    result.minus_words.insert(query_word.data);
-                } else {
-                    result.plus_words.insert(query_word.data);
+    Query ParseQuery(const std::string& text) const ;
+
+    // Existence required
+    double ComputeWordInverseDocumentFreq(const std::string& word) const ;
+    
+    template <typename DocumentPredicate>
+    std::vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
+        std::map<int, double> document_to_relevance;
+        for (const std::string& word : query.plus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
+            for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
+                const auto& document_data = documents_.at(document_id);
+                if (document_predicate(document_id, document_data.status, document_data.rating)) {
+                    document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 }
             }
         }
-        return result;
-    }
 
-    // Existence required
-    double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) const {
-        return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
-    }
+        for (const std::string& word : query.minus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            for (const auto [document_id, _] : word_to_document_freqs_.at(word)) {
+                document_to_relevance.erase(document_id);
+            }
+        }
 
-    
+        std::vector<Document> matched_documents;
+        for (const auto [document_id, relevance] : document_to_relevance) {
+            matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
+        }
+        return matched_documents;
+    }
+};
