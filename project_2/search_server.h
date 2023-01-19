@@ -14,6 +14,7 @@
 #include <vector>
 #include <deque>
 
+const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
 class SearchServer {
 public:
@@ -22,7 +23,7 @@ public:
         : stop_words_(MakeUniqueNonEmptyStrings(stop_words))  // Extract non-empty stop words
     {
         if (!all_of(stop_words_.begin(), stop_words_.end(), IsValidWord)) {
-            throw invalid_argument("Some of stop words are invalid"s);
+            throw std::invalid_argument("Some of stop words are invalid");
         }
     }
 
