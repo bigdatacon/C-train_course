@@ -75,16 +75,6 @@
         return {matched_words, documents_.at(document_id).status};
     }
 
-
-    struct DocumentData {
-        int rating;
-        DocumentStatus status;
-    };
-    const std::set<std::string> stop_words_;
-    std::map<std::string, std::map<int, double>> word_to_document_freqs_;
-    std::map<int, DocumentData> documents_;
-    std::vector<int> document_ids_;
-
     bool SearchServer::IsStopWord(const std::string& word) const {
         return stop_words_.count(word) > 0;
     }
