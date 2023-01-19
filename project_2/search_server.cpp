@@ -1,4 +1,3 @@
-
 //Вставьте сюда своё решение из урока «Очередь запросов» темы «Стек, очередь, дек».‎
 #include "search_server.h"
 #include "document.h"
@@ -17,7 +16,7 @@
 
     void SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
         if ((document_id < 0) || (documents_.count(document_id) > 0)) {
-            throw invalid_argument("Invalid document_id"s);
+            throw std::invalid_argument("Invalid document_id");
         }
         const auto words = SplitIntoWordsNoStop(document);
 
@@ -47,9 +46,9 @@
         return document_ids_.at(index);
     }
 
-    std::tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query, int document_id) const {
+    std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query, int document_id) const {
         const auto query = ParseQuery(raw_query);
-        std::vector<string> matched_words;
+        std::vector<std::string> matched_words;
         for (const std::string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
                 continue;
@@ -91,11 +90,11 @@
         });
     }
 
-    std::vector<string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
+    std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
         std::vector<std::string> words;
         for (const std::string& word : SplitIntoWords(text)) {
             if (!IsValidWord(word)) {
-                throw invalid_argument("Word "s + word + " is invalid"s);
+                throw std::invalid_argument("Word " + word + " is invalid");
             }
             if (!IsStopWord(word)) {
                 words.push_back(word);
@@ -116,7 +115,7 @@
     }
 
     struct QueryWord {
-        string data;
+        std::string data;
         bool is_minus;
         bool is_stop;
     };
