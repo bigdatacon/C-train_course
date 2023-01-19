@@ -1,4 +1,3 @@
-
 //Вставьте сюда своё решение из урока «Очередь запросов» темы «Стек, очередь, дек».
 #include <vector>
 #include <string>
@@ -29,18 +28,11 @@
         return empty_queries_;
     }
 
-    struct RequestQueue::QueryResult {
-        // Содержит строку запроса и документы, найденные по этому запросу
-        std::string raw_query;
-        std::vector<Document> documents_found;
 
-        std::bool isEmpty() {return documents_found.empty();}
-    };
 
-    std::deque<QueryResult> requests_;
     /*const static*/ int min_in_day_ = 1440;
     // Количество пустых ответов в очереди
-    int empty_queries_;
+
     // Сам объект поискового сервера - точнее ссылка на него
     SearchServer * server_;
 
@@ -59,4 +51,4 @@
             requests_.pop_front();
         }
     }
-};
+
