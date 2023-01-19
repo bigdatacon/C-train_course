@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int MAX_RESULT_DOCUMENT_COUNT = 5;
+
 
 int main() {
     SearchServer search_server("and in at"s);
