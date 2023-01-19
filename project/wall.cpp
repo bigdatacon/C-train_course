@@ -19,7 +19,7 @@ std::pair<double, double> Wall::GetSizes() const {
 void Wall::SetColor(Color color) {
     color_ = color;
 }
-Color Wall::GetColor() const {
+Wall::Color Wall::GetColor() const {
     return color_;
 }
 bool Wall::IsDoorInstalled() const {
