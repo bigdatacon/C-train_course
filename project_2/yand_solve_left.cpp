@@ -1,13 +1,7 @@
 
 // search_server_s4_t2_solution.cpp
 
-ostream& operator<<(ostream& out, const Document& document) {
-    out << "{ "s
-        << "document_id = "s << document.id << ", "s
-        << "relevance = "s << document.relevance << ", "s
-        << "rating = "s << document.rating << " }"s;
-    return out;
-}
+
 
 void PrintDocument(const Document& document) {
     cout << "{ "s
