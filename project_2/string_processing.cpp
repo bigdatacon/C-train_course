@@ -3,10 +3,10 @@
 #include <vector>
 #include <string>
 
-std::vector<string> SplitIntoWords(const std::string& text) {
-    std::vector<string> words;
+std::vector<std::string> SplitIntoWords(const std::string& text) {
+    std::vector<std::string> words;
     std::string word;
-    for (const std::char c : text) {
+    for (const char c : text) {
         if (c == ' ') {
             if (!word.empty()) {
                 words.push_back(word);
