@@ -1,27 +1,6 @@
 
 // search_server_s4_t2_solution.cpp
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <map>
-#include <set>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
-#include <deque>
-
-using namespace std;
-
-const int MAX_RESULT_DOCUMENT_COUNT = 5;
-
-
-
-
-
-
-
 ostream& operator<<(ostream& out, const Document& document) {
     out << "{ "s
         << "document_id = "s << document.id << ", "s
@@ -29,10 +8,6 @@ ostream& operator<<(ostream& out, const Document& document) {
         << "rating = "s << document.rating << " }"s;
     return out;
 }
-
-
-
-
 
 void PrintDocument(const Document& document) {
     cout << "{ "s
