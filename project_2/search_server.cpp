@@ -126,7 +126,7 @@
             word = word.substr(1);
         }
         if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
-            throw std::invalid_argument("Query word "s + text + " is invalid");
+            throw std::invalid_argument("Query word " + text + " is invalid");
         }
 
         return {word, is_minus, IsStopWord(word)};
