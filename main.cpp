@@ -7,7 +7,6 @@
 using namespace std;
 
 vector<int> ReverseVector(const vector<int>& source_vector) {
-    LogDuration reverse("Reverse"s);
     vector<int> res;
     for (int i : source_vector) {
         res.insert(res.begin(), i);
@@ -39,7 +38,9 @@ void AppendRandom(vector<int>& v, int n) {
 }
 
 void Operate() {
+    LogDuration sleep_guard("Total"s);
     vector<int> random_bits;
+    vector<int> reversed_bits;
 
     // операция << для целых чисел это сдвиг всех бит в двоичной
     // записи числа. Запишем с её помощью число 2 в степени 17 (131072)
@@ -51,9 +52,9 @@ void Operate() {
     }
 
     // перевернём вектор задом наперёд
-    //{LogDuration reverse("Reverse"s);
-    vector<int> reversed_bits = ReverseVector(random_bits);
-    //}
+    {LogDuration reverse("Reverse"s);
+    /*vector<int>*/ reversed_bits = ReverseVector(random_bits);
+    }
 
 
     // посчитаем процент единиц на начальных отрезках вектора
@@ -70,7 +71,7 @@ void Operate() {
 }
 
 int main() {
-    {LogDuration sleep_guard("Total"s);
+    //{LogDuration sleep_guard("Total"s);
     Operate();
-    }
+    //}
 }
