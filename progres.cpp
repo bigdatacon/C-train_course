@@ -1,113 +1,71 @@
-#include <algorithm>
+#include <chrono>
+#include <cstdlib>
 #include <iostream>
-#include <numeric>
-#include <sstream>
 #include <vector>
-#include <valarray>
+#include "log_duration.h"
 
 using namespace std;
 
-void bubbleSort(vector<int>& a)
-{
-      bool swapp = true;
-      while(swapp){
-        swapp = false;
-        for (size_t i = 0; i < a.size()-1; i++) {
-            if (a[i]>a[i+1] ){
-                a[i] += a[i+1];
-                a[i+1] = a[i] - a[i+1];
-                a[i] -=a[i+1];
-                swapp = true;
-            }
-        }
+vector<int> ReverseVector(const vector<int>& source_vector) {
+    vector<int> res;
+    for (int i : source_vector) {
+        res.insert(res.begin(), i);
     }
+
+    return res;
 }
 
-template <typename It_Begin, typename It_End>
-vector<int> SliceVec(It_Begin it_begin, It_End it_end)
-{
-    vector<int> vec;
-    for (auto i = it_begin; i < it_end; ++i){
-        vec.push_back(*i);
-    }
-        
-	return vec;
-}
+int CountPops(const vector<int>& source_vector, int begin, int end) {
+    int res = 0;
 
-vector<int> SliceVec2(vector<int> vector_input, int it_begin, int it_end)
-{
-    vector<int> vec;
-    for (auto i = it_begin; i < it_end; ++i){
-        vec.push_back(vector_input[i]);
-    }
-        
-	return vec;
-}
-
-template <typename RandomIt>
-void MergeSort(RandomIt range_begin, RandomIt range_end){
-    
-    if (range_end == range_begin + 1) {
-        return;
-    }
-    vector<int> vec; // определяю промежуточный вектора для соединения половинок 
-    
-    // Получаем количество элементов между итераорами
-    int count = range_end - range_begin;
-    // Находим середину контейнера
-    auto range_middle = range_begin + count / 2;
-    // создаю подвекторы 
-    vector<int> v1 = SliceVec(range_begin, range_middle);
-    vector<int> v2 = SliceVec(range_middle, range_end);
-    bubbleSort(v1);   // сортирую подвекторы пузырьков 
-    bubbleSort(v2);
-    
-    auto siz1 = v1.size();
-    auto siz2 = v2.size();
-    size_t p1 = 0;
-    size_t p2 = 0;
-    
-    
-    while (vec.size() < siz1 + siz2) {
-        if (p1 < siz1 && v1.at(p1) < v2.at(p2)) {
-            vec.push_back(v1.at(p1));
-            ++p1;
-        } else {
-            vec.push_back(v2.at(p2));
-            ++p2;
+    for (int i = begin; i < end; ++i) {
+        if (source_vector[i]) {
+            ++res;
         }
     }
 
-    
-        // Копируем временный вектор в исходный
-    for (auto it = range_begin; it != range_end; it++) {
-        *it = vec[it - range_begin];
+    return res;
+}
+
+void AppendRandom(vector<int>& v, int n) {
+    for (int i = 0; i < n; ++i) {
+        // получаем случайное число с помощью функции rand.
+        // с помощью (rand() % 2) получим целое число в диапазоне 0..1.
+        // в C++ имеются более современные генераторы случайных чисел,
+        // но в данном уроке не будем их касаться
+        v.push_back(rand() % 2);
     }
 }
 
-template <typename It>
-void PrintRange(It range_begin, It range_end){
-    for (auto it = range_begin; it != range_end; it++) {
-            cout << *it << " "s;
-            
-        }
-        cout << endl;
-    }
+void Operate() {
+    vector<int> random_bits;
 
+    // операция << для целых чисел это сдвиг всех бит в двоичной
+    // записи числа. Запишем с её помощью число 2 в степени 17 (131072)
+    static const int N = 1 << 17;
+
+    // заполним вектор случайными числами 0 и 1
+    const auto append_start = chrono::steady_clock::now();
+    AppendRandom(random_bits, N);
+    const auto append_end = chrono::steady_clock::now();
+    cerr << "Append random: "s << chrono::duration_cast<chrono::milliseconds>(append_end - append_start).count() << " ms"s << endl;
+
+    // перевернём вектор задом наперёд
+    const auto rev_start = chrono::steady_clock::now();
+    vector<int> reversed_bits = ReverseVector(random_bits);
+    const auto rev_end = chrono::steady_clock::now();
+    cerr << "Reverse: "s << chrono::duration_cast<chrono::milliseconds>(rev_end - rev_start).count() << " ms"s << endl;
+
+    // посчитаем процент единиц на начальных отрезках вектора
+    const auto count_start = chrono::steady_clock::now();
+    for (int i = 1, step = 1; i <= N; i += step, step *= 2) {
+        double rate = CountPops(reversed_bits, 0, i) * 100. / i;
+        cout << "After "s << i << " bits we found "s << rate << "% pops"s << endl;
+    }
+    const auto count_end = chrono::steady_clock::now();
+    cerr << "Counting: "s << chrono::duration_cast<chrono::milliseconds>(count_end - count_start).count() << " ms"s << endl;
+}
 
 int main() {
-    vector<int> test_vector(10);
-    // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
-    // Заполняет диапазон последовательно возрастающими значениями
-    iota(test_vector.begin(), test_vector.end(), 1);
-    // random_shuffle   -> https://ru.cppreference.com/w/cpp/algorithm/random_shuffle
-    // Перемешивает элементы в случайном порядке
-    random_shuffle(test_vector.begin(), test_vector.end());
-    // Выводим вектор до сортировки
-    PrintRange(test_vector.begin(), test_vector.end());
-    // Сортируем вектор с помощью сортировки слиянием
-    MergeSort(test_vector.begin(), test_vector.end());
-    // Выводим результат
-    PrintRange(test_vector.begin(), test_vector.end());
-    return 0;
+    Operate();
 }
