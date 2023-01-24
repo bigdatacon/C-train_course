@@ -25,3 +25,9 @@ private:
     const Clock::time_point start_time_ = Clock::now();
     std::string operation_;
 };
+
+
+#define LOG_DURATION(title, body) { \
+    LogDuration sleep_guard(title); \
+    body; \
+}
