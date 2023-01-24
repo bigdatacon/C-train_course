@@ -1,95 +1,61 @@
 #include "log_duration.h"
-#include <algorithm>
-#include <chrono>
-#include <cstdlib>
+
 #include <iostream>
+#include <numeric>
+#include <random>
+#include <string>
 #include <vector>
 
 using namespace std;
 
-vector<int> ReverseVector(const vector<int>& source_vector) {
-    vector<int> res;
-
-    for (int i : source_vector) {
-        res.insert(res.begin(), i);
-    }
-    return res;
-}
-
-vector<int> ReverseVector2(const vector<int>& source_vector) {
-    vector<int> res;
-    // будем проходить source_vector задом наперёд
-    // с помощью обратного итератора
-    for (auto iterator = source_vector.rbegin(); iterator != source_vector.rend(); ++iterator) {
-        res.push_back(*iterator);
-    }
-
-    return res;
-}
-
-vector<int> ReverseVector3(const vector<int>& source_vector) {
-    return {source_vector.rbegin(), source_vector.rend()};
-}
-
-vector<int> ReverseVector4(const vector<int>& source_vector) {
-    vector<int> res(source_vector.size());
-    // реализация вашего собственного реверсирования
-    // будем проходить source_vector задом наперёд
-    // с помощью обратного итератора
-    for (auto iterator = source_vector.rbegin(); iterator != source_vector.rend();         ++iterator) {
-        res.push_back(*iterator);
-    }
-
-    return res;
-}
-
-void Operate() {
-    vector<int> rand_vector;
-    vector<int> reversed_bits;
-
-    int n;
-
-    cin >> n;
-    rand_vector.reserve(n);
-
-    for (int i = 0; i < n; ++i) {
-        rand_vector.push_back(rand());
-    }
-    // код измерения тут
+vector<float> ComputeAvgTemp(const vector<vector<float>>& measures) {
+    // место для вашего решения
+    int q_external = measures.size();  /// количество векторов внутри вектора векторов measures
+    int q_internal = measures[0].size();  // количество измерений внутри внутренного вектора 
+    vector<float> result(q_internal);  // вектор с измерениями по количечтву измерений в векторе 
     
-    if (n <= 100000) {
-    {
-    LOG_DURATION("Naive"s);
-        reversed_bits = ReverseVector(rand_vector);
-    }
-    
-    {
-    LOG_DURATION("Good"s);
-        reversed_bits = ReverseVector2(rand_vector);
-    }
-    }
-    else {
-    
-    {
-    LOG_DURATION("Good"s);
-        reversed_bits = ReverseVector2(rand_vector);
-    }    
+    for (int j = 0; j < q_internal; ++j){ // начинаю проход по вектору векторов , но сначала определяю индекс 
+        // элемента который буду брать это j
+        float sum_observ = 0;
+        float quant_observ = 0;
+        for (int i = 0; i < q_external; ++i){ // тут иду по вектору векторов и суммирую measures[i][j]
+            if (measures[i][j] > 0){sum_observ+=measures[i][j]; ++quant_observ; }     
+        }
+        // тут закончен цикл и у каждого вложенного вектора проверен и учтен элемен measures[i][j],
+        // перед переходом к j+1 обрабатываю полученные данные и записываю из в вектор
+        if (quant_observ >0) {result.push_back(sum_observ /quant_observ );}
+        else {result.push_back(0.0);}
         
-    {
-    LOG_DURATION("Best"s);
-        reversed_bits = ReverseVector2(rand_vector);
     }
+    return result;
     
-    {
-    LOG_DURATION("Your"s);
-        reversed_bits = ReverseVector2(rand_vector);
-    }
+}
+
+vector<float> GetRandomVector(int size) {
+    static mt19937 engine;
+    uniform_real_distribution<float> d(-100, 100);
+
+    vector<float> res(size);
+    for (int i = 0; i < size; ++i) {
+        res[i] = d(engine);
     }
 
-
+    return res;
 }
 
 int main() {
-    Operate();
-    return 0;
+    vector<vector<float>> data;
+    data.reserve(5000);
+
+    for (int i = 0; i < 5000; ++i) {
+        data.push_back(GetRandomVector(5000));
+    }
+
+    vector<float> avg;
+    {
+        LOG_DURATION("ComputeAvgTemp"s);
+        avg = ComputeAvgTemp(data);
+    }
+
+    cout << "Total mean: "s << accumulate(avg.begin(), avg.end(), 0.f) / avg.size() << endl;
 }
