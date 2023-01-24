@@ -29,45 +29,44 @@ int CountPops(const vector<int>& source_vector, int begin, int end) {
 
 void AppendRandom(vector<int>& v, int n) {
     for (int i = 0; i < n; ++i) {
-        // получаем случайное число с помощью функции rand.
-        // с помощью (rand() % 2) получим целое число в диапазоне 0..1.
-        // в C++ имеются более современные генераторы случайных чисел,
-        // но в данном уроке не будем их касаться
         v.push_back(rand() % 2);
     }
 }
 
 void Operate() {
-    LogDuration sleep_guard("Total"s);
-    vector<int> random_bits;
-    vector<int> reversed_bits;
-
-    // операция << для целых чисел это сдвиг всех бит в двоичной
-    // записи числа. Запишем с её помощью число 2 в степени 17 (131072)
-    static const int N = 1 << 17;
-
-    // заполним вектор случайными числами 0 и 1
-    {LogDuration reverse("Append random"s);
-    AppendRandom(random_bits, N);
-    }
-
-    // перевернём вектор задом наперёд
-    {LogDuration reverse("Reverse"s);
-    /*vector<int>*/ reversed_bits = ReverseVector(random_bits);
-    }
+    LOG_DURATION(
+        "Total"s,
+        {
+            vector<int> random_bits;
+            vector<int> reversed_bits;
 
 
-    // посчитаем процент единиц на начальных отрезках вектора
-       {
-        LogDuration sleep_guard("Counting"s);
-               for (int i = 1, step = 1; i <= N; i += step, step *= 2) {
-        double rate = CountPops(reversed_bits, 0, i) * 100. / i;
-        cout << "After "s << i << " bits we found "s << rate << "% pops"s << endl;
-    }
+            static const int N = 1 << 17;
 
-    }
+            LOG_DURATION(
+                "Append random"s,
+                {AppendRandom(random_bits, N);}
+            )
 
 
+            LOG_DURATION(
+                "Reverse"s,
+                {reversed_bits = ReverseVector(random_bits);}
+            )
+
+
+
+            LOG_DURATION(
+                "Counting"s,
+                {
+                    for (int i = 1, step = 1; i <= N; i += step, step *= 2) {
+                        double rate = CountPops(reversed_bits, 0, i) * 100. / i;
+                        cout << "After "s << i << " bits we found "s << rate << "% pops"s << endl;
+                    }
+                }
+            )
+        }
+    )
 }
 
 int main() {
