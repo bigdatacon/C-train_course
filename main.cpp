@@ -1,13 +1,16 @@
+#include "log_duration.h"
+
+#include <algorithm>
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-#include "log_duration.h"
 
 using namespace std;
 
 vector<int> ReverseVector(const vector<int>& source_vector) {
     vector<int> res;
+
     for (int i : source_vector) {
         res.insert(res.begin(), i);
     }
@@ -15,62 +18,45 @@ vector<int> ReverseVector(const vector<int>& source_vector) {
     return res;
 }
 
-int CountPops(const vector<int>& source_vector, int begin, int end) {
-    int res = 0;
-    
-    for (int i = begin; i < end; ++i) {
-        if (source_vector[i]) {
-            ++res;
-        }
+vector<int> ReverseVector2(const vector<int>& source_vector) {
+    vector<int> res;
+
+    // будем проходить source_vector задом наперёд
+    // с помощью обратного итератора
+    for (auto iterator = source_vector.rbegin(); iterator != source_vector.rend(); ++iterator) {
+        res.push_back(*iterator);
     }
 
     return res;
 }
 
-void AppendRandom(vector<int>& v, int n) {
-    for (int i = 0; i < n; ++i) {
-        v.push_back(rand() % 2);
-    }
+vector<int> ReverseVector3(const vector<int>& source_vector) {
+    return {source_vector.rbegin(), source_vector.rend()};
+}
+
+vector<int> ReverseVector4(const vector<int>& source_vector) {
+    vector<int> res(source_vector.size());
+
+    // реализация вашего собственного реверсирования
+
+    return res;
 }
 
 void Operate() {
-    LOG_DURATION(
-        "Total"s,
-        {
-            vector<int> random_bits;
-            vector<int> reversed_bits;
+    vector<int> rand_vector;
+    int n;
 
+    cin >> n;
+    rand_vector.reserve(n);
 
-            static const int N = 1 << 17;
+    for (int i = 0; i < n; ++i) {
+        rand_vector.push_back(rand());
+    }
 
-            LOG_DURATION(
-                "Append random"s,
-                {AppendRandom(random_bits, N);}
-            )
-
-
-            LOG_DURATION(
-                "Reverse"s,
-                {reversed_bits = ReverseVector(random_bits);}
-            )
-
-
-
-            LOG_DURATION(
-                "Counting"s,
-                {
-                    for (int i = 1, step = 1; i <= N; i += step, step *= 2) {
-                        double rate = CountPops(reversed_bits, 0, i) * 100. / i;
-                        cout << "After "s << i << " bits we found "s << rate << "% pops"s << endl;
-                    }
-                }
-            )
-        }
-    )
+    // код измерения тут
 }
 
 int main() {
-    //{LogDuration sleep_guard("Total"s);
     Operate();
-    //}
+    return 0;
 }
