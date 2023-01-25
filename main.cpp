@@ -1,42 +1,26 @@
 #include "log_duration.h"
 
 #include <iostream>
-#include <numeric>
-#include <random>
-#include <string>
-#include <vector>
 
 using namespace std;
 
-vector<float> ComputeAvgTemp(const vector<vector<float>>& measures) {
-    // место для вашего решения
-}
+class StreamUntier {
+public:
+    // добавьте конструктор, деструктор
+    // и дополнительные поля класса при необходимости
 
-vector<float> GetRandomVector(int size) {
-    static mt19937 engine;
-    uniform_real_distribution<float> d(-100, 100);
-
-    vector<float> res(size);
-    for (int i = 0; i < size; ++i) {
-        res[i] = d(engine);
-    }
-
-    return res;
-}
+private:
+    ostream* tied_before_;
+};
 
 int main() {
-    vector<vector<float>> data;
-    data.reserve(5000);
+    LOG_DURATION("\\n with tie"s);
 
-    for (int i = 0; i < 5000; ++i) {
-        data.push_back(GetRandomVector(5000));
+    StreamUntier guard(cin);
+    int i;
+    while (cin >> i) {
+        cout << i * i << "\n"s;
     }
 
-    vector<float> avg;
-    {
-        LOG_DURATION("ComputeAvgTemp"s);
-        avg = ComputeAvgTemp(data);
-    }
-
-    cout << "Total mean: "s << accumulate(avg.begin(), avg.end(), 0.f) / avg.size() << endl;
+    return 0;
 }
