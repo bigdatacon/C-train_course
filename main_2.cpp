@@ -1,61 +1,47 @@
 #include "log_duration.h"
 
 #include <iostream>
-#include <numeric>
-#include <random>
-#include <string>
-#include <vector>
 
 using namespace std;
 
-vector<float> ComputeAvgTemp(const vector<vector<float>>& measures) {
-    // место для вашего решения
-    int q_external = measures.size();  /// количество векторов внутри вектора векторов measures
-    int q_internal = measures[0].size();  // количество измерений внутри внутренного вектора 
-    vector<float> result(q_internal);  // вектор с измерениями по количечтву измерений в векторе 
-    
-    for (int j = 0; j < q_internal; ++j){ // начинаю проход по вектору векторов , но сначала определяю индекс 
-        // элемента который буду брать это j
-        float sum_observ = 0;
-        float quant_observ = 0;
-        for (int i = 0; i < q_external; ++i){ // тут иду по вектору векторов и суммирую measures[i][j]
-            if (measures[i][j] > 0){sum_observ+=measures[i][j]; ++quant_observ; }     
-        }
-        // тут закончен цикл и у каждого вложенного вектора проверен и учтен элемен measures[i][j],
-        // перед переходом к j+1 обрабатываю полученные данные и записываю из в вектор
-        if (quant_observ >0) {result.push_back(sum_observ /quant_observ );}
-        else {result.push_back(0.0);}
-        
-    }
-    return result;
-    
-}
+/*
+Задание
+Разработайте класс StreamUntier, который выполняет следующие действия:
+В конструкторе — «отвязывание» потока, переданного в конструктор как аргумент.
+В деструкторе — «привязывание» того потока, который был отвязан.
+В этом уроке вы столкнулись с указателями — объектами C++, которые изучите позже в курсе. Тип указателя содержит звёздочку. Вы видели такой тип в параметре main в уроке. Метод потока tie тоже оперирует с указателем — ostream*. Именно им был тип переменной tied_before, выведенный автоматически в выражении auto tied_before = cin.tie(nullptr);.
+Интерфейс класса StreamUntier дан в заготовке кода. Добавьте конструктор, деструктор и, при необходимости, дополнительные поля.
 
-vector<float> GetRandomVector(int size) {
-    static mt19937 engine;
-    uniform_real_distribution<float> d(-100, 100);
+Выполните stream.tie(nullptr) в конструкторе, сохранив возвращённое значение в поле tied_before_. Используйте его в деструкторе. Придётся также добавить поле класса типа istream& для того, чтобы сохранить сам stream.
+*/
 
-    vector<float> res(size);
-    for (int i = 0; i < size; ++i) {
-        res[i] = d(engine);
+
+class StreamUntier {
+public:
+    // добавьте конструктор, деструктор
+    // и дополнительные поля класса при необходимости
+        StreamUntier(istream& stream) : stream_(stream) {
+           ostream* tied_before_ = stream.tie(nullptr);
     }
 
-    return res;
-}
+    ~StreamUntier() {
+
+    }
+
+
+private:
+    ostream* tied_before_;
+    istream& stream_;
+};
 
 int main() {
-    vector<vector<float>> data;
-    data.reserve(5000);
+    LOG_DURATION("\\n with tie"s);
 
-    for (int i = 0; i < 5000; ++i) {
-        data.push_back(GetRandomVector(5000));
+    StreamUntier guard(cin);
+    int i;
+    while (cin >> i) {
+        cout << i * i << "\n"s;
     }
 
-    vector<float> avg;
-    {
-        LOG_DURATION("ComputeAvgTemp"s);
-        avg = ComputeAvgTemp(data);
-    }
-
-    cout << "Total mean: "s << accumulate(avg.begin(), avg.end(), 0.f) / avg.size() << endl;
+    return 0;
 }
