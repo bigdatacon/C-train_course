@@ -18,6 +18,36 @@ using namespace std;
 Универсальный. Годится, если длина пароля заранее неизвестна. Напишите рекурсивную функцию string BruteForceInternal(F check, const string& begin, int n). При n == 5 она будет вызывать check(begin) и возвращать результат вызова в случае успеха, пустую строку в случае неудачи. При n < 5 она будет вызывать себя, приписывая к begin всевозможные символы и увеличивая n на 1. Если рекурсивный вызов BruteForceInternal вернул непустую строку, то это и есть правильный ответ, дальнейший перебор не нужен.
 */
 
+// -- реализация через цикл 
+template <typename F>
+string BruteForce(F check) {
+    // верните строку str, для которой check(str) будет true
+    for (char one =  'A'; one <= 'Z'; ++one){
+        for (char two =  'A'; one <= 'Z'; ++one){
+            for (char three =  'A'; one <= 'Z'; ++one){
+                for (char four =  'A'; one <= 'Z'; ++one){
+                    for (char five =  'A'; one <= 'Z'; ++one){
+                            string s{one, two, three, four, five};
+                            if (!check(s)){continue;}
+                            else {return s;}
+
+    
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            
+        }
+    }
+    return ""s;
+}
+
+
+
+// -- реализация через рекурсию
 template <typename F>
 string BruteForce(F check) {
     // верните строку str, для которой check(str) будет true
