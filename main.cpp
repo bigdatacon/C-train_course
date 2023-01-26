@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 using namespace std;
 /*
@@ -17,11 +18,26 @@ using namespace std;
 Универсальный. Годится, если длина пароля заранее неизвестна. Напишите рекурсивную функцию string BruteForceInternal(F check, const string& begin, int n). При n == 5 она будет вызывать check(begin) и возвращать результат вызова в случае успеха, пустую строку в случае неудачи. При n < 5 она будет вызывать себя, приписывая к begin всевозможные символы и увеличивая n на 1. Если рекурсивный вызов BruteForceInternal вернул непустую строку, то это и есть правильный ответ, дальнейший перебор не нужен.
 */
 
-
 template <typename F>
 string BruteForce(F check) {
     // верните строку str, для которой check(str) будет true
+    char one =  'A' + rand() % 26;
+    char two =  'A' + rand() % 26;
+    char three =  'A' + rand() % 26;
+    char four =  'A' + rand() % 26;
+    char five =  'A' + rand() % 26;
+    string s{one, two, three, four, five};
+
+    if (!check(s)){BruteForce(check);}
+    return s;
 }
+
+
+// - тут заготовка которую я не правил 
+/*template <typename F>
+string BruteForce(F check) {
+    // верните строку str, для которой check(str) будет true
+}*/
 
 int main() {
     string pass = "ARTUR"s;
