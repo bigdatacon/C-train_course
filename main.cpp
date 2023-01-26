@@ -1,37 +1,32 @@
 #include <algorithm>
-#include <deque>
-#include <string>
+#include <cmath>
+#include <cstdint>
+#include <iostream>
+#include <random>
+#include <vector>
 
 using namespace std;
 
-struct Ticket {
-    int id;
-    string name;
-};
+int EffectiveCount(const vector<int>& v, int n, int i) {
+    // место для вашего решения
+}
 
-class TicketOffice {
-public:
-    // добавить билет в систему
-    void PushTicket(const string& name) {
-        // реализуйте метод
+int main() {
+    static const int NUMBERS = 1'000'000;
+    static const int MAX = 1'000'000'000;
+
+    mt19937 r;
+    uniform_int_distribution<int> uniform_dist(0, MAX);
+
+    vector<int> nums;
+    for (int i = 0; i < NUMBERS; ++i) {
+        int random_number = uniform_dist(r);
+        nums.push_back(random_number);
     }
+    sort(nums.begin(), nums.end());
 
-    // получить количество доступных билетов
-    int GetAvailable() const {
-        // реализуйте метод
-    }
-
-    // получить количество доступных билетов определённого типа
-    int GetAvailable(const string& name) const {
-        // реализуйте метод
-    }
-
-    // отозвать старые билеты (до определённого id)
-    void Invalidate(int minimum) {
-        // реализуйте метод
-    }
-
-private:
-    int last_id_ = 0;
-    deque<Ticket> tickets_;
-};
+    int i;
+    cin >> i;
+    int result = EffectiveCount(nums, MAX, i);
+    cout << "Total numbers before "s << i << ": "s << result << endl;
+}
