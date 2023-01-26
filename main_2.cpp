@@ -1,47 +1,56 @@
-#include "log_duration.h"
-
+#include <cstdint>
 #include <iostream>
 
 using namespace std;
 
+// упростите эту экспоненциальную функцию,
+// реализовав линейный алгоритм
 /*
-Задание
-Разработайте класс StreamUntier, который выполняет следующие действия:
-В конструкторе — «отвязывание» потока, переданного в конструктор как аргумент.
-В деструкторе — «привязывание» того потока, который был отвязан.
-В этом уроке вы столкнулись с указателями — объектами C++, которые изучите позже в курсе. Тип указателя содержит звёздочку. Вы видели такой тип в параметре main в уроке. Метод потока tie тоже оперирует с указателем — ostream*. Именно им был тип переменной tied_before, выведенный автоматически в выражении auto tied_before = cin.tie(nullptr);.
-Интерфейс класса StreamUntier дан в заготовке кода. Добавьте конструктор, деструктор и, при необходимости, дополнительные поля.
-
-Выполните stream.tie(nullptr) в конструкторе, сохранив возвращённое значение в поле tied_before_. Используйте его в деструкторе. Придётся также добавить поле класса типа istream& для того, чтобы сохранить сам stream.
+Избавьтесь от рекурсии. В цикле теперь нужно помнить три последних числа. Обратите внимание, что числа трибоначчи начинаются с двух нулей и единицы.
 */
 
-
-class StreamUntier {
-public:
-    // добавьте конструктор, деструктор
-    // и дополнительные поля класса при необходимости
-        StreamUntier(istream& stream) : stream_(stream) {
-           ostream* tied_before_ = stream.tie(nullptr);
+int64_t T(int i) {
+    if (i == 0) {
+        return 0;
     }
 
-    ~StreamUntier() {
+    int64_t prev0 = 0, prev1 = 0, prev2 = 1;
 
+    for (int t = 2; t < i; ++t) {
+        int64_t next = prev0 + prev1+prev2;
+        prev0 = prev1;
+        prev1 = prev2;
+        prev2=next;
+        //cout << "prev2 : " << prev2 <<endl;
     }
 
+    return prev2;
+} 
 
-private:
-    ostream* tied_before_;
-    istream& stream_;
-};
+
+
+
+/*int64_t T(int i) {
+    if (i <= 1) {
+        return 0;
+    }
+    if (i == 2) {
+        return 1;
+    }
+
+    return T(i - 1) + T(i - 2) + T(i - 3);
+}*/
+
 
 int main() {
-    LOG_DURATION("\\n with tie"s);
-
-    StreamUntier guard(cin);
     int i;
-    while (cin >> i) {
-        cout << i * i << "\n"s;
-    }
 
-    return 0;
+    while (true) {
+        cout << "Enter index: "s;
+        if (!(cin >> i)) {
+            break;
+        }
+
+        cout << "Ti = "s << T(i) << endl;
+    }
 }
