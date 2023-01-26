@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <deque>
 #include <string>
-
+#include <iostream>
 using namespace std;
 
 struct Ticket {
@@ -37,13 +37,21 @@ public:
         // реализуйте метод
         //проверяю что очередь не пуста
     if (GetAvailable()){
-    for (auto it = tickets_.begin(); it != tickets_.end();)
+        int i = 0;
+        while(i < GetAvailable())
+        if (tickets_[i].id < minimum)
+            tickets_.erase(tickets_.begin() + i);
+        else
+            i++;
+        
+     // Вторая реализация через цикл - тоже не работтает    
+    /*for (auto it = tickets_.begin(); it != tickets_.end();)
     {
         if (*it.id < minimum)
             it = tickets_.erase(it);
         else
             ++it;
-    }
+    }*/
     }
         
     }
