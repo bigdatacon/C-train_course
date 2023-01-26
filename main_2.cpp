@@ -1,56 +1,83 @@
-#include <cstdint>
-#include <iostream>
+#include <algorithm>
+#include <deque>
+#include <string>
 
 using namespace std;
 
-// упростите эту экспоненциальную функцию,
-// реализовав линейный алгоритм
-/*
-Избавьтесь от рекурсии. В цикле теперь нужно помнить три последних числа. Обратите внимание, что числа трибоначчи начинаются с двух нулей и единицы.
-*/
+struct Ticket {
+    int id;
+    string name;
+};
 
-int64_t T(int i) {
-    if (i == 0) {
-        return 0;
+class TicketOffice {
+public:
+    // добавить билет в систему
+    void PushTicket(const string& name) {
+        // реализуйте метод
+        tickets_.push_back({(last_id_+1), name});
+        ++last_id_;
+        
     }
 
-    int64_t prev0 = 0, prev1 = 0, prev2 = 1;
-
-    for (int t = 2; t < i; ++t) {
-        int64_t next = prev0 + prev1+prev2;
-        prev0 = prev1;
-        prev1 = prev2;
-        prev2=next;
-        //cout << "prev2 : " << prev2 <<endl;
+    // получить количество доступных билетов
+    int GetAvailable() const {
+        // реализуйте метод
+        return tickets_.size();
+        
     }
 
-    return prev2;
-} 
-
-
-
-
-/*int64_t T(int i) {
-    if (i <= 1) {
-        return 0;
-    }
-    if (i == 2) {
-        return 1;
+    // получить количество доступных билетов определённого типа
+    int GetAvailable(const string& name) const {
+        // реализуйте метод
+        return count_if(tickets_.begin(), tickets_.end(), name);
     }
 
-    return T(i - 1) + T(i - 2) + T(i - 3);
-}*/
+    // отозвать старые билеты (до определённого id)
+    void Invalidate(int minimum) {
+        // реализуйте метод
+        //проверяю что очередь не пуста
+    if (GetAvailable()){
+    for (auto it = tickets_.begin(); it != tickets_.end();)
+    {
+        if (*it.id < minimum)
+            it = tickets_.erase(it);
+        else
+            ++it;
+    }
+    }
+        
+    }
+
+private:
+    int last_id_ = 0;
+    deque<Ticket> tickets_;
+};
 
 
 int main() {
-    int i;
+    TicketOffice tickets;
+    tickets.PushTicket("Swan Lake"); // id - 0
+    tickets.PushTicket("Swan Lake"); // id - 1
+    tickets.PushTicket("Boris Godunov"); // id - 2
+    tickets.PushTicket("Boris Godunov"); // id - 3
+    tickets.PushTicket("Swan Lake"); // id - 4
+    tickets.PushTicket("Boris Godunov"); // id - 5
+    tickets.PushTicket("Boris Godunov"); // id - 6
 
-    while (true) {
-        cout << "Enter index: "s;
-        if (!(cin >> i)) {
-            break;
-        }
+    cout << tickets.GetAvailable() << endl; // Вывод: 7
+    cout << tickets.GetAvailable("Swan Lake") << endl; // Вывод: 3
+    cout << tickets.GetAvailable("Boris Godunov") << endl; // Вывод: 4
 
-        cout << "Ti = "s << T(i) << endl;
-    }
+    // Invalidate удалит билеты с номерами 0, 1, 2:
+    tickets.Invalidate(3);
+
+    cout << tickets.GetAvailable() << endl; // Вывод: 4
+    cout << tickets.GetAvailable("Swan Lake") << endl; // Вывод: 1
+    cout << tickets.GetAvailable("Boris Godunov") << endl; // Вывод: 3
+
+    tickets.PushTicket("Swan Lake"); // id - 7
+    tickets.PushTicket("Swan Lake"); // id - 8
+
+    cout << tickets.GetAvailable("Swan Lake") << endl; // Вывод: 3
+    return 0;
 }
