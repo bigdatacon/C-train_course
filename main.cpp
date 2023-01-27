@@ -9,7 +9,31 @@
 using namespace std;
 
 
+
 int EffectiveCount(const vector<int>& v, int n, int i) {
+    // место для вашего решения
+    //1. Нахожу оценочнаую скорость для find_if 
+    auto using_find_if = static_cast<int64_t>(v.size())*(i + 1)/(n + 1) ;
+    
+    //2. Нахожу оценочнаую скорость для upper_bound
+    auto using_upper_bound = log2(v.size());
+    
+    //3. сравниванию скорости 
+    auto good = using_find_if <using_upper_bound ;
+    
+    //4. вывожу ответ 
+    if (good) {
+    auto pos_if = find_if( v.begin(), v.end(),  [i](int el) {return i < el;}) - v.begin();    
+    cout << "Using find_if"; return pos_if;}
+    else {
+        cout << "Using upper_bound";
+        return upper_bound( v.begin(), v.end(),  i) - v.begin();
+    }
+    }
+
+
+
+/*int EffectiveCount(const vector<int>& v, int n, int i) {
     // место для вашего решения
     //1. нахожу номер позиции числа большего i
     auto pos_if = find_if( v.begin(), v.end(),  [i](int el) {return i < el;}) - v.begin();
@@ -28,7 +52,7 @@ int EffectiveCount(const vector<int>& v, int n, int i) {
         return upper_bound( v.begin(), v.end(),  i) - v.begin();
     }
     ///return *pos;     
-}
+}*/
 
  
 
