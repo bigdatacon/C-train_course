@@ -21,6 +21,3 @@
 
 void RemoveDuplicates(SearchServer& search_server);
 
-// отдельно созадю метод ADDDOCUMENT
-void SearchServer::AddDocument(int document_id, const string& document, DocumentStatus status,
-                     const std::vector<int>& ratings); 
