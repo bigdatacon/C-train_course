@@ -38,12 +38,10 @@ public:
 
     //1.Откажитесь от метода GetDocumentId(int index) и вместо него определите методы begin и end.Они вернут итераторы.Итератор даст доступ к id всех документов,
     //хранящихся в поисковом сервере.Вы можете не разрабатывать собственный итератор, а применить готовый константный итератор удобного контейнера.
-
-    auto begin(); 
-
-    auto end();
-
-
+    std::vector<int>::const_iterator begin() const;
+    std::vector<int>::const_iterator end() const;
+    std::vector<int>::iterator begin();
+    std::vector<int>::iterator end();
 
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
 
