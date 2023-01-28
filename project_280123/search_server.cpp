@@ -53,12 +53,23 @@
     }
     //1.Откажитесь от метода GetDocumentId(int index) и вместо него определите методы begin и end.Они вернут итераторы.Итератор даст доступ к id всех документов,
     //хранящихся в поисковом сервере.Вы можете не разрабатывать собственный итератор, а применить готовый константный итератор удобного контейнера.
-
-    auto SearchServer::begin() {
+    std::vector<int>::const_iterator SearchServer::begin() const
+    {
         return document_ids_.begin();
     }
 
-    auto SearchServer::end() {
+    std::vector<int>::const_iterator SearchServer::end() const
+    {
+        return document_ids_.end();
+    }
+
+    std::vector<int>::iterator SearchServer::begin()
+    {
+        return document_ids_.begin();
+    }
+
+    std::vector<int>::iterator SearchServer::end()
+    {
         return document_ids_.end();
     }
 
