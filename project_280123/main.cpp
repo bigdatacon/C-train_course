@@ -6,9 +6,15 @@
 #include <iostream>
 #include <string>
 #include "paginator.h"
+#include "remove_duplicates.h"
 
 using namespace std;
 
+void AddDocument(SearchServer &server, int document_id, const std::string& document, DocumentStatus status,
+                 const std::vector<int>& ratings)
+{
+    return server.AddDocument(document_id, document, status, ratings);
+}
 
 
 int main() {
