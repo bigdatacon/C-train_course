@@ -187,18 +187,21 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 
 //3.Разработайте метод удаления документов из поискового сервера
 void SearchServer::RemoveDocument(int document_id) {
-	word_freqs_.erase(document_id);
-	for (auto el : word_to_document_freqs_) {
-        for (auto inside_el : el.second) {
-        
-		if (inside_el.first == document_id) {
-			word_to_document_freqs_.erase(el);
-		}
-        }
+  word_freqs_.erase(document_id);
+  for (auto el : word_to_document_freqs_) {
+    for (auto inner_el: el.second) {
+      if (inner_el.first == document_id) {
+        el.second.erase(inner_el.first);
+      }
+    }
 
-	}
-	documents_.erase(document_id);
-	document_ids_.erase(document_id);
+  }
+  documents_.erase(document_id);
+  for (auto it = document_ids_.begin(); it != document_ids_.end(); it++) {
+    if (*it == document_id) {
+      document_ids_.erase(it);
+    }
+  }
 }
 
 
@@ -209,21 +212,21 @@ void SearchServer::RemoveDuplicates() {
 	//pair<int, vector<string>> document_struct; // структура слов для 1 документа по id 
 	std::vector <std::pair<int, std::vector<std::string>>>  all_document_struct; // структура слов для всех документов по id 
 
-	for (const int document_id : search_server) {
+	for (const int document_id: document_ids_) {
 		std::map<std::string, double> id_freq = GetWordFrequencies(document_id); // получаю частоту слов для id
 		// записываю только слова для id В вектор
 		for (std::map<std::string, double>::iterator it = id_freq.begin(); it != id_freq.end(); ++it) {
 			key_words.push_back(it->first);
 		}
 		// добавляю id : vector (слов) в итоговую пару document_struct
-		all_document_struct.push_back(std::pair(document_id, key_words);  // добавляю в вектора для каждого id его струткуру документов 
+		all_document_struct.push_back(std::pair(document_id, key_words));  // добавляю в вектора для каждого id его струткуру документов 
 
 	}
 	// иду по вектору all_document_struct и нахожу равные key_words
 	for (auto i = 0; i < all_document_struct.size() - 1; ++i) {
 		for (auto j = 1; j < all_document_struct.size(); ++j)
 			if (all_document_struct[i].second == all_document_struct[j].second) {
-				cout << "Found duplicate document id " << all_document_struct[j].first << std::endl;
+				std::cout << "Found duplicate document id " << all_document_struct[j].first << std::endl;
 				RemoveDocument(all_document_struct[j].first);
 
 			}
