@@ -91,29 +91,6 @@ private:
 
     //2.Разработайте метод получения частот слов по id документа: 
     const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
-
-
-    
-
-
-    /* -- ниже метод другого участника но он добавлял word_freqs_ в AddDocument
-const map<string, double>& SearchServer::GetWordFrequencies(int document_id) const {
-    static map<string, double> word_freqs;
-    if (word_freqs_.count(document_id) == 0) {
-        return word_freqs;
-    }
-    word_freqs = word_freqs_.at(document_id);
-
-    return word_freqs;
-}
-
-void SearchServer::RemoveDocument(int document_id) {
-    word_freqs_.erase(document_id);
-    documents_.erase(document_id);
-    document_ids_.erase(std::find(document_ids_.begin(), document_ids_.end(), document_id));
-    words_with_ids_.erase(document_id);
-}*/
-
     
     template <typename DocumentPredicate>
     std::vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const;
