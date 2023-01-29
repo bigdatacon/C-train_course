@@ -173,14 +173,15 @@ double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) con
 //2.Разработайте метод получения частот слов по id документа: 
 //Если документа не существует, возвратите ссылку на пустой map
 const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
-	std::map<std::string, double> word_freqs;
-	for (auto el : word_to_document_freqs_) {
-		if (el.second.first == document_id) {
-			word_freqs[el.first] += el.second.second;
+	//std::map<std::string, double> word_freqs_;
+	for (auto el : SearchServer::word_to_document_freqs_) {
+		for (auto inside_el : el.second) {
+			if (inside_el.first == document_id) {
+				SearchServer::word_freqs_[inside_el.first] += inside_el.second;
+			}
 		}
-
 	}
-	return word_freqs;
+	return word_freqs_;
 
 }
 
