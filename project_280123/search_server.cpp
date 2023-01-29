@@ -29,9 +29,11 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
 	const double inv_word_count = 1.0 / words.size();
 	for (const std::string& word : words) {
 		word_to_document_freqs_[word][document_id] += inv_word_count;
+        word_freqs_[document_id][word] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 	document_ids_.push_back(document_id);
+
 }
 
 std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentStatus status) const {
@@ -170,23 +172,22 @@ double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) con
 	return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
 }
 
+
 //2.Разработайте метод получения частот слов по id документа: 
 //Если документа не существует, возвратите ссылку на пустой map
-const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
-	std::map<std::string, double> word_freqs;
-	for (auto el : word_to_document_freqs_) {
-		for (auto inside_el : el.second) {
-			if (inside_el.first == document_id) {
-				word_freqs[el.first] += inside_el.second;
-			}
-		}
+const map<string, double>& SearchServer::GetWordFrequencies(int document_id) const {
+	static map<string, double> word_freqs;
+	if (word_freqs_.count(document_id) == 0) {
+		return word_freqs;
 	}
-	return word_freqs;
+	word_freqs = word_freqs_.at(document_id);
 
+	return word_freqs;
 }
 
-//3. Разработайте метод удаления документов из поискового сервера
+//3.Разработайте метод удаления документов из поискового сервера
 void SearchServer::RemoveDocument(int document_id) {
+	word_freqs_.erase(document_id);
 	for (auto el : word_to_document_freqs_) {
 		if (el.second.first == document_id) {
 			word_to_document_freqs_.erase(el);
@@ -195,8 +196,8 @@ void SearchServer::RemoveDocument(int document_id) {
 	}
 	documents_.erase(document_id);
 	document_ids_.erase(document_id);
-
 }
+
 
 //4. Вне класса сервера разработайте функцию поиска и удаления дубликатов :
 void SearchServer::RemoveDuplicates() {
@@ -231,21 +232,5 @@ void SearchServer::RemoveDuplicates() {
 
 
 
-/* -- ниже метод другого участника но он добавлял word_freqs_ в AddDocument
-const map<string, double>& SearchServer::GetWordFrequencies(int document_id) const {
-	static map<string, double> word_freqs;
-	if (word_freqs_.count(document_id) == 0) {
-		return word_freqs;
-	}
-	word_freqs = word_freqs_.at(document_id);
 
-	return word_freqs;
-}
-
-void SearchServer::RemoveDocument(int document_id) {
-	word_freqs_.erase(document_id);
-	documents_.erase(document_id);
-	document_ids_.erase(std::find(document_ids_.begin(), document_ids_.end(), document_id));
-	words_with_ids_.erase(document_id);
-}*/
 
