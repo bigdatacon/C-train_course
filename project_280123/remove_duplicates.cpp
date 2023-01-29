@@ -19,7 +19,8 @@
 
 //4. Вне класса сервера разработайте функцию поиска и удаления дубликатов :
 void RemoveDuplicates(SearchServer& search_server) {
-    return search_server.RemoveDuplicates;
+    search_server.RemoveDuplicates();
 }
+
 
 
