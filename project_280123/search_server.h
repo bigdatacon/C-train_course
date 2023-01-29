@@ -49,7 +49,8 @@ public:
     void RemoveDuplicates();
 
 private:
-    std::map<std::string, double> word_freqs_;  // поле учета частоты документов в слове
+    //std::map<std::string, double> word_freqs_;  // поле учета частоты документов в слове
+    std::map<std::int, std::map<std::string, double>> word_freqs_;
     struct DocumentData {
         int rating;
         DocumentStatus status;
