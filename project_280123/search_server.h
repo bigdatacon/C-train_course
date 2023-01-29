@@ -83,10 +83,13 @@ private:
 
 
     //2.Разработайте метод получения частот слов по id документа: 
-    const map<string, double>& GetWordFrequencies(int document_id) const;
+    const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
 
     //3. Разработайте метод удаления документов из поискового сервера
     void RemoveDocument(int document_id);
+    
+    //4. Методо удаления дубликатовж
+    void RemoveDuplicates():
 
     /* -- ниже метод другого участника но он добавлял word_freqs_ в AddDocument
 const map<string, double>& SearchServer::GetWordFrequencies(int document_id) const {
