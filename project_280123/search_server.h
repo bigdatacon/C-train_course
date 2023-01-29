@@ -44,6 +44,9 @@ public:
     std::vector<int>::iterator end();
 
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
+    
+        //4. Методо удаления дубликатовж
+    void RemoveDuplicates();
 
 private:
     struct DocumentData {
@@ -88,8 +91,7 @@ private:
     //3. Разработайте метод удаления документов из поискового сервера
     void RemoveDocument(int document_id);
     
-    //4. Методо удаления дубликатовж
-    void RemoveDuplicates():
+
 
     /* -- ниже метод другого участника но он добавлял word_freqs_ в AddDocument
 const map<string, double>& SearchServer::GetWordFrequencies(int document_id) const {
