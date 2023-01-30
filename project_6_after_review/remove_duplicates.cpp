@@ -15,18 +15,16 @@
 
 
 void RemoveDuplicates(SearchServer& search_server) {
-	for (const int document_id : search_server.GetDoc_ids()) {
-
 		for (int i = 0; i < (search_server.end() - search_server.begin()); ++i) {
 			for (int j = i + 1; j < (search_server.end() - search_server.begin()); ++j) {
-				if (search_server.GetWords_id()[i] == search_server.GetWords_id()[j]) {
-					search_server.RemoveDocument(search_server.GetWords_id()[j]);
+				if (search_server.GetId_words()[i] == search_server.GetId_words()[j]) {
+					search_server.RemoveDocument(search_server[j]);
 				}
 			}
 		}
 
 	}
-}
+
     /*
 void RemoveDuplicates(SearchServer& search_server) {
   std::map<std::string, double> m; // то что приходит из GetWordFrequencies(document_id)
