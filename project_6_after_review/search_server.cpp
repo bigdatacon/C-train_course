@@ -195,6 +195,13 @@ void SearchServer::RemoveDocument(int document_id) {
   //std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   auto it = std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   document_ids_.erase(it, document_ids_.end());
+  // удаляю данные из новыы словарей где id и множество слов 
+  std::map<int, std::set<std::string>> id_words_;
+  std::map< std::set<std::string>, int> words_id_;
+  words_id_.erase(id_words_[document_id]); // получаю ключ - это вектор слов и удалю по нему содержимое пары 
+  id_words_.erase(document_id);  // тут просто удаляю содержимое пары по ключу 
+   
+    
 }
 
 
