@@ -30,9 +30,11 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
 	for (const std::string& word : words) {
 		word_to_document_freqs_[word][document_id] += inv_word_count;
         word_freqs_[document_id][word] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
+        id_words_[document_id].insert(word); // заполняю map id : set(word)
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 	document_ids_.push_back(document_id);
+    Changekey_value(); // меняю местами id и словаи и заполняю words_ids_ 
 
 }
 
@@ -194,5 +196,7 @@ void SearchServer::RemoveDocument(int document_id) {
   auto it = std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   document_ids_.erase(it, document_ids_.end());
 }
+
+
 
 
