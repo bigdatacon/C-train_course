@@ -49,6 +49,8 @@ public:
     void RemoveDocument(int document_id);
     
     std::vector<int> GetDoc_ids( ){return document_ids_;} ;
+    std::map<int, std::set<std::string>> GetId_words( ){return id_words_;} ;
+    std::map< std::set<std::string>, int> GetWords_id( ){return words_id_;} ;
     
         //2.Разработайте метод получения частот слов по id документа: 
     const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
@@ -56,7 +58,8 @@ public:
     
 private:
     std::map<int, std::map<std::string, double>> word_freqs_;
-    //std::map<int, std::set<string>> word_freqs_;
+    std::map<int, std::set<std::string>> id_words_;
+    std::map< std::set<std::string>, int> words_id_;
     struct DocumentData {
         int rating;
         DocumentStatus status;
@@ -65,6 +68,15 @@ private:
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<int, DocumentData> documents_;
     std::vector<int> document_ids_;
+    
+    //6. Добавляю метод для смены ключей и значений в id_words_
+    void Changekey_value() {
+       for (std::map<int, std::set<std::string>>::iterator it = id_words_.begin(); it != id_words_.end(); ++it) {
+      words_id_.emplace(std::pair(it->second,  it->first));
+    }
+        
+    }
+    
 
     bool IsStopWord(const std::string& word) const ;
 
