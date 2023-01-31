@@ -30,11 +30,10 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
 	for (const std::string& word : words) {
 		word_to_document_freqs_[word][document_id] += inv_word_count;
         word_freqs_[document_id][word] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
-        id_words_[document_id].insert(word); // заполняю map id : set(word)
+        document_ids_[document_id].insert(word); // заполняю map id : set(word)
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
-	document_ids_.push_back(document_id);
-    Changekey_value(); // меняю местами id и словаи и заполняю words_ids_ 
+
 
 }
 
@@ -50,31 +49,6 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
 
 int SearchServer::GetDocumentCount() const {
 	return documents_.size();
-}
-
-int SearchServer::GetDocumentId(int index) const {
-	return document_ids_.at(index);
-}
-//1.Откажитесь от метода GetDocumentId(int index) и вместо него определите методы begin и end.Они вернут итераторы.Итератор даст доступ к id всех документов,
-//хранящихся в поисковом сервере.Вы можете не разрабатывать собственный итератор, а применить готовый константный итератор удобного контейнера.
-std::vector<int>::const_iterator SearchServer::begin() const
-{
-	return document_ids_.begin();
-}
-
-std::vector<int>::const_iterator SearchServer::end() const
-{
-	return document_ids_.end();
-}
-
-std::vector<int>::iterator SearchServer::begin()
-{
-	return document_ids_.begin();
-}
-
-std::vector<int>::iterator SearchServer::end()
-{
-	return document_ids_.end();
 }
 
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query, int document_id) const {
@@ -185,25 +159,47 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 
 void SearchServer::RemoveDocument(int document_id) {
   word_freqs_.erase(document_id);
-  for (auto el : word_to_document_freqs_) {
-    auto it = el.second.find(document_id);
-    if (it != el.second.end()) {
-      el.second.erase(it);
+  for(auto word: document_ids_[document_id]) {
+    auto it = word_to_document_freqs_[word].find(document_id);
+    if (it != word_to_document_freqs_[word].end()) {
+      word_to_document_freqs_[word].erase(it);
     }
   }
+  // Удалить document_id из id_words_
+  //document_ids_.erase(document_id);
   documents_.erase(document_id);
   //std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   auto it = std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   document_ids_.erase(it, document_ids_.end());
-  // удаляю данные из новыы словарей где id и множество слов 
-  std::map<int, std::set<std::string>> id_words_;
-  std::map< std::set<std::string>, int> words_id_;
-  words_id_.erase(id_words_[document_id]); // получаю ключ - это вектор слов и удалю по нему содержимое пары 
-  id_words_.erase(document_id);  // тут просто удаляю содержимое пары по ключу 
-   
-    
 }
 
 
+    class ConstDocumentIdIterator::ConstDocumentIdIterator {
+    private:
+        std::map<int, std::set<std::string>>::const_iterator iterator_;
+        ConstDocumentIdIterator(std::map<int, std::set<std::string>>::const_iterator it) {
+            iterator_ = it;
+        }
+
+        // Чтобы из методов SearchServer можно было вызывать приватный конструктор
+        friend class SearchServer;
+
+    public:
+        int operator*() const { return iterator_->first; };
+        ConstDocumentIdIterator &operator++() {
+            iterator_++;
+            return *this;
+        }
+        bool operator==(const ConstDocumentIdIterator & other) const { return iterator_ == other.iterator_; }
+        bool operator!=(const ConstDocumentIdIterator & other) const { return iterator_ != other.iterator_; }
+       ConstDocumentIdIterator  operator+=(const int m) const { return iterator_ += m; }
+    };
+    
+    ConstDocumentIdIterator begin() const {
+        return ConstDocumentIdIterator(document_ids_.begin());
+    }
+    ConstDocumentIdIterator end() const  {
+        return ConstDocumentIdIterator(document_ids_.end());
+    }
 
 
