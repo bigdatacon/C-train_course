@@ -34,31 +34,55 @@ public:
 
     int GetDocumentCount() const ;
 
-    int GetDocumentId(int index) const ;
-
-    //1.Откажитесь от метода GetDocumentId(int index) и вместо него определите методы begin и end.Они вернут итераторы.Итератор даст доступ к id всех документов,
-    //хранящихся в поисковом сервере.Вы можете не разрабатывать собственный итератор, а применить готовый константный итератор удобного контейнера.
-    std::vector<int>::const_iterator begin() const;
-    std::vector<int>::const_iterator end() const;
-    std::vector<int>::iterator begin();
-    std::vector<int>::iterator end();
-
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
 
         //3. Разработайте метод удаления документов из поискового сервера
     void RemoveDocument(int document_id);
     
-    std::vector<int> GetDoc_ids( ){return document_ids_;} ;
-    std::map<int, std::set<std::string>> GetId_words( ){return id_words_;} ;
-    std::map< std::set<std::string>, int> GetWords_id( ){return words_id_;} ;
+    std::map<int, std::set<std::string>> GetDoc_ids( ){return document_ids_;} ;
+    std::map< std::set<std::string>, int> GetWords_id(){return words_id_;} ;
     
         //2.Разработайте метод получения частот слов по id документа: 
     const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
     
+    class ConstDocumentIdIterator; /* {
+    private:
+        std::map<int, std::set<std::string>>::const_iterator iterator_;
+        ConstDocumentIdIterator(std::map<int, std::set<std::string>>::const_iterator it) {
+            iterator_ = it;
+        }
+
+        // Чтобы из методов SearchServer можно было вызывать приватный конструктор
+        friend class SearchServer;
+
+    public:
+        int operator*() const { return iterator_->first; };
+        ConstDocumentIdIterator &operator++() {
+            iterator_++;
+            return *this;
+        }
+        bool operator==(const ConstDocumentIdIterator & other) const { return iterator_ == other.iterator_; }
+        bool operator!=(const ConstDocumentIdIterator & other) const { return iterator_ != other.iterator_; }
+       ConstDocumentIdIterator  operator+=(const int m) const { return iterator_ += m; }
+    };*/
+
+    ConstDocumentIdIterator begin() const ; /* {
+        return ConstDocumentIdIterator(document_ids_.begin());
+    }*/
+    ConstDocumentIdIterator end() const ; /* {
+        return ConstDocumentIdIterator(document_ids_.end());
+    }*/
+    
+    /*DocumentIdIterator begin()  {
+        return ConstDocumentIdIterator(document_ids_.begin());
+    }
+    DocumentIdIterator end()  {
+        return ConstDocumentIdIterator(document_ids_.end());
+    }*/
     
 private:
     std::map<int, std::map<std::string, double>> word_freqs_;
-    std::map<int, std::set<std::string>> id_words_;
+    std::map<int, std::set<std::string>> document_ids_;
     std::map< std::set<std::string>, int> words_id_;
     struct DocumentData {
         int rating;
@@ -67,17 +91,15 @@ private:
     const std::set<std::string> stop_words_;
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<int, DocumentData> documents_;
-    std::vector<int> document_ids_;
     
     //6. Добавляю метод для смены ключей и значений в id_words_
     void Changekey_value() {
-       for (std::map<int, std::set<std::string>>::iterator it = id_words_.begin(); it != id_words_.end(); ++it) {
+       for (std::map<int, std::set<std::string>>::iterator it = document_ids_.begin(); it != document_ids_.end(); ++it) {
       words_id_.emplace(std::pair(it->second,  it->first));
     }
         
     }
     
-
     bool IsStopWord(const std::string& word) const ;
 
     static bool IsValidWord(const std::string& word) ;
