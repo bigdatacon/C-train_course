@@ -165,10 +165,7 @@ void SearchServer::RemoveDocument(int document_id) {
       word_to_document_freqs_[word].erase(it);
     }
   }
-  // Удалить document_id из id_words_
-  //document_ids_.erase(document_id);
   documents_.erase(document_id);
-  //std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   auto it = std::remove(document_ids_.begin(), document_ids_.end(), document_id);
   document_ids_.erase(it, document_ids_.end());
 }
