@@ -33,7 +33,7 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
         document_ids_[document_id].insert(word); // заполняю map id : set(word)
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
-    Changekey_value(); // меняю местами id и словаи и заполняю words_ids_ 
+
 
 }
 
