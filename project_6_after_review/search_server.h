@@ -83,7 +83,6 @@ public:
 private:
     std::map<int, std::map<std::string, double>> word_freqs_;
     std::map<int, std::set<std::string>> document_ids_;
-    std::map< std::set<std::string>, int> words_id_;
     struct DocumentData {
         int rating;
         DocumentStatus status;
@@ -91,14 +90,6 @@ private:
     const std::set<std::string> stop_words_;
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<int, DocumentData> documents_;
-    
-    //6. Добавляю метод для смены ключей и значений в id_words_
-    void Changekey_value() {
-       for (std::map<int, std::set<std::string>>::iterator it = document_ids_.begin(); it != document_ids_.end(); ++it) {
-      words_id_.emplace(std::pair(it->second,  it->first));
-    }
-        
-    }
     
     bool IsStopWord(const std::string& word) const ;
 
