@@ -1,75 +1,125 @@
+#include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <string>
+#include <vector>
 
+using namespace std;
 
-/*
-Задание 2
-Напишите шаблонную функцию IsSameObject, проверяющую, ссылаются ли переданные ей параметры-ссылки на один и тот же объект.
-Ограничения
-Не меняйте сигнатуру функции IsSameObject.
-Как будет тестироваться ваш код
-Будет проверена работа функции IsSameObject. Ей может быть передана пара любых объектов одного и того же типа.
-Содержимое функции main будет проигнорировано.
-Что отправлять на проверку
-Отправьте код функции IsSameObject.
+// Породы кошек
+enum class CatBreed {
+    Bengal,
+    Balinese,
+    Persian,
+    Siamese,
+    Siberian,
+    Sphynx,SuccessSuccess
+};
 
+// Пол
+enum class Gender {
+    Male,
+    Female,
+};
 
-Две ссылки относятся к одному и тому же объекту, только если адреса их объектов совпадают.
-Узнать адрес объекта по ссылке можно операцией &.
-Напишите сигнатуру функции так, чтобы значения в неё всегда передавались по ссылке.
-*/
+struct Cat {
+    string name;
+    Gender gender;
+    CatBreed breed;
+    int age;
+};
 
-//изначальный код 
-template </* ваша реализация */>
-bool IsSameObject() {
-
-/* ваша реализация */
+string CatBreedToString(CatBreed breed) {
+    switch (breed) {
+        case CatBreed::Bengal:
+            return "Bengal"s;
+        case CatBreed::Balinese:
+            return "Balinese"s;
+        case CatBreed::Persian:
+            return "Persian"s;
+        case CatBreed::Siamese:
+            return "Siamese"s;
+        case CatBreed::Siberian:
+            return "Siberian";
+        case CatBreed::Sphynx:
+            return "Sphynx"s;
+        default:
+            throw invalid_argument("Invalid cat breed"s);
+    }
 }
 
-// Моя реалищзация  ниже 
-template <typename T>
-bool IsSameObject(T& value1, T& value2) {
-    /*Напишите тело функции самостоятельно */
-    //T* value_ptr1 = &value1;
-    //T* value_ptr2 = &value2;
-    
-    T* value_ptr1 = value1;
-    T* value_ptr2 = value2;
+ostream& operator<<(ostream& out, CatBreed breed) {
+    out << CatBreedToString(breed);
+    return out;
+}
 
-    // Значения указателей на один и тот же объект будут равны
-    return assert(value_ptr1 == value_ptr2);
-    
+ostream& operator<<(ostream& out, Gender gender) {
+    out << (gender == Gender::Male ? "male"s : "female"s);
+    return out;
+}
+
+ostream& operator<<(ostream& out, const Cat& cat) {
+    out << '{' << cat.name << ", "s << cat.gender;
+    out << ", breed: "s << cat.breed << ", age:"s << cat.age << '}';
+    return out;
+}
+
+// Возвращает массив указателей на элементы вектора cats, отсортированные с использованием
+// компаратора comp. Компаратор comp - функция, принимающая два аргумента типа const Cat&
+// и возвращающая true, если значения упорядочены, и false в ином случае
+template <typename Comparator>
+vector<const Cat*> GetSortedCats(const vector<Cat>& cats, const Comparator& comp) {
+    vector<const Cat*> sorted_cat_pointers;
+
+    /*
+    Напишите тело функции самостоятельно. Подсказка:
+    1) Поместите в массив sorted_cat_pointers адреса объектов из массива cats.
+    2) Отсортируйте массив sorted_cat_pointers с помощью переданного компаратора comp.
+       Так как comp сравнивает ссылки на объекты, а отсортировать нужно указатели,
+       передайте в sort лямбда функцию, принимающую указатели и сравнивающую объекты
+       при помощи компаратора comp:
+       [comp](const Cat* lhs, const Cat* rhs) {
+           return comp(*lhs, *rhs);
+       }
+    */
+    return sorted_cat_pointers;
+}
+
+// Выводит в поток out значения объектов, на который ссылаются указатели вектора cat_pointers.
+// Пример вывода элементов vector<const Cat*>:
+// {{Tom, male, breed: Bengal, age:2}, {Charlie, male, breed: Balinese, age:7}}
+void PrintCatPointerValues(const vector<const Cat*>& cat_pointers, ostream& out) {
+    // Напишите функцию самостоятельно
 }
 
 int main() {
-    using namespace std;
+    const vector<Cat> cats = {
+        {"Tom"s, Gender::Male, CatBreed::Bengal, 2},
+        {"Leo"s, Gender::Male, CatBreed::Siberian, 3},
+        {"Luna"s, Gender::Female, CatBreed::Siamese, 1},
+        {"Charlie"s, Gender::Male, CatBreed::Balinese, 7},
+        {"Ginger"s, Gender::Female, CatBreed::Sphynx, 5},
+        {"Tom"s, Gender::Male, CatBreed::Siamese, 2},
+    };
 
-    const int x = 1;
-    const int y = 1;
-    // x и y — разные объекты, хоть и имеющие одинаковое значение
-    assert(!IsSameObject(x, y));
-    // Оба аргумента — один и тот же объект
-    assert(IsSameObject(x, x));
+    {
+        auto sorted_cats = GetSortedCats(cats, [](const Cat& lhs, const Cat& rhs) {
+            return tie(lhs.breed, lhs.name) < tie(rhs.breed, rhs.name);
+        });
 
-    const string name1 = "Harry"s;
-    const string name1_copy = name1;
-    const string name2 = "Ronald"s;
-    auto name1_ptr = &name1;
-    const string& name1_ref = name1;
+        cout << "Cats sorted by breed and name:"s << endl;
+        PrintCatPointerValues(sorted_cats, cout);
+        cout << endl;
+    }
 
-    assert(!IsSameObject(name1, name2));  // Две строки с разными значениями — разные объекты
-    assert(!IsSameObject(name1, name1_copy));  // Строка и её копия — разные объекты
+    {
+        auto sorted_cats = GetSortedCats(cats, [](const Cat& lhs, const Cat& rhs) {
+            return tie(lhs.gender, lhs.breed) < tie(rhs.gender, rhs.breed);
+        });
 
-    // Оба параметра ссылаются на одну и ту же строку
-    assert(IsSameObject(name1, name1));
-    assert(IsSameObject(name2, name2));
-    assert(IsSameObject(name1_copy, name1_copy));
-
-    // Разыменованный указатель на объект и сам объект — один и тот же объект
-    assert(IsSameObject(*name1_ptr, name1));
-
-    // Переменная и ссылка на неё относятся к одному и тому же объекту
-    assert(IsSameObject(name1_ref, name1));
-    // Ссылка на объект и разыменованный указатель на объект относятся к одному и тому же объекту
-    assert(IsSameObject(name1_ref, *name1_ptr));
+        cout << "Cats sorted by gender and breed:"s << endl;
+        PrintCatPointerValues(sorted_cats, cout);
+        cout << endl;
+    }
+    return 0;
 }
