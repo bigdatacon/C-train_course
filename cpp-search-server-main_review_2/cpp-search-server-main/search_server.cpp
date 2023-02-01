@@ -30,10 +30,10 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
 	for (const std::string& word : words) {
 		word_to_document_freqs_[word][document_id] += inv_word_count;
         word_freqs_[document_id][word] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
-        document_ids_[document_id].insert(word); // заполняю map id : set(word)
+
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
-
+	document_ids_.insert(document_id);
 
 }
 
@@ -49,6 +49,34 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
 
 int SearchServer::GetDocumentCount() const {
 	return documents_.size();
+}
+
+int SearchServer::GetDocumentId(int index) const {
+	//return document_ids_.at(index);
+    std::set<int>::iterator it = document_ids_.begin();
+    std::advance(it, index);
+    return *it;
+}
+//1.Откажитесь от метода GetDocumentId(int index) и вместо него определите методы begin и end.Они вернут итераторы.Итератор даст доступ к id всех документов,
+//хранящихся в поисковом сервере.Вы можете не разрабатывать собственный итератор, а применить готовый константный итератор удобного контейнера.
+std::set<int>::const_iterator SearchServer::begin() const
+{
+	return document_ids_.begin();
+}
+
+std::set<int>::const_iterator SearchServer::end() const
+{
+	return document_ids_.end();
+}
+
+std::set<int>::iterator SearchServer::begin()
+{
+	return document_ids_.begin();
+}
+
+std::set<int>::iterator SearchServer::end()
+{
+	return document_ids_.end();
 }
 
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query, int document_id) const {
@@ -156,47 +184,17 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 	return word_freqs_.at(document_id);
 }
 
-
 void SearchServer::RemoveDocument(int document_id) {
   word_freqs_.erase(document_id);
-  for(auto word: document_ids_[document_id]) {
+  for(auto [word, freq]: GetWordFrequencies(document_id)) {
     auto it = word_to_document_freqs_[word].find(document_id);
     if (it != word_to_document_freqs_[word].end()) {
       word_to_document_freqs_[word].erase(it);
     }
   }
+
   documents_.erase(document_id);
-  auto it = std::remove(document_ids_.begin(), document_ids_.end(), document_id);
-  document_ids_.erase(it, document_ids_.end());
+  document_ids_.erase(document_id);
+
 }
-
-
-    class ConstDocumentIdIterator::ConstDocumentIdIterator {
-    private:
-        std::map<int, std::set<std::string>>::const_iterator iterator_;
-        ConstDocumentIdIterator(std::map<int, std::set<std::string>>::const_iterator it) {
-            iterator_ = it;
-        }
-
-        // Чтобы из методов SearchServer можно было вызывать приватный конструктор
-        friend class SearchServer;
-
-    public:
-        int operator*() const { return iterator_->first; };
-        ConstDocumentIdIterator &operator++() {
-            iterator_++;
-            return *this;
-        }
-        bool operator==(const ConstDocumentIdIterator & other) const { return iterator_ == other.iterator_; }
-        bool operator!=(const ConstDocumentIdIterator & other) const { return iterator_ != other.iterator_; }
-       ConstDocumentIdIterator  operator+=(const int m) const { return iterator_ += m; }
-    };
-    
-    ConstDocumentIdIterator begin() const {
-        return ConstDocumentIdIterator(document_ids_.begin());
-    }
-    ConstDocumentIdIterator end() const  {
-        return ConstDocumentIdIterator(document_ids_.end());
-    }
-
 
