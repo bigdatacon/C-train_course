@@ -1,92 +1,122 @@
 Задание
 Задание
-Это задание — итоговый проект пятого спринта. Вы будете сдавать его на проверку через репозиторий на GitHub. Не забудьте сохранить верное решение.
-Расширьте поисковый сервер, добавив в него дополнительные методы.
-Откажитесь от метода GetDocumentId(int index) и вместо него определите методы begin и end. Они вернут итераторы. Итератор даст доступ к id всех документов, хранящихся в поисковом сервере. Вы можете не разрабатывать собственный итератор, а применить готовый константный итератор удобного контейнера.
- Если begin и end определены корректно, появится возможность использовать упрощённую форму for с поисковым сервером:
- SearchServer search_server;
+Попрактикуйтесь использовать константные указатели на примере программы, которая ведёт учёт кошек. В ней кошки представлены структурой Cat, задающей имя, пол, породу и возраст:
+// Породы кошек
+enum class CatBreed {
+    Bengal,
+    Balinese,
+    Persian,
+    Siamese,
+    Siberian,
+    Sphynx,
+};
 
- for (const int document_id : search_server) {
-     // ...
- }
-  
-Разработайте метод получения частот слов по id документа: 
- const map<string, double>& GetWordFrequencies(int document_id) const;
-  
- Если документа не существует, возвратите ссылку на пустой map.
-Разработайте метод удаления документов из поискового сервера
- void RemoveDocument(int document_id);
-  
-Вне класса сервера разработайте функцию поиска и удаления дубликатов:
- void RemoveDuplicates(SearchServer& search_server);
-  
- Дубликатами считаются документы, у которых наборы встречающихся слов совпадают. Совпадение частот необязательно. Порядок слов неважен, а стоп-слова игнорируются. Функция должна использовать только доступные к этому моменту методы поискового сервера.
- При обнаружении дублирующихся документов функция должна удалить документ с большим id из поискового сервера, и при этом сообщить id удалённого документа в соответствии с форматом выходных данных, приведённым ниже.
-Будьте аккуратны, если функция RemoveDuplicates проходит циклом по поисковому серверу так:
-void RemoveDuplicates(SearchServer& search_server) {
-    ...
-    for (const int document_id : search_server) {
-        ...
-    }
-    ...
-} 
-В подобном случае удалять документы внутри цикла нельзя — это может привести к невалидности внутреннего итератора.
-Все реализации должны быть эффективными. Если NN — общее количество документов, а WW — количество слов во всех документах, то:
-сложность GetWordFrequencies должна быть O(\log N)O(logN);
-сложность RemoveDocument должна быть O(w(\log N+\log W))O(w(logN+logW)), где ww — количество слов в удаляемом документе;
-сложность begin и end — O(1)O(1);
-сложность RemoveDuplicates должна быть O(wN(\log N+\log W))O(wN(logN+logW)), где ww — максимальное количество слов в документе.
-В этом задании может потребоваться рефакторинг вашего кода. Например, замена одного вида контейнера на другой или введение нового индекса.
-Вам предстоит оценить сложность разрабатываемых алгоритмов, чтобы знать, что они достаточно быстрые.
-Формат выходных данных
-Функция RemoveDuplicates должна для каждого удаляемого документа вывести в cout сообщение в формате Found duplicate document id N, где вместо N следует подставить id удаляемого документа.
-Ограничения
-Сохраните корректную и быструю работу всех методов кроме GetDocumentId. 
-Что отправлять на проверку
-Загрузите полный код поискового сервера и вспомогательных функций. Код нужно разбить на файлы. Функция main при проверке будет игнорироваться.
-Как будет тестироваться ваш код
-Будет проверено, что:
-вы не изменили работу методов и функций, которые не описаны в условии,
-вы реализовали требуемые методы и функцию RemoveDuplicates,
-реализованные методы работают достаточно быстро и их сложность соответствует условию.
-Пример использования
+// Пол
+enum class Gender {
+    Male,
+    Female,
+};
+
+struct Cat {
+    string name;
+    Gender gender;
+    CatBreed breed;
+    int age;
+}; 
+Для хранения кошек используется контейнер vector:
 int main() {
-    SearchServer search_server("and with"s);
-
-    AddDocument(search_server, 1, "funny pet and nasty rat"s, DocumentStatus::ACTUAL, {7, 2, 7});
-    AddDocument(search_server, 2, "funny pet with curly hair"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // дубликат документа 2, будет удалён
-    AddDocument(search_server, 3, "funny pet with curly hair"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // отличие только в стоп-словах, считаем дубликатом
-    AddDocument(search_server, 4, "funny pet and curly hair"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // множество слов такое же, считаем дубликатом документа 1
-    AddDocument(search_server, 5, "funny funny pet and nasty nasty rat"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // добавились новые слова, дубликатом не является
-    AddDocument(search_server, 6, "funny pet and not very nasty rat"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // множество слов такое же, как в id 6, несмотря на другой порядок, считаем дубликатом
-    AddDocument(search_server, 7, "very nasty rat and not very funny pet"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // есть не все слова, не является дубликатом
-    AddDocument(search_server, 8, "pet with rat and rat and rat"s, DocumentStatus::ACTUAL, {1, 2});
-
-    // слова из разных документов, не является дубликатом
-    AddDocument(search_server, 9, "nasty rat with curly hair"s, DocumentStatus::ACTUAL, {1, 2});
-    
-    cout << "Before duplicates removed: "s << search_server.GetDocumentCount() << endl;
-    RemoveDuplicates(search_server);
-    cout << "After duplicates removed: "s << search_server.GetDocumentCount() << endl;
+    const vector<Cat> cats = {
+        {"Tom"s, Gender::Male, CatBreed::Bengal, 2},
+        {"Leo"s, Gender::Male, CatBreed::Siberian, 3},
+        {"Luna"s, Gender::Female, CatBreed::Siamese, 1},
+        {"Charlie"s, Gender::Male, CatBreed::Balinese, 7},
+        {"Ginger"s, Gender::Female, CatBreed::Sphynx, 5},
+        {"Tom"s, Gender::Male, CatBreed::Siamese, 2},
+    };
+    ...
 } 
-Ожидаемый вывод этой программы:
-Before duplicates removed: 9
-Found duplicate document id 3
-Found duplicate document id 4
-Found duplicate document id 5
-Found duplicate document id 7
-After duplicates removed: 5 
+Требуется создать в программе несколько одновременно существующих представлений этой коллекции, отсортированных по разным критериям:
+По породе и имени. Кошки одинаковой породы сортируются по имени.
+По полу и породе.
+Простейшее решение — создать несколько копий вектора кошек и отсортировать их по заданным критериям. Основной недостаток решения — избыточное потребление памяти. Каждая кошка будет храниться в нескольких экземплярах со всеми своими данными. Представьте, что вам пришлось бы клонировать оригинальный набор кошек, а потом отсортировать копию каждого набора. Слишком много кошек!
+Более эффективно хранить каждую кошку в единственном экземпляре в контейнере cats. Отсортированное представление контейнера cats можно задать в виде вектора указателей, которые ссылаются на кошек из cats и отсортированы как надо. Для хранения указателя нужно в несколько раз меньше памяти, чем для хранения данных о кошке. Такое решение аналогично сортировке листков бумаги с адресами этих замечательных животных.
+image
 
+Два индекса используют одни и те же данные
+Требования
+Напишите
+шаблонную функцию GetSortedCats, которая принимает константную ссылку на массив кошек,
+функцию-компаратор, которая проверяет кошек на упорядоченность.
+GetSortedCats должна вернуть контейнер vector<const Cat*>, содержащий указатели на элементы вектора кошек. Для сортировки указателей используйте переданную функцию-компаратор:
+// Возвращает массив указателей на элементы вектора cats, отсортированные с использованием
+// компаратора comp. Компаратор comp - функция, принимающая два аргумента типа const Cat&
+// и возвращающая true, если значения упорядочены, и false в ином случае
+template <typename Comparator>
+vector<const Cat*> GetSortedCats(const vector<Cat>& cats, const Comparator& comp) {
+    ...
+}
+
+int main() {
+    const vector<Cat> cats = { ... };
+
+    auto sorted_cats = GetSortedCats(cats, [](const Cat& lhs, const Cat& rhs) {
+        // Сравниваем кошек по породе и имени
+        return tie(lhs.breed, lhs.name) < tie(rhs.breed, rhs.name);
+    });
+    // sorted_cats - вектор указателей на кошек, отсортированных по кличке и имени
+    ...
+} 
+Чтобы вывести информацию о кошках из массива указателей, напишите функцию PrintCatPointerValues: 
+// Выводит в поток out кошек, на которых ссылаются указатели вектора cat_pointers.
+// Пример вывода:
+// {{Tom, male, breed: Bengal, age:2}, {Charlie, male, breed: Balinese, age:7}}
+void PrintCatPointerValues(const vector<const Cat*>& cat_pointers, ostream& out) {
+    ...
+}
+
+int main() {
+    ...
+    auto sorted_cats = GetSortedCats(...);
+    PrintCatPointerValues(sorted_cats, cout);
+    ...
+} 
+В заготовке кода есть готовые операции вывода кошек в поток.
+Ограничения
+Вектор кошек, передаваемый в функцию GetSortedCats, может содержать от 0 до 1000000 кошек. Клички кошек могут содержать буквы английского алфавита в разном регистре и пробелы, например: “Cat in Boots”.
+Что отправлять на проверку
+Загрузите в тренажёр код программы без функции main. Функция main, если она будет загружена в тренажёр, будет заменена на версию из тренажёра.
+Как будет тестироваться ваш код
+Функции GetSortedCats и PrintCatPointerValues будут протестированы кодом, подобным тому, что сейчас находится в функции main.
+
+Подсказка: 
+
+Чтобы получить отсортированное представление, создайте вектор указателей, ссылающихся на элементы оригинального контейнера кошек. Затем отсортируйте этот вектор как нужно. Программа должна сортировать указатели, сравнивая их значения, а не их адреса. Пример:
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    vector<int> items = {5, 2, 3, 4};
+    vector<const int*> item_pointers;
+    // Перебирать элементы вектора здесь следует по константной ссылке,
+    // а не по значению.
+    // В противном случае item_pointers будут хранить адреса объектов,
+    // область видимости которых ограничена телом цикла
+    for (const int& item : items) {
+        item_pointers.push_back(&item);
+    }
+
+    // сортируем указатели в порядке убывания чисел, на которые они ссылаются.
+    sort(item_pointers.begin(), item_pointers.end(), [](const int* lhs, const int* rhs) {
+        // Чтобы сравнить значения, надо разыменовать указатели
+        return *lhs > *rhs;
+    });
+
+    for (const int* item_ptr : item_pointers) {
+        cout << *item_ptr << ", "s;
+    }
+} 
 
