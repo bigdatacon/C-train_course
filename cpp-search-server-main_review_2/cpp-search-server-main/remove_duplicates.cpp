@@ -14,29 +14,29 @@
 #include <numeric>
 
 
-/*void RemoveDuplicates(SearchServer& search_server) {
-    for (auto i = search_server.begin(); i != search_server.end(); ++i) {
-        for (auto j = i + 1; j != search_server.end(); ++j) {
-            if (search_server.GetDoc_ids()[*i] == search_server.GetDoc_ids()[*j]) {
-                std::cout << "Found duplicate document id " << *j << std::endl;
-                search_server.RemoveDocument(*j);
-                j--;
-            }
-        }
-    }
-}*/
-
 void RemoveDuplicates(SearchServer& search_server) {
-    std::set<int> to_delete;
-    for (auto i: search_server) {
-        for (auto j: search_server) {
-            if (j > i && !to_delete.count(j) && search_server.GetId_words()[i] == search_server.GetId_words()[j]) {
-                std::cout << "Found duplicate document id " << j << std::endl;
-                to_delete.insert(j);
-            }
-        }
-    }
-    for (auto j: to_delete) {
-        search_server.RemoveDocument(j);
-    }
+	std::set<std::set<std::string>> all_document_struct; // структура слов для всех документов по id
+	std::set<int> to_erase;
+	for (const int document_id : search_server) {
+		std::set<std::string> key_words; // только слова документа без id
+		std::map<std::string, double> id_freq = search_server.GetWordFrequencies(document_id); // получаю частоту слов для id
+		// записываю только слова для id В вектор
+		for (auto&& [first, second] : id_freq) {
+			key_words.insert(first);
+		}
+		// добавляю set (слов) в итогов document_struct при условии что аналогичного набора там нет 
+		if (all_document_struct.count(key_words) == 0) {
+			all_document_struct.insert(key_words);
+		}
+		else {
+			std::cout << "Found duplicate document id " << document_id << std::endl;
+			to_erase.insert(document_id);
+		}
+	}
+
+	for (auto document_id : to_erase) {
+		search_server.RemoveDocument(document_id);  // удаляю документ)
+	}
+
 }
+
