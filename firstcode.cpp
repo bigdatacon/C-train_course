@@ -1,125 +1,86 @@
-#include <algorithm>
 #include <cassert>
-#include <iostream>
-#include <string>
-#include <vector>
 
-using namespace std;
+// Умный указатель, удаляющий связанный объект при своём разрушении.
+// Параметр шаблона T задаёт тип объекта, на который ссылается указатель
+template <typename T>
+class ScopedPtr {
+public:
+    // Конструктор по умолчанию создаёт нулевой указатель,
+    // так как поле ptr_ имеет значение по умолчанию nullptr
+    ScopedPtr() = default;
 
-// Породы кошек
-enum class CatBreed {
-    Bengal,
-    Balinese,
-    Persian,
-    Siamese,
-    Siberian,
-    Sphynx,SuccessSuccess
-};
-
-// Пол
-enum class Gender {
-    Male,
-    Female,
-};
-
-struct Cat {
-    string name;
-    Gender gender;
-    CatBreed breed;
-    int age;
-};
-
-string CatBreedToString(CatBreed breed) {
-    switch (breed) {
-        case CatBreed::Bengal:
-            return "Bengal"s;
-        case CatBreed::Balinese:
-            return "Balinese"s;
-        case CatBreed::Persian:
-            return "Persian"s;
-        case CatBreed::Siamese:
-            return "Siamese"s;
-        case CatBreed::Siberian:
-            return "Siberian";
-        case CatBreed::Sphynx:
-            return "Sphynx"s;
-        default:
-            throw invalid_argument("Invalid cat breed"s);
+    // Создаёт указатель, ссылающийся на переданный raw_ptr.
+    // raw_ptr ссылается либо на объект, созданный в куче при помощи new,
+    // либо является нулевым указателем
+    // Спецификатор noexcept обозначает, что метод не бросает исключений
+    explicit ScopedPtr(T* raw_ptr) noexcept {
+        // Реализуйте самостоятельно
     }
-}
 
-ostream& operator<<(ostream& out, CatBreed breed) {
-    out << CatBreedToString(breed);
-    return out;
-}
+    // Удаляем у класса конструктор копирования
+    ScopedPtr(const ScopedPtr&) = delete;
 
-ostream& operator<<(ostream& out, Gender gender) {
-    out << (gender == Gender::Male ? "male"s : "female"s);
-    return out;
-}
+    // Деструктор. Удаляет объект, на который ссылается умный указатель.
+    ~ScopedPtr() {
+        // Реализуйте тело деструктора самостоятельно
+    }
 
-ostream& operator<<(ostream& out, const Cat& cat) {
-    out << '{' << cat.name << ", "s << cat.gender;
-    out << ", breed: "s << cat.breed << ", age:"s << cat.age << '}';
-    return out;
-}
+    // Возвращает указатель, хранящийся внутри ScopedPtr
+    T* GetRawPtr() const noexcept {
+        // Напишите код метода самостоятельно
+    }
 
-// Возвращает массив указателей на элементы вектора cats, отсортированные с использованием
-// компаратора comp. Компаратор comp - функция, принимающая два аргумента типа const Cat&
-// и возвращающая true, если значения упорядочены, и false в ином случае
-template <typename Comparator>
-vector<const Cat*> GetSortedCats(const vector<Cat>& cats, const Comparator& comp) {
-    vector<const Cat*> sorted_cat_pointers;
+    // Прекращает владение объектом, на который ссылается умный указатель.
+    // Возвращает прежнее значение "сырого" указателя и устанавливает поле ptr_ в null
+    T* Release() noexcept {
+        // Реализуйте самостоятельно
+    }
 
-    /*
-    Напишите тело функции самостоятельно. Подсказка:
-    1) Поместите в массив sorted_cat_pointers адреса объектов из массива cats.
-    2) Отсортируйте массив sorted_cat_pointers с помощью переданного компаратора comp.
-       Так как comp сравнивает ссылки на объекты, а отсортировать нужно указатели,
-       передайте в sort лямбда функцию, принимающую указатели и сравнивающую объекты
-       при помощи компаратора comp:
-       [comp](const Cat* lhs, const Cat* rhs) {
-           return comp(*lhs, *rhs);
-       }
-    */
-    return sorted_cat_pointers;
-}
+private:
+    T* ptr_ = nullptr;
+};
 
-// Выводит в поток out значения объектов, на который ссылаются указатели вектора cat_pointers.
-// Пример вывода элементов vector<const Cat*>:
-// {{Tom, male, breed: Bengal, age:2}, {Charlie, male, breed: Balinese, age:7}}
-void PrintCatPointerValues(const vector<const Cat*>& cat_pointers, ostream& out) {
-    // Напишите функцию самостоятельно
-}
-
+// Этот main тестирует класс ScopedPtr
 int main() {
-    const vector<Cat> cats = {
-        {"Tom"s, Gender::Male, CatBreed::Bengal, 2},
-        {"Leo"s, Gender::Male, CatBreed::Siberian, 3},
-        {"Luna"s, Gender::Female, CatBreed::Siamese, 1},
-        {"Charlie"s, Gender::Male, CatBreed::Balinese, 7},
-        {"Ginger"s, Gender::Female, CatBreed::Sphynx, 5},
-        {"Tom"s, Gender::Male, CatBreed::Siamese, 2},
+    // Вспомогательный "шпион", позволяющий узнать о своём удалении
+    struct DeletionSpy {
+        explicit DeletionSpy(bool& is_deleted)
+            : is_deleted_(is_deleted) {
+        }
+        ~DeletionSpy() {
+            is_deleted_ = true;
+        }
+        bool& is_deleted_;
     };
 
+    // Проверяем автоматическое удаление
     {
-        auto sorted_cats = GetSortedCats(cats, [](const Cat& lhs, const Cat& rhs) {
-            return tie(lhs.breed, lhs.name) < tie(rhs.breed, rhs.name);
-        });
-
-        cout << "Cats sorted by breed and name:"s << endl;
-        PrintCatPointerValues(sorted_cats, cout);
-        cout << endl;
+        bool is_deleted = false;
+        {
+            // настраиваем "шпион", чтобы при своём удалении он выставил is_deleted в true
+            DeletionSpy* raw_ptr = new DeletionSpy(is_deleted);
+            ScopedPtr<DeletionSpy> p(raw_ptr);
+            assert(p.GetRawPtr() == raw_ptr);
+            assert(!is_deleted);
+            // При выходе из блока деструктор p должен удалить "шпиона"
+        }
+        // Если деструктор умного указателя работает правильно, шпион перед своей "смертью"
+        // должен выставить is_deleted в true
+        assert(is_deleted);
     }
 
+    // Проверяем работу метода Release
     {
-        auto sorted_cats = GetSortedCats(cats, [](const Cat& lhs, const Cat& rhs) {
-            return tie(lhs.gender, lhs.breed) < tie(rhs.gender, rhs.breed);
-        });
-
-        cout << "Cats sorted by gender and breed:"s << endl;
-        PrintCatPointerValues(sorted_cats, cout);
-        cout << endl;
+        bool is_deleted = false;
+        DeletionSpy* raw_ptr = new DeletionSpy(is_deleted);
+        {
+            ScopedPtr<DeletionSpy> scoped_ptr(raw_ptr);
+            assert(scoped_ptr.Release() == raw_ptr);
+            assert(scoped_ptr.GetRawPtr() == nullptr);
+            // После Release умный указатель не ссылается на объект и не удаляет его при своём удалении
+        }
+        assert(!is_deleted);
+        delete raw_ptr;
+        assert(is_deleted);
     }
-    return 0;
 }
