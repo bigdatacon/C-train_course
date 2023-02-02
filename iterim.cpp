@@ -101,8 +101,12 @@ vector<const Cat*> GetSortedCats(const vector<Cat>& cats, const Comparator& comp
 void PrintCatPointerValues(const vector<const Cat*>& cat_pointers, ostream& out) {
     // Напишите функцию самостоятельно
     cout << "{"s;
+    bool first = true;
     for (const Cat* item_ptr : cat_pointers) {
-            out << *item_ptr << ", "s;
+            if (first) {
+            out << *item_ptr  ;
+            first = false;}
+            else {out << ", "s << *item_ptr  ;}
     }
     cout << "}"s;
 
