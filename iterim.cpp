@@ -69,6 +69,13 @@ public:
     T& operator*() const {
         // Реализуйте самостоятельно
         //2.В операциях * и -> сначала проверьте сырой указатель на равенство nullptr и выбросьте исключение logic_error в случае, когда эти операции вызваны у пустого ScopedPtr. Если всё хорошо, верните ссылку или указ  throw std::logic_error( " logic_error vector empty " );
+        // форма try также не работает 
+        /*try {
+            ptr_ != nullptr;
+            }
+        } catch (const logic_error&) {
+            throw;
+        }*/
         if (ptr_ = nullptr){throw logic_error( " logic_error vector empty " );}
         return &ptr_;
     }
