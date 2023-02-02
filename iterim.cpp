@@ -100,9 +100,11 @@ vector<const Cat*> GetSortedCats(const vector<Cat>& cats, const Comparator& comp
 // {{Tom, male, breed: Bengal, age:2}, {Charlie, male, breed: Balinese, age:7}}
 void PrintCatPointerValues(const vector<const Cat*>& cat_pointers, ostream& out) {
     // Напишите функцию самостоятельно
+    cout << "{"s;
     for (const Cat* item_ptr : cat_pointers) {
-            out << *item_ptr << endl;
+            out << *item_ptr << ", "s;
     }
+    cout << "}"s;
 
     //return out;
 }
