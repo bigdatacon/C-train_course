@@ -76,7 +76,7 @@ public:
         } catch (const logic_error&) {
             throw;
         }*/
-        if (ptr_ = nullptr){throw logic_error( " logic_error vector empty " );}
+            if (!ptr_){throw logic_error( " logic_error vector empty " );}
         return &ptr_;
     }
 
@@ -84,7 +84,7 @@ public:
     // Выбрасывает исключение std::logic_error, если указатель нулевой
     T* operator->() const {
         // Реализуйте самостоятельно
-        if (ptr_ = nullptr){throw logic_error( " logic_error vector empty " );}
+        if (!ptr_ ){throw logic_error( " logic_error vector empty " );}
         return ptr_;
     }
     
