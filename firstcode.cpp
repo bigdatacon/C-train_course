@@ -78,7 +78,46 @@ private:
         }
         };
 
-//--------octopus
+//--------octopus-- каким должен быть
+class Tentacle {
+public:
+    explicit Tentacle(int id) noexcept;
+    int GetId() const noexcept;
+
+    Tentacle* GetLinkedTentacle() const noexcept {
+        return linked_tentacle_;
+    }
+    void LinkTo(Tentacle& tentacle) noexcept {
+        linked_tentacle_ = &tentacle;
+    }
+    void Unlink() noexcept {
+        linked_tentacle_ = nullptr;
+    }
+
+private:
+    int id_ = 0;
+    Tentacle* linked_tentacle_ = nullptr;
+};
+
+class Octopus {
+public:
+    Octopus();
+    explicit Octopus(int num_tentacles);
+
+    void AddTentacle();
+    size_t GetTentacleCount() const noexcept;
+    const Tentacle& GetTentacle(size_t index) const;
+    Tentacle& GetTentacle(size_t index);
+
+    ~Octopus();
+
+private:
+    void Cleanup() noexcept;
+
+    vector<Tentacle*> tentacles_;
+};
+
+///-- осьминог каким был
 // Щупальце
 class Tentacle {
 public:
