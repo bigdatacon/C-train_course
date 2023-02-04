@@ -38,9 +38,10 @@ class SingleLinkedList {
         Node* next_node = nullptr;
     };
     
+    // создаю конструктор по умолчанию 
+    //SingleLinkedList() {} - так не работает 
     Node* first;
     Node* last;
-
     SingleLinkedList() : first(nullptr), last(nullptr) {}
     
 
