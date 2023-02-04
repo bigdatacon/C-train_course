@@ -2,6 +2,8 @@
 
 // Тут можно подключить scopedptr.h и ptrvector.h, 
 // если они вам понадобятся.
+#include "ptrvector.h"
+#include "scopedptr.h"
 
 #include <new> // Для исключения bad_alloc
 #include <vector>
@@ -102,4 +104,6 @@ private:
 
     // Вектор хранит указатели на щупальца. Сами объекты щупалец находятся в куче
     std::vector<Tentacle*> tentacles_;
+    PtrVector<std::vector<Tentacle*>> tentacles_ptr_vector_(tentacles_);  // -- оборацияю tentacles_ в ptrvector
+
 };
