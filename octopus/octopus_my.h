@@ -45,7 +45,9 @@ public:
         Tentacle* t = nullptr;
         try {
             for (int i = 1; i <= num_tentacles; ++i) {
-                t = new Tentacle(i);      // Может выбросить исключение bad_alloc
+                //t = new ScopedPtr(Tentacle(i)); //- так не работает
+                t = new Tentacle(i);  
+                // Может выбросить исключение bad_alloc
                 tentacles_.push_back(t);  // Может выбросить исключение bad_alloc
 
                 // Обнуляем указатель на щупальце, которое уже добавили в tentacles_,
