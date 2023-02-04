@@ -84,7 +84,6 @@ public:
         Tentacle* t = nullptr;
         t = new Tentacle(GetTentacleCount()+1);
         tentacles_.GetItems().push_back(ScopedPtr(t));
-        t = nullptr;
         t.Release();
         return *tentacles_.back(); // возвращаю разименованный послдений 
         
