@@ -114,7 +114,7 @@ private:
 
     // Вектор хранит указатели на щупальца. Сами объекты щупалец находятся в куче
     //std::vector<Tentacle*> tentacles_;
-    PtrVector<Tentacle> tentacles_;
+    PtrVector<Tentacle*> tentacles_;
     
 
 };
