@@ -51,9 +51,6 @@ public:
             }
             return size;
 
-        
-        assert(false);
-        return 42;
     }
 
     // Сообщает, пустой ли список за время O(1)
@@ -61,8 +58,7 @@ public:
         // Заглушка. Реализуйте метод самостоятельно
         return this->head_ == NULL;  // так нашел в интернете 
         
-        assert(false);
-        return false;
+
     }
 
 private:
