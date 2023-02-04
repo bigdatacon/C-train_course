@@ -45,10 +45,8 @@ public:
         Tentacle* t = nullptr;
         try {
             for (int i = 1; i <= num_tentacles; ++i) {
-                //t = new ScopedPtr(Tentacle(i)); //- так не работает
-                t = new Tentacle(i);  
-                // Может выбросить исключение bad_alloc
-                tentacles_.push_back(t);  // Может выбросить исключение bad_alloc
+                t = new Tentacle(i);  // Может выбросить исключение bad_alloc
+                tentacles_.GetItems().push_back(t);  // Может выбросить исключение bad_alloc
 
                 // Обнуляем указатель на щупальце, которое уже добавили в tentacles_,
                 // чтобы не удалить его в обработчике catch повторно
@@ -85,8 +83,9 @@ public:
     //     Реализуйте добавление щупальца самостоятельно
         Tentacle* t = nullptr;
         t = new Tentacle(ScopedPtr(GetTentacleCount()+1)); 
-        tentacles_.push_back(t);
+        tentacles_.GetItems().push_back(t);
         t = nullptr;
+        t.Release();
         return *tentacles_.back(); // возвращаю разименованный послдений 
         
     }
@@ -114,7 +113,7 @@ private:
 
     // Вектор хранит указатели на щупальца. Сами объекты щупалец находятся в куче
     //std::vector<Tentacle*> tentacles_;
-    PtrVector<Tentacle*> tentacles_;
+    PtrVector<Tentacle> tentacles_;
     
 
 };
