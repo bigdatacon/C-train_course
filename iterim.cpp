@@ -37,6 +37,12 @@ class SingleLinkedList {
         Type value;
         Node* next_node = nullptr;
     };
+    
+    Node* first;
+    Node* last;
+
+    SingleLinkedList() : first(nullptr), last(nullptr) {}
+    
 
 public:
     // Возвращает количество элементов в списке за время O(1)
