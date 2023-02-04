@@ -77,6 +77,7 @@ public:
     // Возвращает ссылку на добавленное щупальце
     Tentacle& AddTentacle() {
     //     Реализуйте добавление щупальца самостоятельно
+        tentacles_.push_back(GetTentacleCount()+1); // Добавляю новоу щупальце в tentacles_ c id = количеству щупалец, увеличенному на 1.
         return &Tentacle(GetTentacleCount()+1).GetId(); // созданю новое щупальце с id = tentacles_.size()+1 и возвращаю id этого щупальца через GetId()
         
     }
