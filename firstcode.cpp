@@ -1,267 +1,172 @@
-#include "octopus.h"
-
+#include <algorithm>
 #include <cassert>
-#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 using namespace std;
-
 /*
-Используйте классы ScopedPtr и PtrVector. С ними класс Octopus станет заметно проще.
-Когда щупальца хранятся внутри PtrVector, создавать собственный конструктор копирования и деструктор для класса Octopus не придётся — конструктор копирования PtrVector корректно скопирует щупальца, а деструктор удалит их.
+Подсказка
+Чтобы написать надёжную операцию присваивания, используйте идиому copy-and-swap.
+Пригодится метод swap класса vector. Этот метод обменивает содержимое двух контейнеров за время O(1)O(1) и не выбрасывает исключений.
 */
 
-template <typename T>
-class ScopedPtr {
-public:
-    ScopedPtr() = default;
-    explicit ScopedPtr(T* raw_ptr) noexcept {
-        ptr_ = raw_ptr; 
-    }
-    ScopedPtr(const ScopedPtr&) = delete;
-    ~ScopedPtr() {
-        delete ptr_;
-    }
-    T* GetRawPtr() const noexcept {
-        return ptr_;
-    }
-    T* Release() noexcept {
-        T * p = ptr_;
-        ptr_ = nullptr;
-        return p;
-    }
-    explicit operator bool() const noexcept {
-        if (!ptr_) {return false;}
-        else {return true;}
-    }
-    T& operator*() const {
-        if (!ptr_){throw logic_error( " logic_error vector empty " );}
-        return *ptr_;
-    }
-    T* operator->() const {
-        if (!ptr_ ){throw logic_error( " logic_error vector empty " );}
-        return ptr_;
-    }
-private:
-    T* ptr_ = nullptr;
-};
 
-//----------PtrVector
+// Используйте эту заготовку PtrVector или замените её на свою реализацию
 template <typename T>
 class PtrVector {
 public:
     PtrVector() = default;
+
+    // Создаёт вектор указателей на копии объектов из other
     PtrVector(const PtrVector& other) {
-        items_.reserve(other.size());
-        for (const auto item : other.items_) {
-            if(item) {
-                items_.push_back(*item );
-            } else {
-                items_.push_back(nullptr);
-            }
-        }
-    }
-    ~PtrVector() {
-        for (const auto item : items_) {
-        delete item;
-    }
-    }
-    vector<T*>& GetItems() noexcept {
-       return items_;
-    }
-    vector<T*> const& GetItems() const noexcept {
-        return items_;
-    }
-private:
-    vector<T*> items_;
-    int size() const {
-            return items_.size();
-        }
-        };
+        // Резервируем место в vector-е для хранения нужного количества элементов
+        // Благодаря этому при push_back не будет выбрасываться исключение
+        items_.reserve(other.items_.size());
 
-//////////////////////////////////////////////////////////////////////////////////////////////////OCTOPUS каким должен быть 
-class Tentacle {
-public:
-    explicit Tentacle(int id) noexcept;
-    int GetId() const noexcept;
-
-    Tentacle* GetLinkedTentacle() const noexcept {
-        return linked_tentacle_;
-    }
-    void LinkTo(Tentacle& tentacle) noexcept {
-        linked_tentacle_ = &tentacle;
-    }
-    void Unlink() noexcept {
-        linked_tentacle_ = nullptr;
-    }
-
-private:
-    int id_ = 0;
-    Tentacle* linked_tentacle_ = nullptr;
-};
-
-class Octopus {
-public:
-    Octopus();
-    explicit Octopus(int num_tentacles);
-
-    void AddTentacle();
-    size_t GetTentacleCount() const noexcept;
-    const Tentacle& GetTentacle(size_t index) const;
-    Tentacle& GetTentacle(size_t index);
-
-    ~Octopus();
-
-private:
-    void Cleanup() noexcept;
-
-    vector<Tentacle*> tentacles_;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////OCTOPUS каким был в последнем задании
-// Щупальце
-class Tentacle {
-public:
-    explicit Tentacle(int id)
-        : id_(id)
-    {
-    }
-
-    int GetId() const {
-        return id_;
-    }
-
-private:
-    int id_ = 0;
-};
-
-// Осьминог
-class Octopus {
-public:
-    Octopus() {
-        Tentacle* t = nullptr;
         try {
-            for (int i = 1; i <= 8; ++i) {
-                t = new Tentacle(i);      // Может выбросить исключение bad_alloc
-                tentacles_.push_back(t);  // Может выбросить исключение bad_alloc
+            for (auto p : other.items_) {
+                // Копируем объект, если указатель на него ненулевой
+                auto p_copy = p ? new T(*p) : nullptr;  // new может выбросить исключение
 
-                // Обнуляем указатель на щупальце, которое уже добавили в tentacles_,
-                // чтобы не удалить его в обработчике catch повторно
-                t = nullptr;
+                // Не выбросит исключение, т. к. в vector память уже зарезервирована
+                items_.push_back(p_copy);
             }
-        } catch (const bad_alloc&) {
-            // Удаляем щупальца, которые успели попасть в контейнер tentacles_
-            Cleanup();
-            // Удаляем щупальце, которое создали, но не добавили в tentacles_
-            delete t;
-            // Конструктор не смог создать осьминога с восемью щупальцами,
-            // поэтому выбрасываем исключение, чтобы сообщить вызывающему коду об ошибке
-            // throw без параметров внутри catch выполняет ПЕРЕВЫБРОС пойманного исключения
+        } catch (...) {
+            // удаляем элементы в векторе и перевыбрасываем пойманное исключение
+            DeleteItems();
             throw;
         }
     }
 
-    const Tentacle& GetTentacle(int index) const {
-        if (index < 0 || static_cast<size_t>(index) >= tentacles_.size()) {
-            throw out_of_range("Invalid tentacle index"s);
-        }
-        // Чтобы превратить указатель в ссылку, разыменовываем его
-        return *tentacles_[index];
+    // Деструктор удаляет объекты в куче, на которые ссылаются указатели,
+    // в векторе items_
+    ~PtrVector() {
+        DeleteItems();
     }
 
-    ~Octopus() {
-        // Осьминог владеет объектами в динамической памяти (щупальца),
-        // которые должны быть удалены при его разрушении.
-        // Деструктор - лучшее место, чтобы прибраться за собой.
-        Cleanup();
+    // Возвращает ссылку на вектор указателей
+    vector<T*>& GetItems() noexcept {
+        return items_;
+    }
+
+    // Возвращает константную ссылку на вектор указателей
+    vector<T*> const& GetItems() const noexcept {
+        return items_;
     }
 
 private:
-    void Cleanup() {
-        // Удаляем щупальца осьминога из динамической памяти
-        for (Tentacle* t : tentacles_) {
-            delete t;
+    void DeleteItems() noexcept {
+        for (auto p : items_) {
+            delete p;
         }
-        // Очищаем массив указателей на щупальца
-        tentacles_.clear();
     }
 
-    // Вектор хранит указатели на щупальца. Сами объекты щупалец находятся в куче
-    vector<Tentacle*> tentacles_;
+    vector<T*> items_;
 };
 
+// Эта функция main тестирует шаблон класса PtrVector
 int main() {
-    // Проверка конструирования осьминогов
-    {
-        // По умолчанию осьминог имеет 8 щупалец
-        Octopus default_octopus;
-        assert(default_octopus.GetTentacleCount() == 8);
-
-        // Осьминог может иметь отличное от 8 количество щупалец
-        Octopus quadropus(4);
-        assert(quadropus.GetTentacleCount() == 4);
-
-        // И даже вообще не иметь щупалец
-        Octopus coloboque(0);
-        assert(coloboque.GetTentacleCount() == 0);
-    }
-
-    // Осьминогу можно добавлять щупальца
-    {
-        Octopus octopus(1);
-        Tentacle* t0 = &octopus.GetTentacle(0);
-        Tentacle* t1 = &octopus.AddTentacle();
-        assert(octopus.GetTentacleCount() == 2);
-        Tentacle* t2 = &octopus.AddTentacle();
-        assert(octopus.GetTentacleCount() == 3);
-
-        // После добавления щупалец ранее созданные щупальца не меняют своих адресов
-        assert(&octopus.GetTentacle(0) == t0);
-        assert(&octopus.GetTentacle(1) == t1);
-        assert(&octopus.GetTentacle(2) == t2);
-
-        for (int i = 0; i < octopus.GetTentacleCount(); ++i) {
-            assert(octopus.GetTentacle(i).GetId() == i + 1);
+    struct CopyingSpy {
+        CopyingSpy(int& copy_count, int& deletion_count)
+            : copy_count_(copy_count)
+            , deletion_count_(deletion_count) {
         }
-    }
-
-    // Осьминоги могут прицепляться к щупальцам друг друга
-    {
-        Octopus male(2);
-        Octopus female(2);
-
-        assert(male.GetTentacle(0).GetLinkedTentacle() == nullptr);
-
-        male.GetTentacle(0).LinkTo(female.GetTentacle(1));
-        assert(male.GetTentacle(0).GetLinkedTentacle() == &female.GetTentacle(1));
-
-        male.GetTentacle(0).Unlink();
-        assert(male.GetTentacle(0).GetLinkedTentacle() == nullptr);
-    }
-
-    // Копия осьминога имеет свою собственную копию щупалец, которые
-    // копируют состояние щупалец оригинального осьминога
-    {
-        // Перебираем осьминогов с разным количеством щупалец
-        for (int num_tentacles = 0; num_tentacles < 10; ++num_tentacles) {
-            Octopus male(num_tentacles);
-            Octopus female(num_tentacles);
-            // Пусть они хватают друг друга за щупальца
-            for (int i = 0; i < num_tentacles; ++i) {
-                male.GetTentacle(i).LinkTo(female.GetTentacle(num_tentacles - 1 - i));
+        CopyingSpy(const CopyingSpy& rhs)
+            : copy_count_(rhs.copy_count_)          // счётчик копирований
+            , deletion_count_(rhs.deletion_count_)  // счётчик удалений
+        {
+            if (rhs.throw_on_copy_) {
+                throw runtime_error("copy construction failed"s);
             }
-
-            Octopus male_copy(male);
-            // Проверяем состояние щупалец копии
-            assert(male_copy.GetTentacleCount() == male.GetTentacleCount());
-            for (int i = 0; i < male_copy.GetTentacleCount(); ++i) {
-                // Каждое щупальце копии размещается по адресу, отличному от адреса оригинального щупальца
-                assert(&male_copy.GetTentacle(i) != &male.GetTentacle(i));
-                // Каждое щупальце копии прицепляется к тому же щупальцу, что и оригинальное
-                assert(male_copy.GetTentacle(i).GetLinkedTentacle() == male.GetTentacle(i).GetLinkedTentacle());
-            }
+            ++copy_count_;
         }
-        // Если вы видите эту надпись, то разрушение осьминогов, скорее всего,
-        // прошло без неопределённого поведения
-        cout << "Everything is OK"s << endl;
+        ~CopyingSpy() {
+            ++deletion_count_;
+        }
+        void ThrowOnCopy() {
+            throw_on_copy_ = true;
+        }
+
+    private:
+        int& copy_count_;
+        int& deletion_count_;
+        bool throw_on_copy_ = false;
+    };
+
+    // Проверка присваивания
+    {
+        int item0_copy_count = 0;
+        int item0_deletion_count = 0;
+        {
+            PtrVector<CopyingSpy> v;
+
+            v.GetItems().push_back(new CopyingSpy(item0_copy_count, item0_deletion_count));
+            v.GetItems().push_back(nullptr);
+            {
+                PtrVector<CopyingSpy> v_copy;
+                v_copy = v;
+                assert(v_copy.GetItems().size() == v.GetItems().size());
+                assert(v_copy.GetItems().at(0) != v.GetItems().at(0));
+                assert(v_copy.GetItems().at(1) == nullptr);
+                assert(item0_copy_count == 1);
+                assert(item0_deletion_count == 0);
+            }
+            assert(item0_deletion_count == 1);
+        }
+        assert(item0_deletion_count == 2);
+    }
+
+    // Проверка корректности самоприсваивания
+    {
+        int item0_copy_count = 0;
+        int item0_deletion_count = 0;
+
+        PtrVector<CopyingSpy> v;
+        v.GetItems().push_back(new CopyingSpy(item0_copy_count, item0_deletion_count));
+        CopyingSpy* first_item = v.GetItems().front();
+
+        v = v;
+        assert(v.GetItems().size() == 1);
+        // При самоприсваивании объекты должны быть расположены по тем же адресам
+        assert(v.GetItems().front() == first_item);
+        assert(item0_copy_count == 0);
+        assert(item0_deletion_count == 0);
+    }
+
+    // Проверка обеспечения строгой гарантии безопасности исключений при присваивании
+    {
+        int item0_copy_count = 0;
+        int item0_deletion_count = 0;
+
+        int item1_copy_count = 0;
+        int item1_deletion_count = 0;
+
+        // v хранит 2 элемента
+        PtrVector<CopyingSpy> v;
+        v.GetItems().push_back(new CopyingSpy(item0_copy_count, item0_deletion_count));
+        v.GetItems().push_back(new CopyingSpy(item1_copy_count, item1_deletion_count));
+
+        int other_item0_copy_count = 0;
+        int other_item0_deletion_count = 0;
+        // other_vector хранит 1 элемент, при копировании которого будет выброшено исключение
+        PtrVector<CopyingSpy> other_vector;
+        other_vector.GetItems().push_back(new CopyingSpy(other_item0_copy_count, other_item0_deletion_count));
+        other_vector.GetItems().front()->ThrowOnCopy();
+
+        // Сохраняем массив указателей
+        auto v_items(v.GetItems());
+
+        try {
+            v = other_vector;
+            // Операция должна выбросить исключение
+            assert(false);
+        } catch (const runtime_error&) {
+        }
+
+        // Элементы массива должны остаться прежними
+        assert(v.GetItems() == v_items);
+        assert(item0_copy_count == 0);
+        assert(item1_copy_count == 0);
+        assert(other_item0_copy_count == 0);
     }
 }
