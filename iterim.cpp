@@ -52,10 +52,11 @@ public:
         // Заглушка. Реализуйте метод самостоятельно
         // Возможно вместо this нужно использовать Node
             int size = 0;
-            if (this->/*value*/ first != NULL)
+            if ( this != NULL)
             {
                 size += 1;
-                GetSize(this-> next_node);//переход к следующему элементу}
+                this = this-> next_node;
+                GetSize();//переход к следующему элементу}
             }
             return size;
 
