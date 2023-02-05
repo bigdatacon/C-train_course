@@ -51,13 +51,21 @@ public:
     [[nodiscard]] size_t GetSize() const noexcept {
         // Заглушка. Реализуйте метод самостоятельно
         // Возможно вместо this нужно использовать Node
-            int size = 0;
+         int size = 0;
+        Node* p = first;
+        while (p) {
+            size += 1;
+            p = p->next_node;
+        }
+        
+        
+            /*int size = 0;
             if ( this != NULL)
             {
                 size += 1;
                 this = this-> next_node;
                 GetSize();//переход к следующему элементу}
-            }
+            }*/
             return size;
 
     }
