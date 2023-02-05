@@ -42,10 +42,10 @@ class SingleLinkedList {
 		friend class SingleLinkedList;
 
 		// Конвертирующий конструктор итератора из указателя на узел списка
-		explicit BasicIterator(Node* node) node_(node) {
+		explicit BasicIterator(Node* node) /*node_(node)*/ {
 			//assert(false);
 			// Реализуйте конструктор самостоятельно
-            //return node_ = node;  -- или так 
+            return node_ = node;  //-- так тоже не работает и как Выше написано node_(node) - тоже не работает 
 		}
 
 	public:
