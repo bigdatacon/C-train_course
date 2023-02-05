@@ -38,23 +38,24 @@ class SingleLinkedList {
         Node* next_node = nullptr;
     };
     
+public:  
     // создаю конструктор по умолчанию 
-    //SingleLinkedList() {} - так не работает 
+    //SingleLinkedList() {} - так не работа
     Node* first;
     Node* last;
     SingleLinkedList() : first(nullptr), last(nullptr) {}
     
 
-public:
+
     // Возвращает количество элементов в списке за время O(1)
     [[nodiscard]] size_t GetSize() const noexcept {
         // Заглушка. Реализуйте метод самостоятельно
         // Возможно вместо this нужно использовать Node
             int size = 0;
-            if (this->Next != NULL)
+            if (this->/*value*/ first != NULL)
             {
                 size += 1;
-                GetSize(this->Next);//переход к следующему элементу}
+                GetSize(this-> next_node);//переход к следующему элементу}
             }
             return size;
 
@@ -63,7 +64,7 @@ public:
     // Сообщает, пустой ли список за время O(1)
     [[nodiscard]] bool IsEmpty() const noexcept {
         // Заглушка. Реализуйте метод самостоятельно
-        return this->head_ == NULL;  // так нашел в интернете 
+        return first == nullptr;  // так нашел в интернете 
         
 
     }
