@@ -106,7 +106,7 @@ public:
   using const_reference = const value_type&;
 
   using Iterator = BasicIterator<Type>;
-    using ConstIterator = BasicIterator<const Type>;
+  using ConstIterator = BasicIterator<const Type>;
 
   [[nodiscard]] Iterator begin() noexcept {
     return Iterator(first);
@@ -242,7 +242,19 @@ public:
      */
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
         // Заглушка. Реализуйте метод самостоятельно
-        return {};
+        //Node* next = first->next_node;
+        for (ConstIterator it = head_ ; it != last; it++) {
+                if (it->next_node == pos){
+                // итератора 
+                node_base* my_node = pos;
+                std::unique_ptr<node_base> old_next = std::move(my_node->next_node);
+                std::unique_ptr<node<T>> new_node = std::make_unique<node<T>>(std::move(old_next), std::move(value));
+                my_node->next = std::move(new_node);
+                return my_node->next.get();
+                
+                }
+            }
+        
     }
 
     void PopFront() noexcept {
