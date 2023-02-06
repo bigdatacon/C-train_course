@@ -186,7 +186,7 @@ public:
         assert(size_ == 0 && head_.next_node == nullptr);
         SingleLinkedList tmp;
         /* скопировать внутрь tmp элементы other */
-        for (auto item : items) {
+        for (auto item : values) {
             PushFront(item);
         }
         // После того как элементы скопированы, обмениваем данные текущего списка и tmp
@@ -199,8 +199,8 @@ public:
                 assert(size_ == 0 && head_.next_node == nullptr);
         SingleLinkedList tmp;
         /* скопировать внутрь tmp элементы other */
-        for (auto item : items) {
-            PushFront(item);
+        for (auto item : other) {
+            PushFront(item.value);
         }
         // После того как элементы скопированы, обмениваем данные текущего списка и tmp
         swap(tmp);
