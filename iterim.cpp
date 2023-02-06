@@ -15,131 +15,131 @@ using namespace std;
 
 template <typename Type>
 class SingleLinkedList {
-  struct Node {
-    Node() = default;
-    Node(const Type& val, Node* next)
-      : value(val)
-      , next_node(next) {
-    }
-    Type value;
-    Node* next_node = nullptr;
-  };
+    struct Node {
+        Node() = default;
+        Node(const Type& val, Node* next)
+            : value(val)
+            , next_node(next) {
+        }
+        Type value;
+        Node* next_node = nullptr;
+    };
 
 
-  template <typename ValueType>
-  class BasicIterator {
-    friend class SingleLinkedList;
+    template <typename ValueType>
+    class BasicIterator {
+        friend class SingleLinkedList;
 
-    explicit BasicIterator(Node* node) {
-      node_ = node;
-    }
+        explicit BasicIterator(Node* node) {
+            node_ = node;
+        }
 
-  public:
+    public:
 
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = Type;
-    using difference_type = std::ptrdiff_t;
-    using pointer = ValueType*;
-    using reference = ValueType&;
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = Type;
+        using difference_type = std::ptrdiff_t;
+        using pointer = ValueType*;
+        using reference = ValueType&;
 
-    BasicIterator() = default;
+        BasicIterator() = default;
 
-    BasicIterator(const BasicIterator<Type>& other) noexcept {
-      node_ = other.node_;
-    }
+        BasicIterator(const BasicIterator<Type>& other) noexcept {
+            node_ = other.node_;
+        }
 
-    BasicIterator(const BasicIterator<const Type>& other) noexcept {
-      node_ = other.node_;
-    }
+        BasicIterator(const BasicIterator<const Type>& other) noexcept {
+            node_ = other.node_;
+        }
 
-    BasicIterator& operator=(const BasicIterator<ValueType>& rhs) = default;
+        BasicIterator& operator=(const BasicIterator<ValueType>& rhs) = default;
 
-    [[nodiscard]] bool operator==(const BasicIterator<const Type>& rhs) const noexcept {
-      return (node_ == rhs.node_);
-    }
+        [[nodiscard]] bool operator==(const BasicIterator<const Type>& rhs) const noexcept {
+            return (node_ == rhs.node_);
+        }
 
-    [[nodiscard]] bool operator!=(const BasicIterator<const Type>& rhs) const noexcept {
-      return (node_ != rhs.node_);
-    }
+        [[nodiscard]] bool operator!=(const BasicIterator<const Type>& rhs) const noexcept {
+            return (node_ != rhs.node_);
+        }
 
-    [[nodiscard]] bool operator==(const BasicIterator<Type>& rhs) const noexcept {
-      return (node_ == rhs.node_);
-    }
+        [[nodiscard]] bool operator==(const BasicIterator<Type>& rhs) const noexcept {
+            return (node_ == rhs.node_);
+        }
 
-    [[nodiscard]] bool operator!=(const BasicIterator<Type>& rhs) const noexcept {
-      return (node_ != rhs.node_);
-    }
+        [[nodiscard]] bool operator!=(const BasicIterator<Type>& rhs) const noexcept {
+            return (node_ != rhs.node_);
+        }
 
-    BasicIterator& operator++() noexcept {
-      if (node_) { node_ = node_->next_node; };
-      return *this;
-    }
+        BasicIterator& operator++() noexcept {
+            if (node_) { node_ = node_->next_node; };
+            return *this;
+        }
 
-    BasicIterator operator++(int) noexcept {
-      auto old_value(*this); 
-      if (node_) { node_ = node_->next_node; };
-      return old_value;      
-    }
+        BasicIterator operator++(int) noexcept {
+            auto old_value(*this);
+            if (node_) { node_ = node_->next_node; };
+            return old_value;
+        }
 
-    [[nodiscard]] reference operator*() const noexcept {
-      return node_->value;
-    }
+        [[nodiscard]] reference operator*() const noexcept {
+            return node_->value;
+        }
 
-    [[nodiscard]] pointer operator->() const noexcept {
-      return &node_->value;
-    }
+        [[nodiscard]] pointer operator->() const noexcept {
+            return &node_->value;
+        }
 
-  private:
-    Node* node_ = nullptr;
-  };
+    private:
+        Node* node_ = nullptr;
+    };
 
 public:
-  Node* first = nullptr;
-  Node* last = nullptr;
-  SingleLinkedList() : first(nullptr) {}
+    Node* first = nullptr;
+    Node* last = nullptr;
+    SingleLinkedList() : first(nullptr) {}
 
-  ~SingleLinkedList() {
-    Clear();
-  }
-  using value_type = Type;
-  using reference = value_type&;
-  using const_reference = const value_type&;
+    ~SingleLinkedList() {
+        Clear();
+    }
+    using value_type = Type;
+    using reference = value_type&;
+    using const_reference = const value_type&;
 
-  using Iterator = BasicIterator<Type>;
-  using ConstIterator = BasicIterator<const Type>;
+    using Iterator = BasicIterator<Type>;
+    using ConstIterator = BasicIterator<const Type>;
 
-  [[nodiscard]] Iterator begin() noexcept {
-    return Iterator(first);
-  }
+    [[nodiscard]] Iterator begin() noexcept {
+        return Iterator(head_.next_node);
+    }
 
-  [[nodiscard]] Iterator end() noexcept {
-    return Iterator(nullptr);
-  }
+    [[nodiscard]] Iterator end() noexcept {
+        return Iterator(nullptr);
+    }
 
-  [[nodiscard]] ConstIterator begin() const noexcept {
-    return ConstIterator(first); 
-  }
+    [[nodiscard]] ConstIterator begin() const noexcept {
+        return ConstIterator(head_.next_node);
+    }
 
-  [[nodiscard]] ConstIterator end() const noexcept {
-    return ConstIterator(nullptr);
-  }
+    [[nodiscard]] ConstIterator end() const noexcept {
+        return ConstIterator(nullptr);
+    }
 
-  [[nodiscard]] ConstIterator cbegin() const noexcept {
-    return ConstIterator(first); 
-  }
+    [[nodiscard]] ConstIterator cbegin() const noexcept {
+        return ConstIterator(head_.next_node);
+    }
 
-  [[nodiscard]] ConstIterator cend() const noexcept {
-    return ConstIterator(nullptr); 
-  }
-  
-  SingleLinkedList(std::initializer_list<Type> values) {
-       
+    [[nodiscard]] ConstIterator cend() const noexcept {
+        return ConstIterator(nullptr);
+    }
+
+    SingleLinkedList(std::initializer_list<Type> values) {
+
         SingleLinkedList tmp;
-        for (auto item: values) {
+        for (auto item : values) {
             tmp.PushBack(item);
         }
 
-        swap(tmp);   
+        swap(tmp);
     }
 
     SingleLinkedList(const SingleLinkedList& other) {
@@ -152,70 +152,71 @@ public:
     }
 
     SingleLinkedList& operator=(const SingleLinkedList& rhs) {
-       if (this != &rhs){
+        if (this != &rhs) {
             SingleLinkedList tmp;
             for (auto item : rhs) {
                 tmp.PushBack(item);
             }
             swap(tmp);
-       }
-       return *this;
+        }
+        return *this;
     }
 
     void swap(SingleLinkedList& other) noexcept {
-        Node * tmp = other.first;
-        other.first = first;
-        first = tmp;
+        Node* tmp = other.head_.next_node;
+        other.head_.next_node = head_.next_node;
+        head_.next_node = tmp;
         tmp = other.last;
         other.last = last;
         last = tmp;
     }
 
-  [[nodiscard]] size_t GetSize() const noexcept {
-    int size = 0;
-    Node* p = first;
-    while (p) {
-      size += 1;
-      p = p->next_node;
+    [[nodiscard]] size_t GetSize() const noexcept {
+        int size = 0;
+        Node* p = head_.next_node;
+        while (p) {
+            size += 1;
+            p = p->next_node;
+        }
+        return size;
+
     }
-    return size;
 
-  }
-
-  [[nodiscard]] bool IsEmpty() const noexcept {
-    return first == nullptr;  
-  }
-
-  void PushFront(const Type& value) {
-    first = new Node(value, first);
-    if (!last) {
-        last = first;
+    [[nodiscard]] bool IsEmpty() const noexcept {
+        return head_.next_node == nullptr;
     }
-    ++size_;
-  }
 
-  void PushBack(const Type& value) {
-    if (last) {
-        last->next_node = new Node(value, nullptr);
-        last = last->next_node;
-    } else {
-        first = new Node(value, first);
-        last = first;
+    void PushFront(const Type& value) {
+        head_.next_node = new Node(value, head_.next_node);
+        if (!last) {
+            last = head_.next_node;
+        }
+        ++size_;
     }
-  }
 
-  void Clear() noexcept {
-    while (first) {
-      Node* next = first->next_node;
-      delete first;
-      first = next;
+    void PushBack(const Type& value) {
+        if (last) {
+            last->next_node = new Node(value, nullptr);
+            last = last->next_node;
+        }
+        else {
+            head_.next_node = new Node(value, head_.next_node);
+            last = head_.next_node;
+        }
     }
-    first = nullptr;
-    last = nullptr;
-  }
-  
-  // Возвращает итератор, указывающий на позицию перед первым элементом односвязного списка.
-    // Разыменовывать этот итератор нельзя - попытка разыменования приведёт к неопределённому поведению
+
+    void Clear() noexcept {
+        while (head_.next_node) {
+            Node* next = head_.next_node->next_node;
+            delete head_.next_node;
+            head_.next_node = next;
+        }
+        head_.next_node = nullptr;
+        last = nullptr;
+    }
+
+    // Возвращает итератор, указывающий на позицию перед первым элементом односвязного списка.
+      // Разыменовывать этот итератор нельзя - попытка разыменования приведёт к неопределённому поведению
     [[nodiscard]] Iterator before_begin() noexcept {
         // Реализуйте самостоятельно
         return Iterator(&head_);
@@ -242,43 +243,43 @@ public:
      */
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
         // Заглушка. Реализуйте метод самостоятельно
-        //Node* next = first->next_node;
-        for (ConstIterator it = head_ ; it != last; it++) {
-                if (it->next_node == pos){
+        //Node* next = head_.next_node->next_node;
+        for (ConstIterator it = head_; it != last; it++) {
+            if (it->next_node == pos) {
                 // итератора 
                 node_base* my_node = pos;
                 std::unique_ptr<node_base> old_next = std::move(my_node->next_node);
                 std::unique_ptr<node<T>> new_node = std::make_unique<node<T>>(std::move(old_next), std::move(value));
                 my_node->next = std::move(new_node);
                 return my_node->next.get();
-                
-                }
+
             }
-        
+        }
+
     }
 
     void PopFront() noexcept {
         // Реализуйте метод самостоятельно
-          Node* second_el_node = first->next_node;  // нахожу второй элемент
-          delete first;   // удаляю первый 
-          first = second_el_node; // второй становится первым 
+        Node* second_el_node = head_.next_node->next_node;  // нахожу второй элемент
+        delete head_.next_node;   // удаляю первый 
+        head_.next_node = second_el_node; // второй становится первым 
     }
-    }
+}
 
-    /*
-     * Удаляет элемент, следующий за pos.
-     * Возвращает итератор на элемент, следующий за удалённым
-     */
-    Iterator EraseAfter(ConstIterator pos) noexcept {
-        // Заглушка. Реализуйте метод самостоятельно
-        return {};
-    }
-  
-  
+/*
+ * Удаляет элемент, следующий за pos.
+ * Возвращает итератор на элемент, следующий за удалённым
+ */
+Iterator EraseAfter(ConstIterator pos) noexcept {
+    // Заглушка. Реализуйте метод самостоятельно
+    return {};
+}
+
+
 private:
-  // Фиктивный узел, используется для вставки "перед первым элементом"
-  Node head_;
-  size_t size_;
+    // Фиктивный узел, используется для вставки "перед первым элементом"
+    Node head_;
+    size_t size_;
 };
 
 
