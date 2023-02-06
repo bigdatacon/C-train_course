@@ -196,22 +196,23 @@ public:
 
     SingleLinkedList(const SingleLinkedList& other) {
         // Реализуйте конструктор самостоятельно
-                assert(size_ == 0 && head_.next_node == nullptr);
+        assert(size_ == 0 && head_.next_node == nullptr);
         SingleLinkedList tmp;
-        /* скопировать внутрь tmp элементы other */
         for (auto item : other) {
-            PushFront(item.value);
+            tmp.PushFront(item);
         }
-        // После того как элементы скопированы, обмениваем данные текущего списка и tmp
         swap(tmp);
     }
 
     SingleLinkedList& operator=(const SingleLinkedList& rhs) {
         // Реализуйте присваивание самостоятельно
        // ИЗ теория Проверьте, не выполняется присваивание списка самому себе, сравнив адреса левого и правого аргументов операции  присваивания.
-       if (*this != rhs ){
-        const SingleLinkedList& copy{ rhs};
-        swap(copy);
+        if (this != &rhs){
+            SingleLinkedList tmp;
+            for (auto item : rhs) {
+                tmp.PushFront(item);
+            }
+            swap(tmp);
        }
        return *this;
     }
@@ -219,7 +220,13 @@ public:
     // Обменивает содержимое списков за время O(1)
     void swap(SingleLinkedList& other) noexcept {
         // Реализуйте обмен содержимого списков самостоятельно
-       this.swap( other);  // поскоульку тип у other такой же как и у экземпляра класса , то разименование не делаю, а просто swap
+        Node * tmp = other.first;
+        other.first = first;
+        first = tmp;
+        tmp = other.last;
+        other.last = last;
+        last = tmp;
+
     } 
 
 
@@ -275,7 +282,7 @@ template <typename Type>
 bool operator==(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
     // Заглушка. Реализуйте сравнение самостоятельно
     return (lhs.GetSize() == rhs.GetSize() &&
-            equal(lhs.сbegin(), lhs.сend(), rhs.сbegin())
+            equal(lhs.cbegin(), lhs.cend(), rhs.cbegin())
             );
 }
 
@@ -283,15 +290,15 @@ template <typename Type>
 bool operator!=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
     // Заглушка. Реализуйте сравнение самостоятельно
         return (lhs.GetSize() != rhs.GetSize() ||
-            !equal(lhs.сbegin(), lhs.сend(), rhs.сbegin())
+            !equal(lhs.cbegin(), lhs.cend(), rhs.cbegin())
             );
 }
 
 template <typename Type>
 bool operator<(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
     // Заглушка. Реализуйте сравнение самостоятельно
-    return lexicographical_compare(lhs.сbegin(), lhs.сend(),
-                                         rhs.сbegin(), rhs.сend());
+    return lexicographical_compare(lhs.cbegin(), lhs.cend(),
+                                         rhs.cbegin(), rhs.cend());
 }
 
 template <typename Type>
@@ -303,8 +310,8 @@ bool operator<=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>&
 template <typename Type>
 bool operator>(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
     // Заглушка. Реализуйте сравнение самостоятельно
-        return !lexicographical_compare(lhs.сbegin(), lhs.сend(),
-                                         rhs.сbegin(), rhs.сend());
+        return !lexicographical_compare(lhs.cbegin(), lhs.cend(),
+                                         rhs.cbegin(), rhs.cend());
 }
 
 template <typename Type>
