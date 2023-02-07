@@ -1,62 +1,106 @@
 #include <cassert>
-#include <vector>
-#include <iostream>
+#include <cstdlib>
 
-using namespace std;
+template <typename Type>
+class ArrayPtr {
+public:
+    // Инициализирует ArrayPtr нулевым указателем
+    ArrayPtr() = default;
 
-/*
-адание
-Напишите шаблонную функцию ReverseArray, которая заменяет порядок элементов массива на противоположный. Функция принимает адрес первого элемента массива и количество элементов массива.
-Сигнатура функции ReverseArray:
-template <typename T>
-void ReverseArray(T* start, size_t size); 
-Переданный массив может быть пустым или непустым. В случае пустого массива параметр size равен нулю, а указатель start может быть как нулевым, так и ненулевым указателем. Если массив непустой, указатель start будет ненулевым.
-Ограничения
-Функция ReverseArray должна использовать O(1)O(1) дополнительной памяти, то есть её объём не должен зависеть от размера массива. Например, нельзя использовать vector или иной контейнер для промежуточного хранения элементов. Ограничение по времени выполнения — O(N)O(N).
-
-Корректно обрабатывайте вырожденные случаи — пустой массив и массив из одного элемента. Убедитесь, что программа правильно работает с массивами чётного и нечётного размеров.
-*/
-
-template <typename T>
-void ReverseArray(T* start, size_t size) {
-    cout << "before reverse : "s << endl;
-    for (auto i = start; i < (start+ size); ++i ){
-        
-        cout <<  *i << ", "s;}
-    cout <<  endl;
-        //cout << endl;
-    
-    // Напишите тело функции самостоятельно
-    if (size == 0 || size == 1) {return;} // проверяю массив на пустоту
-    else {
-    
-    int minus = size-1;
-    for (auto i = start; i < (start+ size); ++i ){
-        //cout <<"before i : " <<  *i<< endl;
-        auto tmp = *i;
-
-        
-        cout <<"before i : " <<  *i<< " before *i+minus : " <<  *(i+minus)<< " minus : " << minus << "  tmp : "<< tmp <<    endl;
-        *i = *(i+minus);
-        *(i+minus) =  tmp ;
-        minus-=2;
-        cout <<"after i : " <<  *i<<  " *i+minus : "<< *(i+minus) << " minus : " << minus <<   endl;
-        
-        //cout <<"after *i+minus : " <<  *(i+minus)<< " minus : " << minus <<   endl;
+    // Создаёт в куче массив из size элементов типа Type.
+    // Если size == 0, поле raw_ptr_ должно быть равно nullptr
+    explicit ArrayPtr(size_t size) {
+        // Реализуйте конструктор самостоятельно
+        if (size ==0) {raw_ptr_ =nullptr; }
+        else {
+            raw_ptr_ = new Type[size]; 
+        }
         
     }
+
+    // Конструктор из сырого указателя, хранящего адрес массива в куче либо nullptr
+    explicit ArrayPtr(Type* raw_ptr) noexcept {
+        // Реализуйте конструктор самостоятельно
+        raw_ptr_ = raw_ptr; 
     }
-    cout << "final : "s << endl;
-    for (auto i = start; i < (start+ size); ++i )
-        cout <<  *i << ", ";
-    
-}
+
+    // Запрещаем копирование
+    ArrayPtr(const ArrayPtr&) = delete;
+
+    ~ArrayPtr() {
+        // Напишите деструктор самостоятельно
+        delete[] raw_ptr_; 
+    }
+
+    // Запрещаем присваивание
+    ArrayPtr& operator=(const ArrayPtr&) = delete;
+
+    // Прекращает владением массивом в памяти, возвращает значение адреса массива
+    // После вызова метода указатель на массив должен обнулиться
+    [[nodiscard]] Type* Release() noexcept {
+        // Заглушка. Реализуйте метод самостоятельно
+        Type*  p =raw_ptr_;
+        raw_ptr_ = nullptr;
+        return p ;
+   }
+
+    // Возвращает ссылку на элемент массива с индексом index
+    Type& operator[](size_t index) noexcept {
+        // Реализуйте операцию самостоятельно
+        retutn raw_ptr_[index];
+    }
+
+    // Возвращает константную ссылку на элемент массива с индексом index
+    const Type& operator[](size_t index) const noexcept {
+        // Реализуйте операцию самостоятельно
+
+        const_cast<ArrayPtr>( *raw_ptr_[index]);  // не уверен что так но пока так пишу 
+    }
+
+    // Возвращает true, если указатель ненулевой, и false в противном случае
+    explicit operator bool() const {
+        // Заглушка. Реализуйте операцию самостоятельно
+        if (raw_ptr_){return true;}
+        else {
+        return false;}
+    }
+
+    // Возвращает значение сырого указателя, хранящего адрес начала массива
+    Type* Get() const noexcept {
+        // Заглушка. Реализуйте метод самостоятельно
+        return *raw_ptr_;
+    }
+
+    // Обменивается значениям указателя на массив с объектом other
+    void swap(ArrayPtr& other) noexcept {
+        // Реализуйте метод самостоятельно
+        
+        Type* tmp = raw_ptr_;
+        raw_ptr_ = other;
+        other=  tmp;
+        
+        
+    }
+
+private:
+    Type* raw_ptr_ = nullptr;
+};
 
 int main() {
-    using namespace std;
-    
-    //vector<int> v = {1, 2};
-    vector<int> v = {1, 2,3 , 5 };
-    ReverseArray(v.data(), v.size());
-    //assert(v == (vector<int>{2, 1}));
+    ArrayPtr<int> numbers(10);
+    const auto& const_numbers = numbers;
+
+    numbers[2] = 42;
+    assert(const_numbers[2] == 42);
+    assert(&const_numbers[2] == &numbers[2]);
+
+    assert(numbers.Get() == &numbers[0]);
+
+    ArrayPtr<int> numbers_2(5);
+    numbers_2[2] = 43;
+
+    numbers.swap(numbers_2);
+
+    assert(numbers_2[2] == 42);
+    assert(numbers[2] == 43);
 }
