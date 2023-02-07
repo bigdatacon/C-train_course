@@ -94,6 +94,7 @@ class SingleLinkedList {
 	};
 
 public:
+	//Node* head_.next_node = nullptr;
 	//Node* first = nullptr;
 	Node* last = nullptr;
 	SingleLinkedList() : last(nullptr) {}
@@ -216,7 +217,7 @@ public:
 	}
 
 	// Возвращает итератор, указывающий на позицию перед первым элементом односвязного списка.
-	  // Разыменовывать этот итератор нельзя - попытка разыменования приведёт к неопределённому поведению
+  // Разыменовывать этот итератор нельзя - попытка разыменования приведёт к неопределённому поведению
 	[[nodiscard]] Iterator before_begin() noexcept {
 		// Реализуйте самостоятельно
 		return Iterator(&head_);
@@ -241,22 +242,26 @@ public:
 	 * Возвращает итератор на вставленный элемент
 	 * Если при создании элемента будет выброшено исключение, список останется в прежнем состоянии
 	 */
+
+
 	Iterator InsertAfter(ConstIterator pos, const Type& value) {
-		// Заглушка. Реализуйте метод самостоятельно
-		//Node* next = head_.next_node->next_node;
-		for (ConstIterator it = head_; it != last; it++) {
-			if (it->next_node == pos) {
-				// итератора 
-				node_base* my_node = pos;
-				std::unique_ptr<node_base> old_next = std::move(my_node->next_node);
-				std::unique_ptr<node<T>> new_node = std::make_unique<node<T>>(std::move(old_next), std::move(value));
-				my_node->next = std::move(new_node);
-				return my_node->next.get();
-
-			}
+		Node* current = pos.node_;
+		if (current == &head_) {
+			PushFront(value);
+			return ConstIterator(head_.next_node);
 		}
-
+		else if (!current) {
+			throw invalid_argument("Could not insert after end");
+		}
+		else {
+			Node* new_node = new Node(value, current->next_node);
+			current->next_node = new_node;
+			return ConstIterator(current->next_node);
+		}
 	}
+
+
+
 
 	void PopFront() noexcept {
 		// Реализуйте метод самостоятельно
@@ -276,11 +281,56 @@ public:
 	}
 
 
+
+
 private:
 	// Фиктивный узел, используется для вставки "перед первым элементом"
 	Node head_;
 	size_t size_;
 };
+
+
+template <typename Type>
+void swap(SingleLinkedList<Type>& lhs, SingleLinkedList<Type>& rhs) noexcept {
+	lhs.swap(rhs);
+}
+
+template <typename Type>
+bool operator==(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
+	return (lhs.GetSize() == rhs.GetSize() &&
+		equal(lhs.cbegin(), lhs.cend(), rhs.cbegin())
+		);
+}
+
+template <typename Type>
+bool operator!=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
+	return (lhs.GetSize() != rhs.GetSize() ||
+		!equal(lhs.cbegin(), lhs.cend(), rhs.cbegin())
+		);
+}
+
+template <typename Type>
+bool operator<(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
+	return lexicographical_compare(lhs.cbegin(), lhs.cend(),
+		rhs.cbegin(), rhs.cend());
+}
+
+template <typename Type>
+bool operator<=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
+	return (lhs < rhs || lhs == rhs);
+}
+
+template <typename Type>
+bool operator>(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
+	return !lexicographical_compare(lhs.cbegin(), lhs.cend(),
+		rhs.cbegin(), rhs.cend());
+}
+
+template <typename Type>
+bool operator>=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
+	return !(lhs < rhs);
+}
+
 
 
 // Эта функция проверяет работу класса SingleLinkedList
