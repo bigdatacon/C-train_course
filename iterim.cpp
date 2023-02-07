@@ -256,6 +256,7 @@ public:
 		else {
 			Node* new_node = new Node(value, current->next_node);
 			current->next_node = new_node;
+			++size_;
 			return ConstIterator(current->next_node);
 		}
 	}
@@ -277,7 +278,20 @@ public:
 	 */
 	Iterator EraseAfter(ConstIterator pos) noexcept {
 		// Заглушка. Реализуйте метод самостоятельно
-		return {};
+		Node* current = pos.node_;
+		if (current == &head_) {
+			PopFront();
+			return ConstIterator(head_.next_node);
+		}
+		else if (!current) {
+			throw invalid_argument("Could not insert after end");
+		}
+		else {
+			delete current->next_node;
+			--size_;
+			return ConstIterator(current->next_node);  // поскольку current->next_node удален, то новый (после сдвига влева в следствие уданиея элемента current->next_node) current->next_node это
+			//элемент который был следом , справа за удаленным 
+		}
 	}
 
 
