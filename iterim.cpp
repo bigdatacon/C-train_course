@@ -264,16 +264,16 @@ public:
 		delete head_.next_node;   // удаляю первый 
 		head_.next_node = second_el_node; // второй становится первым 
 	}
-}
 
-/*
- * Удаляет элемент, следующий за pos.
- * Возвращает итератор на элемент, следующий за удалённым
- */
-Iterator EraseAfter(ConstIterator pos) noexcept {
-	// Заглушка. Реализуйте метод самостоятельно
-	return {};
-}
+
+	/*
+	 * Удаляет элемент, следующий за pos.
+	 * Возвращает итератор на элемент, следующий за удалённым
+	 */
+	Iterator EraseAfter(ConstIterator pos) noexcept {
+		// Заглушка. Реализуйте метод самостоятельно
+		return {};
+	}
 
 
 private:
