@@ -269,6 +269,7 @@ public:
 		Node* second_el_node = head_.next_node->next_node;  // нахожу второй элемент
 		delete head_.next_node;   // удаляю первый 
 		head_.next_node = second_el_node; // второй становится первым 
+		--size_;
 	}
 
 
