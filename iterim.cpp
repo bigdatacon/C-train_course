@@ -39,7 +39,7 @@ void ReverseArray(T* start, size_t size) {
         cout <<"before i : " <<  *i<< " before *i+minus : " <<  *(i+minus)<< " minus : " << minus << "  tmp : "<< tmp <<    endl;
         *i = *(i+minus);
         *(i+minus) =  tmp ;
-        --minus;
+        minus-=2;
         cout <<"after i : " <<  *i<<  " *i+minus : "<< *(i+minus) << " minus : " << minus <<   endl;
         
         //cout <<"after *i+minus : " <<  *(i+minus)<< " minus : " << minus <<   endl;
