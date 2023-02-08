@@ -43,8 +43,8 @@ using namespace std;
 #2  0x0000000000405d15 in __gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > >::operator* (this=0x64fb30)
     at C:/dev/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/debug/safe_iterator.h:268
 #3  0x000000000040312d in PrintRangeComma<__gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > > > (range_begin=9,
-    range_end=-1414812757) at qww.cpp:57
-#4  0x00000000004016ce in main () at qww.cpp:103
+    range_end=-1414812757) at qww.cpp:34
+#4  0x00000000004016ce in main () at qww.cpp:80
  * */
 
 // функция выводит элементы контейнера через запятую
@@ -55,7 +55,7 @@ void PrintRangeComma(It range_begin, It range_end) {
     }
     for (auto it = range_begin;;) {
         cout << *it;
-        if (it++ == range_end) {
+        if (it++ == range_end -1) {  //добавил -1 чтобы не выходить за предлелы цикла
             break;
         }
         cout << ", "s;
@@ -72,7 +72,8 @@ void MergeSort(RandomIt range_begin, RandomIt range_end) {
     }
 
     // 2. Создаём вектор, содержащий все элементы текущего диапазона
-    vector<typename RandomIt::value_type> elements(range_end, range_begin);
+    //vector<typename RandomIt::value_type> elements(range_end, range_begin);
+    vector<typename RandomIt::value_type> elements(range_begin, range_end); // поправил тут передал начало и конец
 
     // 3. Разбиваем вектор на две равные части
     auto mid = elements.begin() + range_length / 2;
@@ -84,7 +85,8 @@ void MergeSort(RandomIt range_begin, RandomIt range_end) {
     // 5. С помощью алгоритма merge сливаем отсортированные половины
     // в исходный диапазон
     // merge -> http://ru.cppreference.com/w/cpp/algorithm/merge
-    merge(elements.begin(), elements.end(), mid, mid, range_begin);
+    //merge(elements.begin(), elements.end(), mid, mid, range_begin);
+    merge(elements.begin(), mid, mid, elements.end(), range_begin);  // Вот так нужно но это из готоого решения
 }
 
 int main() {
