@@ -12,12 +12,13 @@ using namespace std;
 // g++ qww.cpp -o find -std=c++17 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1
 // через gdb
 
-//g++ qww.cpp -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1 -g -o qww
-//gdb qww
-//gdb // break abort
-//r
-//bt
-// после bt должна быть показана строка где ошибка
+/*
+g++ qww.cpp -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1 -g -o qww
+gdb qww
+break abort
+r
+bt
+*/
 
 
 // функция выводит элементы контейнера через запятую
