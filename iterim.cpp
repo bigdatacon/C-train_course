@@ -17,7 +17,7 @@ using namespace std;
 //gdb // break abort
 //r
 //bt
-// после bt должна быть показана строка где ошибка 
+// после bt должна быть показана строка где ошибка
 
 
 /*
@@ -42,9 +42,9 @@ using namespace std;
 #1  0x000000006fc62a11 in libstdc++-6!_ZNK11__gnu_debug16_Error_formatter8_M_errorEv () from C:\dev\mingw64\bin\libstdc++-6.dll
 #2  0x0000000000405d15 in __gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > >::operator* (this=0x64fb30)
     at C:/dev/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/debug/safe_iterator.h:268
-#3  0x000000000040312d in PrintRangeComma<__gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > > > (range_begin=9, 
-    range_end=-1414812757) at qww.cpp:34
-#4  0x00000000004016ce in main () at qww.cpp:80
+#3  0x000000000040312d in PrintRangeComma<__gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > > > (range_begin=9,
+    range_end=-1414812757) at qww.cpp:57
+#4  0x00000000004016ce in main () at qww.cpp:103
  * */
 
 // функция выводит элементы контейнера через запятую
