@@ -14,8 +14,6 @@ auto MakeInsertingFunction(vector<SingleLinkedList<Type>>& lists, int x) {
     };
 }
 
-
-
 template <class T>
 void InsertRange(int from, int to, T push_function) {
     for (int i = from; i < to; ++i) {
