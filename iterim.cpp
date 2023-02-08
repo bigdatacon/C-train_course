@@ -20,33 +20,6 @@ using namespace std;
 // после bt должна быть показана строка где ошибка
 
 
-/*
-Задание
-Перед вами решение задачи о сортировке слиянием. В нём несколько модификаций и ошибок. Попробуйте найти все ошибки и исправить их.
-Все ошибки можно выявить отладочными макроопределениями. Используйте их при решении задачи на своём компьютере, поскольку в тренажёре они не включены. Если у вас компилятор Visual Studio, проверки включены всегда в отладочной конфигурации.
-Формат выходных данных
-Функция PrintRangeComma выводит элементы контейнера между заданными итераторами через запятую и начинает новую строку. Для пустого контейнера она не выводит ничего. Запятая после последнего элемента не допускается.
-Ограничения
-Не меняйте суть алгоритма, ваша задача только исправить ошибки.
-Пример
-Пример дан в функции main в заготовке.
-
-Подсказка
-Ищите три ошибки: одну в PrintRangeComma и две в MergeSort.
-*/
-
-/*
- Что нашел отладчик:
- (gdb) bt
-#0  0x00007ff97e49f1e7 in msvcrt!abort () from C:\Windows\System32\msvcrt.dll
-#1  0x000000006fc62a11 in libstdc++-6!_ZNK11__gnu_debug16_Error_formatter8_M_errorEv () from C:\dev\mingw64\bin\libstdc++-6.dll
-#2  0x0000000000405d15 in __gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > >::operator* (this=0x64fb30)
-    at C:/dev/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/debug/safe_iterator.h:268
-#3  0x000000000040312d in PrintRangeComma<__gnu_debug::_Safe_iterator<__gnu_cxx::__normal_iterator<int*, std::__cxx1998::vector<int, std::allocator<int> > >, std::__debug::vector<int, std::allocator<int> > > > (range_begin=9,
-    range_end=-1414812757) at qww.cpp:34
-#4  0x00000000004016ce in main () at qww.cpp:80
- * */
-
 // функция выводит элементы контейнера через запятую
 template <typename It>
 void PrintRangeComma(It range_begin, It range_end) {
@@ -62,6 +35,8 @@ void PrintRangeComma(It range_begin, It range_end) {
     }
     cout << endl;
 }
+
+
 
 template <typename RandomIt>
 void MergeSort(RandomIt range_begin, RandomIt range_end) {
