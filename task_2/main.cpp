@@ -9,10 +9,12 @@ using namespace std;
 // выполняющий вставку в выбранный список
 template <class Type>
 auto MakeInsertingFunction(vector<SingleLinkedList<Type>>& lists, int x) {
-    return [&](const Type& value) {
+    return [&lists, x](const Type & value) {
         lists[x].PushFront(value);
     };
 }
+
+
 
 template <class T>
 void InsertRange(int from, int to, T push_function) {
