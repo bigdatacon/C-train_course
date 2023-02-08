@@ -235,12 +235,15 @@ public:
         return Iterator{prev_node->next_node};
     }
 
+
+    
     void PopFront() noexcept {
         assert(!IsEmpty());
 
+        auto tmp = head_.next_node->next_node;
         delete head_.next_node;
         // Теперь "голова" списка ссылается на прежний второй узел
-        head_.next_node = head_.next_node->next_node;
+        head_.next_node = tmp;
         --size_;
     }
 
@@ -265,11 +268,13 @@ public:
     void Clear() noexcept {
         // Удаляем элементы начиная с головы списка, пока они не закончатся
         while (head_.next_node != nullptr) {
+            auto tmp = head_.next_node->next_node;
             delete head_.next_node;
-            head_.next_node = head_.next_node->next_node;
+            head_.next_node = tmp;
         }
         size_ = 0;
     }
+
 
     // Обменивает содержимое списков за время O(1)
     void swap(SingleLinkedList& other) noexcept {
