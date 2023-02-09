@@ -40,6 +40,7 @@ public:
     */
     
     void Cut(size_t tokens = 1) {
+        text_buff_.clear();
         for (size_t i = 1; i <= tokens && it_ != text_base_.end(); ++i) {
             text_buff_.push_back(*it_);
             //text_base_.erase(it_);
