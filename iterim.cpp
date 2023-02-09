@@ -57,14 +57,21 @@ public:
         }
     }
 
-
     void Copy(size_t tokens = 1) {
-        text_buff_.clear();
+        //text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
             text_buff_.push_back(*it_);
             //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
         }
     }
+    
+    /*void Copy(size_t tokens = 1) {
+        text_buff_.clear();
+        for (size_t i = 1; i <= tokens; ++i) {
+            text_buff_.push_back(*it_);
+            //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
+        }
+    }*/
 
     // вставить содержимое буфера в текущую позицию курсора
     void Paste() {
