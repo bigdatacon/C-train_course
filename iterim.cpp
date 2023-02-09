@@ -1,90 +1,115 @@
-#include <algorithm>
-#include <iostream>
-#include <numeric>
-#include <vector>
 
-#include <random>
-#include <algorithm>
+#include <cassert>
+#include <vector>
+#include <list>
 #include <iostream>
+#include <iterator>
 
 using namespace std;
 
-// g++ qww.cpp -o find -std=c++17 -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1
-// через gdb
-
 /*
-g++ qww.cpp -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1 -g -o qww
-gdb qww
-break abort
-r
-bt
+Вам понадобятся два списка: один для хранения текста, а другой — для буфера вставки. Итератор — удобное решение для хранения текущей позиции курсора.
+std::list<int>::iterator range_begin = c.begin();
 */
-
-
-// функция выводит элементы контейнера через запятую
-template <typename It>
-void PrintRangeComma(It range_begin, It range_end) {
-    if (range_begin == range_end) {
-        return;
-    }
-    for (auto it = range_begin;;) {
-        cout << *it;
-        if (it++ == range_end -1) {  //добавил -1 чтобы не выходить за предлелы цикла
-            break;
+class Editor {
+public:
+    Editor();
+    // сдвинуть курсор влево
+    void Left();
+    // сдвинуть курсор вправо
+        if (it_ != text_base_.begin()) {
+            --it_;
         }
-        cout << ", "s;
-    }
-    cout << endl;
-}
+    void Right();
+    // вставить символ token
+        if (it_ != text_base_.end()) {
+            ++it_;
+        }
+    void Insert(char token);
+        text_base_.insert(it, token);
+        Right();
+        
+
+    // вырезать не более tokens символов, начиная с текущей позиции курсора
+    void Cut(size_t tokens = 1);
+        for (int i = 1; i <= tokens; ++i) {
+            text_base_.erase(it_);
+            Left();
+        }
+
+    // cкопировать не более tokens символов, начиная с текущей позиции курсора
+    void Copy(size_t tokens = 1);
+        for (int i = 1; i <= tokens; ++i) {
+            text_buff_.insert(*it_);
+            Right();
+        }
 
 
 
-template <typename RandomIt>
-void MergeSort(RandomIt range_begin, RandomIt range_end) {
-    // 1. Если диапазон содержит меньше 2 элементов, выходим из функции
-    int range_length = range_end - range_begin;
-    if (range_length < 2) {
-        return;
-    }
 
-    // 2. Создаём вектор, содержащий все элементы текущего диапазона
-    //vector<typename RandomIt::value_type> elements(range_end, range_begin);
-    vector<typename RandomIt::value_type> elements(range_begin, range_end); // поправил тут передал начало и конец
+    // вставить содержимое буфера в текущую позицию курсора
+    void Paste();
+        for (char el: text_buff_) {
+                text_base_.Insert(el);
+            }
 
-    // 3. Разбиваем вектор на две равные части
-    auto mid = elements.begin() + range_length / 2;
 
-    // 4. Вызываем функцию MergeSort от каждой половины вектора
-    MergeSort(elements.begin(), mid);
-    MergeSort(mid, elements.end());
+    // получить текущее содержимое текстового редактора
+    string GetText() const;
+        string res=""s;
+        for (char el : text_base_) {
+            res +=el;
+        }
+        retutn res;
 
-    // 5. С помощью алгоритма merge сливаем отсортированные половины
-    // в исходный диапазон
-    // merge -> http://ru.cppreference.com/w/cpp/algorithm/merge
-    //merge(elements.begin(), elements.end(), mid, mid, range_begin);
-    merge(elements.begin(), mid, mid, elements.end(), range_begin);  // Вот так нужно но это из готоого решения
-}
+
+private:
+    list<char> text_base_; //один для хранения текста
+    list<char> text_buff_; //а другой — для буфера вставки
+    std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
+};
 
 int main() {
-    vector<int> test_vector(10);
-
-    // iota             -> http://ru.cppreference.com/w/cpp/algorithm/iota
-    // Заполняет диапазон последовательно возрастающими значениями
-    iota(test_vector.begin(), test_vector.end(), 1);
-
-    // random_shuffle   -> https://ru.cppreference.com/w/cpp/algorithm/random_shuffle
-    // Перемешивает элементы в случайном порядке
-    random_shuffle(test_vector.begin(), test_vector.end());
-    //shuffle(test_vector.begin(), test_vector.end());
-
-    // Выводим вектор до сортировки
-    PrintRangeComma(test_vector.begin(), test_vector.end());
-
-    // Сортируем вектор с помощью сортировки слиянием
-    MergeSort(test_vector.begin(), test_vector.end());
-
-    // Выводим результат
-    PrintRangeComma(test_vector.begin(), test_vector.end());
-
+    Editor editor;
+    const string text = "hello, world"s;
+    for (char c : text) {
+        editor.Insert(c);
+    }
+    // Текущее состояние редактора: `hello, world|`
+    for (size_t i = 0; i < text.size(); ++i) {
+        editor.Left();
+    }
+    // Текущее состояние редактора: `|hello, world`
+    editor.Cut(7);
+    // Текущее состояние редактора: `|world`
+    // в буфере обмена находится текст `hello, `
+    for (size_t i = 0; i < 5; ++i) {
+        editor.Right();
+    }
+    // Текущее состояние редактора: `world|`
+    editor.Insert(',');
+    editor.Insert(' ');
+    // Текущее состояние редактора: `world, |`
+    editor.Paste();
+    // Текущее состояние редактора: `world, hello, |`
+    editor.Left();
+    editor.Left();
+    //Текущее состояние редактора: `world, hello|, `
+    editor.Cut(3);  // Будут вырезаны 2 символа
+    // Текущее состояние редактора: `world, hello|`
+    cout << editor.GetText();
     return 0;
 }
+
+/*
+int main() {
+
+	list<int> numbers = {1, 2, 3, 4};
+    list<char> chars = { 's', 'r'};
+	 std::list<int>::iterator it = find(numbers.begin(), numbers.end(), 3);
+    std::list<char>::iterator cht = find(chars.begin(), chars.end(), 's');
+	numbers.erase(it);
+	cout << "end " << endl;
+    
+}
+*/
