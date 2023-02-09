@@ -16,27 +16,35 @@ public:
     Editor(){};
     // сдвинуть курсор влево
     void Left() {
-    // сдвинуть курсор вправо
+    
         if (it_ != text_base_.begin()) {
             --it_;
         }
     }
     void Right() {
-    // вставить символ token
+        // сдвинуть курсор вправо
+    
         if (it_ != text_base_.end()) {
             ++it_;
         }
     }
+
+    
     void Insert(char token) {
+        // вставить символ token
         text_base_.insert(it_, token);
         Right();
     }
-
+        /*
+    Курсор не смещается ни при копировании, ни при вырезании текста. Например, после вырезания из текста ab|cdef фрагмента из трёх символов получим текст ab|f.
+    */
     // вырезать не более tokens символов, начиная с текущей позиции курсора
     void Cut(size_t tokens = 1) {
         for (size_t i = 1; i <= tokens; ++i) {
+            Copy();
             text_base_.erase(it_);
-            Left();
+            //Left();
+            cout << "Текущее состояние редактора в CUT : " << GetText() << endl;
         }
     }
 
@@ -44,7 +52,7 @@ public:
         text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
             text_buff_.push_back(*it_);
-            Right();
+            //Right();
         }
     }
 
