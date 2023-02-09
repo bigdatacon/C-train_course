@@ -13,12 +13,13 @@ std::list<int>::iterator range_begin = c.begin();
 */
 class Editor {
 public:
-    Editor(){};
+   Editor() = default;
     // сдвинуть курсор влево
     void Left() {
     
         if (it_ != text_base_.begin()) {
             --it_;
+            --num_it;
         }
     }
     void Right() {
@@ -26,6 +27,7 @@ public:
     
         if (it_ != text_base_.end()) {
             ++it_;
+            ++num_it;
         }
     }
 
@@ -34,8 +36,11 @@ public:
     */
     void Insert(char token) {
         // вставить символ token
+        //cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
         text_base_.insert(it_, token);
         Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
+        ++num_it;
+        //cout << "Текущее состояние в insert : " << GetText() << endl;
     }
         /*
     Курсор не смещается ни при копировании, ни при вырезании текста. Например, после вырезания из текста ab|cdef фрагмента из трёх символов получим текст ab|f.
@@ -48,7 +53,7 @@ public:
             //text_base_.erase(it_);
             it_ = text_base_.erase(it_);
             //Left(); // не сдвигаю курсор как написано в теории Выше над функцией 
-            cout << "Текущее состояние редактора в CUT : " << GetText() << endl;
+            //cout << "Текущее состояние редактора в CUT : " << GetText() << endl;
         }
     }
 
@@ -76,6 +81,8 @@ public:
         for (char el : text_base_) {
             res +=el;
         }
+        //std::ptrdiff_t index(std::distance(text_base_.begin(), it_));
+        //cout << "in GetText() it position : " << num_it << endl;
         return res;
     }
 
@@ -84,6 +91,7 @@ private:
     list<char> text_base_; //один для хранения текста
     list<char> text_buff_; //а другой — для буфера вставки
     std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
+    int num_it = 0;
 };
 int main() {
     Editor editor;
@@ -92,36 +100,27 @@ int main() {
         editor.Insert(c);
     }
     // Текущее состояние редактора: `hello, world|`
-    cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
     for (size_t i = 0; i < text.size(); ++i) {
         editor.Left();
     }
     // Текущее состояние редактора: `|hello, world`
-    cout << "Текущее состояние редактора: `|hello, world` : " << editor.GetText() << endl;
     editor.Cut(7);
     // Текущее состояние редактора: `|world`
-    cout << "Текущее состояние редактора: `|world` : " << editor.GetText() << endl;
     // в буфере обмена находится текст `hello, `
     for (size_t i = 0; i < 5; ++i) {
         editor.Right();
     }
     // Текущее состояние редактора: `world|`
-    cout << "Текущее состояние редактора до insert: `world|` : " << editor.GetText() << endl;
     editor.Insert(',');
     editor.Insert(' ');
     // Текущее состояние редактора: `world, |`
-    cout << "Текущее состояние редактора: `world, |` :    " << endl;
     editor.Paste();
     // Текущее состояние редактора: `world, hello, |`
- 
-    cout << "Текущее состояние редактора: `world, |` :    " << endl;
     editor.Left();
     editor.Left();
     //Текущее состояние редактора: `world, hello|, `
-    cout << "Текущее состояние редактора: `world, hello|, ` :    " << endl;
     editor.Cut(3);  // Будут вырезаны 2 символа
     // Текущее состояние редактора: `world, hello|`
-    cout << "Текущее состояние редактора: `world, hello|`   " << endl;
     cout << editor.GetText();
     return 0;
 }
