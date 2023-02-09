@@ -62,6 +62,7 @@ public:
     void Paste() {
         for (char el: text_buff_) {
             text_base_.insert(it_, el);
+            Right();
         }
     }
 
