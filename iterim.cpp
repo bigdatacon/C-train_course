@@ -78,27 +78,36 @@ int main() {
         editor.Insert(c);
     }
     // Текущее состояние редактора: `hello, world|`
+    cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
     for (size_t i = 0; i < text.size(); ++i) {
         editor.Left();
     }
     // Текущее состояние редактора: `|hello, world`
+    cout << "Текущее состояние редактора: `|hello, world` : " << editor.GetText() << endl;
     editor.Cut(7);
     // Текущее состояние редактора: `|world`
+    cout << "Текущее состояние редактора: `|world` : " << editor.GetText() << endl;
     // в буфере обмена находится текст `hello, `
     for (size_t i = 0; i < 5; ++i) {
         editor.Right();
     }
     // Текущее состояние редактора: `world|`
+    cout << "Текущее состояние редактора: `world|` : " << editor.GetText() << endl;
     editor.Insert(',');
     editor.Insert(' ');
     // Текущее состояние редактора: `world, |`
+    cout << "Текущее состояние редактора: `world, |` :    " << endl;
     editor.Paste();
     // Текущее состояние редактора: `world, hello, |`
+ 
+    cout << "Текущее состояние редактора: `world, |` :    " << endl;
     editor.Left();
     editor.Left();
     //Текущее состояние редактора: `world, hello|, `
+    cout << "Текущее состояние редактора: `world, hello|, ` :    " << endl;
     editor.Cut(3);  // Будут вырезаны 2 символа
     // Текущее состояние редактора: `world, hello|`
+    cout << "Текущее состояние редактора: `world, hello|`   " << endl;
     cout << editor.GetText();
     return 0;
 }
