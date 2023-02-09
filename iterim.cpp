@@ -13,7 +13,7 @@ std::list<int>::iterator range_begin = c.begin();
 */
 class Editor {
 public:
-    Editor();
+    Editor(){};
     // сдвинуть курсор влево
     void Left() {
     // сдвинуть курсор вправо
