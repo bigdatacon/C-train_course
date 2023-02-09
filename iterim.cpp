@@ -33,20 +33,22 @@ public:
     void Insert(char token) {
         // вставить символ token
         text_base_.insert(it_, token);
-        Right();
+        //Right();
     }
         /*
     Курсор не смещается ни при копировании, ни при вырезании текста. Например, после вырезания из текста ab|cdef фрагмента из трёх символов получим текст ab|f.
     */
-    // вырезать не более tokens символов, начиная с текущей позиции курсора
+    
     void Cut(size_t tokens = 1) {
-        for (size_t i = 1; i <= tokens; ++i) {
-            Copy();
-            text_base_.erase(it_);
+        for (size_t i = 1; i <= tokens && it_ != text_base_.end(); ++i) {
+            text_buff_.push_back(*it_);
+            //text_base_.erase(it_);
+            it_ = text_base_.erase(it_);
             //Left();
             cout << "Текущее состояние редактора в CUT : " << GetText() << endl;
         }
     }
+
 
     void Copy(size_t tokens = 1) {
         text_buff_.clear();
@@ -100,7 +102,7 @@ int main() {
         editor.Right();
     }
     // Текущее состояние редактора: `world|`
-    cout << "Текущее состояние редактора: `world|` : " << editor.GetText() << endl;
+    cout << "Текущее состояние редактора до insert: `world|` : " << editor.GetText() << endl;
     editor.Insert(',');
     editor.Insert(' ');
     // Текущее состояние редактора: `world, |`
