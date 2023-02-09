@@ -19,7 +19,7 @@ public:
     
         if (it_ != text_base_.begin()) {
             --it_;
-            --num_it;
+            //--num_it;
         }
     }
     void Right() {
@@ -27,7 +27,7 @@ public:
     
         if (it_ != text_base_.end()) {
             ++it_;
-            ++num_it;
+           // ++num_it;
         }
     }
 
@@ -39,7 +39,7 @@ public:
         //cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
         text_base_.insert(it_, token);
         Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
-        ++num_it;
+        //++num_it;
         //cout << "Текущее состояние в insert : " << GetText() << endl;
     }
         /*
@@ -60,7 +60,7 @@ public:
     }
 
     void Copy(size_t tokens = 1) {
-        //text_buff_.clear();
+        text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
             text_buff_.push_back(*it_);
             //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
@@ -100,7 +100,7 @@ private:
     list<char> text_base_; //один для хранения текста
     list<char> text_buff_; //а другой — для буфера вставки
     std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
-    int num_it = 0;
+    //int num_it = 0;
 };
 int main() {
     Editor editor;
