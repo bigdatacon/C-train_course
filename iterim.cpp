@@ -15,52 +15,55 @@ class Editor {
 public:
     Editor();
     // сдвинуть курсор влево
-    void Left();
+    void Left() {
     // сдвинуть курсор вправо
         if (it_ != text_base_.begin()) {
             --it_;
         }
-    void Right();
+    }
+    void Right() {
     // вставить символ token
         if (it_ != text_base_.end()) {
             ++it_;
         }
-    void Insert(char token);
-        text_base_.insert(it, token);
+    }
+    void Insert(char token) {
+        text_base_.insert(it_, token);
         Right();
-        
+    }
 
     // вырезать не более tokens символов, начиная с текущей позиции курсора
-    void Cut(size_t tokens = 1);
-        for (int i = 1; i <= tokens; ++i) {
+    void Cut(size_t tokens = 1) {
+        for (size_t i = 1; i <= tokens; ++i) {
             text_base_.erase(it_);
             Left();
         }
+    }
 
-    // cкопировать не более tokens символов, начиная с текущей позиции курсора
-    void Copy(size_t tokens = 1);
-        for (int i = 1; i <= tokens; ++i) {
-            text_buff_.insert(*it_);
+    void Copy(size_t tokens = 1) {
+        text_buff_.clear();
+        for (size_t i = 1; i <= tokens; ++i) {
+            text_buff_.push_back(*it_);
             Right();
         }
-
-
-
+    }
 
     // вставить содержимое буфера в текущую позицию курсора
-    void Paste();
+    void Paste() {
         for (char el: text_buff_) {
-                text_base_.Insert(el);
-            }
+            text_base_.insert(it_, el);
+        }
+    }
 
 
     // получить текущее содержимое текстового редактора
-    string GetText() const;
+    string GetText() const {
         string res=""s;
         for (char el : text_base_) {
             res +=el;
         }
-        retutn res;
+        return res;
+    }
 
 
 private:
@@ -68,7 +71,6 @@ private:
     list<char> text_buff_; //а другой — для буфера вставки
     std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
 };
-
 int main() {
     Editor editor;
     const string text = "hello, world"s;
