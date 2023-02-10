@@ -68,29 +68,24 @@ public:
         }
         for (auto el : text_buff_) {cout << el << endl;}
     }*/
+
     
     void Copy(size_t tokens = 1) {
         text_buff_.clear();
-        for (size_t i = 1; i <= tokens; ++i) {
+        size_t actual_tokens = 0;
+        for (size_t i = 1; i <= tokens && it_ != text_base_.end(); ++i) {
             text_buff_.push_back(*it_);
-            cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
+            //cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
             Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
+            actual_tokens++;
         }
-        for (size_t i = 1; i <= tokens; ++i) {
+        for (size_t i = 1; i <= actual_tokens&& it_ != text_base_.begin(); ++i) {
             Left();
-            cout << "*it for copy afer : " << *it_ << endl;  // смотрю что пишет
+            //cout << "*it for copy afer : " << *it_ << endl;  // смотрю что пишет
         }
         for (auto el : text_buff_) {cout << el << endl;}
     }
     
-    
-    /*void Copy(size_t tokens = 1) {
-        text_buff_.clear();
-        for (size_t i = 1; i <= tokens; ++i) {
-            text_buff_.push_back(*it_);
-            //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
-        }
-    }*/
 
     // вставить содержимое буфера в текущую позицию курсора
     void Paste() {
@@ -109,7 +104,7 @@ public:
             res +=el;
         }
         //std::ptrdiff_t index(std::distance(text_base_.begin(), it_));
-        cout << "in GetText() it_ position : " << num_it << endl;
+        //cout << "in GetText() it_ position : " << num_it << endl;
         return res;
     }
 
@@ -131,7 +126,7 @@ int main() {
         editor.Left();
     }
     // Текущее состояние редактора: `|hello, world`
-    editor.Copy(3);
+    //editor.Copy(3);
     editor.Cut(7);
     // Текущее состояние редактора: `|world`
     // в буфере обмена находится текст `hello, `
