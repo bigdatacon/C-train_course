@@ -74,13 +74,13 @@ public:
         for (size_t i = 1; i <= tokens; ++i) {
             text_buff_.push_back(*it_);
             cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
-            //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
+            Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
         }
         for (size_t i = 1; i <= tokens; ++i) {
             Left();
-            //cout << "*it for copy afer : " << *it_ << endl;  // смотрю что пишет
+            cout << "*it for copy afer : " << *it_ << endl;  // смотрю что пишет
         }
-        //for (auto el : text_buff_) {cout << el << endl;}
+        for (auto el : text_buff_) {cout << el << endl;}
     }
     
     
@@ -131,7 +131,7 @@ int main() {
         editor.Left();
     }
     // Текущее состояние редактора: `|hello, world`
-    //editor.Copy(3);
+    editor.Copy(3);
     editor.Cut(7);
     // Текущее состояние редактора: `|world`
     // в буфере обмена находится текст `hello, `
