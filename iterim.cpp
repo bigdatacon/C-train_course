@@ -38,7 +38,7 @@ public:
         // вставить символ token
         //cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
         text_base_.insert(it_, token);
-        Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
+        //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
         //++num_it;
         //cout << "Текущее состояние в insert : " << GetText() << endl;
     }
@@ -62,10 +62,23 @@ public:
     void Copy(size_t tokens = 1) {
         text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
+            cout << "*it for copy : " << *it_ << endl;
             text_buff_.push_back(*it_);
             //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
         }
     }
+    
+    /*void Copy(size_t tokens = 1) {
+        //text_buff_.clear();
+        for (size_t i = 1; i <= tokens; ++i) {
+            text_buff_.push_back(*it_);
+            Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
+        }
+        for (size_t i = 1; i <= tokens; ++i) {
+            Left();
+        }
+    }*/
+    
     
     /*void Copy(size_t tokens = 1) {
         text_buff_.clear();
@@ -79,7 +92,7 @@ public:
     void Paste() {
         for (char el: text_buff_) {
             text_base_.insert(it_, el);
-            Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
+            //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
         }
     }
 
@@ -125,6 +138,9 @@ int main() {
     // Текущее состояние редактора: `world, |`
     editor.Paste();
     // Текущее состояние редактора: `world, hello, |`
+    editor.Copy(3);
+    
+    
     editor.Left();
     editor.Left();
     //Текущее состояние редактора: `world, hello|, `
