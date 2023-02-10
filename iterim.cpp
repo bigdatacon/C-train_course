@@ -62,10 +62,11 @@ public:
     void Copy(size_t tokens = 1) {
         text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
-            cout << "*it for copy : " << *it_ << endl;
+            cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
             text_buff_.push_back(*it_);
             //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
         }
+        for (auto el : text_buff_) {cout << el << endl;}
     }
     
     /*void Copy(size_t tokens = 1) {
