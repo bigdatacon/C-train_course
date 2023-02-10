@@ -19,7 +19,7 @@ public:
     
         if (it_ != text_base_.begin()) {
             --it_;
-            //--num_it;
+            --num_it;
         }
     }
     void Right() {
@@ -27,7 +27,7 @@ public:
     
         if (it_ != text_base_.end()) {
             ++it_;
-           // ++num_it;
+            ++num_it;
         }
     }
 
@@ -39,7 +39,7 @@ public:
         //cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
         text_base_.insert(it_, token);
         //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
-        //++num_it;
+        ++num_it;
         //cout << "Текущее состояние в insert : " << GetText() << endl;
     }
         /*
@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void Copy(size_t tokens = 1) {
+    /*void Copy(size_t tokens = 1) {
         text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
             cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
@@ -67,18 +67,21 @@ public:
             //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
         }
         for (auto el : text_buff_) {cout << el << endl;}
-    }
+    }*/
     
-    /*void Copy(size_t tokens = 1) {
-        //text_buff_.clear();
+    void Copy(size_t tokens = 1) {
+        text_buff_.clear();
         for (size_t i = 1; i <= tokens; ++i) {
             text_buff_.push_back(*it_);
-            Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
+            cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
+            //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
         }
         for (size_t i = 1; i <= tokens; ++i) {
             Left();
+            //cout << "*it for copy afer : " << *it_ << endl;  // смотрю что пишет
         }
-    }*/
+        //for (auto el : text_buff_) {cout << el << endl;}
+    }
     
     
     /*void Copy(size_t tokens = 1) {
@@ -93,6 +96,7 @@ public:
     void Paste() {
         for (char el: text_buff_) {
             text_base_.insert(it_, el);
+            ++num_it;
             //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
         }
     }
@@ -105,7 +109,7 @@ public:
             res +=el;
         }
         //std::ptrdiff_t index(std::distance(text_base_.begin(), it_));
-        //cout << "in GetText() it position : " << num_it << endl;
+        cout << "in GetText() it_ position : " << num_it << endl;
         return res;
     }
 
@@ -114,7 +118,7 @@ private:
     list<char> text_base_; //один для хранения текста
     list<char> text_buff_; //а другой — для буфера вставки
     std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
-    //int num_it = 0;
+    int num_it = 0;
 };
 int main() {
     Editor editor;
@@ -127,6 +131,7 @@ int main() {
         editor.Left();
     }
     // Текущее состояние редактора: `|hello, world`
+    //editor.Copy(3);
     editor.Cut(7);
     // Текущее состояние редактора: `|world`
     // в буфере обмена находится текст `hello, `
@@ -139,7 +144,7 @@ int main() {
     // Текущее состояние редактора: `world, |`
     editor.Paste();
     // Текущее состояние редактора: `world, hello, |`
-    editor.Copy(3);
+    
     
     
     editor.Left();
@@ -148,6 +153,7 @@ int main() {
     editor.Cut(3);  // Будут вырезаны 2 символа
     // Текущее состояние редактора: `world, hello|`
     cout << editor.GetText();
+    
     return 0;
 }
 
