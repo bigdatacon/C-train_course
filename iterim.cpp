@@ -27,7 +27,8 @@ vector<string_view> SplitIntoWordsView(string_view str) {
         if (space == pos_end) {result.push_back(str.substr(0, pos_end));}
         else {result.push_back(str.substr(0, space));
                      //4.Сдвиньте начало str так, чтобы оно указывало на позицию за пробелом. Это можно сделать методом remove_prefix, передвигая начало str на указанное в аргументе количество позиций.
-        str.remove_prefix(std::min(str.find_first_not_of(" "), str.size())); // поскольку найдено слово до пробела , просто удаляю пробел 
+        str.remove_prefix(std::min(str.find_first_not_of(" "), str.size())); // поскольку найдено слово до пробела , просто удаляю пробел . если пробелов несколько
+              // до удалятся все пробелы до первого не пробельного символа или до конца строки 
              }
     }
     return result;
@@ -46,7 +47,6 @@ vector<string_view> SplitIntoWordsView(string_view str) {
         result.push_back(space == pos_end ? str.substr(pos) : str.substr(pos, space - pos));
         pos = str.find_first_not_of(" ", space);
     }
-
     return result;
 }
 */
