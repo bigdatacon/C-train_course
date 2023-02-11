@@ -1,166 +1,66 @@
-
 #include <cassert>
-#include <vector>
-#include <list>
 #include <iostream>
-#include <iterator>
+#include <string_view>
+#include <vector>
+#include <algorithm>
+
 
 using namespace std;
 
-/*
-Вам понадобятся два списка: один для хранения текста, а другой — для буфера вставки. Итератор — удобное решение для хранения текущей позиции курсора.
-std::list<int>::iterator range_begin = c.begin();
-*/
-class Editor {
-public:
-   Editor() = default;
-    // сдвинуть курсор влево
-    void Left() {
-    
-        if (it_ != text_base_.begin()) {
-            --it_;
-            --num_it;
-        }
-    }
-    void Right() {
-        // сдвинуть курсор вправо
-    
-        if (it_ != text_base_.end()) {
-            ++it_;
-            ++num_it;
-        }
-    }
 
-    /*
-    Введённый символ располагается в позиции курсора, сдвигая курсор и весь текст справа от него на одну позицию вправо. Аналогично при вставке фрагмента длиной n курсор и текст справа от него смещаются на n позиций вправо. В таблице приведены примеры, демонстрирующие это правило.
-    */
-    void Insert(char token) {
-        // вставить символ token
-        //cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
-        text_base_.insert(it_, token);
-        //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
-        ++num_it;
-        //cout << "Текущее состояние в insert : " << GetText() << endl;
-    }
-        /*
-    Курсор не смещается ни при копировании, ни при вырезании текста. Например, после вырезания из текста ab|cdef фрагмента из трёх символов получим текст ab|f.
-    */
-    
-    
-    
-    void Cut(size_t tokens = 1) {
-        text_buff_.clear();
-        for (size_t i = 1; i <= tokens && it_ != text_base_.end(); ++i) {
-            text_buff_.push_back(*it_);
-            //text_base_.erase(it_);
-            it_ = text_base_.erase(it_);
-            //Left(); // не сдвигаю курсор как написано в теории Выше над функцией 
-            //cout << "Текущее состояние редактора в CUT : " << GetText() << endl;
-        }
-    }
-
-    /*void Copy(size_t tokens = 1) {
-        text_buff_.clear();
-        for (size_t i = 1; i <= tokens; ++i) {
-            cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
-            text_buff_.push_back(*it_);
-            //Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
-        }
-        for (auto el : text_buff_) {cout << el << endl;}
-    }*/
-
-    
-    void Copy(size_t tokens = 1) {
-        text_buff_.clear();
-        size_t actual_tokens = 0;
-        for (size_t i = 1; i <= tokens && it_ != text_base_.end(); ++i) {
-            text_buff_.push_back(*it_);
-            //cout << "*it for copy : " << *it_ << endl;  // смотрю что пишет
-            Right(); // не сдвигаю курсор как написано в теории Выше над функцией 
-            actual_tokens++;
-        }
-        for (size_t i = 1; i <= actual_tokens&& it_ != text_base_.begin(); ++i) {
-            Left();
-            //cout << "*it for copy afer : " << *it_ << endl;  // смотрю что пишет
-        }
-        for (auto el : text_buff_) {cout << el << endl;}
-    }
-    
-
-    // вставить содержимое буфера в текущую позицию курсора
-    void Paste() {
-        for (char el: text_buff_) {
-            text_base_.insert(it_, el);
-            ++num_it;
-            //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
-        }
-    }
+//Вернитесь к описанию алгоритма или откройте документацию для методов find и substr. Пока эти страницы есть только на английском.
+// новая реализация 
 
 
-    // получить текущее содержимое текстового редактора
-    string GetText() const {
-        string res=""s;
-        for (char el : text_base_) {
-            res +=el;
-        }
-        //std::ptrdiff_t index(std::distance(text_base_.begin(), it_));
-        //cout << "in GetText() it_ position : " << num_it << endl;
-        return res;
-    }
-
-
-private:
-    list<char> text_base_; //один для хранения текста
-    list<char> text_buff_; //а другой — для буфера вставки
-    std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
-    int num_it = 0;
-};
-int main() {
-    Editor editor;
-    const string text = "hello, world"s;
-    for (char c : text) {
-        editor.Insert(c);
-    }
-    // Текущее состояние редактора: `hello, world|`
-    for (size_t i = 0; i < text.size(); ++i) {
-        editor.Left();
-    }
-    // Текущее состояние редактора: `|hello, world`
-    //editor.Copy(3);
-    editor.Cut(7);
-    // Текущее состояние редактора: `|world`
-    // в буфере обмена находится текст `hello, `
-    for (size_t i = 0; i < 5; ++i) {
-        editor.Right();
-    }
-    // Текущее состояние редактора: `world|`
-    editor.Insert(',');
-    editor.Insert(' ');
-    // Текущее состояние редактора: `world, |`
-    editor.Paste();
-    // Текущее состояние редактора: `world, hello, |`
+vector<string_view> SplitIntoWordsView(string_view str) {
+    vector<string_view> result;
+    //1.Удалите начало из str до первого непробельного символа, воспользовавшись методом remove_prefix. Он уберёт из string_view указанное количество символов.
+    str.remove_prefix(std::min(str.find_first_not_of(" "), str.size()));
+    //std::cout << "View  : '" << v << "'\n";
     
+    const int64_t pos_end = str.npos;
     
+    //Цикл следует продолжать, пока строка str непуста. Можно найти инвариант: в начале итерации цикла str никогда не начинается с пробела.
     
-    editor.Left();
-    editor.Left();
-    //Текущее состояние редактора: `world, hello|, `
-    editor.Cut(3);  // Будут вырезаны 2 символа
-    // Текущее состояние редактора: `world, hello|`
-    cout << editor.GetText();
-    
-    return 0;
+    while (!str.empty()) {
+        //2.В цикле используйте метод find с одним параметром, чтобы найти номер позиции первого пробела.
+        int64_t space = str.find(' '); // поскольку возможный пробел в начале уже обрезан, просто нахожу позицию первого пробела 
+        //3.Добавьте в результирующий вектор элемент string_view, полученный вызовом метода substr, где начальная позиция будет 0, а конечная — найденная позиция пробела или npos.
+        result.push_back(space == pos_end ? str.substr(0, pos_end) : str.substr(0, space ));
+        
+        //4.Сдвиньте начало str так, чтобы оно указывало на позицию за пробелом. Это можно сделать методом remove_prefix, передвигая начало str на указанное в аргументе количество позиций.
+        str.remove_prefix(std::min(str.find_first_not_of(" "), str.size())); // поскольку найдено слово до пробела , просто удаляю пробел 
+    }
+    return result;
 }
 
-/*
-int main() {
 
-	list<int> numbers = {1, 2, 3, 4};
-    list<char> chars = { 's', 'r'};
-	 std::list<int>::iterator it = find(numbers.begin(), numbers.end(), 3);
-    std::list<char>::iterator cht = find(chars.begin(), chars.end(), 's');
-	numbers.erase(it);
-	cout << "end " << endl;
+// прежняя реализация 
+/*
+vector<string_view> SplitIntoWordsView(string_view str) {
+    vector<string_view> result;
+    int64_t pos = str.find_first_not_of(" ");
+    const int64_t pos_end = str.npos;
     
+    while (pos != pos_end) {
+        int64_t space = str.find(' ', pos);
+        result.push_back(space == pos_end ? str.substr(pos) : str.substr(pos, space - pos));
+        pos = str.find_first_not_of(" ", space);
+    }
+
+    return result;
 }
 */
+
+int main() {
+    assert((SplitIntoWordsView("") == vector<string_view>{}));
+    assert((SplitIntoWordsView("     ") == vector<string_view>{}));
+    assert((SplitIntoWordsView("aaaaaaa") == vector{"aaaaaaa"sv}));
+    assert((SplitIntoWordsView("a") == vector{"a"sv}));
+    assert((SplitIntoWordsView("a b c") == vector{"a"sv, "b"sv, "c"sv}));
+    assert((SplitIntoWordsView("a    bbb   cc") == vector{"a"sv, "bbb"sv, "cc"sv}));
+    assert((SplitIntoWordsView("  a    bbb   cc") == vector{"a"sv, "bbb"sv, "cc"sv}));
+    assert((SplitIntoWordsView("a    bbb   cc   ") == vector{"a"sv, "bbb"sv, "cc"sv}));
+    assert((SplitIntoWordsView("  a    bbb   cc   ") == vector{"a"sv, "bbb"sv, "cc"sv}));
+    cout << "All OK" << endl;
+}
