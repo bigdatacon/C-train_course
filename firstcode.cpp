@@ -1,40 +1,127 @@
+#pragma once
+
 #include <cassert>
-#include <iostream>
-#include <string_view>
-#include <vector>
-#include <algorithm>
+#include <initializer_list>
+#include "array_ptr.h"
 
-
-using namespace std;
 
 /*
-Самый простой способ реализации словаря — это, конечно, контейнер-словарь. В данном случае удобно держать два контейнера, чтобы обеспечить поиск слов и для прямого перевода, и для обратного. Хранить в этих словарях строки — расточительство. Но строки вам всё равно нужны, так как строки могут быть уничтожены до уничтожения объекта Translator. Сохраните их себе в удобном контейнере.
+В методе Resize отдельно обработайте три ситуации: новый размер меньше или равен текущему, новый размер не превышает его вместимости, новый размер превышает текущую вместимость вектора.
+Если при изменении размера массива новый размер вектора превышает его текущую вместимость, создайте новый массив с нужной вместимостью, скопируйте в него прежнее содержимое и заполните остальные элементы значением по умолчанию. Затем старый массив можно удалить и использовать копию. После этого не забудьте обновить размер и вместимость вектора.
+Если при увеличении размера массива новый размер вектора не превышает его вместимость, заполните добавленные элементы значением по умолчанию для типа Type.
+При уменьшении размера вектора просто уменьшите его размер.
+Примените алгоритмы std::copy и std::fill для копирования элементов массива и заполнения их некоторым значением.
+В методе Clear достаточно обнулить размер массива.
 */
 
 
-class Translator {
+
+template <typename Type>
+class SimpleVector {
 public:
-    void Add(string_view source, string_view target);
-    string_view TranslateForward(string_view source) const;
-    string_view TranslateBackward(string_view target) const;
+    using Iterator = Type*;
+    using ConstIterator = const Type*;
 
-private:
-    // ...
-}
+    SimpleVector() noexcept = default;
 
+    // Создаёт вектор из size элементов, инициализированных значением по умолчанию
+    explicit SimpleVector(size_t size) {
+        // Напишите тело конструктора самостоятельно
+    }
 
+    // Создаёт вектор из size элементов, инициализированных значением value
+    SimpleVector(size_t size, const Type& value) {
+        // Напишите тело конструктора самостоятельно
+    }
 
-void TestSimple() {
-    Translator translator;
-    translator.Add(string("okno"s), string("window"s));
-    translator.Add(string("stol"s), string("table"s));
+    // Создаёт вектор из std::initializer_list
+    SimpleVector(std::initializer_list<Type> init) {
+        // Напишите тело конструктора самостоятельно
+    }
 
-    assert(translator.TranslateForward("okno"s) == "window"s);
-    assert(translator.TranslateBackward("table"s) == "stol"s);
-    assert(translator.TranslateForward("table"s) == ""s);
-}
+    // Возвращает количество элементов в массиве
+    size_t GetSize() const noexcept {
+        // Напишите тело самостоятельно
+        return 0;
+    }
 
-int main() {
-    TestSimple();
-    return 0;
-}
+    // Возвращает вместимость массива
+    size_t GetCapacity() const noexcept {
+        // Напишите тело самостоятельно
+        return 0;
+    }
+
+    // Сообщает, пустой ли массив
+    bool IsEmpty() const noexcept {
+        return true;
+    }
+
+    // Возвращает ссылку на элемент с индексом index
+    Type& operator[](size_t index) noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает константную ссылку на элемент с индексом index
+    const Type& operator[](size_t index) const noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает константную ссылку на элемент с индексом index
+    // Выбрасывает исключение std::out_of_range, если index >= size
+    Type& At(size_t index) {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает константную ссылку на элемент с индексом index
+    // Выбрасывает исключение std::out_of_range, если index >= size
+    const Type& At(size_t index) const {
+        // Напишите тело самостоятельно
+    }
+
+    // Обнуляет размер массива, не изменяя его вместимость
+    void Clear() noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Изменяет размер массива.
+    // При увеличении размера новые элементы получают значение по умолчанию для типа Type
+    void Resize(size_t new_size) {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает итератор на начало массива
+    // Для пустого массива может быть равен (или не равен) nullptr
+    Iterator begin() noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает итератор на элемент, следующий за последним
+    // Для пустого массива может быть равен (или не равен) nullptr
+    Iterator end() noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает константный итератор на начало массива
+    // Для пустого массива может быть равен (или не равен) nullptr
+    ConstIterator begin() const noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает итератор на элемент, следующий за последним
+    // Для пустого массива может быть равен (или не равен) nullptr
+    ConstIterator end() const noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает константный итератор на начало массива
+    // Для пустого массива может быть равен (или не равен) nullptr
+    ConstIterator cbegin() const noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Возвращает итератор на элемент, следующий за последним
+    // Для пустого массива может быть равен (или не равен) nullptr
+    ConstIterator cend() const noexcept {
+        // Напишите тело самостоятельно
+    }
+};
