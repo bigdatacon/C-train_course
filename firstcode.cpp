@@ -2,32 +2,39 @@
 #include <iostream>
 #include <string_view>
 #include <vector>
+#include <algorithm>
+
 
 using namespace std;
 
-vector<string_view> SplitIntoWordsView(string_view str) {
-    vector<string_view> result;
-    int64_t pos = str.find_first_not_of(" ");
-    const int64_t pos_end = str.npos;
-    
-    while (pos != pos_end) {
-        int64_t space = str.find(' ', pos);
-        result.push_back(space == pos_end ? str.substr(pos) : str.substr(pos, space - pos));
-        pos = str.find_first_not_of(" ", space);
-    }
+/*
+Самый простой способ реализации словаря — это, конечно, контейнер-словарь. В данном случае удобно держать два контейнера, чтобы обеспечить поиск слов и для прямого перевода, и для обратного. Хранить в этих словарях строки — расточительство. Но строки вам всё равно нужны, так как строки могут быть уничтожены до уничтожения объекта Translator. Сохраните их себе в удобном контейнере.
+*/
 
-    return result;
+
+class Translator {
+public:
+    void Add(string_view source, string_view target);
+    string_view TranslateForward(string_view source) const;
+    string_view TranslateBackward(string_view target) const;
+
+private:
+    // ...
+}
+
+
+
+void TestSimple() {
+    Translator translator;
+    translator.Add(string("okno"s), string("window"s));
+    translator.Add(string("stol"s), string("table"s));
+
+    assert(translator.TranslateForward("okno"s) == "window"s);
+    assert(translator.TranslateBackward("table"s) == "stol"s);
+    assert(translator.TranslateForward("table"s) == ""s);
 }
 
 int main() {
-    assert((SplitIntoWordsView("") == vector<string_view>{}));
-    assert((SplitIntoWordsView("     ") == vector<string_view>{}));
-    assert((SplitIntoWordsView("aaaaaaa") == vector{"aaaaaaa"sv}));
-    assert((SplitIntoWordsView("a") == vector{"a"sv}));
-    assert((SplitIntoWordsView("a b c") == vector{"a"sv, "b"sv, "c"sv}));
-    assert((SplitIntoWordsView("a    bbb   cc") == vector{"a"sv, "bbb"sv, "cc"sv}));
-    assert((SplitIntoWordsView("  a    bbb   cc") == vector{"a"sv, "bbb"sv, "cc"sv}));
-    assert((SplitIntoWordsView("a    bbb   cc   ") == vector{"a"sv, "bbb"sv, "cc"sv}));
-    assert((SplitIntoWordsView("  a    bbb   cc   ") == vector{"a"sv, "bbb"sv, "cc"sv}));
-    cout << "All OK" << endl;
+    TestSimple();
+    return 0;
 }
