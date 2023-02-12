@@ -44,7 +44,7 @@ public:
 
 	// Создаёт вектор из std::initializer_list
 	SimpleVector(std::initializer_list<Type> init) :  array_ptr_(init.size()) {
-        std::copy (init.begin(), init.end(), std::back_inserter(array_ptr_));
+        std::copy (init.begin(), init.end(), array_ptr_.Get());
         size_ = init.size();
 		capacity_ = size_;
         
@@ -105,7 +105,7 @@ public:
 	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
 	void Resize(size_t new_size) {
 		// Напишите тело самостоятельно
-		if (new_size <= size_) { size = new_size; }
+		if (new_size <= size_) { size_ = new_size; }
 
 		// случай когда увеличивается размер вектора до размера <= capacity
 		if (new_size > size_ && new_size <= capacity_) {
