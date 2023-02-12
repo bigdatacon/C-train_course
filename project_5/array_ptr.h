@@ -4,88 +4,134 @@
 template <typename Type>
 class ArrayPtr {
 public:
-    // Инициализирует ArrayPtr нулевым указателем
-    ArrayPtr() = default;
+	// Инициализирует ArrayPtr нулевым указателем
+	ArrayPtr() = default;
+	using Iterator = Type*;
+	using ConstIterator = const Type*;
 
-    // Создаёт в куче массив из size элементов типа Type.
-    // Если size == 0, поле raw_ptr_ должно быть равно nullptr
-    explicit ArrayPtr(size_t size) {
-        // Реализуйте конструктор самостоятельно
-        if (size ==0) {raw_ptr_ =nullptr; }
-        else {
-            raw_ptr_ = new Type[size]; 
-        }
-        
-    }
+	// Создаёт в куче массив из size элементов типа Type.
+	// Если size == 0, поле raw_ptr_ должно быть равно nullptr
+	explicit ArrayPtr(size_t size) {
+		// Реализуйте конструктор самостоятельно
+		if (size == 0) { raw_ptr_ = nullptr; }
+		else {
+			raw_ptr_ = new Type[size];
+		}
 
-    // Конструктор из сырого указателя, хранящего адрес массива в куче либо nullptr
-    explicit ArrayPtr(Type* raw_ptr) noexcept {
-        // Реализуйте конструктор самостоятельно
-        raw_ptr_ = raw_ptr; 
-    }
+	}
 
-    // Запрещаем копирование
-    ArrayPtr(const ArrayPtr&) = delete;
+	// Конструктор из сырого указателя, хранящего адрес массива в куче либо nullptr
+	explicit ArrayPtr(Type* raw_ptr) noexcept {
+		// Реализуйте конструктор самостоятельно
+		raw_ptr_ = raw_ptr;
+	}
 
-    ~ArrayPtr() {
-        // Напишите деструктор самостоятельно
-        delete[] raw_ptr_; 
-    }
+	// Запрещаем копирование
+	ArrayPtr(const ArrayPtr&) = delete;
 
-    // Запрещаем присваивание
-    ArrayPtr& operator=(const ArrayPtr&) = delete;
+	~ArrayPtr() {
+		// Напишите деструктор самостоятельно
+		delete[] raw_ptr_;
+	}
 
-    // Прекращает владением массивом в памяти, возвращает значение адреса массива
-    // После вызова метода указатель на массив должен обнулиться
-    [[nodiscard]] Type* Release() noexcept {
-        // Заглушка. Реализуйте метод самостоятельно
-        Type*  p =raw_ptr_;
-        raw_ptr_ = nullptr;
-        return p ;
-   }
+	// Запрещаем присваивание
+	ArrayPtr& operator=(const ArrayPtr&) = delete;
 
-    // Возвращает ссылку на элемент массива с индексом index
-    Type& operator[](size_t index) noexcept {
-        // Реализуйте операцию самостоятельно
-        return raw_ptr_[index];
-    }
+	// Прекращает владением массивом в памяти, возвращает значение адреса массива
+	// После вызова метода указатель на массив должен обнулиться
+	[[nodiscard]] Type* Release() noexcept {
+		// Заглушка. Реализуйте метод самостоятельно
+		Type* p = raw_ptr_;
+		raw_ptr_ = nullptr;
+		return p;
+	}
 
-    // Возвращает константную ссылку на элемент массива с индексом index
-    const Type& operator[](size_t index) const noexcept {
-        // Реализуйте операцию самостоятельно
+	// Возвращает ссылку на элемент массива с индексом index
+	Type& operator[](size_t index) noexcept {
+		// Реализуйте операцию самостоятельно
+		return raw_ptr_[index];
+	}
 
-        return  raw_ptr_[index];
-    }
+	// Возвращает константную ссылку на элемент массива с индексом index
+	const Type& operator[](size_t index) const noexcept {
+		// Реализуйте операцию самостоятельно
 
-    // Возвращает true, если указатель ненулевой, и false в противном случае
-    explicit operator bool() const {
-        // Заглушка. Реализуйте операцию самостоятельно
-        if (raw_ptr_){return true;}
-        else {
-        return false;}
-    }
+		return  raw_ptr_[index];
+	}
 
-    // Возвращает значение сырого указателя, хранящего адрес начала массива
-    Type* Get() const noexcept {
-        // Заглушка. Реализуйте метод самостоятельно
-        return raw_ptr_;
-    }
+	// Возвращает true, если указатель ненулевой, и false в противном случае
+	explicit operator bool() const {
+		// Заглушка. Реализуйте операцию самостоятельно
+		if (raw_ptr_) { return true; }
+		else {
+			return false;
+		}
+	}
 
-    // Обменивается значениям указателя на массив с объектом other
-    void swap(ArrayPtr& other) noexcept {
-        // Реализуйте метод самостоятельно
-        /*Type * ptr = raw_ptr_;
-        raw_ptr_ = other.raw_ptr_;
-        other.raw_ptr_ = ptr;*/
-        
-        
-        Type* tmp = raw_ptr_;
-        raw_ptr_ = other.raw_ptr_;
-        other.raw_ptr_=  tmp;
-        
-        
-    }
+	// Возвращает значение сырого указателя, хранящего адрес начала массива
+	Type* Get() const noexcept {
+		// Заглушка. Реализуйте метод самостоятельно
+		return raw_ptr_;
+	}
+
+	// Обменивается значениям указателя на массив с объектом other
+	void swap(ArrayPtr& other) noexcept {
+		// Реализуйте метод самостоятельно
+		/*Type * ptr = raw_ptr_;
+		raw_ptr_ = other.raw_ptr_;
+		other.raw_ptr_ = ptr;*/
+
+
+		Type* tmp = raw_ptr_;
+		raw_ptr_ = other.raw_ptr_;
+		other.raw_ptr_ = tmp;
+
+
+	}
+
+	// Возвращает итератор на начало массива
+// Для пустого массива может быть равен (или не равен) nullptr
+	Iterator begin() noexcept {
+		// Напишите тело самостоятельно
+		return raw_ptr_.begin();
+	}
+
+	// Возвращает итератор на элемент, следующий за последним
+	// Для пустого массива может быть равен (или не равен) nullptr
+	Iterator end() noexcept {
+		// Напишите тело самостоятельно
+		return raw_ptr_.end();
+	}
+
+	// Возвращает константный итератор на начало массива
+	// Для пустого массива может быть равен (или не равен) nullptr
+	ConstIterator begin() const noexcept {
+		// Напишите тело самостоятельно
+		return raw_ptr_.cbegin();
+	}
+
+	// Возвращает итератор на элемент, следующий за последним
+	// Для пустого массива может быть равен (или не равен) nullptr
+	ConstIterator end() const noexcept {
+		// Напишите тело самостоятельно
+		return raw_ptr_.cend();
+	}
+
+	// Возвращает константный итератор на начало массива
+	// Для пустого массива может быть равен (или не равен) nullptr
+	ConstIterator cbegin() const noexcept {
+		// Напишите тело самостоятельно
+		return raw_ptr_.cbegin();
+	}
+
+	// Возвращает итератор на элемент, следующий за последним
+	// Для пустого массива может быть равен (или не равен) nullptr
+	ConstIterator cend() const noexcept {
+		// Напишите тело самостоятельно
+		return raw_ptr_.cend();
+	}
+
 
 private:
-    Type* raw_ptr_ = nullptr;
+	Type* raw_ptr_ = nullptr;
 };
