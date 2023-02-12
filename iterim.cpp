@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include "array_ptr.h"
 #include <algorithm>
+#include<stdexcept>
 
 using namespace std;
 
@@ -117,7 +118,7 @@ public:
 			for (size_t i = 1; i < add_new_el; ++i) {
 
 				std::fill(last_it, ++last_it, el);   // заполняю вектор значениями типа T
-				++last_it // увеличиваю итератор на 1 шаг вперед 
+				++last_it; // увеличиваю итератор на 1 шаг вперед 
 			}
 		}
 		// случай когда увеличивается размер вектора до размера > capacity
@@ -129,7 +130,7 @@ public:
 		if (new_size > capacity_) {
 			//0. определяю новую вместимость 
 			//Подобно std::vector во многих реализациях стандартной библиотеки, новую вместимость SimpleVector можно выбрать как максимум из new_capacity и capacity_
-			new_size = max(new_size, capacity_ * 2)
+			new_size = max(new_size, capacity_ * 2);
 
 				ArrayPtr<Type> new_array_ptr_(new_size); // 1. создаю новый массив 
 			array_ptr_.swap(new_array_ptr_); // обмениваю новый и старый массив 
