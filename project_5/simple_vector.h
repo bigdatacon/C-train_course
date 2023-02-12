@@ -44,11 +44,9 @@ public:
 
 	// Создаёт вектор из std::initializer_list
 	SimpleVector(std::initializer_list<Type> init) :  array_ptr_(init.size()) {
-        //std::copy (init.begin(), init.end(), array_ptr_.begin());
-        //std::back_inserter
         std::copy (init.begin(), init.end(), std::back_inserter(array_ptr_));
         size_ = init.size();
-		capacity_ = size;
+		capacity_ = size_;
         
 	}
 
