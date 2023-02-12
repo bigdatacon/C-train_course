@@ -43,14 +43,11 @@ public:
 	}
 
 	// Создаёт вектор из std::initializer_list
-	SimpleVector(std::initializer_list<Type> init) {
-		// Напишите тело конструктора самостоятельно
-		//https://runebook.dev/en/docs/cpp/utility/initializer_list
-		//array_ptr_(init);
-		// если не сработает то так:
-		//array_ptr_.insert(array_ptr_.end(), init.begin(), init.end());
-        array_ptr_(init.size());
+	SimpleVector(std::initializer_list<Type> init) :  array_ptr_(init.size()) {
         std::copy (init.begin(), init.end(), array_ptr_.begin());
+        size_ = init.size();
+		capacity_ = size;
+        
 	}
 
 	// Возвращает количество элементов в массиве
