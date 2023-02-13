@@ -107,55 +107,23 @@ public:
 
 	// Изменяет размер массива.
 	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
-	void Resize(size_t new_size) {
-		// Напишите тело самостоятельно
-		if (new_size <= size_) { size_ = new_size; }
-
-		// случай когда увеличивается размер вектора до размера <= capacity
-		if (new_size > size_ && new_size <= capacity_) {
-			Type& last_el = array_ptr_[-1]; // получаю послдений элемент вектора 
-			auto last_it = std::find(array_ptr_.Get(), array_ptr_.Get()+size_, last_el); // нахожу итератор на последний элемента вектора 
-
-			size_t add_new_el = new_size - size_;  // количество элементов сколько нужно добавить 
-			//Type el; // создаю переменную со значением типа T. не инициализирована 
-			// но тренажер вроде пропускает, а как иначе не знаю
-
-			// получаю итератор на конец диапазона . сдвигая его на количество элементов которые нужно добавить 
-			auto end_it = last_it;
-			// увеличиваю end_it относительно last_it на количество элементов сколько нужно добавить 
-
-			for (size_t i = 1; i < add_new_el && end_it != array_ptr_.Get()+size_; ++i) {
-				++end_it; // сдвигаю итератор 
-			}
-
-			// увеличиваю размер вектора до new_size, то есть уже в этот момент делаю Resize 
-			size_ = new_size;
-
-			// заполняю остаток диапазона элементами T
-			std::fill(last_it, end_it, Type());
-
-		}
-		// случай когда увеличивается размер вектора до размера > capacity
-		if (new_size > capacity_) {
-			//0. определяю новую вместимость 
-			//Подобно std::vector во многих реализациях стандартной библиотеки, новую вместимость SimpleVector можно выбрать как максимум из new_capacity и capacity_
-			new_size = max(new_size, capacity_ * 2);
-
-			ArrayPtr<Type> new_array_ptr_(new_size); // 1. создаю новый массив 
-			array_ptr_.swap(new_array_ptr_); // обмениваю новый и старый массив 
-			std::copy(new_array_ptr_.Get(), new_array_ptr_.Get() + new_size, array_ptr_.Get());  // копирую в него элементы из прежнего массива 
-			//инициализирует остальные элементы значением по умолчанию
-			//Type el; // создаю переменную со значением типа T
-			Type& last_el = array_ptr_[-1]; // получаю послдений элемент вектора не нулевой 
-			auto last_it = std::find(array_ptr_.Get(), array_ptr_.Get() + size_, last_el); // нахожу итератор на последний элемента вектора 
-			//заполняю остальные элементы значениями пол умолчанию 
-			std::fill(last_it, array_ptr_.Get() + new_size, Type());
-
-			//После копирования и заполнения элементов нулевым значением можно обновить size_ и capacity_, а старый массив — удалить. Так вы обеспечите строгую гарантию безопасности исключений. Умный указатель ArrayPtr позволит сделать код не только надёжнее, но и проще.
-			capacity_ = new_size; //емкость становится как величина на которую делал resize,
-			size_ = new_size;
-		}
-	}
+		void Resize(size_t new_size) {
+        if (new_size <= size_) {
+            size_ = new_size;
+        } else if (new_size <= capacity_) {
+            std::fill(array_ptr_.Get() + size_, array_ptr_.Get() + capacity_, Type());
+        } else {
+            //while (new_size > capacity_) capacity_ *= 2;
+            new_size = max(new_size, capacity_ * 2);
+            auto tmp = Iterator(size_);  // итератор на последний элемент
+            ArrayPtr<Type> new_array_ptr_(new_size); // 1. создаю новый массив 
+			array_ptr_.swap(new_array_ptr_); // обмениваю новый и старый массив        
+			std::copy(new_array_ptr_.Get(), new_array_ptr_.Get()+ size_, array_ptr_.Get());  
+			std::fill(tmp, tmp + (new_size- size_), Type());
+			capacity_ = new_size; 
+			size_ = size_ ; // размер size_ не меняю, поскольку количество элементов не пол умолчанию, не изменилось  
+        }
+    }
 
 	// Возвращает итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
