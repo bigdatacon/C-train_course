@@ -101,7 +101,7 @@ public:
 	// Обнуляет размер массива, не изменяя его вместимость
 	void Clear() noexcept {
 		// Напишите тело самостоятельно
-		//Resize(0);
+		//Resiz e(0);
 		size_ = 0;
 	}
 
@@ -116,8 +116,8 @@ public:
                 size_t new_capacity = max(new_size, capacity_ * 2);
                 ArrayPtr<Type> new_array_ptr_(new_capacity);
                 std::copy(array_ptr_.Get(), array_ptr_.Get() + size_, new_array_ptr_.Get());
-                auto tmp = Iterator(size_);
                 array_ptr_.swap(new_array_ptr_);
+                auto tmp = array_ptr_.Get() + size_;
                 std::fill(tmp, tmp + (new_capacity- size_), Type());
                 capacity_ = new_capacity; 
                 size_ = new_size;
