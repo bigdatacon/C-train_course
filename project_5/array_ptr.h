@@ -93,42 +93,48 @@ public:
 // Для пустого массива может быть равен (или не равен) nullptr
 	Iterator begin() noexcept {
 		// Напишите тело самостоятельно
-		return raw_ptr_.begin();
+		//return raw_ptr_.begin();
+        return std::begin(raw_ptr_);
 	}
 
 	// Возвращает итератор на элемент, следующий за последним
 	// Для пустого массива может быть равен (или не равен) nullptr
 	Iterator end() noexcept {
 		// Напишите тело самостоятельно
-		return raw_ptr_.end();
+		//return raw_ptr_.end();
+        return std::end(raw_ptr_);
 	}
 
 	// Возвращает константный итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator begin() const noexcept {
 		// Напишите тело самостоятельно
-		return raw_ptr_.cbegin();
+		//return raw_ptr_.cbegin();
+        return std::cbegin(raw_ptr_);
 	}
 
 	// Возвращает итератор на элемент, следующий за последним
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator end() const noexcept {
 		// Напишите тело самостоятельно
-		return raw_ptr_.cend();
+		//return raw_ptr_.cend();
+        return std::cend(raw_ptr_);
 	}
 
 	// Возвращает константный итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator cbegin() const noexcept {
 		// Напишите тело самостоятельно
-		return raw_ptr_.cbegin();
+		//return raw_ptr_.cbegin();
+        return std::cbegin(raw_ptr_);
 	}
 
 	// Возвращает итератор на элемент, следующий за последним
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator cend() const noexcept {
 		// Напишите тело самостоятельно
-		return raw_ptr_.cend();
+		//return raw_ptr_.cend();
+        return std::cend(raw_ptr_);
 	}
 
 
