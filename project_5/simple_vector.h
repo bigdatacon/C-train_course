@@ -170,7 +170,7 @@ public:
 	Iterator end() noexcept {
 		// Напишите тело самостоятельно
 		//return array_ptr_.end();
-		return array_ptr_.Get() + size_();
+		return array_ptr_.Get() + size_;
 
 	}
 
@@ -187,7 +187,7 @@ public:
 	ConstIterator end() const noexcept {
 		// Напишите тело самостоятельно
 		//return array_ptr_.cend();
-		return array_ptr_.Get() + size_();
+		return array_ptr_.Get() + size_;
 	}
 
 	// Возвращает константный итератор на начало массива
@@ -203,7 +203,7 @@ public:
 	ConstIterator cend() const noexcept {
 		// Напишите тело самостоятельно
 		//return array_ptr_.cend();
-		return array_ptr_.Get() + size_();
+		return array_ptr_.Get() + size_;
 	}
 
 private:
