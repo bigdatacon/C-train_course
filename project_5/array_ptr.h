@@ -6,10 +6,6 @@ class ArrayPtr {
 public:
 	// Инициализирует ArrayPtr нулевым указателем
 	ArrayPtr() = default;
-	/*using Iterator = Type*;
-	using ConstIterator = const Type*;*/
-    using Iterator = ArrayPtr<Type>;
-    using ConstIterator = const ArrayPtr<Type>;
 
 	// Создаёт в куче массив из size элементов типа Type.
 	// Если size == 0, поле raw_ptr_ должно быть равно nullptr
@@ -90,25 +86,6 @@ public:
 
 
 	}
-
-	// Возвращает итератор на начало массива
-// Для пустого массива может быть равен (или не равен) nullptr
-	Iterator begin() noexcept {
-		// Напишите тело самостоятельно
-		//return raw_ptr_.begin();
-        return std::begin(raw_ptr_);
-	}
-
-	// Возвращает итератор на элемент, следующий за последним
-	// Для пустого массива может быть равен (или не равен) nullptr
-	Iterator end() noexcept {
-		// Напишите тело самостоятельно
-		//return raw_ptr_.end();
-        return std::end(raw_ptr_);
-	}
-
-	// Возвращает константный итератор на начало массива
-	// Для пустого массива может быть равен (или не равен) nullptr
 
 
 
