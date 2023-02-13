@@ -20,8 +20,11 @@ using namespace std;
 template <typename Type>
 class SimpleVector {
 public:
-	using Iterator = Type*;
-	using ConstIterator = const Type*;
+	/*using Iterator = Type*;
+	using ConstIterator = const Type*;*/
+    
+    using Iterator = ArrayPtr<Type>;
+    using ConstIterator = const ArrayPtr<Type>;
 
 	SimpleVector() noexcept = default;
 
