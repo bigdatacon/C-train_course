@@ -20,11 +20,11 @@ using namespace std;
 template <typename Type>
 class SimpleVector {
 public:
-	/*using Iterator = Type*;
-	using ConstIterator = const Type*;*/
-    
-    using Iterator = ArrayPtr<Type>;
-    using ConstIterator = const ArrayPtr<Type>;
+	using Iterator = Type*;
+	using ConstIterator = const Type*;
+
+	//using Iterator = ArrayPtr<Type>;
+	//using ConstIterator = const ArrayPtr<Type>;
 
 	SimpleVector() noexcept = default;
 
@@ -101,7 +101,8 @@ public:
 	// Обнуляет размер массива, не изменяя его вместимость
 	void Clear() noexcept {
 		// Напишите тело самостоятельно
-		Resize(0);
+		//Resize(0);
+		size_ = 0;
 	}
 
 	// Изменяет размер массива.
@@ -160,47 +161,55 @@ public:
 	// Для пустого массива может быть равен (или не равен) nullptr
 	Iterator begin() noexcept {
 		// Напишите тело самостоятельно
-		return array_ptr_.begin();
+		//return array_ptr_.begin();
+		return array_ptr_.Get();
 	}
 
 	// Возвращает итератор на элемент, следующий за последним
 	// Для пустого массива может быть равен (или не равен) nullptr
 	Iterator end() noexcept {
 		// Напишите тело самостоятельно
-		return array_ptr_.end();
+		//return array_ptr_.end();
+		return array_ptr_.Get() + size_();
+
 	}
 
 	// Возвращает константный итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator begin() const noexcept {
 		// Напишите тело самостоятельно
-		return array_ptr_.cbegin();
+		//return array_ptr_.cbegin();
+		return array_ptr_.Get();
 	}
 
 	// Возвращает итератор на элемент, следующий за последним
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator end() const noexcept {
 		// Напишите тело самостоятельно
-		return array_ptr_.cend();
+		//return array_ptr_.cend();
+		return array_ptr_.Get() + size_();
 	}
 
 	// Возвращает константный итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator cbegin() const noexcept {
 		// Напишите тело самостоятельно
-		return array_ptr_.cbegin();
+		//return array_ptr_.cbegin();
+		return array_ptr_.Get();
 	}
 
 	// Возвращает итератор на элемент, следующий за последним
 	// Для пустого массива может быть равен (или не равен) nullptr
 	ConstIterator cend() const noexcept {
 		// Напишите тело самостоятельно
-		return array_ptr_.cend();
+		//return array_ptr_.cend();
+		return array_ptr_.Get() + size_();
 	}
 
 private:
 	ArrayPtr<Type> array_ptr_;
 	size_t size_ = 0;
 	size_t capacity_ = 0;
+	Iterator data;
 
 };
