@@ -108,22 +108,23 @@ public:
 	// Изменяет размер массива.
 	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
 		void Resize(size_t new_size) {
-        if (new_size <= size_) {
-            size_ = new_size;
-        } else if (new_size <= capacity_) {
-            std::fill(array_ptr_.Get() + size_, array_ptr_.Get() + capacity_, Type());
-        } else {
-            //while (new_size > capacity_) capacity_ *= 2;
-            new_size = max(new_size, capacity_ * 2);
-            auto tmp = Iterator(size_);  // итератор на последний элемент
-            ArrayPtr<Type> new_array_ptr_(new_size); // 1. создаю новый массив 
-			array_ptr_.swap(new_array_ptr_); // обмениваю новый и старый массив        
-			std::copy(new_array_ptr_.Get(), new_array_ptr_.Get()+ size_, array_ptr_.Get());  
-			std::fill(tmp, tmp + (new_size- size_), Type());
-			capacity_ = new_size; 
-			size_ = size_ ; // размер size_ не меняю, поскольку количество элементов не пол умолчанию, не изменилось  
+            if (new_size <= size_) {
+                size_ = new_size;
+            } else if (new_size <= capacity_) {
+                std::fill(array_ptr_.Get() + size_, array_ptr_.Get() + capacity_, Type());
+            } else {
+                size_t new_capacity = max(new_size, capacity_ * 2);
+                ArrayPtr<Type> new_array_ptr_(new_capacity);
+                std::copy(array_ptr_.Get(), array_ptr_.Get() + size_, new_array_ptr_.Get());
+                auto tmp = Iterator(size_);
+                array_ptr_.swap(new_array_ptr_);
+                std::fill(tmp, tmp + (new_capacity- size_), Type());
+                capacity_ = new_capacity; 
+                size_ = new_size;
+            }
         }
-    }
+        
+
 
 	// Возвращает итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
