@@ -230,6 +230,7 @@ public:
 		if (size_ > 0 && size_ < capacity_) {
 			std::copy_backward(pos, array_ptr_.Get() + size_, array_ptr_.Get() + ++size_);
 			*pos = value;
+            ++size_;
 		}
 		else {
 			/*
