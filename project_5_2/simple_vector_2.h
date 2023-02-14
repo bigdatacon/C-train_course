@@ -25,19 +25,22 @@ public:
 
 	SimpleVector() noexcept = default;
 
-    SimpleVector(const SimpleVector& other) {
-        // Напишите тело конструктора самостоятельно
-    }
-    
-    explicit SimpleVector(size_t size) :
+	SimpleVector(const SimpleVector& other) {
+		// Напишите тело конструктора самостоятельно
+		SimpleVector tmp;
+		if (!other.IsEmpty()) {
+			tmp.size_ = other.size_;
+			tmp.capacity_ = other.capacity_;
+		}
+		swap(tmp);
+
+	}
+
+	explicit SimpleVector(size_t size) :
 		array_ptr_(size) {
 		size_ = size;
 		capacity_ = size;
-        //std::fill(data, data + size_, Type());
-        //array_ptr_.Get() + new_size
-        std::fill(array_ptr_.Get(), array_ptr_.Get() + size_, Type());
-        
-        
+		std::fill(array_ptr_.Get(), array_ptr_.Get() + size_, Type());
 	}
 
 	// Создаёт вектор из size элементов, инициализированных значением value
@@ -109,29 +112,30 @@ public:
 		//Resiz e(0);
 		size_ = 0;
 	}
-    
-    void Reserve(size_t new_capacity) {
-        if (new_capacity > capacity_) {
-            ArrayPtr<Type> tmp(new_capacity);
-            std::move(begin(), end(), tmp.Get());
-            array_ptr_.swap(tmp);
-            capacity_ = new_capacity;
-        }
-    }
+
+	void Reserve(size_t new_capacity) {
+		if (new_capacity > capacity_) {
+			ArrayPtr<Type> tmp(new_capacity);
+			std::move(begin(), end(), tmp.Get());
+			array_ptr_.swap(tmp);
+			capacity_ = new_capacity;
+		}
+	}
 	// Изменяет размер массива.
 	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
-		void Resize(size_t new_size) {
-        if (new_size > size_) {
-            if (new_size <= capacity_) {
-                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
-            } else {
-                //while (new_size > capacity_) capacity_ *= 2;
-                Reserve(new_size);
-                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
-            }
-        }
-        size_ = new_size;
-    }
+	void Resize(size_t new_size) {
+		if (new_size > size_) {
+			if (new_size <= capacity_) {
+				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
+			}
+			else {
+				//while (new_size > capacity_) capacity_ *= 2;
+				Reserve(new_size);
+				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
+			}
+		}
+		size_ = new_size;
+	}
 
 	// Возвращает итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
@@ -181,83 +185,136 @@ public:
 		//return array_ptr_.cend();
 		return array_ptr_.Get() + size_;
 	}
-    
-    ////////////////////////////////////////////////////////////////////////////
-    
+
+	////////////////////////////////////////////////////////////////////////////
+
+	SimpleVector& operator=(const SimpleVector& rhs) {
+		// Напишите тело конструктора самостоятельно
+		if (this != rhs) {   // или this != &rhs  -- почему так? 
+			SimpleVector tmp(rhs);  // инициализируб копию вектором 
+			swap(tmp);
+		}
+		return *this;
+	}
+
+	// Добавляет элемент в конец вектора
+	// При нехватке места увеличивает вдвое вместимость вектора
+	void PushBack(const Type& item) {
+		// Напишите тело самостоятельно
+
+		/*Когда вектор заполнен частично, запишем вставляемый элемент следом за последним элементом вектора и увеличим его размер.
+Чуть сложнее обстоит ситуация, когда вектор заполнен полностью. В этом случае выделите новый массив с удвоенной вместимостью, скопируйте в него элементы исходного массива, а в конец поместите вставляемый элемент. После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
+		if (size_ < capacity_) { array_ptr_[array_ptr_.Get() + size_] = item; }
+		else {
+			SimpleVector tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
+			std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get());  //скопируйте в него элементы исходного массива
+			tmp[tmp.Get() + size_] = item; // а в конец поместите вставляемый элемент
+			//После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
+			swap(tmp);
+			size_ = size_ + 1;
+			capacity_ = capacity_ * 2;
+		}
+	}
+
+	// Вставляет значение value в позицию pos.
+	// Возвращает итератор на вставленное значение
+	// Если перед вставкой значения вектор был заполнен полностью,
+	// вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
+	Iterator Insert(ConstIterator pos, const Type& value) {
+		// Напишите тело самостоятельно
+		if (size_ > 0 && size_ < capacity_) {
+			std::copy_backward(pos, array_ptr_.Get() + size_, array_ptr_.Get() + ++size_);
+			*pos = value;
+		}
+		else {
+			/*
+			Когда элемент вставляется в заполненный вектор, в куче выделяется массив с удвоенной вместимостью. В этот массив копируются элементы, которые предшествуют вставляемому, сам вставляемый элемент и элементы, следующие за ним. В конце вектор обновляет свой размер и вместимость, начинает ссылаться на новый массив, а старый массив удаляет:
+	Как и в случае с Erase, базовая гарантия безопасности исключений естественна для метода Insert. Аналогичное решение принято и для метода insert класса std::vector.
+			*/
+			int tmp_capacity = 0;
+			if (capacity_ = 0) { tmp_capacity = 1; }
+			else { tmp_capacity = capacity_ * 2; }
+
+			SimpleVector tmp(tmp_capacity);
+			std::copy(tmp.Get(), tmp.Get() + pos, array_ptr_.Get()); // копируются элементы, которые предшествуют вставляемому
+			tmp.PushBack(value);  //сам вставляемый элемент
+			std::copy(++pos, ++pos + (array_ptr_.Get() + size_ - pos), array_ptr_.Get());   // и элементы, следующие за ним
+			//В конце вектор обновляет свой размер и вместимость, начинает ссылаться на новый массив, а старый массив удаляет:
+			swap(tmp);
+			size_ = size_ + 1;
+			capacity_ = tmp_capacity;
+
+		}
+	}
+
+	// "Удаляет" последний элемент вектора. Вектор не должен быть пустым
+	void PopBack() noexcept {
+		// Напишите тело самостоятельно
+		if (!IsEmpty()) --size_;
+	}
+
+	// Удаляет элемент вектора в указанной позиции
+	Iterator Erase(ConstIterator pos) {
+		// Напишите тело самостоятельно
+		/*
+		Для удаления произвольного элемента вектора служит метод Erase. Он принимает итератор, указывающий на удаляемый элемент вектора, и возвращает итератор, который ссылается на элемент, следующий за удалённым:
+
+При работе этого метода элементы, следующие за удаляемым, должны быть скопированы на его место один за другим. После того, как все элементы будут скопированы, нужно уменьшить размер массива и вернуть указатель на элемент, следующий за удалённым.
+		*/
 
 
-    SimpleVector& operator=(const SimpleVector& rhs) {
-        // Напишите тело конструктора самостоятельно
-        return *this;
-    }
+		std::copy_backward(pos + 1, array_ptr_.Get() + size_, pos);
+		--size_;
+		return pos;  // следующий за удалернным будет именно pos как я понял 
 
-    // Добавляет элемент в конец вектора
-    // При нехватке места увеличивает вдвое вместимость вектора
-    void PushBack(const Type& item) {
-        // Напишите тело самостоятельно
-    }
 
-    // Вставляет значение value в позицию pos.
-    // Возвращает итератор на вставленное значение
-    // Если перед вставкой значения вектор был заполнен полностью,
-    // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
-    Iterator Insert(ConstIterator pos, const Type& value) {
-        // Напишите тело самостоятельно
-    }
+	}
 
-    // "Удаляет" последний элемент вектора. Вектор не должен быть пустым
-    void PopBack() noexcept {
-        // Напишите тело самостоятельно
-    }
+	// Обменивает значение с другим вектором
+	void swap(SimpleVector& other) noexcept {
+		// Напишите тело самостоятельно
+		size_ = other.size_;
+		capacity_ = other.size_;
+	}
 
-    // Удаляет элемент вектора в указанной позиции
-    Iterator Erase(ConstIterator pos) {
-        // Напишите тело самостоятельно
-    }
-
-    // Обменивает значение с другим вектором
-    void swap(SimpleVector& other) noexcept {
-        // Напишите тело самостоятельно
-    }
-    
 
 private:
 	ArrayPtr<Type> array_ptr_;
 	size_t size_ = 0;
 	size_t capacity_ = 0;
-	Iterator data;
+
 
 };
 
 
 
 template<typename Type>
-inline bool operator==(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
-    return lhs.GetSize() == rhs.GetSize() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+inline bool operator==(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+	return lhs.GetSize() == rhs.GetSize() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
- 
+
 template<typename Type>
-inline bool operator!=(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
-    return !(operator==(lhs, rhs));
+inline bool operator!=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+	return !(operator==(lhs, rhs));
 }
- 
+
 template<typename Type>
-inline bool operator<(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
-    return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                        rhs.begin(), rhs.end());
+inline bool operator<(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+	return std::lexicographical_compare(lhs.begin(), lhs.end(),
+		rhs.begin(), rhs.end());
 }
- 
+
 template<typename Type>
-inline bool operator<=(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
-    return (operator==(lhs, rhs)) || (operator<(lhs, rhs));
+inline bool operator<=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+	return (operator==(lhs, rhs)) || (operator<(lhs, rhs));
 }
- 
+
 template<typename Type>
-inline bool operator>(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
-    return !(operator<=(lhs, rhs));
+inline bool operator>(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+	return !(operator<=(lhs, rhs));
 }
- 
+
 template<typename Type>
-inline bool operator>=(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
-    return (operator==(lhs, rhs)) || (operator>(lhs, rhs));
+inline bool operator>=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+	return (operator==(lhs, rhs)) || (operator>(lhs, rhs));
 }
