@@ -213,9 +213,9 @@ public:
             ArrayPtr<Type> tmp(capacity_ * 2);
 			//SimpleVector tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
 			std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get());  //скопируйте в него элементы исходного массива
-			tmp[tmp.Get() + size_] = item; // а в конец поместите вставляемый элемент
+			tmp[size_] = item; // а в конец поместите вставляемый элемент
 			//После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
-			swap(tmp);
+			array_ptr_.swap(tmp); //swap(tmp);
 			size_ = size_ + 1;
 			capacity_ = capacity_ * 2;
 		}
