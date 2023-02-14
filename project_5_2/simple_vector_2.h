@@ -205,9 +205,13 @@ public:
 
 		/*Когда вектор заполнен частично, запишем вставляемый элемент следом за последним элементом вектора и увеличим его размер.
 Чуть сложнее обстоит ситуация, когда вектор заполнен полностью. В этом случае выделите новый массив с удвоенной вместимостью, скопируйте в него элементы исходного массива, а в конец поместите вставляемый элемент. После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
-		if (size_ < capacity_) { array_ptr_[array_ptr_.Get() + size_] = item; }
+		if (size_ < capacity_) { 
+        //array_ptr_[array_ptr_.Get() + size_] = item;
+        array_ptr_[size_] = item; ++size_; 
+        }
 		else {
-			SimpleVector tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
+            ArrayPtr<Type> tmp(capacity_ * 2);
+			//SimpleVector tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
 			std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get());  //скопируйте в него элементы исходного массива
 			tmp[tmp.Get() + size_] = item; // а в конец поместите вставляемый элемент
 			//После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
@@ -236,7 +240,7 @@ public:
 			if (capacity_ = 0) { tmp_capacity = 1; }
 			else { tmp_capacity = capacity_ * 2; }
 
-			SimpleVector tmp(tmp_capacity);
+			ArrayPtr<Type> tmp(tmp_capacity);
 			std::copy(tmp.Get(), tmp.Get() + pos, array_ptr_.Get()); // копируются элементы, которые предшествуют вставляемому
 			tmp.PushBack(value);  //сам вставляемый элемент
 			std::copy(++pos, ++pos + (array_ptr_.Get() + size_ - pos), array_ptr_.Get());   // и элементы, следующие за ним
