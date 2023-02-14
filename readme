@@ -1,30 +1,321 @@
 Задание:
 Задание
-Разработайте шаблонный класс SimpleVector<Type>, который будет упрощённым аналогом контейнера vector, со следующим функционалом:
-Конструкторы.
-По умолчанию. Создаёт пустой вектор с нулевой вместимостью. Не выделяет динамическую память и не выбрасывает исключений.
-Параметризованный конструктор, создающий вектор заданного размера. Элементы вектора инициализированы значением по умолчанию для типа Type. Вектор должен иметь одинаковые размер и вместимость. Если размер нулевой, динамическая память для его элементов выделяться не должна.
-Конструктор из std::initializer_list. Элементы вектора должны содержать копию элементов initializer_list. Имеет размер и вместимость, совпадающую с размерами и вместимостью переданного initializer_list.
-Метод GetSize для получения количества элементов в векторе. Не выбрасывает исключений.
-Метод GetCapacity для получения вместимости вектора. Не выбрасывает исключений.
-Метод IsEmpty, сообщающий, пуст ли вектор. Не выбрасывает исключений.
-Оператор [] для доступа к элементу вектора по его индексу. Имеет две версии — константную и неконстантную. Не выбрасывает исключений. Для корректной работы оператора индекс элемента массива не должен выходить за пределы массива.
-Метод At для доступа к элементу вектора по его индексу, аналог метода at класса vector. В случае выхода индекса за пределы массива должен выбросить исключение std::out_of_range.
-Метод Clear для очистки массива без изменения его вместимости. Не выбрасывает исключений.
-Метод Resize для изменения количества элементов в массиве. Метод должен предоставлять строгую гарантию безопасности исключений.
-Методы begin, end, cbegin и cend, возвращающие итераторы на начало и конец массива. В качестве итераторов используйте указатели. Эти методы должны быть объявлены со спецификатором noexcept. В противном случае тренажёр отклонит ваше решение.
-При разрушении вектора должна освобождаться память, занимаемая его элементами.
+Реализуйте в классе SimpleVector следующие операции:
+Конструктор копирования. Копия вектора должна иметь вместимость, достаточную для хранения копии элементов исходного вектора.
+Оператор присваивания. Должен обеспечивать строгую гарантию безопасности исключений.
+Метод PushBack, добавляющий элемент в конец вектора. Должен обеспечивать строгую гарантию безопасности исключений.
+Метод PopBack, удаляющий последний элемент вектора. Не выбрасывает исключений.
+Метод Insert, вставляющий элемент в произвольное место контейнера. Обеспечивает базовую гарантию безопасности исключений.
+Метод Erase, удаляющий элемент в произвольной позиции вектора. Обеспечивает базовую гарантию безопасности исключений.
+Метод swap, обменивающий содержимое вектора с другим вектором. Не выбрасывает исключений, имеет время выполнения O(1).
+Операторы == и !=. Два вектора равны, если их размеры равны и содержат равные элементы. Равенство вместимости не требуется.
+Операторы <, >, <=, >=, выполняющие лексикографическое сравнение содержимого двух векторов.
+Сигнатура новых методов:
+template <typename Type>
+class SimpleVector {
+public:
+    ...
+    SimpleVector(const SimpleVector& other) {
+        // Напишите тело конструктора самостоятельно
+    }
+
+    SimpleVector& operator=(const SimpleVector& rhs) {
+        // Напишите тело конструктора самостоятельно
+        return *this;
+    }
+
+    // Добавляет элемент в конец вектора
+    // При нехватке места увеличивает вдвое вместимость вектора
+    void PushBack(const Type& item) {
+        // Напишите тело самостоятельно
+    }
+
+    // Вставляет значение value в позицию pos.
+    // Возвращает итератор на вставленное значение
+    // Если перед вставкой значения вектор был заполнен полностью,
+    // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
+    Iterator Insert(ConstIterator pos, const Type& value) {
+        // Напишите тело самостоятельно
+    }
+
+    // "Удаляет" последний элемент вектора. Вектор не должен быть пустым
+    void PopBack() noexcept {
+        // Напишите тело самостоятельно
+    }
+
+    // Удаляет элемент вектора в указанной позиции
+    Iterator Erase(ConstIterator pos) {
+        // Напишите тело самостоятельно
+    }
+
+    // Обменивает значение с другим вектором
+    void swap(SimpleVector& other) noexcept {
+        // Напишите тело самостоятельно
+    }
+    ...
+};
+
+template <typename Type>
+inline bool operator==(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+    // Заглушка. Напишите тело самостоятельно
+    return true;
+}
+
+template <typename Type>
+inline bool operator!=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+    // Заглушка. Напишите тело самостоятельно
+    return true;
+}
+
+template <typename Type>
+inline bool operator<(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+    // Заглушка. Напишите тело самостоятельно
+    return true;
+}
+
+template <typename Type>
+inline bool operator<=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+    // Заглушка. Напишите тело самостоятельно
+    return true;
+}
+
+template <typename Type>
+inline bool operator>(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+    // Заглушка. Напишите тело самостоятельно
+    return true;
+}
+
+template <typename Type>
+inline bool operator>=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
+    // Заглушка. Напишите тело самостоятельно
+    return true;
+} 
+Тесты, которые помогут проверить решение:
+tests.h
+#pragma once
+#include <cassert>
+#include <stdexcept>
+
+inline void Test1() {
+    // Инициализация конструктором по умолчанию
+    {
+        SimpleVector<int> v;
+        assert(v.GetSize() == 0u);
+        assert(v.IsEmpty());
+        assert(v.GetCapacity() == 0u);
+    }
+
+    // Инициализация вектора указанного размера
+    {
+        SimpleVector<int> v(5);
+        assert(v.GetSize() == 5u);
+        assert(v.GetCapacity() == 5u);
+        assert(!v.IsEmpty());
+        for (size_t i = 0; i < v.GetSize(); ++i) {
+            assert(v[i] == 0);
+        }
+    }
+
+    // Инициализация вектора, заполненного заданным значением
+    {
+        SimpleVector<int> v(3, 42);
+        assert(v.GetSize() == 3);
+        assert(v.GetCapacity() == 3);
+        for (size_t i = 0; i < v.GetSize(); ++i) {
+            assert(v[i] == 42);
+        }
+    }
+
+    // Инициализация вектора при помощи initializer_list
+    {
+        SimpleVector<int> v{1, 2, 3};
+        assert(v.GetSize() == 3);
+        assert(v.GetCapacity() == 3);
+        assert(v[2] == 3);
+    }
+
+    // Доступ к элементам при помощи At
+    {
+        SimpleVector<int> v(3);
+        assert(&v.At(2) == &v[2]);
+        try {
+            v.At(3);
+            assert(false);  // Ожидается выбрасывание исключения
+        } catch (const std::out_of_range&) {
+        } catch (...) {
+            assert(false);  // Не ожидается исключение, отличное от out_of_range
+        }
+    }
+
+    // Очистка вектора
+    {
+        SimpleVector<int> v(10);
+        const size_t old_capacity = v.GetCapacity();
+        v.Clear();
+        assert(v.GetSize() == 0);
+        assert(v.GetCapacity() == old_capacity);
+    }
+
+    // Изменение размера
+    {
+        SimpleVector<int> v(3);
+        v[2] = 17;
+        v.Resize(7);
+        assert(v.GetSize() == 7);
+        assert(v.GetCapacity() >= v.GetSize());
+        assert(v[2] == 17);
+        assert(v[3] == 0);
+    }
+    {
+        SimpleVector<int> v(3);
+        v[0] = 42;
+        v[1] = 55;
+        const size_t old_capacity = v.GetCapacity();
+        v.Resize(2);
+        assert(v.GetSize() == 2);
+        assert(v.GetCapacity() == old_capacity);
+        assert(v[0] == 42);
+        assert(v[1] == 55);
+    }
+    {
+        const size_t old_size = 3;
+        SimpleVector<int> v(3);
+        v.Resize(old_size + 5);
+        v[3] = 42;
+        v.Resize(old_size);
+        v.Resize(old_size + 2);
+        assert(v[3] == 0);
+    }
+
+    // Итерирование по SimpleVector
+    {
+        // Пустой вектор
+        {
+            SimpleVector<int> v;
+            assert(v.begin() == nullptr);
+            assert(v.end() == nullptr);
+        }
+
+        // Непустой вектор
+        {
+            SimpleVector<int> v(10, 42);
+            assert(v.begin());
+            assert(*v.begin() == 42);
+            assert(v.end() == v.begin() + v.GetSize());
+        }
+    }
+}
+
+inline void Test2() {
+    // PushBack
+    {
+        SimpleVector<int> v(1);
+        v.PushBack(42);
+        assert(v.GetSize() == 2);
+        assert(v.GetCapacity() >= v.GetSize());
+        assert(v[0] == 0);
+        assert(v[1] == 42);
+    }
+
+    // Если хватает места, PushBack не увеличивает Capacity
+    {
+        SimpleVector<int> v(2);
+        v.Resize(1);
+        const size_t old_capacity = v.GetCapacity();
+        v.PushBack(123);
+        assert(v.GetSize() == 2);
+        assert(v.GetCapacity() == old_capacity);
+    }
+
+    // PopBack
+    {
+        SimpleVector<int> v{0, 1, 2, 3};
+        const size_t old_capacity = v.GetCapacity();
+        const auto old_begin = v.begin();
+        v.PopBack();
+        assert(v.GetCapacity() == old_capacity);
+        assert(v.begin() == old_begin);
+        assert((v == SimpleVector<int>{0, 1, 2}));
+    }
+
+    // Конструктор копирования
+    {
+        SimpleVector<int> numbers{1, 2};
+        auto numbers_copy(numbers);
+        assert(&numbers_copy[0] != &numbers[0]);
+        assert(numbers_copy.GetSize() == numbers.GetSize());
+        for (size_t i = 0; i < numbers.GetSize(); ++i) {
+            assert(numbers_copy[i] == numbers[i]);
+            assert(&numbers_copy[i] != &numbers[i]);
+        }
+    }
+
+    // Сравнение
+    {
+        assert((SimpleVector{1, 2, 3} == SimpleVector{1, 2, 3}));
+        assert((SimpleVector{1, 2, 3} != SimpleVector{1, 2, 2}));
+
+        assert((SimpleVector{1, 2, 3} < SimpleVector{1, 2, 3, 1}));
+        assert((SimpleVector{1, 2, 3} > SimpleVector{1, 2, 2, 1}));
+
+        assert((SimpleVector{1, 2, 3} >= SimpleVector{1, 2, 3}));
+        assert((SimpleVector{1, 2, 4} >= SimpleVector{1, 2, 3}));
+        assert((SimpleVector{1, 2, 3} <= SimpleVector{1, 2, 3}));
+        assert((SimpleVector{1, 2, 3} <= SimpleVector{1, 2, 4}));
+    }
+
+    // Обмен значений векторов
+    {
+        SimpleVector<int> v1{42, 666};
+        SimpleVector<int> v2;
+        v2.PushBack(0);
+        v2.PushBack(1);
+        v2.PushBack(2);
+        const int* const begin1 = &v1[0];
+        const int* const begin2 = &v2[0];
+
+        const size_t capacity1 = v1.GetCapacity();
+        const size_t capacity2 = v2.GetCapacity();
+
+        const size_t size1 = v1.GetSize();
+        const size_t size2 = v2.GetSize();
+
+        static_assert(noexcept(v1.swap(v2)));
+        v1.swap(v2);
+        assert(&v2[0] == begin1);
+        assert(&v1[0] == begin2);
+        assert(v1.GetSize() == size2);
+        assert(v2.GetSize() == size1);
+        assert(v1.GetCapacity() == capacity2);
+        assert(v2.GetCapacity() == capacity1);
+    }
+
+    // Присваивание
+    {
+        SimpleVector<int> src_vector{1, 2, 3, 4};
+        SimpleVector<int> dst_vector{1, 2, 3, 4, 5, 6};
+        dst_vector = src_vector;
+        assert(dst_vector == src_vector);
+    }
+
+    // Вставка элементов
+    {
+        SimpleVector<int> v{1, 2, 3, 4};
+        v.Insert(v.begin() + 2, 42);
+        assert((v == SimpleVector<int>{1, 2, 42, 3, 4}));
+    }
+
+    // Удаление элементов
+    {
+        SimpleVector<int> v{1, 2, 3, 4};
+        v.Erase(v.cbegin() + 2);
+        assert((v == SimpleVector<int>{1, 2, 4}));
+    }
+} 
 Ограничения
-Гарантируется, что тренажёр при проверке решения не будет передавать в оператор [] индексы, выходящие за границы массива. При написании  SimpleVector реализуйте самостоятельно работу с массивом в динамической памяти. Чтобы упростить управление массивом, пригодится разработанный в предыдущем спринте шаблонный класс ArrayPtr. Не используйте класс std::vector.
+Недопустимо передавать в методы Insert и Erase невалидные итераторы и итераторы, полученные у другого вектора. Нельзя передавать в метод Erase и end-итератор текущего вектора. Вызывать PopBack у пустого вектора тоже нельзя.
+Гарантируется, что тренажёр не будет передавать недопустимые значения итераторов в методы Insert и Erase и вызывать PopBack у пустого вектора. Поэтому не усложняйте реализацию этих методов.
 Что отправлять на проверку
 Файл simple_vector.h с исходным кодом класса SimpleVector. Если нужно включить дополнительные заголовочные файлы, например, с кодом ArrayPtr, отправьте их тоже. Если загрузите функцию main, она будет заменена на версию из тренажёра.
 Как будет тестироваться ваш код
-Сохраните сигнатуру методов класса SimpleVector неизменной, чтобы код скомпилировался без ошибок, а тренажёр не отклонил ваше решение. Это особенно касается спецификатора noexcept.
-
-Подсказка:
-В методе Resize отдельно обработайте три ситуации: новый размер меньше или равен текущему, новый размер не превышает его вместимости, новый размер превышает текущую вместимость вектора.
-Если при изменении размера массива новый размер вектора превышает его текущую вместимость, создайте новый массив с нужной вместимостью, скопируйте в него прежнее содержимое и заполните остальные элементы значением по умолчанию. Затем старый массив можно удалить и использовать копию. После этого не забудьте обновить размер и вместимость вектора.
-Если при увеличении размера массива новый размер вектора не превышает его вместимость, заполните добавленные элементы значением по умолчанию для типа Type.
-При уменьшении размера вектора просто уменьшите его размер.
-Примените алгоритмы std::copy и std::fill для копирования элементов массива и заполнения их некоторым значением.
-В методе Clear достаточно обнулить размер массива.
+Сохраните сигнатуру методов класса SimpleVector неизменной, чтобы код скомпилировался без ошибок.
