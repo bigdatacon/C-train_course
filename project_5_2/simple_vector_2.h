@@ -190,7 +190,8 @@ public:
 
 	SimpleVector& operator=(const SimpleVector& rhs) {
 		// Напишите тело конструктора самостоятельно
-		if (this != rhs) {   // или this != &rhs  -- почему так? 
+		if (this != &rhs) {   
+        
 			SimpleVector tmp(rhs);  // инициализируб копию вектором 
 			swap(tmp);
 		}
