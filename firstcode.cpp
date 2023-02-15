@@ -20,6 +20,8 @@ int main() {
     auto pos = sec.begin() + 5;
     std::copy_backward(first.begin(), first.end(), pos);
 
+    cout << "first[pos] : " << sec[(pos - sec.begin())] << endl;
+
     std::cout << "destination contains: after copy_backward from first to sec" << endl;
     for (auto i : sec)
         std::cout << i << ' ';
@@ -36,8 +38,16 @@ int main() {
     // Пробую скопировать полный фрагмент 
     auto post = sec.begin() + 5;
     std::copy_backward(post-2, post+3, sec.end());
+    
 
     std::cout << "destination 3  contains after copy_backward from itself: " << endl;
+    for (auto i : sec)
+        std::cout << i << ' ';
+    std::cout << '\n';
+
+    std::copy_backward(post - 2, post + 3, sec.end() - 1);
+
+    std::cout << "destination 4  contains after copy_backward from itself to left: " << endl;
     for (auto i : sec)
         std::cout << i << ' ';
     std::cout << '\n';
