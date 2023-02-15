@@ -229,9 +229,8 @@ public:
 		// Напишите тело самостоятельно
 		if (size_ > 0 && size_ < capacity_) {
             ++size_; // увеличиваю размер чтобы было куда сдвинуть вправо 
-			std::copy_backward(pos, array_ptr_.Get() + size_, array_ptr_.Get() + ++size_);
-			*pos = value;
-            
+            std::copy_backward(pos, cend(), end() + 1);
+            array_ptr_[pos-array_ptr_.Get()] = value;
 		}
 		else {
 			/*
@@ -239,7 +238,7 @@ public:
 	Как и в случае с Erase, базовая гарантия безопасности исключений естественна для метода Insert. Аналогичное решение принято и для метода insert класса std::vector.
 			*/
 			int tmp_capacity = 0;
-			if (capacity_ = 0) { tmp_capacity = 1; }
+			if (capacity_ == 0) { tmp_capacity = 1; }
 			else { tmp_capacity = capacity_ * 2; }
 
 			ArrayPtr<Type> tmp(tmp_capacity);
