@@ -26,7 +26,7 @@ int main() {
     std::cout << '\n';
 
 
-    sec.resize(sec.size() + 1);
+    sec.resize(sec.size() + 1);  // увеличиваю размер на 1 чтобы было куда сдвинуть - иначе ошибка 
     std::cout << "destination 2  contains after resize: " << endl;
     for (auto i : sec)
         std::cout << i << ' ';
