@@ -254,7 +254,7 @@ public:
 	// Удаляет элемент вектора в указанной позиции
 	Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
-		std::copy_backward(pos + 1, array_ptr_.Get() + size_, pos);
+        std::copy_backward(pos+1, cend(), pos);
 		--size_;
 		return pos;  // следующий за удалернным будет именно pos как я понял 
 	}
