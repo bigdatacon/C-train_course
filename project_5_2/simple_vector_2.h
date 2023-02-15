@@ -206,14 +206,14 @@ public:
 		/*Когда вектор заполнен частично, запишем вставляемый элемент следом за последним элементом вектора и увеличим его размер.
 Чуть сложнее обстоит ситуация, когда вектор заполнен полностью. В этом случае выделите новый массив с удвоенной вместимостью, скопируйте в него элементы исходного массива, а в конец поместите вставляемый элемент. После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
 		if (size_ < capacity_) { 
-        //array_ptr_[array_ptr_.Get() + size_] = item;
-        array_ptr_[size_] = item; ++size_; 
+        array_ptr_[size_] = item; 
+        ++size_; 
         }
 		else {
-            ArrayPtr<Type> tmp(capacity_ * 2);
-			//SimpleVector tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
+            ArrayPtr<Type> tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
 			std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get());  //скопируйте в него элементы исходного массива
 			tmp[size_] = item; // а в конец поместите вставляемый элемент
+            
 			//После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
 			array_ptr_.swap(tmp); //swap(tmp);
 			size_ = size_ + 1;
@@ -228,9 +228,10 @@ public:
 	Iterator Insert(ConstIterator pos, const Type& value) {
 		// Напишите тело самостоятельно
 		if (size_ > 0 && size_ < capacity_) {
+            ++size_; // увеличиваю размер чтобы было куда сдвинуть вправо 
 			std::copy_backward(pos, array_ptr_.Get() + size_, array_ptr_.Get() + ++size_);
 			*pos = value;
-            ++size_;
+            
 		}
 		else {
 			/*
@@ -242,9 +243,9 @@ public:
 			else { tmp_capacity = capacity_ * 2; }
 
 			ArrayPtr<Type> tmp(tmp_capacity);
-			std::copy(tmp.Get(), tmp.Get() + pos, array_ptr_.Get()); // копируются элементы, которые предшествуют вставляемому
-			tmp.PushBack(value);  //сам вставляемый элемент
-			std::copy(++pos, ++pos + (array_ptr_.Get() + size_ - pos), array_ptr_.Get());   // и элементы, следующие за ним
+            std::copy(array_ptr_.Get(), --pos, std::back_inserter(tmp)); // копируются элементы, которые предшествуют вставляемому
+			tmp[pos - tmp.Get()] = value;  //сам вставляемый элемент
+			std::copy( array_ptr_.Get()+ pos++, array_ptr_.Get()+size_,  std::back_inserter(tmp) );   // и элементы, следующие за ним
 			//В конце вектор обновляет свой размер и вместимость, начинает ссылаться на новый массив, а старый массив удаляет:
 			swap(tmp);
 			size_ = size_ + 1;
