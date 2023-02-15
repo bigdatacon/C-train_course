@@ -12,20 +12,22 @@ int main() {
     std::vector<int> for_coopy{1};
 
     // Проверяю копирование
+    std::cout << "simple copy: ";
     std::copy(first.begin(), first.end() , std::back_inserter(for_coopy)  /*for_coopy.begin()*/ );
     for (auto el : for_coopy) { cout << " " << el << ' '; }
+    cout << endl;
 
     auto pos = sec.begin() + 5;
     std::copy_backward(first.begin(), first.end(), pos);
 
-    std::cout << "destination contains: ";
+    std::cout << "destination contains: after copy_backward from first to sec" << endl;
     for (auto i : sec)
         std::cout << i << ' ';
     std::cout << '\n';
 
 
     sec.resize(sec.size() + 1);
-    std::cout << "destination 2  contains: ";
+    std::cout << "destination 2  contains after resize: " << endl;
     for (auto i : sec)
         std::cout << i << ' ';
     std::cout << '\n';
@@ -35,7 +37,7 @@ int main() {
     auto post = sec.begin() + 5;
     std::copy_backward(post-2, post+3, sec.end());
 
-    std::cout << "destination 3  contains: ";
+    std::cout << "destination 3  contains after copy_backward from itself: " << endl;
     for (auto i : sec)
         std::cout << i << ' ';
     std::cout << '\n';
