@@ -234,11 +234,14 @@ public:
 			if (capacity_ == 0) { tmp_capacity = 1; }
 			else { tmp_capacity = capacity_ * 2; }
 			ArrayPtr<Type> tmp(tmp_capacity);
-            std::copy(array_ptr_.Get(), --pos, std::back_inserter(tmp)); // копируются элементы, которые предшествуют вставляемому
+            std::copy(cbegin(), pos, tmp.Get()); // копируются элементы, которые предшествуют вставляемому
+            
 			tmp[pos - tmp.Get()] = value;  //сам вставляемый элемент
-			std::copy( array_ptr_.Get()+ pos++, array_ptr_.Get()+size_,  std::back_inserter(tmp) );   // и элементы, следующие за ним
+            std::copy( pos, cend(),  tmp.Get() ); // и элементы, следующие за ним
+            
 			//В конце вектор обновляет свой размер и вместимость, начинает ссылаться на новый массив, а старый массив удаляет:
 			swap(tmp);
+            //array_ptr_ = tmp;  - так не работает 
 			size_ = size_ + 1;
 			capacity_ = tmp_capacity;
 
