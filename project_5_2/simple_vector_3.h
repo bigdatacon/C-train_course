@@ -24,6 +24,15 @@ public:
 	//using ConstIterator = const ArrayPtr<Type>;
 
 	SimpleVector() noexcept = default;
+    
+    // Пробую напрямую
+    /*SimpleVector(const SimpleVector &other) :
+            array_ptr_(other.array_ptr_), size_(other.size_), capacity_(other.capacity_) {
+        // Напишите тело конструктора самостоятельно
+        std::copy(other.begin(), other.end(), begin());
+
+
+    }*/
 
 	SimpleVector(const SimpleVector& other) {
 		// Напишите тело конструктора самостоятельно
@@ -187,7 +196,21 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-
+    
+    
+    SimpleVector& operator=(const SimpleVector &rhs) {
+        // Напишите тело конструктора самостоятельно
+        delete[] array_ptr_.Release();
+        /*pointer*/ ArrayPtr<Type> newptr(rhs.size_);
+        std::copy(rhs.begin(), rhs.end(), newptr.Get());
+        array_ptr_.swap(newptr);
+        size_ = rhs.size_;
+        capacity_ = size_;
+        return *this;
+    }
+    
+    // Старая версия 
+    /*
 	SimpleVector& operator=(const SimpleVector& rhs) {
 		// Напишите тело конструктора самостоятельно
 		if (this != &rhs) {   
@@ -196,7 +219,7 @@ public:
 			swap(tmp);
 		}
 		return *this;
-	}
+	}*/
 
 	// Добавляет элемент в конец вектора
 	// При нехватке места увеличивает вдвое вместимость вектора
@@ -222,11 +245,12 @@ public:
 	// Возвращает итератор на вставленное значение
 	// Если перед вставкой значения вектор был заполнен полностью,
 	// вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
-	Iterator Insert(ConstIterator pos, const Type& value) {
+
+    Iterator Insert(ConstIterator pos, const Type& value) {
 		// Напишите тело самостоятельно
 		if (size_ > 0 && size_ < capacity_) {
             ++size_; // увеличиваю размер чтобы было куда сдвинуть вправо 
-            std::copy_backward(pos, cend(), end() + 1);
+            std::copy_backward(Iterator(pos), end(), end() + 1);
             array_ptr_[pos-array_ptr_.Get()] = value;
 		}
 		else {
@@ -234,10 +258,10 @@ public:
 			if (capacity_ == 0) { tmp_capacity = 1; }
 			else { tmp_capacity = capacity_ * 2; }
 			ArrayPtr<Type> tmp(tmp_capacity);
-            std::copy(cbegin(), pos, tmp.Get()); // копируются элементы, которые предшествуют вставляемому
+            std::copy(begin(), Iterator(pos), tmp.Get()); // копируются элементы, которые предшествуют вставляемому
             
 			tmp[pos - tmp.Get()] = value;  //сам вставляемый элемент
-            std::copy( pos, cend(),  tmp.Get() ); // и элементы, следующие за ним
+            std::copy( Iterator(pos), end(),  tmp.Get() ); // и элементы, следующие за ним
             
 			//В конце вектор обновляет свой размер и вместимость, начинает ссылаться на новый массив, а старый массив удаляет:
 			//swap(tmp);
