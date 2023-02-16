@@ -220,6 +220,8 @@ public:
 		}
 		return *this;
 	}*/
+    
+    
 
 	// Добавляет элемент в конец вектора
 	// При нехватке места увеличивает вдвое вместимость вектора
@@ -246,6 +248,30 @@ public:
 	// Если перед вставкой значения вектор был заполнен полностью,
 	// вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
 
+
+
+    
+    Iterator Insert(ConstIterator pos, const Type &value) {
+        if (size_ < capacity_) {
+            std::copy_backward((Iterator)pos, end(), end() + 1);
+            *((Iterator)pos) = value;
+            ++size_;
+            return (Iterator)pos;
+        }
+
+
+        SimpleVector<Type> swap_ptr((2 * capacity_));
+        std::copy(begin(), (Iterator)pos, swap_ptr.begin());
+        std::copy((Iterator)pos,end(),swap_ptr.begin() + ((Iterator)pos - begin() + 1));
+        auto return_it = swap_ptr.begin() + (pos - begin());
+        *return_it = value;
+        capacity_ = 2 * capacity_;
+        ++size_;
+        array_ptr_.swap(swap_ptr.array_ptr_);
+        return return_it;
+    }
+    
+    /*
     Iterator Insert(ConstIterator pos, const Type& value) {
 		// Напишите тело самостоятельно
 		if (size_ > 0 && size_ < capacity_) {
@@ -272,7 +298,7 @@ public:
 
 		}
         return Iterator(&value);
-	}
+	}*/
 
 	// "Удаляет" последний элемент вектора. Вектор не должен быть пустым
 	void PopBack() noexcept {
@@ -290,11 +316,16 @@ public:
 	}
 
 	// Обменивает значение с другим вектором
-	void swap(SimpleVector& other) noexcept {
-		// Напишите тело самостоятельно
-		size_ = other.size_;
-		capacity_ = other.size_;
-	}
+    void swap(SimpleVector& other) noexcept {
+        // Напишите тело самостоятельно
+        array_ptr_.swap(other.array_ptr_);
+        size_t tmp = size_;
+        size_ = other.size_;
+        other.size_ = tmp;
+        tmp = capacity_;
+        capacity_ = other.capacity_;
+        other.capacity_ = tmp;
+      }
 
 
 private:
