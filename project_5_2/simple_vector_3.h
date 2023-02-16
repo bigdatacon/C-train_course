@@ -21,6 +21,8 @@ public:
 	using ConstIterator = const Type*;
 	SimpleVector() noexcept = default;
     
+
+    
     SimpleVector(const SimpleVector& other) {
         // Напишите тело конструктора самостоятельно
         if (!other.IsEmpty()) {
@@ -199,7 +201,7 @@ public:
         capacity_ = size_;
         return *this;
     }
-    
+      
     // Старая версия 
     /*
 	SimpleVector& operator=(const SimpleVector& rhs) {
@@ -218,6 +220,11 @@ public:
 	// При нехватке места увеличивает вдвое вместимость вектора
 	void PushBack(const Type& item) {
 		// Напишите тело самостоятельно
+        if (IsEmpty()){
+            ++size_;
+            array_ptr_[size_] = item; 
+            
+        }
 		if (size_ < capacity_) { 
         array_ptr_[size_] = item; 
         ++size_; 
