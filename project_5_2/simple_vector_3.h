@@ -25,25 +25,21 @@ public:
 
 	SimpleVector() noexcept = default;
     
-    // Пробую напрямую
-    /*SimpleVector(const SimpleVector &other) :
-            array_ptr_(other.array_ptr_), size_(other.size_), capacity_(other.capacity_) {
+    SimpleVector(const SimpleVector& other) {
         // Напишите тело конструктора самостоятельно
-        std::copy(other.begin(), other.end(), begin());
+        if (!other.IsEmpty()) {
+          SimpleVector tmp(other.size_);
+          tmp.size_ = other.size_;
+          tmp.capacity_ = other.capacity_;
+          for (size_t i = 0; i < other.size_; i++) {
+            tmp.array_ptr_[i] = other.array_ptr_[i];
+          }
+          swap(tmp);
+        }
+
+      }
 
 
-    }*/
-
-	SimpleVector(const SimpleVector& other) {
-		// Напишите тело конструктора самостоятельно
-		SimpleVector tmp;
-		if (!other.IsEmpty()) {
-			tmp.size_ = other.size_;
-			tmp.capacity_ = other.capacity_;
-		}
-		swap(tmp);
-
-	}
 
 	explicit SimpleVector(size_t size) :
 		array_ptr_(size) {
