@@ -240,8 +240,9 @@ public:
             std::copy( pos, cend(),  tmp.Get() ); // и элементы, следующие за ним
             
 			//В конце вектор обновляет свой размер и вместимость, начинает ссылаться на новый массив, а старый массив удаляет:
-			swap(tmp);
-            //array_ptr_ = tmp;  - так не работает 
+			//swap(tmp);
+            //array_ptr_ = tmp;  - так не работает
+            array_ptr_.swap(tmp);
 			size_ = size_ + 1;
 			capacity_ = tmp_capacity;
 
