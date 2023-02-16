@@ -259,10 +259,10 @@ public:
 	// Удаляет элемент вектора в указанной позиции
 	Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
-        std::copy_backward(pos+1, cend(), pos);
+        std::copy_backward(Iterator(pos+1), end(), Iterator(pos));
 		--size_;
-		//return Iterator(pos-1);
-        return pos;// следующий за удалернным будет именно pos как я понял 
+		return Iterator(pos); // следующий за удалернным будет именно pos как я понял 
+
 	}
 
 	// Обменивает значение с другим вектором
