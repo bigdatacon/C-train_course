@@ -19,16 +19,13 @@ class SimpleVector {
 public:
 	using Iterator = Type*;
 	using ConstIterator = const Type*;
-
-	//using Iterator = ArrayPtr<Type>;
-	//using ConstIterator = const ArrayPtr<Type>;
-
 	SimpleVector() noexcept = default;
     
     SimpleVector(const SimpleVector& other) {
         // Напишите тело конструктора самостоятельно
         if (!other.IsEmpty()) {
-          SimpleVector tmp(other.size_);
+          SimpleVector tmp(other.capacity_);
+          std::fill(array_ptr_.Get(), array_ptr_.Get() + other.capacity_, Type());
           tmp.size_ = other.size_;
           tmp.capacity_ = other.capacity_;
           for (size_t i = 0; i < other.size_; i++) {
@@ -38,8 +35,6 @@ public:
         }
 
       }
-
-
 
 	explicit SimpleVector(size_t size) :
 		array_ptr_(size) {
