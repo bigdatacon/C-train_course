@@ -220,11 +220,7 @@ public:
 	// При нехватке места увеличивает вдвое вместимость вектора
 	void PushBack(const Type& item) {
 		// Напишите тело самостоятельно
-        if (IsEmpty()){
-            ++size_;
-            array_ptr_[size_] = item; 
-            
-        }
+        if (IsEmpty()) { Reserve(10); array_ptr_[0] = item; size_ = 1; return; }
 		if (size_ < capacity_) { 
         array_ptr_[size_] = item; 
         ++size_; 
