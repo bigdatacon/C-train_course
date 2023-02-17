@@ -20,7 +20,7 @@ public:
 	using Iterator = Type*;
 	using ConstIterator = const Type*;
 	SimpleVector() noexcept = default;
-    
+     
 
     
     SimpleVector(const SimpleVector& other) {
@@ -219,23 +219,22 @@ public:
 	// Добавляет элемент в конец вектора
 	// При нехватке места увеличивает вдвое вместимость вектора
 	void PushBack(const Type& item) {
-		// Напишите тело самостоятельно
+    // Напишите тело самостоятельно
         if (IsEmpty()) { Reserve(10); array_ptr_[0] = item; size_ = 1; return; }
-		if (size_ < capacity_) { 
-        array_ptr_[size_] = item; 
-        ++size_; 
-        }
-		else {
-            ArrayPtr<Type> tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
-			std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get());  //скопируйте в него элементы исходного массива
-			tmp[size_] = item; // а в конец поместите вставляемый элемент
-            
-			//После этого можно обновить размер и вместимость вектора, переключиться на новый массив, а старый массив — удалить.*/
-			array_ptr_.swap(tmp); //swap(tmp);
-			size_ = size_ + 1;
-			capacity_ = capacity_ * 2;
-		}
-	}
+  if (size_ < capacity_) { 
+    array_ptr_[size_] = item; 
+    ++size_; 
+  } else {
+    ArrayPtr<Type> tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
+    //std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get()); // наоборот было изначально
+    std::copy(array_ptr_.Get(), array_ptr_.Get() + size_, tmp.Get());  //скопируйте в него элементы исходного массива
+    tmp[size_] = item; // а в конец поместите вставляемый элемент
+    array_ptr_.swap(tmp);
+    size_ = size_ + 1;
+    capacity_ = capacity_ * 2;
+  }
+  }
+    
 
 	// Вставляет значение value в позицию pos.
 	// Возвращает итератор на вставленное значение
