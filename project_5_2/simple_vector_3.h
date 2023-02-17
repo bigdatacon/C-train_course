@@ -23,6 +23,20 @@ public:
      
 
     
+    /*SimpleVector(const SimpleVector& other) {
+        // Напишите тело конструктора самостоятельно
+        if (!other.IsEmpty()) {
+          SimpleVector tmp(other.capacity_);
+          std::fill(tmp.array_ptr_.Get(), tmp.array_ptr_.Get() + other.capacity_, Type());
+          tmp.size_ = other.size_;
+          tmp.capacity_ = other.capacity_;
+          std::copy(other.array_ptr_.Get(), other.array_ptr_.Get() + size_, tmp.array_ptr_.Get());
+          std::fill(tmp.array_ptr_.Get() + size_, tmp.array_ptr_.Get() + other.capacity_, Type());
+          swap(tmp);
+        }
+
+      }*/
+    
     SimpleVector(const SimpleVector& other) {
         // Напишите тело конструктора самостоятельно
         if (!other.IsEmpty()) {
@@ -300,13 +314,23 @@ public:
 	}
 
 	// Удаляет элемент вектора в указанной позиции
-	Iterator Erase(ConstIterator pos) {
+	/*Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
         std::copy_backward(Iterator(pos+1), end(), Iterator(pos));
 		--size_;
 		return Iterator(pos); // следующий за удалернным будет именно pos как я понял 
 
-	}
+	}*/
+    
+    Iterator Erase(ConstIterator pos) {
+    // Напишите тело самостоятельно
+    std::copy(Iterator(pos+1), end(), Iterator(pos));
+    --size_;
+    return Iterator(pos); // следующий за удалернным будет именно pos как я понял 
+
+  }
+    
+    
 
 	// Обменивает значение с другим вектором
     void swap(SimpleVector& other) noexcept {
