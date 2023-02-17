@@ -27,7 +27,7 @@ public:
         // Напишите тело конструктора самостоятельно
         if (!other.IsEmpty()) {
           SimpleVector tmp(other.capacity_);
-          std::fill(array_ptr_.Get(), array_ptr_.Get() + other.capacity_, Type());
+          std::fill(array_ptr_.Get(), array_ptr_.Get() + capacity_, Type());
           tmp.size_ = other.size_;
           tmp.capacity_ = other.capacity_;
           for (size_t i = 0; i < other.size_; i++) {
@@ -227,7 +227,7 @@ public:
   } else {
     ArrayPtr<Type> tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
     //std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get()); // наоборот было изначально
-    std::copy(array_ptr_.Get(), array_ptr_.Get() + size_, tmp.Get());  //скопируйте в него элементы исходного массива
+    std::copy(array_ptr_.Get(), array_ptr_.Get() + size_, tmp.Get());   //скопируйте в него элементы исходного массива
     tmp[size_] = item; // а в конец поместите вставляемый элемент
     array_ptr_.swap(tmp);
     size_ = size_ + 1;
