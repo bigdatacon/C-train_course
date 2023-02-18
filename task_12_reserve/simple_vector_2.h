@@ -11,9 +11,8 @@ using namespace std;
 
 class ReserveProxyObj{
     public:
-        ReserveProxyObj(size_t i):capacity_to_reserve(i){
-
-
+        ReserveProxyObj(size_t i) {
+            capacity_to_reserve = i;
         }
         size_t capacity_to_reserve;
     };
@@ -26,7 +25,6 @@ public:
 	SimpleVector() noexcept = default;
     
 
-    
     SimpleVector(ReserveProxyObj other) {
         // Напишите тело конструктора самостоятельно
         Reserve(other.capacity_to_reserve);
@@ -315,7 +313,10 @@ private:
 
 };
 
-
+//огда функция (не метод!) будет иметь следующую сигнатуру:
+ReserveProxyObj Reserve(size_t capacity_to_reserve) {
+    return ReserveProxyObj(capacity_to_reserve);
+}
 
 template<typename Type>
 inline bool operator==(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
