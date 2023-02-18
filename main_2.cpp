@@ -5,28 +5,16 @@
 
 using namespace std;
 
-/*Функция move поможет вам избежать копирования объектов и при создании pool, и при переносе выживших обратно в контейнер.*/
-/*
-Задание
-Дан диапазон объектов некоторого типа. Напишите функцию, которая переставляет его элементы в соответствии с порядком, определённым считалкой Иосифа Флавия с заданным размером шага. Вы можете почитать о задаче здесь (https://habr.com/ru/company/goto/blog/351092/) или разобраться с примером в заготовке кода.
-template <typename RandomIt>
-void MakeJosephusPermutation(RandomIt range_begin, RandomIt range_end, uint32_t step_size); 
-Предлагаемое решение задачи о считалке копирует элементы и не укладывается в ограничения по времени, но в остальном оно корректное. Исправьте его или напишите своё. Если найдёте, что в решении можно улучшить кроме замены копирования на перемещение, не стесняйтесь. Главное, чтобы оно продолжало корректно работать. Сохраните себе решение этого задания, оно вам ещё пригодится.
-Формат входных данных
-Гарантируется, что итераторы range_begin и range_end являются итераторами произвольного доступа, то есть допускают вычитание одного из другого и сложение с числом. Кроме того, вы можете полагаться на то, что step_size > 0. Тип переупорядочиваемых объектов можно получить с помощью выражения typename RandomIt::value_type. 
-Максимальный размер диапазона — 10^5, максимальный размер шага — 10^2. Время выполнения одного вызова функции ограничено одной секундой.
-Ограничения
-Объекты такого типа копировать запрещено. При их копировании вы получите ошибку компиляции.
-Тесты
-Достаточно нескольких небольших ручных тестов и одного большого с максимальными ограничениями.
-*/
 template <typename RandomIt>
 void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) {
     vector<typename RandomIt::value_type> pool(first, last);
     size_t cur_pos = 0;
     while (!pool.empty()) {
-        *(first++) = pool[cur_pos];
-        pool.erase(pool.begin() + cur_pos);
+        
+        *(first++) = std::move(pool[cur_pos]) ;
+
+        /*(first++) = pool[cur_pos];
+        pool.erase(pool.begin() + cur_pos);*/
         if (pool.empty()) {
             break;
         }
@@ -78,6 +66,26 @@ ostream& operator<<(ostream& os, const NoncopyableInt& v) {
 }
 
 void TestAvoidsCopying() {
+    vector<int> numbers;
+    numbers.push_back({1});
+    numbers.push_back({2});
+    numbers.push_back({3});
+    numbers.push_back({4});
+    numbers.push_back({5});
+
+    MakeJosephusPermutation(begin(numbers), end(numbers), 2);
+
+    vector<int> expected;
+    expected.push_back({1});
+    expected.push_back({3});
+    expected.push_back({5});
+    expected.push_back({4});
+    expected.push_back({2});
+
+    assert(numbers == expected);
+}
+
+/*void TestAvoidsCopying() {
     vector<NoncopyableInt> numbers;
     numbers.push_back({1});
     numbers.push_back({2});
@@ -95,7 +103,7 @@ void TestAvoidsCopying() {
     expected.push_back({2});
 
     assert(numbers == expected);
-}
+}*/
 
 int main() {
     TestIntVector();
