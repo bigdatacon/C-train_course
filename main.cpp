@@ -37,6 +37,26 @@ void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) 
 }
 
 
+/*
+template <typename RandomIt>
+void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) {
+    vector<typename RandomIt::value_type> pool(make_move_iterator(first), make_move_iterator(last));
+    size_t cur_pos = 0;
+    while (!pool.empty()) {
+        *(first++) = std::move(pool[cur_pos]) ;
+
+        //(first++) = pool[cur_pos];
+        pool.erase(pool.begin() + cur_pos);
+        if (pool.empty()) {
+            break;
+        }
+        cur_pos = (cur_pos + step_size - 1) % pool.size();
+    }
+}
+
+*/
+
+
 vector<int> MakeTestVector() {
     vector<int> numbers(10);
     iota(begin(numbers), end(numbers), 0);
