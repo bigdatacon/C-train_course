@@ -4,6 +4,7 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+#include <iterator>
 
 using namespace std;
 
@@ -16,15 +17,18 @@ using namespace std;
 
 */
 
+
 template <typename RandomIt>
 void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) {
     //auto original = first;
     size_t cur_pos = 0;
     size_t cur_size = last - first;
     while (cur_size > 0) {
-        auto cur_item = std::move(* (first + cur_pos));
+        //auto cur_item = std::move(* (first + cur_pos));
+        auto cur_item = make_move_iterator(* (first + cur_pos));
         for (auto it = first + cur_pos; it != first; it--) {
             *it = std::move(* (it - 1));
+            //*it = make_move_iterator(*(it-1));
         }
         * (first++) = std::move(cur_item);
         cur_size--;
@@ -36,9 +40,7 @@ void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) 
     }
 }
 
-
-/*
-template <typename RandomIt>
+/*template <typename RandomIt>
 void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) {
     vector<typename RandomIt::value_type> pool(make_move_iterator(first), make_move_iterator(last));
     size_t cur_pos = 0;
@@ -50,9 +52,8 @@ void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) 
         }
         cur_pos = (cur_pos + step_size - 1) % pool.size();
     }
-}
+}*/
 
-*/
 
 
 vector<int> MakeTestVector() {
