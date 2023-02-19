@@ -44,8 +44,6 @@ void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) 
     size_t cur_pos = 0;
     while (!pool.empty()) {
         *(first++) = std::move(pool[cur_pos]) ;
-
-        //(first++) = pool[cur_pos];
         pool.erase(pool.begin() + cur_pos);
         if (pool.empty()) {
             break;
