@@ -24,8 +24,8 @@ void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) 
     size_t cur_pos = 0;
     size_t cur_size = last - first;
     while (cur_size > 0) {
-        //auto cur_item = std::move(* (first + cur_pos));
-        auto cur_item = make_move_iterator(* (first + cur_pos));
+        auto cur_item = std::move(* (first + cur_pos));
+        //auto cur_item = make_move_iterator(* (first + cur_pos));
         for (auto it = first + cur_pos; it != first; it--) {
             *it = std::move(* (it - 1));
             //*it = make_move_iterator(*(it-1));
