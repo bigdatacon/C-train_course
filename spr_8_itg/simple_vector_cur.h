@@ -381,14 +381,12 @@ public:
 
 	Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
-		auto ret_it = std::move((Iterator)pos);
-		auto it_after = pos + 1;
-		for (; it_after != end(); ++pos, ++it_after) {
-			*(Iterator)pos = std::move(*it_after);
-		}
+
+		std::move(++pos, end(), pos); // сдвигаю все элементы следующие за pos на 1 влево 
 		--size_;
-		return ret_it;
+		return Iterator(pos);
 	}
+
 
 
 
