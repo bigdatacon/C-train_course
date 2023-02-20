@@ -382,7 +382,7 @@ public:
 	Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
 
-		std::move(++pos, end(), pos); // сдвигаю все элементы следующие за pos на 1 влево 
+		std::move(++Iterator(pos), end(), Iterator(pos)); // сдвигаю все элементы следующие за pos на 1 влево 
 		--size_;
 		return Iterator(pos);
 	}
