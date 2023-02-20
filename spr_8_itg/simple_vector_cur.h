@@ -38,6 +38,16 @@ public:
 			swap(tmp);
 		}
 	}
+	// Конструктор для rvalue
+	SimpleVector(SimpleVector&& other) {
+		// Напишите тело конструктора самостоятельно
+		if (!other.IsEmpty()) {
+			SimpleVector tmp(other.size_);
+			std::move(other.begin(), other.end(), tmp.array_ptr_.Get());
+			swap(tmp);
+		}
+	}
+
 
 	explicit SimpleVector(size_t size) :
 		array_ptr_(size) {
@@ -127,7 +137,7 @@ public:
 	}
 	// Изменяет размер массива.
 	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
-	void Resize(size_t new_size) {
+	/*void Resize(size_t new_size) {
 		if (new_size > size_) {
 			if (new_size <= capacity_) {
 				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
@@ -139,7 +149,23 @@ public:
 			}
 		}
 		size_ = new_size;
+	}*/
+
+	// для rvalue
+	void Resize(size_t new_size) {
+		if (new_size > size_) {
+			if (new_size <= capacity_) {
+				std::generate(end(), array_ptr_.Get() + new_size, Type{} );
+			}
+			else {
+				//while (new_size > capacity_) capacity_ *= 2;
+				Reserve(new_size);
+				std::generate(end(), array_ptr_.Get() + new_size, Type{} );
+			}
+		}
+		size_ = new_size;
 	}
+
 
 	// Возвращает итератор на начало массива
 	// Для пустого массива может быть равен (или не равен) nullptr
@@ -204,6 +230,18 @@ public:
 		return *this;
 	}
 
+	//Присваивание для rvalue 
+	SimpleVector& operator=(SimpleVector&& rhs) {
+		// Напишите тело конструктора самостоятельно
+		delete[] array_ptr_.Release();
+		/*pointer*/ ArrayPtr<Type> newptr(rhs.size_);
+		std::move(rhs.begin(), rhs.end(), newptr.Get());
+		array_ptr_.swap(newptr);
+		size_ = std::move(rhs.size_);
+		capacity_ = size_;
+		return *this;
+	}
+
 
 
 	// Добавляет элемент в конец вектора
@@ -233,6 +271,35 @@ public:
 			capacity_ = capacity_ * 2;
 		}
 	}
+
+	// Push_back для rvalues ссылки 
+	void PushBack(Type&& item) {
+		// Напишите тело самостоятельно
+		if (IsEmpty()) {
+			if (!capacity_) {
+				Reserve(10);
+			}
+			array_ptr_[0] = std::move(item);
+			size_ = 1;
+			return;
+		}
+		if (size_ < capacity_) {
+			array_ptr_[size_] = std::move(item);
+			++size_;
+		}
+		else {
+			ArrayPtr<Type> tmp(capacity_ * 2); //выделите новый массив с удвоенной вместимостью
+			//std::copy(tmp.Get(), tmp.Get() + size_, array_ptr_.Get()); // наоборот было изначально
+			std::move(array_ptr_.Get(), array_ptr_.Get() + size_, tmp.Get());   //скопируйте в него элементы исходного массива
+			tmp[size_] = std::move(item); // а в конец поместите вставляемый элемент
+			array_ptr_.swap(tmp);
+			size_ = size_ + 1;
+			capacity_ = capacity_ * 2;
+		}
+	}
+
+
+
 
 
 
@@ -266,6 +333,31 @@ public:
 		return return_it;
 	}
 
+	// для rvalue ссылки 
+	Iterator Insert(ConstIterator pos, const Type&& value) {
+		if (pos == end()) {
+			PushBack(std::move(value));
+			return end() - 1;
+		}
+		if (size_ < capacity_) {
+			std::copy_backward((Iterator)pos, end(), end() + 1);
+			*((Iterator)pos) = std::move(value);
+			++size_;
+			return (Iterator)pos;
+		}
+
+
+		SimpleVector<Type> swap_ptr((2 * capacity_));
+		std::move(begin(), (Iterator)pos, swap_ptr.begin());
+		std::move((Iterator)pos, end(), swap_ptr.begin() + ((Iterator)pos - begin() + 1));
+		auto return_it = swap_ptr.begin() + (pos - begin());
+		*return_it = std::move(value);
+		capacity_ = 2 * capacity_;
+		++size_;
+		array_ptr_.swap(swap_ptr.array_ptr_);
+		return return_it;
+	}
+
 
 
 
@@ -276,10 +368,7 @@ public:
 	}
 
 
-
-
-
-	Iterator Erase(ConstIterator pos) {
+	/*Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
 		auto ret_it = (Iterator)pos;
 		auto it_after = pos + 1;
@@ -288,7 +377,20 @@ public:
 		}
 		--size_;
 		return ret_it;
+	}*/
+
+	Iterator Erase(ConstIterator pos) {
+		// Напишите тело самостоятельно
+		auto ret_it = std::move((Iterator)pos);
+		auto it_after = pos + 1;
+		for (; it_after != end(); ++pos, ++it_after) {
+			*(Iterator)pos = std::move(*it_after);
+		}
+		--size_;
+		return ret_it;
 	}
+
+
 
 
 
@@ -304,7 +406,17 @@ public:
 		other.capacity_ = tmp;
 	}
 
-
+	// для rvalue ссылки 
+	void swap(SimpleVector&& other) noexcept {
+		// Напишите тело самостоятельно
+		array_ptr_.swap(other.array_ptr_);
+		size_t tmp = size_;
+		size_ = std::move(other.size_);
+		other.size_ = tmp;
+		tmp = capacity_;
+		capacity_ = std::move(other.capacity_);
+		other.capacity_ = tmp;
+	}
 
 
 private:
