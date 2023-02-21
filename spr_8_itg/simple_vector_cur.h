@@ -159,12 +159,14 @@ public:
 	void Resize(size_t new_size) {
 		if (new_size > size_) {
 			if (new_size <= capacity_) {
-				std::generate(end(), array_ptr_.Get() + new_size, Type{} );
+				//std::generate(end(), array_ptr_.Get() + new_size, Type{} );
+                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); } );
 			}
 			else {
 				//while (new_size > capacity_) capacity_ *= 2;
 				Reserve(new_size);
-				std::generate(end(), array_ptr_.Get() + new_size, Type{} );
+				//std::generate(end(), array_ptr_.Get() + new_size, Type{} );
+                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); } );
 			}
 		}
 		size_ = new_size;
