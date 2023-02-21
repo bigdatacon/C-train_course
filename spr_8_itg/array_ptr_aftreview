@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <algorithm>
 
 template <typename Type>
 class ArrayPtr {
@@ -98,16 +99,7 @@ public:
 	// Обменивается значениям указателя на массив с объектом other
 	void swap(ArrayPtr& other) noexcept {
 		// Реализуйте метод самостоятельно
-		/*Type * ptr = raw_ptr_;
-		raw_ptr_ = other.raw_ptr_;
-		other.raw_ptr_ = ptr;*/
-
-
-		Type* tmp = raw_ptr_;
-		raw_ptr_ = other.raw_ptr_;
-		other.raw_ptr_ = tmp;
-
-
+        std::swap(raw_ptr_, other.raw_ptr_);
 	}
 
 
