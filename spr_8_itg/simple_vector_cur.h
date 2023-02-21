@@ -45,15 +45,6 @@ public:
 	}
 
 
-	/*explicit SimpleVector(size_t size) :
-		array_ptr_(size) {
-		size_ = size;
-		capacity_ = size;
-		//std::fill(array_ptr_.Get(), array_ptr_.Get() + size_, Type());
-		//std::generate(array_ptr_.Get(), array_ptr_.Get() + size_, [] { return Type(); });
-		std::generate(array_ptr_.Get(), array_ptr_.Get() + size_, [] { return Type{};});
-	}*/
-
 	explicit SimpleVector(size_t size) :
 		array_ptr_(size) {
 		size_ = size;
@@ -139,34 +130,20 @@ public:
 			capacity_ = new_capacity;
 		}
 	}
-	// Изменяет размер массива.
-	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
-	/*void Resize(size_t new_size) {
-		if (new_size > size_) {
-			if (new_size <= capacity_) {
-				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
-			}
-			else {
-				//while (new_size > capacity_) capacity_ *= 2;
-				Reserve(new_size);
-				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
-			}
-		}
-		size_ = new_size;
-	}*/
+
 
 	// для rvalue
 	void Resize(size_t new_size) {
 		if (new_size > size_) {
 			if (new_size <= capacity_) {
 				//std::generate(end(), array_ptr_.Get() + new_size, Type{} );
-                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); } );
+				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
 			}
 			else {
 				//while (new_size > capacity_) capacity_ *= 2;
 				Reserve(new_size);
 				//std::generate(end(), array_ptr_.Get() + new_size, Type{} );
-                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); } );
+				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
 			}
 		}
 		size_ = new_size;
@@ -222,7 +199,6 @@ public:
 		return array_ptr_.Get() + size_;
 	}
 
-	////////////////////////////////////////////////////////////////////////////
 
 
 	SimpleVector& operator=(const SimpleVector& rhs) {
@@ -247,7 +223,6 @@ public:
 		capacity_ = size_;
 		return *this;
 	}
-
 
 
 	// Добавляет элемент в конец вектора
@@ -305,10 +280,6 @@ public:
 	}
 
 
-
-
-
-
 	// Вставляет значение value в позицию pos.
 	// Возвращает итератор на вставленное значение
 	// Если перед вставкой значения вектор был заполнен полностью,
@@ -340,13 +311,15 @@ public:
 	}
 
 	// для rvalue ссылки 
-	Iterator Insert(ConstIterator pos,  Type&& value) {
+	Iterator Insert(ConstIterator pos, Type&& value) {
 		if (pos == end()) {
 			PushBack(std::move(value));
 			return end() - 1;
 		}
 		if (size_ < capacity_) {
-			std::move((Iterator)pos, end(), end() + 1);
+			for (auto p = end(); p != (Iterator)pos; p = prev(p)) {
+				*p = std::move(*prev(p));
+			}
 			*((Iterator)pos) = std::move(value);
 			++size_;
 			return (Iterator)pos;
@@ -365,8 +338,6 @@ public:
 	}
 
 
-
-
 	// "Удаляет" последний элемент вектора. Вектор не должен быть пустым
 	void PopBack() noexcept {
 		// Напишите тело самостоятельно
@@ -374,16 +345,6 @@ public:
 	}
 
 
-	/*Iterator Erase(ConstIterator pos) {
-		// Напишите тело самостоятельно
-		auto ret_it = (Iterator)pos;
-		auto it_after = pos + 1;
-		for (; it_after != end(); ++pos, ++it_after) {
-			*(Iterator)pos = *it_after;
-		}
-		--size_;
-		return ret_it;
-	}*/
 
 	Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
@@ -393,10 +354,6 @@ public:
 		--size_;
 		return Iterator(pos);
 	}
-
-
-
-
 
 
 	// Обменивает значение с другим вектором
