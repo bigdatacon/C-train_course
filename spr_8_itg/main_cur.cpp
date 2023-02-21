@@ -1,4 +1,4 @@
-#include "simple_vector.h"
+#include "simple_vector_after_review.h"
 
 #include <cassert>
 #include <iostream>
@@ -156,12 +156,12 @@ void TestNoncopiableErase() {
 
 int main() {
     TestTemporaryObjConstructor();
-    /*TestTemporaryObjOperator();
+    TestTemporaryObjOperator();
     TestNamedMoveConstructor();
     TestNamedMoveOperator();
     TestNoncopiableMoveConstructor();
     TestNoncopiablePushBack();
     TestNoncopiableInsert();
-    TestNoncopiableErase();*/
+    TestNoncopiableErase();
     return 0;
 }
