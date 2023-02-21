@@ -87,13 +87,13 @@ public:
 
 	// Возвращает ссылку на элемент с индексом index
 	Type& operator[](size_t index) noexcept {
-        assert(index < size_)
+		assert(index < size_);
 		return array_ptr_[index];
 	}
 
 	// Возвращает константную ссылку на элемент с индексом index
 	const Type& operator[](size_t index) const noexcept {
-        assert(index < size_)
+		assert(index < size_);
 		return array_ptr_[index];
 	}
 
@@ -139,13 +139,13 @@ public:
 		if (new_size > size_) {
 			if (new_size <= capacity_) {
 				//std::generate(end(), array_ptr_.Get() + new_size, Type{} );
-                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); } );
+				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
 			}
 			else {
 				//while (new_size > capacity_) capacity_ *= 2;
 				Reserve(new_size);
 				//std::generate(end(), array_ptr_.Get() + new_size, Type{} );
-                std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); } );
+				std::generate(end(), array_ptr_.Get() + new_size, [] { return Type(); });
 			}
 		}
 		size_ = new_size;
@@ -289,8 +289,8 @@ public:
 
 
 	Iterator Insert(ConstIterator pos, const Type& value) {
-		assert(pos >= begin() && pos <= end())
-        if (pos == end()) {
+		assert(pos >= begin() && pos <= end());
+		if (pos == end()) {
 			PushBack(value);
 			return end() - 1;
 		}
@@ -314,33 +314,33 @@ public:
 	}
 
 	// для rvalue ссылки 
-    Iterator Insert(ConstIterator pos,  Type&& value) {
-    assert(pos >= begin() && pos <= end())
-    if (pos == end()) {
-      PushBack(std::move(value));
-      return end() - 1;
-    }
-    if (size_ < capacity_) {
-      for (auto p = end(); p != (Iterator) pos; p = prev(p)) {
-        *p = std::move(*prev(p));
-      }
-      *((Iterator)pos) = std::move(value);
-      ++size_;
-      return (Iterator)pos;
-    }
+	Iterator Insert(ConstIterator pos, Type&& value) {
+		assert(pos >= begin() && pos <= end());
+		if (pos == end()) {
+			PushBack(std::move(value));
+			return end() - 1;
+		}
+		if (size_ < capacity_) {
+			for (auto p = end(); p != (Iterator)pos; p = prev(p)) {
+				*p = std::move(*prev(p));
+			}
+			*((Iterator)pos) = std::move(value);
+			++size_;
+			return (Iterator)pos;
+		}
 
 
-    SimpleVector<Type> swap_ptr((2 * capacity_));
-    std::move(begin(), (Iterator)pos, swap_ptr.begin());
-    std::move((Iterator)pos, end(), swap_ptr.begin() + ((Iterator)pos - begin() + 1));
-    auto return_it = swap_ptr.begin() + (pos - begin());
-    *return_it = std::move(value);
-    capacity_ = 2 * capacity_;
-    ++size_;
-    array_ptr_.swap(swap_ptr.array_ptr_);
-    return return_it;
-  }
-    
+		SimpleVector<Type> swap_ptr((2 * capacity_));
+		std::move(begin(), (Iterator)pos, swap_ptr.begin());
+		std::move((Iterator)pos, end(), swap_ptr.begin() + ((Iterator)pos - begin() + 1));
+		auto return_it = swap_ptr.begin() + (pos - begin());
+		*return_it = std::move(value);
+		capacity_ = 2 * capacity_;
+		++size_;
+		array_ptr_.swap(swap_ptr.array_ptr_);
+		return return_it;
+	}
+
 
 	// "Удаляет" последний элемент вектора. Вектор не должен быть пустым
 	void PopBack() noexcept {
@@ -352,9 +352,7 @@ public:
 
 	Iterator Erase(ConstIterator pos) {
 		// Напишите тело самостоятельно
-         assert(pos >= begin() && pos < end())
-
-		//std::move(++Iterator(pos), end(), Iterator(pos)); // сдвигаю все элементы следующие за pos на 1 влево 
+		assert(pos >= begin() && pos < end());
 		std::move(std::next(Iterator(pos)), end(), Iterator(pos)); // сдвигаю все элементы следующие за pos на 1 влево 
 		--size_;
 		return Iterator(pos);
@@ -365,28 +363,17 @@ public:
 	void swap(SimpleVector& other) noexcept {
 		// Напишите тело самостоятельно
 		array_ptr_.swap(other.array_ptr_);
-		size_t tmp = size_;
-		size_ = other.size_;
-		other.size_ = tmp;
-		tmp = capacity_;
-		capacity_ = other.capacity_;
-		other.capacity_ = tmp;
+		std::swap(size_, other.size_);
+		std::swap(capacity_, other.capacity_);
+
 	}
 
 	// для rvalue ссылки 
 	void swap(SimpleVector&& other) noexcept {
 		// Напишите тело самостоятельно
 		array_ptr_.swap(other.array_ptr_);
-        size_.swap(other.size_);
-        capacity_.swap(other.capacity_);
-        
-        /*size_ = std::move(other.size_);
-		size_t tmp.swap(size_); //size_t tmp = size_;
-		size_ = std::move(other.size_);
-		other.size_ = tmp;
-		tmp = capacity_;
-		capacity_ = std::move(other.capacity_);
-		other.capacity_ = tmp;*/
+		std::swap(size_, other.size_);
+		std::swap(capacity_, other.capacity_);
 	}
 
 
