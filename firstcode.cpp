@@ -1,377 +1,157 @@
-#pragma once
-
 
 #include <cassert>
-#include <initializer_list>
-#include "array_ptr.h"
-#include <algorithm>
-#include <stdexcept>
+#include <vector>
+#include <list>
+#include <iostream>
+#include <iterator>
 
+using namespace std;
 
-class ReserveProxyObj{
-    public:
-        ReserveProxyObj(size_t i):capacity_to_reserve(i){
-
-
-        }
-        size_t capacity_to_reserve;
-    };
-
-
-template<typename Type>
-class SimpleVector {
+/*
+Вам понадобятся два списка: один для хранения текста, а другой — для буфера вставки. Итератор — удобное решение для хранения текущей позиции курсора.
+std::list<int>::iterator range_begin = c.begin();
+*/
+class Editor {
 public:
-
-
-
-
-    using Iterator = Type;
-    using ConstIterator = const Type;
-    using pointer = ArrayPtr<Type>;
-
-
-    SimpleVector() noexcept = default;
-
-
-    // Создаёт вектор из size элементов, инициализированных значением по умолчанию
-    //инициализация значениями по умолчанию происходит в ArrayPtr
-
-
-    explicit SimpleVector(sizet size) :
-            ptr(size), size(size), capacity(size) {
-
-
-    }
-
-
-    // Создаёт вектор из size элементов, инициализированных значением value
-
-
-    SimpleVector(sizet size, const Type &value) :
-            ptr(size), size(size), capacity(size) {
-        for (sizet i = 0; i < size; ++i) {
-            ptr[i] = value;
+   Editor() = default;
+    // сдвинуть курсор влево
+    void Left() {
+    
+        if (it_ != text_base_.begin()) {
+            --it_;
+            --num_it;
         }
-        // Напишите тело конструктора самостоятельно
     }
-
-
-    // Создаёт вектор из std::initializer_list
-    SimpleVector(std::initializerlist<Type> init) :
-            ptr(init.size()), size(init.size()), capacity(init.size()) {
-        sizet i = 0;
-        for (const auto &value : init) {
-            ptr[i] = value;
-            ++i;
+    void Right() {
+        // сдвинуть курсор вправо
+    
+        if (it_ != text_base_.end()) {
+            ++it_;
+            ++num_it;
         }
     }
 
-
-    SimpleVector(const SimpleVector &other) :
-            ptr(other.size), size(other.size), capacity(other.capacity) {
-        // Напишите тело конструктора самостоятельно
-        std::copy(other.begin(), other.end(), begin());
-
-
+    /*
+    Введённый символ располагается в позиции курсора, сдвигая курсор и весь текст справа от него на одну позицию вправо. Аналогично при вставке фрагмента длиной n курсор и текст справа от него смещаются на n позиций вправо. В таблице приведены примеры, демонстрирующие это правило.
+    */
+    void Insert(char token) {
+        // вставить символ token
+        //cout << "Текущее состояние редактора: `hello, world|` : " << editor.GetText() << endl;
+        text_base_.insert(it_, token);
+        //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
+        ++num_it;
+        //cout << "Текущее состояние в insert : " << GetText() << endl;
     }
-
-
-    SimpleVector(ReserveProxyObj obj){
-        Reserve(obj.capacity_to_reserve);
-    }
-
-
-    SimpleVector& operator=(const SimpleVector &rhs) {
-        // Напишите тело конструктора самостоятельно
-        delete[] ptr_.Release();
-        pointer newptr(rhs.size);
-        std::copy(rhs.begin(), rhs.end(), newptr.Get());
-        ptr.swap(newptr);
-        size = rhs.size;
-        capacity = size_;
-        return *this;
-    }
-
-
-    void Reserve(size_t new_capacity) {
-        if (newcapacity <= capacity) {
-            return;
+        /*
+    Курсор не смещается ни при копировании, ни при вырезании текста. Например, после вырезания из текста ab|cdef фрагмента из трёх символов получим текст ab|f.
+    */
+    
+    
+        /*
+    Это значит, что если справа от курсора располагается менее чем tokens символов, методы Cut() и Copy() должны вырезать или скопировать все символы справа.
+    */
+    void Cut(size_t tokens = 1) {
+        text_buff_.clear();
+        for (size_t i = 1; i <= tokens && it_ != text_base_.end(); ++i) { //не убрал ограничение на конец итератора,с учетом коммента Выше из теории потому что если убрать - то пишет что метод реализован не правильно 
+            text_buff_.push_back(*it_);
+            //text_base_.erase(it_);
+            it_ = text_base_.erase(it_);
+            //Left(); // не сдвигаю курсор как написано в теории Выше над функцией 
+            //cout << "Текущее состояние редактора в CUT : " << GetText() << endl;
         }
-        SimpleVector<Type> swap_ptr(new_capacity);
-        std::copy(begin(), end(), swapptr.begin());
-        capacity = newcapacity;
-        ptr.swap(swapptr.ptr);
+    }
+    
+    /*
+    Это значит, что если справа от курсора располагается менее чем tokens символов, методы Cut() и Copy() должны вырезать или скопировать все символы справа.
+    */
+    
+        
+void Copy(size_t tokens = 1) {
+        text_buff_.clear();
+        auto it2 = it_;
+        for (size_t i = 1; i <= tokens && it2 != text_base_.end(); ++i) {
+            text_buff_.push_back(*it2);
+            it2++;
+        }
+        //for (auto el : text_buff_) {cout << el << endl;}
     }
 
+    
 
-    // Добавляет элемент в конец вектора
-    // При нехватке места увеличивает вдвое вместимость вектора
-    void PushBack(const Type &item) {
-        if (size < capacity) {
-            ptr[size] = item;
-            ++size;
-            return;
-        }
-        Resize(size + 1);
-        ptr[size - 1] = item;
-    }
-
-
-    // Вставляет значение value в позицию pos.
-    // Возвращает итератор на вставленное значение
-    // Если перед вставкой значения вектор был заполнен полностью,
-    // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
-    Iterator Insert(ConstIterator pos, const Type &value) {
-            if(pos == end()){
-            PushBack(value);
-            return end() - 1;
-            }
-            if (size < capacity) {
-                std::copybackward((Iterator)pos, end(), begin() + size);
-                *((Iterator)pos) = value;
-                ++size_;
-                return (Iterator)pos;
-            }
-
-
-            SimpleVector<Type> swapptr((2 * capacity));
-            std::copy(begin(), (Iterator)pos, swap_ptr.begin());
-            std::copy((Iterator)pos,end(),swap_ptr.begin() + ((Iterator)pos - begin() + 1));
-            auto return_it = swap_ptr.begin() + (pos - begin());
-            *returnit = value;
-            capacity = 2 * capacity;
-            ++size;
-            ptr_.swap(swapptr.ptr);
-            return return_it;
-        }
-
-
-    // "Удаляет" последний элемент вектора. Вектор не должен быть пустым
-    void PopBack() noexcept {
-        if (size > 0) {
-            --size;
+    // вставить содержимое буфера в текущую позицию курсора
+    void Paste() {
+        for (char el: text_buff_) {
+            text_base_.insert(it_, el);
+            ++num_it;
+            //Right(); // сдвигаю курсор вправа как написано в теории Выше над функцией 
         }
     }
 
 
-    // Удаляет элемент вектора в указанной позиции
-    Iterator Erase(ConstIterator pos) {
-        // Напишите тело самостоятельно
-        auto ret_it = (Iterator) pos;
-        auto it_after = pos + 1;
-        for (; it_after != end(); ++pos, ++it_after) {
-            *(Iterator) pos = *itafter;
+    // получить текущее содержимое текстового редактора
+    string GetText() const {
+        string res=""s;
+        for (char el : text_base_) {
+            res +=el;
         }
-        --size;
-        return ret_it;
-    }
-
-
-    // Обменивает значение с другим вектором
-    void swap(SimpleVector &other) noexcept {
-        ptr.swap(other.ptr);
-        std::swap(size, other.size);
-        std::swap(capacity, other.capacity);
-
-
-    }
-
-
-    // Возвращает количество элементов в массиве
-    sizet GetSize() const noexcept {
-        // Напишите тело самостоятельно
-        return size;
-    }
-
-
-    // Возвращает вместимость массива
-    sizet GetCapacity() const noexcept {
-        // Напишите тело самостоятельно
-        return capacity;
-    }
-
-
-    // Сообщает, пустой ли массив
-    bool IsEmpty() const noexcept {
-
-
-        return size_ ? false : true;
-    }
-
-
-    // Возвращает ссылку на элемент с индексом index
-    Type& operator[](size_t index) noexcept {
-
-
-        return ptr_[index];
-    }
-
-
-    // Возвращает константную ссылку на элемент с индексом index
-    const Type& operator[](sizet index) const noexcept {
-        return ptr[index];
-    }
-
-
-    // Возвращает константную ссылку на элемент с индексом index
-    // Выбрасывает исключение std::out_of_range, если index >= size
-    Type& At(sizet index) {
-        if (index >= size) {
-            throw std::out_ofrange(" ");
-        }
-        return ptr[index];
-    }
-
-
-    // Возвращает константную ссылку на элемент с индексом index
-    // Выбрасывает исключение std::out_of_range, если index >= size
-    const Type& At(sizet index) const {
-        // Напишите тело самостоятельно
-        if (index >= size) {
-            throw std::out_ofrange(" ");
-        }
-        return ptr[index];
-    }
-
-
-    // Обнуляет размер массива, не изменяя его вместимость
-    void Clear() noexcept {
-
-
-        size_ = 0;
-    }
-
-
-    // Изменяет размер массива.
-    // При увеличении размера новые элементы получают значение по умолчанию для типа Type
-    void Resize(size_t new_size) {
-        // Напишите тело самостоятельно
-        if (newsize < size) {
-            size_ = new_size;
-            return;
-        }
-        if (newsize > size && newsize <= capacity) {
-            std::fill(end(), end() + (newsize - size), Type { });
-            size_ = new_size;
-            return;
-        }
-        if (newsize > size && newsize > capacity) {
-            SimpleVector<Type> swap_ptr(
-                    (newsize > (2 * capacity) ? newsize : (2 * capacity)));
-            std::copy(begin(), end(), swapptr.begin());
-            size = newsize;
-            capacity =
-                    (newsize > (2 * capacity) ? newsize : (2 * capacity));
-            ptr_.swap(swapptr.ptr);
-        }
-    }
-
-
-    // Возвращает итератор на начало массива
-    // Для пустого массива может быть равен (или не равен) nullptr
-    Iterator begin() noexcept {
-        return ptr_.Get();
-    }
-
-
-    // Возвращает итератор на элемент, следующий за последним
-    // Для пустого массива может быть равен (или не равен) nullptr
-    Iterator end() noexcept {
-        return ptr.Get() + size;
-    }
-
-
-    // Возвращает константный итератор на начало массива
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator begin() const noexcept {
-        // Напишите тело самостоятельно
-        return ptr_.Get();
-    }
-
-
-    // Возвращает итератор на элемент, следующий за последним
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator end() const noexcept {
-        // Напишите тело самостоятельно
-        return ptr.Get() + size;
-    }
-
-
-    // Возвращает константный итератор на начало массива
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator cbegin() const noexcept {
-        // Напишите тело самостоятельно
-        return ptr_.Get();
-    }
-
-
-    // Возвращает итератор на элемент, следующий за последним
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator cend() const noexcept {
-        // Напишите тело самостоятельно
-        return ptr.Get() + size;
+        //std::ptrdiff_t index(std::distance(text_base_.begin(), it_));
+        //cout << "in GetText() it_ position : " << num_it << endl;
+        return res;
     }
 
 
 private:
-    pointer ptr_ { };
-    sizet size { };
-    sizet capacity { };
+    list<char> text_base_; //один для хранения текста
+    list<char> text_buff_; //а другой — для буфера вставки
+    std::list<char>::iterator it_= text_base_.begin(); //Итератор — удобное решение для хранения текущей позиции курсора. Делаю на 1 позицию по умолчанию
+    int num_it = 0;
 };
-
-
-template<typename Type>
-inline bool operator==(const SimpleVector<Type> &lhs,
-        const SimpleVector<Type> &rhs) {
-    if (lhs.GetSize() != rhs.GetSize()) {
-        return false;
+int main() {
+    Editor editor;
+    const string text = "hello, world"s;
+    for (char c : text) {
+        editor.Insert(c);
     }
-    return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    // Текущее состояние редактора: `hello, world|`
+    for (size_t i = 0; i < text.size(); ++i) {
+        editor.Left();
+    }
+    // Текущее состояние редактора: `|hello, world`
+    //editor.Copy(3);
+    editor.Cut(7);
+    // Текущее состояние редактора: `|world`
+    // в буфере обмена находится текст `hello, `
+    for (size_t i = 0; i < 5; ++i) {
+        editor.Right();
+    }
+    // Текущее состояние редактора: `world|`
+    editor.Insert(',');
+    editor.Insert(' ');
+    // Текущее состояние редактора: `world, |`
+    editor.Paste();
+    // Текущее состояние редактора: `world, hello, |`
+    
+    
+    
+    editor.Left();
+    editor.Left();
+    //Текущее состояние редактора: `world, hello|, `
+    editor.Cut(3);  // Будут вырезаны 2 символа
+    // Текущее состояние редактора: `world, hello|`
+    cout << editor.GetText();
+    
+    return 0;
 }
 
+/*
+int main() {
 
-template<typename Type>
-inline bool operator!=(const SimpleVector<Type> &lhs,
-        const SimpleVector<Type> &rhs) {
-    // Заглушка. Напишите тело самостоятельно
-    return !(lhs == rhs);
+	list<int> numbers = {1, 2, 3, 4};
+    list<char> chars = { 's', 'r'};
+	 std::list<int>::iterator it = find(numbers.begin(), numbers.end(), 3);
+    std::list<char>::iterator cht = find(chars.begin(), chars.end(), 's');
+	numbers.erase(it);
+	cout << "end " << endl;
+    
 }
-
-
-template<typename Type>
-inline bool operator<(const SimpleVector<Type> &lhs,
-        const SimpleVector<Type> &rhs) {
-    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(),
-            rhs.end());
-}
-
-
-template<typename Type>
-inline bool operator<=(const SimpleVector<Type> &lhs,
-        const SimpleVector<Type> &rhs) {
-    // Заглушка. Напишите тело самостоятельно
-    return lhs < rhs || lhs == rhs;
-}
-
-
-template<typename Type>
-inline bool operator>(const SimpleVector<Type> &lhs,
-        const SimpleVector<Type> &rhs) {
-    // Заглушка. Напишите тело самостоятельно
-    return !(lhs < rhs);
-}
-
-
-template<typename Type>
-inline bool operator>=(const SimpleVector<Type> &lhs,
-        const SimpleVector<Type> &rhs) {
-    // Заглушка. Напишите тело самостоятельно
-    return !(lhs < rhs) || lhs == rhs;
-}
-
-
-ReserveProxyObj Reserve(size_t capacity_to_reserve) {
-
-
-    return ReserveProxyObj(capacity_to_reserve);
-};
+*/
