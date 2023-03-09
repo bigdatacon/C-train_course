@@ -1,109 +1,35 @@
-#include <iostream>
-#include <stdexcept>
-#include <vector>
+#include <utility>
 
-using namespace std;
+class Alibaba;
 
-class Tower {
+// Разбойник — это объект шаблонного класса
+// Разбойники разных специализаций имеют разные шаблонные параметры
+template <typename LootType>
+class Thief {
 public:
-    // конструктор и метод SetDisks нужны, чтобы правильно создать башни
-    Tower(int disks_num) {
-        FillTower(disks_num);
-    }
+    void GreetAlibaba(Alibaba& alibaba);
 
-    void SetDisks(int disks_num) {
-        FillTower(disks_num);
-    }
-
-    int GetDisksNum() const {
-        return disks_.size();
-    }
-
-    // перемещаем 1 диск с текущей башни на destination
-    void MoveTopTo(Tower& destination) {
-        int top_disk_num = disks_.size() - 1;
-        try {
-            destination.AddToTop(disks_[top_disk_num]);
-        }
-        catch (const invalid_argument& e) {
-            cout << e.what() << '\n';
-            throw;
-        }
-
-        disks_.pop_back();
-    }
-
-    // добавляем диск на верх собственной башни
-    void AddToTop(int disk) {
-        int top_disk_num = disks_.size() - 1;
-        if (0 != disks_.size() && disk >= disks_[top_disk_num]) {
-            throw invalid_argument("Невозможно поместить большой диск на маленький");
-        }
-        else {
-            disks_.push_back(disk);
-        }
-    }
-
-    void MoveDisks(int disks_num, Tower& destination, Tower& buffer) {
-        // наше условие завершения - не осталось больше дисков, чтобы перемещать их
-        if (0 == disks_num) { return; }
-        if (1 == disks_num) { 
-        int current_disk = disks_.back(); // беру последний элемент 
-        disks_.pop_back();// удаляю последний элемент
-        destination.AddToTop(current_disk); // добавляю верхний диск на буффер а второй диск на destination 
-        }
-        if (disks_num > 1) {
-            MoveDisks(disks_num - 1, buffer, destination); // переношу n-1 на буффер
-            MoveTopTo(destination); // оставшийся диск переношу на destionation 
-            buffer.MoveDisks(disks_num - 1, destination, *this); // переношу с буфера на дестинатинатион n-1 
-        
-        }
-
-
-
-
-        // решение яндекса 
-        /*if (0 < disks_num) {
-            // сначала отложим все диски, кроме верхнего, на дополнительный
-            // стержень, используя destination в качестве буфера
-            MoveDisks(disks_num - 1, buffer, destination);
-            // переложим оставшийся самый большой диск в destination
-            MoveTopTo(destination);
-            // теперь нам нужно переложить диски, оказавшиеся в буфере,
-            // в destination, используя изначальный стержжень, как буфер
-            buffer.MoveDisks(disks_num - 1, destination, *this);
-        }*/
-    }
+    LootType ConvertMoneyToLoot(int money);
 
 private:
-    vector<int> disks_;
-
-    // используем приватный метод FillTower, чтобы избежать дубликации кода
-    void FillTower(int disks_num) {
-        for (int i = disks_num; i > 0; i--) {
-            disks_.push_back(i);
-        }
-    }
+    LootType loot_;
 };
 
-void SolveHanoi(vector<Tower>& towers) {
-    int disks_num = towers[0].GetDisksNum();
-    towers[0].MoveDisks(disks_num, towers[2], towers[1]);
-}
+class Alibaba {
+    // Али-Баба дружит с разбойниками всех специализаций
+    // Конструкцию friend делаем шаблонной
+    template <typename T>
+    friend class Thief;
 
-int main() {
-    int towers_num = 3;
-    int disks_num = 3;
-    vector<Tower> towers;
-    // добавим в вектор три пустые башни
-    for (int i = 0; i < towers_num; ++i) {
-        towers.push_back(0);
-    }
-    // добавим на первую башню три кольца
-    towers[0].SetDisks(disks_num);
+private:
+    int money_ = 100;
+};
 
-
-    SolveHanoi(towers);
-    cout << "ok \n";
-    return 0;
+template <typename T>
+void Thief<T>::GreetAlibaba(Alibaba& alibaba) {
+    int stolen = 0;
+    // Благодаря дружбе с Али-Бабой разбойник получил доступ к 
+    // его приватному полю и обнулил это поле
+    std::swap(stolen, alibaba.money_);
+    loot_ += ConvertMoneyToLoot(stolen);
 }
