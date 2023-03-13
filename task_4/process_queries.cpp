@@ -19,10 +19,8 @@ std::vector<std::vector<Document>> ProcessQueries(
 {
     std::vector<Document> results;
     std::vector<std::vector<Document>> itg(queries.size());
-    transform(std::execution::par, queries.begin(), queries.end(), results.begin(), [&search_server](std::string string_for_find) { return search_server.FindTopDocuments(string_for_find, [](int document_id, DocumentStatus status, int rating) {
-        return status == DocumentStatus::ACTUAL; }); });  // записываю результат работы поискадокументов в вектор
-itg.push_back(results);
-results.clear();
+    transform(std::execution::par, queries.begin(), queries.end(), itg.begin(),     [&search_server](std::string string_for_find) {return search_server.FindTopDocuments(string_for_find); } );
+
 return itg;    
         
         // тривиальное решение ниже работает
