@@ -24,6 +24,13 @@ std::vector<std::vector<Document>> ProcessQueries(
 itg.push_back(results);
 results.clear();
 return itg;    
+        
+        // тривиальное решение ниже работает
+        /*std::vector<std::vector<Document>> documents_lists;
+        for (const std::string& query : queries) {
+        documents_lists.push_back(search_server.FindTopDocuments(query));
+    } 
+    return documents_lists;*/
     
     
 }
