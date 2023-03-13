@@ -11,8 +11,6 @@
 Достаточно применить функцию transform, которая запишет результат в вектор, заранее созданный с нужной длиной.
 */
 
-
-
 std::vector<std::vector<Document>> ProcessQueries(
     const SearchServer& search_server,
     const std::vector<std::string>& queries)
@@ -22,13 +20,35 @@ std::vector<std::vector<Document>> ProcessQueries(
     transform(std::execution::par, queries.begin(), queries.end(), itg.begin(),     [&search_server](std::string string_for_find) {return search_server.FindTopDocuments(string_for_find); } );
 
 return itg;    
-        
-        // тривиальное решение ниже работает
-        /*std::vector<std::vector<Document>> documents_lists;
-        for (const std::string& query : queries) {
-        documents_lists.push_back(search_server.FindTopDocuments(query));
-    } 
-    return documents_lists;*/
-    
     
 }
+
+//1 так не работает
+/*std::vector<Document> ProcessQueriesJoined(
+    const SearchServer& search_server,
+    const std::vector<std::string>& queries)
+{
+    std::vector<Document> results;
+    transform(std::execution::par, queries.begin(), queries.end(), results.begin(),     [&search_server](std::string string_for_find) {return search_server.FindTopDocuments(string_for_find); } );
+
+return results;    
+    
+}*/
+
+// переиспользую функцию выше 
+std::vector<Document> ProcessQueriesJoined(
+    const SearchServer& search_server,
+    const std::vector<std::string>& queries)
+{
+    std::vector<Document> results;
+    for (
+        auto documents : ProcessQueries(search_server, queries)
+        )
+        {
+        results.push_back(documents);
+    }
+
+return results;    
+    
+}
+
