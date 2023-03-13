@@ -35,7 +35,26 @@ return results;
     
 }*/
 
-// переиспользую функцию выше 
+// переиспользую функцию выше - так не работает прямым проходом 
+/*std::vector<Document> ProcessQueriesJoined(
+    const SearchServer& search_server,
+    const std::vector<std::string>& queries)
+{
+    std::vector<Document> results;
+    for (
+        auto documents : ProcessQueries(search_server, queries)
+        )
+        {
+        for (auto el : documents){ for (auto inner_el : el){ results.push_back(inner_el);
+        }
+                                 }
+    }
+
+return results;    
+    
+}*/
+
+// переиспользую функцию выше -через лябмду но иначе - тоже не работает
 std::vector<Document> ProcessQueriesJoined(
     const SearchServer& search_server,
     const std::vector<std::string>& queries)
@@ -45,7 +64,7 @@ std::vector<Document> ProcessQueriesJoined(
         auto documents : ProcessQueries(search_server, queries)
         )
         {
-        results.push_back(documents);
+        transform(std::execution::par, documents.begin(), documents.end(), results.begin(),     [results](Document doc) {return results.push_back(doc); } );
     }
 
 return results;    
