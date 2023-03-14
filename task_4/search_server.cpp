@@ -206,18 +206,20 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int d
 // версия с параллельной политикой имеет свой функционал 
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
   word_freqs_.erase(document_id);
-  vector<std::string*> words_for_erase; // создаю вектор указателей 
+  std::vector<std::string*> words_for_erase; // создаю вектор указателей 
  
   // записываю указатели на слова в вектор   
-  transform(policy, word_to_document_freqs_.begin(), word_to_document_freqs_.end(), words_for_erase.begin(),     [document_id](auto tmp) {
+  transform(policy, word_to_document_freqs_.begin(), word_to_document_freqs_.end(), words_for_erase.begin(),     [document_id, words_for_erase](auto temp) {
   if (temp.second.find(document_id) !=temp.second.end()) {words_for_erase.push_back(&temp.first);}
   }
   );
     
   // удаляю слова из word_to_document_freqs_ если указатели на них есть в векторе указателей words_for_erase
   std::for_each(policy, word_to_document_freqs_.begin(), word_to_document_freqs_.end(),
-  [](auto& temp){
-  if (words_for_erase.count(&temp.first)) {word_to_document_freqs_.erase(temp);}
+  [words_for_erase](auto& temp){
+  if ( std::find(words_for_erase.begin(), words_for_erase.end(), &temp.first) )
+      
+      {word_to_document_freqs_.erase(temp);}
   }
   )
 
