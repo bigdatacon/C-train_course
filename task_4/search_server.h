@@ -155,23 +155,4 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
     return matched_documents;
 }
 
-template <typename Flow>
-void SearchServer::RemoveDocument(int document_id, Flow flow = std::execution::seq) {
-  word_freqs_.erase(document_id);
-  /*for(flow, auto [word, freq]: GetWordFrequencies(document_id)) {
-    auto it = word_to_document_freqs_[word].find(document_id);
-    if (it != word_to_document_freqs_[word].end()) {
-      word_to_document_freqs_[word].erase(it);
-    }
-  }*/
-  
-  std::for_each(flow, word_to_document_freqs_.begin(), word_to_document_freqs_.end(),
-  [document_id](auto& temp){
-  if (temp.second.find(document_id) !=temp.second.end()) {temp.second.erase(document_id);}
-  }
-  )
-
-  documents_.erase(document_id);
-  document_ids_.erase(document_id);
-
-}
+void RemoveDocument(const std::execution::parallel_policy&, int document_id); 
