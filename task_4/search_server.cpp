@@ -197,3 +197,29 @@ void SearchServer::RemoveDocument(int document_id) {
   document_ids_.erase(document_id);
 
 }
+
+
+
+void SearchServer::RemoveDocument(const std::execution::parallel_policy&, int document_id) {
+  word_freqs_.erase(document_id);
+  vector<std::string*> words_for_erase; // создаю вектор указателей 
+ 
+  // записываю указатели на слова в вектор   
+  transform( word_to_document_freqs_.begin(), word_to_document_freqs_.end(), words_for_erase.begin(),     [document_id](auto tmp) {
+  if (temp.second.find(document_id) !=temp.second.end()) {words_for_erase.push_back(&temp.first);}
+  }
+  );
+    
+  // удаляю слова из word_to_document_freqs_ если указатели на них есть в векторе указателей words_for_erase
+  std::for_each( word_to_document_freqs_.begin(), word_to_document_freqs_.end(),
+  [](auto& temp){
+  if (words_for_erase.count(&temp.first)) {word_to_document_freqs_.erase(temp);}
+  }
+  )
+
+  documents_.erase(document_id);
+  document_ids_.erase(document_id);
+
+}
+
+
