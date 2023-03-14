@@ -210,7 +210,7 @@ void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy,
  
   // записываю указатели на слова в вектор   
   transform(policy, word_to_document_freqs_.begin(), word_to_document_freqs_.end(), words_for_erase.begin(),     [document_id, words_for_erase](auto temp) {
-  if (temp.second.find(document_id) !=temp.second.end()) {words_for_erase.push_back(&temp.first);}
+  if (temp.second.find(document_id) !=temp.second.end()) {return &temp.first;}
   }
   );
     
