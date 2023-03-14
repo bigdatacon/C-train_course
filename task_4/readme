@@ -1,26 +1,23 @@
 Подсказка:
-Попробуйте разные варианты:
-как можно проще переиспользовать предыдущее решение;
-применить вместо вектора легко объединяемый контейнер;
-и что угодно ещё, что подскажет вам фантазия.
+Вы можете столкнуться с тем, что нужный алгоритм не параллелится, когда передаёте в него итераторы не произвольного доступа.
+Попробуйте переложить нужные элементы в вектор и запустить алгоритм для него.
 
 Задание
-Это задание — часть итогового проекта девятого спринта. Вы будете сдавать его на проверку через репозиторий на GitHub. Не забудьте сохранить верное решение.
-Напишите функцию ProcessQueriesJoined. Она должна, подобно функции ProcessQueries, распараллеливать обработку нескольких запросов к поисковой системе, но возвращать набор документов в плоском виде. Объявление функции:
-/* набор объектов Document */ ProcessQueriesJoined(
-    const SearchServer& search_server,
-    const std::vector<std::string>& queries); 
-Функция должна вернуть объект documents. Для него можно написать for (const Document& document : documents) и получить сначала все документы из результата вызова FindTopDocuments для первого запроса, затем для второго и так далее. Количество итераций такого цикла должно быть равно суммарному размеру внутренних векторов, возвращаемых функцией ProcessQueries.
-Конкретный тип возвращаемого значения остаётся на ваше усмотрение: это может быть как vector<Document> или list<Document>, так и ваш собственный тип данных с определёнными методами begin и end. Главное — чтобы работал for, и скорость была приемлемой.
+Задание 1
+Это задание — часть итогового проекта восьмого спринта. Вы будете сдавать его на проверку через репозиторий на GitHub. Не забудьте сохранить верное решение.
+Реализуйте многопоточную версию метода RemoveDocument в дополнение к однопоточной.
 Пример
-#include "process_queries.h"
 #include "search_server.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
+
 using namespace std;
+
 int main() {
     SearchServer search_server("and with"s);
+
     int id = 0;
     for (
         const string& text : {
@@ -33,35 +30,31 @@ int main() {
     ) {
         search_server.AddDocument(++id, text, DocumentStatus::ACTUAL, {1, 2});
     }
-    const vector<string> queries = {
-        "nasty rat -not"s,
-        "not very funny nasty pet"s,
-        "curly hair"s
+
+    const string query = "curly and funny"s;
+
+    auto report = [&search_server, &query] {
+        cout << search_server.GetDocumentCount() << " documents total, "s
+            << search_server.FindTopDocuments(query).size() << " documents for query ["s << query << "]"s << endl;
     };
-    for (const Document& document : ProcessQueriesJoined(search_server, queries)) {
-        cout << "Document "s << document.id << " matched with relevance "s << document.relevance << endl;
-    }
+
+    report();
+    // однопоточная версия
+    search_server.RemoveDocument(5);
+    report();
+    // однопоточная версия
+    search_server.RemoveDocument(execution::seq, 1);
+    report();
+    // многопоточная версия
+    search_server.RemoveDocument(execution::par, 2);
+    report();
+
     return 0;
 } 
 Вывод:
-Document 1 matched with relevance 0.183492
-Document 5 matched with relevance 0.183492
-Document 4 matched with relevance 0.167358
-Document 3 matched with relevance 0.743945
-Document 1 matched with relevance 0.311199
-Document 2 matched with relevance 0.183492
-Document 5 matched with relevance 0.127706
-Document 4 matched with relevance 0.0557859
-Document 2 matched with relevance 0.458145
-Document 5 matched with relevance 0.458145 
+5 documents total, 4 documents for query [curly and funny]
+4 documents total, 3 documents for query [curly and funny]
+3 documents total, 2 documents for query [curly and funny]
+2 documents total, 1 documents for query [curly and funny] 
 Ограничения
-Поисковые запросы корректны и не порождают исключений.
-Что отправлять на проверку
-Заголовочные файлы и файлы с реализацией, содержащие класс SearchServer, написанные ранее вспомогательные функции и новую функцию ProcessQueriesJoined. Функция main будет проигнорирована.
-Как будет тестироваться ваш код
-Правильность работы функции будет проверена юнит-тестами.
-Как и в предыдущей задаче, время работы вашей функции должно быть по крайней мере вдвое меньше, чем у тривиального решения с последовательными вызовами FindTopDocuments.
-Мы проверим это на таких входных данных:
-поисковая система из 20 000 документов, не более 10 слов в каждом;
-2 000 поисковых запросов, не более 7 слов в каждом;
-все слова — из словаря, состоящего из 2 000 слов длиной не более 25 букв.
+Как и прежде, в метод RemoveDocument может быть передан любой document_id. Если такой документ отсутствует, метод должен немедленно завершиться.
