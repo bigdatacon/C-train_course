@@ -49,6 +49,7 @@ public:
 
         //3. Разработайте метод удаления документов из поискового сервера
     void RemoveDocument(int document_id);
+    void RemoveDocument(const std::execution::parallel_policy& policy, int document_id); 
     
     std::set<int> GetDoc_ids( ){return document_ids_;} ;
     
@@ -155,4 +156,4 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
     return matched_documents;
 }
 
-void RemoveDocument(const std::execution::parallel_policy&, int document_id); 
+
