@@ -184,6 +184,7 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 	return word_freqs_.at(document_id);
 }
 
+// Версия без политики
 void SearchServer::RemoveDocument(int document_id) {
   word_freqs_.erase(document_id);
   for(auto [word, freq]: GetWordFrequencies(document_id)) {
@@ -198,8 +199,11 @@ void SearchServer::RemoveDocument(int document_id) {
 
 }
 
+// ПОследовательная политика вызывает версию без политики
+void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int document_id){return RemoveDocument(document_id);}
 
 
+// версия с параллельной политикой имеет свой функционал 
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
   word_freqs_.erase(document_id);
   vector<std::string*> words_for_erase; // создаю вектор указателей 
