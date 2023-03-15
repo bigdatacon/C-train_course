@@ -240,20 +240,14 @@ void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy,
                 return const_cast<std::string *> (&temp.first); 
             }
     );
-    /*auto p = [this](const std::string* t){return word_to_document_freqs_.erase(*t);};
+    auto p = [this](const std::string* t){return word_to_document_freqs_.erase(*t);};
     std::for_each(
         policy,
         words_for_erase.begin(),
         words_for_erase.end(),
         p
-    );*/
-    
-    std::for_each(policy,
-                  words_for_erase.begin(), words_for_erase.end(),
-                  [&, document_id](const std::string* t) {
-                      word_to_document_freqs_.at(*t).erase(document_id);
-                  }
     );
+
     word_freqs_.erase(document_id);
     documents_.erase(document_id);
     document_ids_.erase(document_id);
