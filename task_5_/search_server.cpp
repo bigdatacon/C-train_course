@@ -113,9 +113,9 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 // многопоточная 
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
 	
-	const auto query = ParseQuery(raw_query);
+	const auto query = ParseQuery(policy, raw_query);
 	std::vector<std::string> matched_words;
-	for (policy, const std::string& word : query.plus_words) {
+	for ( const std::string& word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
 			continue;
 		}
@@ -123,7 +123,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 			matched_words.push_back(word);
 		}
 	}
-	for (policy, const std::string& word : query.minus_words) {
+	for ( const std::string& word : query.minus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
 			continue;
 		}
@@ -211,7 +211,7 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_pol
 // параллельная версия 
 SearchServer::Query SearchServer::ParseQuery(const std::execution::parallel_policy& policy, const std::string& text) const {
 	Query result;
-	for (policy, const std::string& word : SplitIntoWords(text)) {
+	for ( const std::string& word : SplitIntoWords(text)) {
 		const auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
