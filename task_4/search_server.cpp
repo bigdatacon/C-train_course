@@ -187,55 +187,20 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 // Версия без политики
 void SearchServer::RemoveDocument(int document_id) {
   word_freqs_.erase(document_id);
-  for(auto [word, freq]: GetWordFrequencies(document_id)) {
-    auto it = word_to_document_freqs_[word].find(document_id);
-    if (it != word_to_document_freqs_[word].end()) {
-      word_to_document_freqs_[word].erase(it);
-    }
-  }
-
+  for (auto &word: SearchServer:: word_to_document_freqs_) {
+        bool is_document_present = word.second.count(document_id);
+        if (is_document_present) {
+            word.second.erase(document_id);
+        }
+    }  
+  
   documents_.erase(document_id);
   document_ids_.erase(document_id);
-
 }
 
 // ПОследовательная политика вызывает версию без политики
 void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int document_id){return RemoveDocument(document_id);}
 
-
-
-// версия с параллельной политикой имеет свой функционал 
-/*void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
-    word_freqs_.erase(document_id);
-    std::vector<std::string*> words_for_erase; // создаю вектор указателей 
-    words_for_erase.reserve(word_to_document_freqs_.size()); // резервирую размер вектора по размеру map из которого нужно удалить id 
-    // записываю указатели на слова в вектор   
-    transform(
-        policy,
-        word_to_document_freqs_.begin(),
-        word_to_document_freqs_.end(),
-        words_for_erase.begin(),
-        [this, document_id, words_for_erase](auto temp) {
-            if (temp.second.find(document_id) !=temp.second.end()) {
-                return &temp.first;
-            }
-        }
-    );
-    // удаляю слова из word_to_document_freqs_ если указатели на них есть в векторе указателей words_for_erase
-    std::for_each(
-        policy,
-        word_to_document_freqs_.begin(),
-        word_to_document_freqs_.end(),
-        [this, words_for_erase](auto& temp){
-            if (std::find(words_for_erase.begin(), words_for_erase.end(), &temp.first) ) {
-                word_to_document_freqs_.erase(temp);
-            }
-        } 
-    );
-
-    documents_.erase(document_id);
-    document_ids_.erase(document_id);
-}*/
 
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
     word_freqs_.erase(document_id);
