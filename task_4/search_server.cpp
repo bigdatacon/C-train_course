@@ -185,7 +185,7 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 }
 
 // Версия без политики
-void SearchServer::RemoveDocument(int document_id) {
+/*void SearchServer::RemoveDocument(int document_id) {
   word_freqs_.erase(document_id);
   for (auto &word: SearchServer:: word_to_document_freqs_) {
         bool is_document_present = word.second.count(document_id);
@@ -196,32 +196,21 @@ void SearchServer::RemoveDocument(int document_id) {
   
   documents_.erase(document_id);
   document_ids_.erase(document_id);
-}
+}*/
+
+ void SearchServer::RemoveDocument(int document_id){
+    document_ids_.erase(document_id);
+    documents_.erase(document_id);
+    word_freqs_.erase(document_id);
+    for(auto &[key, value]:word_to_document_freqs_){
+        value.erase(document_id);
+    }
+ }
+
 
 // ПОследовательная политика вызывает версию без политики
 void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int document_id){return RemoveDocument(document_id);}
 
-
-/*void SearchServer::RemoveDocument(const std::execution::parallel_policy &policy, int document_id) {
-    if (document_ids_.count(document_id) == 0) return;
-    const auto &freqs = documents_.at(document_id).freqs;
-    std::vector<string_view> words(freqs.size());
-    std::transform(policy,
-                   freqs.begin(), freqs.end(),
-                   words.begin(),
-                   [](const auto &word) {
-                       return word.first;
-                   }
-    );
-    std::for_each(policy,
-                  words.begin(), words.end(),
-                  [&, document_id](const auto &word) {
-                      word_to_document_freqs_[word].erase(document_id);
-                  }
-    );
-    document_ids_.erase(document_id);
-    documents_.erase(document_id);
-}*/
 
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
     if (document_ids_.count(document_id) == 0) return;
@@ -237,7 +226,7 @@ void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy,
         word_freqs_.at(document_id).end(),
         words_for_erase.begin(),
         [this](const auto & temp) {
-                return const_cast<std::string *> (&temp.first); 
+                return  new std::string(temp.first); /*const_cast<std::string *> (&temp.first); */
             }
     );
     auto p = [this](const std::string* t){return word_to_document_freqs_.erase(*t);};
