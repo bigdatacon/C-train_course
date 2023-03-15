@@ -248,13 +248,13 @@ void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy,
         word_freqs_.at(document_id).end(),
         words_for_erase.begin(),
         [this](const auto & temp) {
-                return const_cast<string *> (&temp.first); /*&temp.first;*/
+                return const_cast<std::string *> (&temp.first); /*&temp.first;*/
             }
     );
     
     /*auto p = [this, word_to_document_freqs_](std::string* t){return word_to_document_freqs_.erase(*t);}*/
     
-    auto p = [this](std::string* t){return word_to_document_freqs_.erase(*t);};
+    auto p = [this](const std::string* t){return word_to_document_freqs_.erase(*t);};
     
     // удаляю слова из word_to_document_freqs_ если указатели на них есть в векторе указателей words_for_erase
     std::for_each(
