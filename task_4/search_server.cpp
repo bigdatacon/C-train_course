@@ -230,7 +230,7 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int d
             if (std::find(words_for_erase.begin(), words_for_erase.end(), &temp.first) ) {
                 word_to_document_freqs_.erase(temp);
             }
-        }
+        } 
     );
 
     documents_.erase(document_id);
@@ -239,7 +239,7 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int d
 
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
     word_freqs_.erase(document_id);
-    std::vector<std::string*> words_for_erase; // создаю вектор указателей 
+    std::vector<const std::string*> words_for_erase; // создаю вектор указателей 
     words_for_erase.reserve(word_freqs_.size()); // резервирую размер вектора по размеру map из которого нужно удалить id 
     // записываю указатели на слова в вектор   
     transform(
@@ -247,12 +247,14 @@ void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy,
         word_freqs_.at(document_id).begin(),
         word_freqs_.at(document_id).end(),
         words_for_erase.begin(),
-        [this](auto temp) {
-                return &temp.first;
+        [this](const auto & temp) {
+                return const_cast<string *> (&temp.first); /*&temp.first;*/
             }
     );
     
-    auto p = [word_to_document_freqs_](std::string* t){return word_to_document_freqs_.erase(*t);}
+    /*auto p = [this, word_to_document_freqs_](std::string* t){return word_to_document_freqs_.erase(*t);}*/
+    
+    auto p = [this](std::string* t){return word_to_document_freqs_.erase(*t);};
     
     // удаляю слова из word_to_document_freqs_ если указатели на них есть в векторе указателей words_for_erase
     std::for_each(
