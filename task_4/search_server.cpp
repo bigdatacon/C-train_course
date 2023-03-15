@@ -225,7 +225,7 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int d
 
 void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy, int document_id) {
     if (document_ids_.count(document_id) == 0) return;
-    word_freqs_.erase(document_id);
+    
     std::vector<const std::string*> words_for_erase; // создаю вектор указателей 
     
     words_for_erase.reserve(word_to_document_freqs_.size()); // резервирую размер вектора по размеру map из которого нужно удалить id 
@@ -254,7 +254,7 @@ void SearchServer::RemoveDocument(const std::execution::parallel_policy& policy,
                       word_to_document_freqs_.at(*t).erase(document_id);
                   }
     );
-
+    word_freqs_.erase(document_id);
     documents_.erase(document_id);
     document_ids_.erase(document_id);
 }
