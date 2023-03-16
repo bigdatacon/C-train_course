@@ -178,20 +178,20 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
             return false;
         }) == true) return {matched_words, documents_.at(document_id).status};
  
-        copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const auto& word){
+        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const auto& word){
             if (word_to_document_freqs_.count(word) == 0) {
-				return false;
-			}
+        return false;
+      }
             if (word_to_document_freqs_.at(word).count(document_id)) {
                 return true;
             }
             return false;
-		});
+    });
  
-        sort(policy, matched_words.begin(), matched_words.end());
-        auto it = unique(policy, matched_words.begin(), matched_words.end());
+        sort(policy, matched_words.begin(), end);
+        auto it = unique(policy, matched_words.begin(), end);
         matched_words.erase(it, matched_words.end());
-        matched_words.erase(matched_words.begin());
+        //matched_words.erase(matched_words.begin());
     return { matched_words, documents_.at(document_id).status };
 }
 
@@ -376,3 +376,4 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int d
 	//for_each(std::execution::par, qwe.begin(),qwe.end(),p);
 	for_each(std::execution::seq, qwe.begin(), qwe.end(), p);
 }
+ 
