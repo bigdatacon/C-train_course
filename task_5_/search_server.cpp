@@ -189,10 +189,10 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
       break;
     }
   }
-    
+    std::sort(matched_words.begin(), matched_words.end()); 
     auto last = std::unique(matched_words.begin(), matched_words.end());
     matched_words.erase(last, matched_words.end());
-    std::sort(matched_words.begin(), matched_words.end()); 
+    //std::sort(matched_words.begin(), matched_words.end()); 
         
   return { matched_words, documents_.at(document_id).status };
 }
@@ -268,13 +268,15 @@ SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 		}
 	}
     // Избавляюь от дубликатов в плюс и минус словах в последовательной версии 
+    std::sort(result.minus_words.begin(), result.minus_words.end()); 
     auto last = std::unique(result.minus_words.begin(), result.minus_words.end());
     result.minus_words.erase(last, result.minus_words.end());
-    std::sort(result.minus_words.begin(), result.minus_words.end()); 
+    //std::sort(result.minus_words.begin(), result.minus_words.end()); 
     
+    std::sort(result.plus_words.begin(), result.plus_words.end()); 
     auto last_p = std::unique(result.plus_words.begin(), result.plus_words.end());
     result.plus_words.erase(last_p, result.plus_words.end());
-    std::sort(result.plus_words.begin(), result.plus_words.end()); 
+    //std::sort(result.plus_words.begin(), result.plus_words.end()); 
     
 	return result;
 }
