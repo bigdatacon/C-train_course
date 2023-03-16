@@ -192,6 +192,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
         auto it = unique(policy, matched_words.begin(), end);
         matched_words.erase(it, matched_words.end());
         //matched_words.erase(matched_words.begin());
+        std::cout <<"matched_words.size() : " << <<matched_words.size() <<endl;
     return { matched_words, documents_.at(document_id).status };
 }
 
