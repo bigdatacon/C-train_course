@@ -129,6 +129,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 			break;
 		}
 	}
+    std::cout << "matched_words.size() : " << matched_words.size() <<std::endl;
 	return { matched_words, documents_.at(document_id).status };
 }
 
