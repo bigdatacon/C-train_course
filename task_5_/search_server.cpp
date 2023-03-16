@@ -13,6 +13,33 @@
 #include <deque>
 #include <numeric>
 
+//question 
+/*
+в ParseQuery учитываешь, что сортировку для параллельной версии нужно пропускать? (делать её один раз в SearchServer::MatchDocument)"
+
+
+Ответьте, пожалуйста:
+1. MatchDocument тоже должен быть в трех версиях - прежняя, par, seq?
+2. ParseQuery должна быть в двух версиях - обычной и "параллельной"?
+3. О какой сортировке идет речь - разделение на наборы plus и minus слов?
+4. Именно эта сортировка д.б. перенесена  в MatchDocument? Если так, то меняется возвращаемый тип из ParseQuery. Верно?
+Других сортировок не вижу - может не с той стороны смотрю )
+*/
+
+//answer
+
+/*Сергей Заболотный [наставник]
+
+11:03
+Фёдор Королёв
+
+@cepxuozab " ... в ParseQuery учитываешь, что сортировку для параллельной версии нужно пропускать? (делать её один раз в SearchServer::MatchDocument)" Ответьте, пожалуйста: 1. MatchDocument тоже должен быть в трех версиях - прежняя, par, seq? 2. ParseQuery должна быть в двух версиях - обычной и "параллельной"? 3. О какой сортировке идет речь - разделение на наборы plus и minus слов? 4. Именно эта сортировка д.б. перенесена в MatchDocument? Если так, то меняется возвращаемый тип из ParseQuery. Верно? Других сортировок не вижу - может не с той стороны смотрю )
+1. Да.
+2. Можно сделать одну версию - добавив параметр по умолчанию - булевый флажок. И если он false например, то не нужно сортировку и удаление дубликатов проводить - иначе нужно.
+3. В предыдущих задачах плюс и минус слова хранились в std::set. Начиная с этой задачи нужно их хранить в std::vector - так как использование паралельных алгоритмов на итераторах сета контрпродуктивно. Но так как вектора не гарантируют уникальность слов - нужно избавляться от дубликатов. Для этого стоит использовать последовательно std::sort - std::unique - erase.
+
+4. Именно избавление от дубликатов в последовательной версии должно производиться в ParseQuery а в паралельной версии - нужно только уже вектор результатов избавить от дублей.*/
+
 
 SearchServer::SearchServer(const std::string& stop_words_text)
 	: SearchServer(
@@ -196,10 +223,12 @@ SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 		const auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
-				result.minus_words.insert(query_word.data);
+				//result.minus_words.insert(query_word.data);
+                result.minus_words.push_back(query_word.data);
 			}
 			else {
-				result.plus_words.insert(query_word.data);
+				//result.plus_words.insert(query_word.data);
+                result.plus_words.push_back(query_word.data);
 			}
 		}
 	}
@@ -211,7 +240,8 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_pol
 // параллельная версия 
 SearchServer::Query SearchServer::ParseQuery(const std::execution::parallel_policy& policy, const std::string& text) const {
 	Query result;
-    auto p=[this , result](const std::string& word){
+    // заготовка под for_each
+    /*auto p=[this , result](const std::string& word){
         const auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
@@ -222,19 +252,21 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::parallel_poli
 			}
 		}
       }
-    for_each(policy, SplitIntoWords(text).begin(), SplitIntoWords(text).end(),p);
+    for_each(policy, SplitIntoWords(text).begin(), SplitIntoWords(text).end(),p);*/
     
-	/*for ( const std::string& word : SplitIntoWords(text)) {
+	for ( const std::string& word : SplitIntoWords(text)) {
 		const auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
-				result.minus_words.insert(query_word.data);
+				//result.minus_words.insert(query_word.data);
+                result.minus_words.push_back(query_word.data);
 			}
 			else {
-				result.plus_words.insert(query_word.data);
+				//result.plus_words.insert(query_word.data);
+                result.plus_words.push_back(query_word.data);
 			}
 		}
-	}*/
+	}
 	return result;
 }
 
