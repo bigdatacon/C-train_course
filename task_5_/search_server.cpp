@@ -265,20 +265,20 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_pol
 SearchServer::Query SearchServer::ParseQuery(const std::execution::parallel_policy& policy, const std::string& text) const {
 	Query result;
     // заготовка под for_each
-    /*auto p=[this , result](const std::string& word){
+    auto p=[this , result](const std::string& word){
         const auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
-				result.minus_words.insert(query_word.data);
+				result.minus_words.push_back(query_word.data);
 			}
 			else {
-				result.plus_words.insert(query_word.data);
+				result.plus_words.push_back(query_word.data);
 			}
 		}
       }
-    for_each(policy, SplitIntoWords(text).begin(), SplitIntoWords(text).end(),p);*/
+    for_each(policy, SplitIntoWords(text).begin(), SplitIntoWords(text).end(),p);
     
-	for ( const std::string& word : SplitIntoWords(text)) {
+	/*for ( const std::string& word : SplitIntoWords(text)) {
 		const auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
@@ -290,7 +290,7 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::parallel_poli
                 result.plus_words.push_back(query_word.data);
 			}
 		}
-	}
+	}*/
 	return result;
 }
 
