@@ -169,7 +169,12 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
 	const auto query = ParseQuery(policy, raw_query);
 	std::vector<std::string> matched_words;
-	for (const std::string& word : query.minus_words) {
+    
+    if (std::any_of(policy, query.minus_words.begin(), query.minus_words.end(), [this, &word_to_document_freqs_](const std::string& word){return word_to_document_freqs_.at(word).count(document_id);})) {
+        return { matched_words, documents_.at(document_id).status };
+    }
+    
+	/*for (const std::string& word : query.minus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
 			continue;
 		}
@@ -178,7 +183,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 			//break;
 			return { matched_words, documents_.at(document_id).status };
 		}
-	}
+	}*/
 	matched_words.resize(query.plus_words.size());
     std::copy_if(
 		policy, query.plus_words.begin(), query.plus_words.end(), std::back_inserter(matched_words),
