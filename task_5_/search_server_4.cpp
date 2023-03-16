@@ -178,7 +178,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
             return false;
         }) == true) return {matched_words, documents_.at(document_id).status};
  
-        copy_if(policy, query.plus_words.begin(), query.plus_words.end(), std::back_inserter(matched_words), [&](const auto& word){
+        copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const auto& word){
             if (word_to_document_freqs_.count(word) == 0) {
 				return false;
 			}
@@ -192,6 +192,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
         auto it = unique(policy, matched_words.begin(), matched_words.end());
         matched_words.erase(it, matched_words.end());
         matched_words.erase(matched_words.begin());
+    return { matched_words, documents_.at(document_id).status };
 }
 
 bool SearchServer::IsStopWord(const std::string& word) const {
