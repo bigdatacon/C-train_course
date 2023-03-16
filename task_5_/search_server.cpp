@@ -299,21 +299,9 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::parallel_poli
 		}
       };
     
-    std::for_each(policy, SplitIntoWords(text).begin(), SplitIntoWords(text).end(),p);
-    
-	/*for ( const std::string& word : SplitIntoWords(text)) {
-		const auto query_word = ParseQueryWord(word);
-		if (!query_word.is_stop) {
-			if (query_word.is_minus) {
-				//result.minus_words.insert(query_word.data);
-                result.minus_words.push_back(query_word.data);
-			}
-			else {
-				//result.plus_words.insert(query_word.data);
-                result.plus_words.push_back(query_word.data);
-			}
-		}
-	}*/
+    //std::for_each(policy, SplitIntoWords(text).begin(),    SplitIntoWords(text).end(),p);
+	auto words = SplitIntoWords(text); 
+	for_each(policy, words.begin(), words.end(), p);
 	return result;
 }
 
