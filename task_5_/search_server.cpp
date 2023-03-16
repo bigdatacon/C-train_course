@@ -232,6 +232,15 @@ SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 			}
 		}
 	}
+    // Избавляюь от дубликатов в плюс и минус словах в последовательной версии 
+    auto last = std::unique(result.minus_words.begin(), result.minus_words.end());
+    result.minus_words.erase(last, result.minus_words.end());
+    std::sort(result.minus_words.begin(), result.minus_words.end()); 
+    
+    auto last_p = std::unique(result.plus_words.begin(), result.plus_words.end());
+    result.plus_words.erase(last_p, result.plus_words.end());
+    std::sort(result.plus_words.begin(), result.plus_words.end()); 
+    
 	return result;
 }
 // последовательная версия 
