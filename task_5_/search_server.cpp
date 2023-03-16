@@ -138,19 +138,8 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 }
 
 // многопоточная 
-std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
-	
-	const auto query = ParseQuery(policy, raw_query);
-    //Добавляю сортировку для многопоточной версии
-    /*auto last = std::unique(query.minus_words.begin(), query.minus_words.end());
-    query.minus_words.erase(last, query.minus_words.end());
-    std::sort(result.minus_words.begin(), query.minus_words.end()); 
-    
-     auto last_p = std::unique(query.plus_words.begin(), query.plus_words.end());
-    query.plus_words.erase(last_p, query.plus_words.end());
-    std::sort(query.plus_words.begin(), query.plus_words.end()); */
-    
-    
+/*std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
+	const auto query = ParseQuery(policy, raw_query);   
 	std::vector<std::string> matched_words;
 	for ( const std::string& word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
@@ -170,11 +159,42 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 		}
 	}
     
-        /*const*/ auto last = std::unique(matched_words.begin(), matched_words.end());
+    auto last = std::unique(matched_words.begin(), matched_words.end());
     matched_words.erase(last, matched_words.end());
     std::sort(matched_words.begin(), matched_words.end()); 
         
 	return { matched_words, documents_.at(document_id).status };
+}*/
+
+std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
+  const auto query = ParseQuery(policy, raw_query);   
+  std::vector<std::string> matched_words;
+  std::for_each(
+    policy, query.plus_words.begin(), query.plus_words.end(),
+    [this, document_id, &matched_words](const std::string & word) {
+      if (word_to_document_freqs_.count(word) == 0) {
+        return;
+      }
+      if (word_to_document_freqs_.at(word).count(document_id)) {
+        matched_words.push_back(word);
+      }
+    }
+  );
+  for ( const std::string& word : query.minus_words) {
+    if (word_to_document_freqs_.count(word) == 0) {
+      continue;
+    }
+    if (word_to_document_freqs_.at(word).count(document_id)) {
+      matched_words.clear();
+      break;
+    }
+  }
+    
+    auto last = std::unique(matched_words.begin(), matched_words.end());
+    matched_words.erase(last, matched_words.end());
+    std::sort(matched_words.begin(), matched_words.end()); 
+        
+  return { matched_words, documents_.at(document_id).status };
 }
 
 
