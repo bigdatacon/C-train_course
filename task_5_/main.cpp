@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#include "search_server.h"
+/*#include "search_server.h"
 #include "process_queries.h"
 #include <execution>
 #include <iostream>
@@ -91,9 +91,9 @@ int main() {
 
     TEST(seq);
     TEST(par);
-}
+}*/
 
-/*
+
 int main() {
     SearchServer search_server("and with"s);
 
@@ -131,4 +131,4 @@ int main() {
     }
 
     return 0;
-}*/
+}
