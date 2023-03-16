@@ -142,13 +142,13 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 	
 	const auto query = ParseQuery(policy, raw_query);
     //Добавляю сортировку для многопоточной версии
-    /*const*/ auto last = std::unique(query.minus_words.begin(), query.minus_words.end());
+    /*auto last = std::unique(query.minus_words.begin(), query.minus_words.end());
     query.minus_words.erase(last, query.minus_words.end());
     std::sort(result.minus_words.begin(), query.minus_words.end()); 
     
-    /*const*/ auto last_p = std::unique(query.plus_words.begin(), query.plus_words.end());
+     auto last_p = std::unique(query.plus_words.begin(), query.plus_words.end());
     query.plus_words.erase(last_p, query.plus_words.end());
-    std::sort(query.plus_words.begin(), query.plus_words.end()); 
+    std::sort(query.plus_words.begin(), query.plus_words.end()); */
     
     
 	std::vector<std::string> matched_words;
@@ -169,6 +169,11 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 			break;
 		}
 	}
+    
+        /*const*/ auto last = std::unique(matched_words.begin(), matched_words.end());
+    matched_words.erase(last, matched_words.end());
+    std::sort(matched_words.begin(), matched_words.end()); 
+        
 	return { matched_words, documents_.at(document_id).status };
 }
 
