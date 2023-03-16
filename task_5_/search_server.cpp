@@ -141,6 +141,16 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
 	
 	const auto query = ParseQuery(policy, raw_query);
+    //Добавляю сортировку для многопоточной версии
+    /*const*/ auto last = std::unique(query.minus_words.begin(), query.minus_words.end());
+    query.minus_words.erase(last, query.minus_words.end());
+    std::sort(result.minus_words.begin(), query.minus_words.end()); 
+    
+    /*const*/ auto last_p = std::unique(query.plus_words.begin(), query.plus_words.end());
+    query.plus_words.erase(last_p, query.plus_words.end());
+    std::sort(query.plus_words.begin(), query.plus_words.end()); 
+    
+    
 	std::vector<std::string> matched_words;
 	for ( const std::string& word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
