@@ -94,8 +94,10 @@ private:
     QueryWord ParseQueryWord(const std::string& text) const ;
 
     struct Query {
-        std::set<std::string> plus_words;
-        std::set<std::string> minus_words;
+        /*std::set<std::string> plus_words;
+        std::set<std::string> minus_words;*/
+        std::vector<std::string> plus_words;
+        std::vector<std::string> minus_words;
     };
     
     // Добавляю многопоточную версию ParseQuery
