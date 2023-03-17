@@ -111,7 +111,7 @@ int main() {
     }
 
     const string query = "curly and funny -not"s;
-    std:string_view sw(query.data(), query.length());
+    std::string_view sw(query.data(), query.length());
     //convert string to string view 
     
     {
