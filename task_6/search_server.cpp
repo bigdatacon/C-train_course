@@ -134,7 +134,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 			continue;
 		}
 		if (word_to_document_freqs_.at(word).count(document_id)) {
-			std::string_view word_sv(word.begin(), word.end());
+			std::string_view word_sv(word.data(), word.size());
             matched_words.push_back(word_sv);
 		}
 	}
@@ -167,7 +167,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             return false;
         }) == true) return {matched_words, documents_.at(document_id).status};
  
-        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string_view& word_sv(word.begin(), word.end())){
+        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string_view& word_sv(word.data(), word.size())){
             if (word_to_document_freqs_.count(std::string word{word_sv.data(), word_sv.size()}).count(document_id)) == 0) {
         return false;
       }
