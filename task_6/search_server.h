@@ -79,7 +79,7 @@ public:
     std::set<int> GetDoc_ids( ){return document_ids_;} ;
     
         //2.Разработайте метод получения частот слов по id документа: 
-    const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
+    //const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
     const std::map<std::string_view, double>& GetWordFrequencies(int document_id) const;
     
     
