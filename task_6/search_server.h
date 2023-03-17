@@ -36,6 +36,7 @@ public:
 
     std::vector<Document> FindTopDocuments(const std::string& raw_query) const ;
     
+    template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments(const std::string_view& raw_query, DocumentPredicate document_predicate) const;
 
     std::vector<Document> FindTopDocuments(const std::string_view& raw_query, DocumentStatus status) const;
@@ -79,7 +80,7 @@ public:
     
         //2.Разработайте метод получения частот слов по id документа: 
     const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
-    const std::map<std::string_view, double>& SearchServer::GetWordFrequencies(int document_id) const;
+    const std::map<std::string_view, double>& GetWordFrequencies(int document_id) const;
     
     
 private:
