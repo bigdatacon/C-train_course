@@ -56,18 +56,18 @@ public:
     
     
     //доплняю многопоточную версию 
-    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string_view& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::string_view& raw_query, int document_id) const;
     
-    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string_view& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string_view& raw_query, int document_id) const;
     
-    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const;
     
     
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
     
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string& raw_query, int document_id) const;
     
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const;
     
     
 
