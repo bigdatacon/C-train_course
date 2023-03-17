@@ -41,8 +41,10 @@ void SearchServer::AddDocument(int document_id, const std::string_view& document
 	if ((document_id < 0) || (documents_.count(document_id) > 0)) {
 		throw std::invalid_argument("Invalid document_id");
 	}
-    //std::string document_s{document.data(), document.size()}; // cоздаю строку из string_view
-	const auto words = SplitIntoWordsNoStop(document);
+
+	//const auto words = SplitIntoWordsNoStop(document);
+    std::string document_str = std::string{document.data(), document.size()};
+    const auto words = SplitIntoWordsNoStop(document_str);
 
 	const double inv_word_count = 1.0 / words.size();
 	for (const std::string_view& word : words) {
@@ -60,12 +62,11 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
 		throw std::invalid_argument("Invalid document_id");
 	}
 	const auto words = SplitIntoWordsNoStop(document);
-
 	const double inv_word_count = 1.0 / words.size();
 	for (const std::string& word : words) {
-		word_to_document_freqs_[word][document_id] += inv_word_count;
-		word_freqs_[document_id][word] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
-
+        std::string_view word_view{word.data(), word.size()}; 
+        word_to_document_freqs_[word_view][document_id] += inv_word_count;
+        word_freqs_[document_id][word_view] += inv_word_count;
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 	document_ids_.insert(document_id);
