@@ -345,13 +345,13 @@ const std::map<std::string_view, double>& SearchServer::GetWordFrequencies(int d
 	return word_freqs_.at(document_id);
 }
 
-const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
+/*const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
 	static std::map<std::string, double> word_freqs;
 	if (word_freqs_.count(document_id) == 0) {
 		return word_freqs;
 	}
 	return word_freqs_.at(document_id);
-}
+}*/
 
 void SearchServer::RemoveDocument(int document_id) {
 	document_ids_.erase(document_id);
