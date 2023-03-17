@@ -53,7 +53,7 @@ std::vector<std::string_view> SplitIntoWords(const std::string_view& text) {
 std::set<std::string_view> MakeUniqueNonEmptyStrings(const std::vector<std::string_view>& strings) {
     std::set<std::string_view> non_empty_strings;
     for (const auto& str : strings) {
-        if (str.size()==0) {
+        if (!str.size()==0) {
             non_empty_strings.insert(str);
         }
     }
