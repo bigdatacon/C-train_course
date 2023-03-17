@@ -167,7 +167,19 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             return false;
         }) == true) return {matched_words, documents_.at(document_id).status};
  
-        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string_view& word_sv(word.data(), word.size())){
+        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string & raw_word){
+            std::string_view word(raw_word.data(), raw_word.size());
+            if (word_to_document_freqs_.count(word ) == 0) {
+        return false;
+      }
+            if (word_to_document_freqs_.at(word ).count(document_id).count(document_id)) {
+                return true;
+            }
+            return false;
+    });   
+    
+    /*auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string & raw_word){
+            std::string_view word(raw_word.begin(), raw_word.end());
             if (word_to_document_freqs_.count(std::string word{word_sv.data(), word_sv.size()}).count(document_id)) == 0) {
         return false;
       }
@@ -175,7 +187,17 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
                 return true;
             }
             return false;
-    });
+    }); */   
+    
+    /*auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string_view& word_sv(word.data(), word.size())){
+            if (word_to_document_freqs_.count(std::string word{word_sv.data(), word_sv.size()}).count(document_id)) == 0) {
+        return false;
+      }
+            if (word_to_document_freqs_.at(std::string word{word_sv.data(), word_sv.size()}).count(document_id)).count(document_id)) {
+                return true;
+            }
+            return false;
+    });*/
  
         sort(policy, matched_words.begin(), end);
         auto it = unique(policy, matched_words.begin(), end);
