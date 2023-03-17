@@ -89,7 +89,7 @@ private:
         int rating;
         DocumentStatus status;
     };
-    const std::set<string, less<>> stop_words_;
+    const std::set<std::string, less<>> stop_words_;
     const std::set<std::string> stop_words_;
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<std::string_view, std::map<int, double>> word_to_document_freqs_;
