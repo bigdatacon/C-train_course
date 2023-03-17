@@ -129,7 +129,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 			break;
 		}
 	}
-    std::cout << "matched_words.size() : " << matched_words.size() <<std::endl;
+    //std::cout << "matched_words.size() : " << matched_words.size() <<std::endl;
 	return { matched_words, documents_.at(document_id).status };
 }
 
@@ -138,37 +138,9 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 	return SearchServer::MatchDocument(raw_query, document_id);
 }
 
-// многопоточная 
-/*std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
-	const auto query = ParseQuery(policy, raw_query);
-	std::vector<std::string> matched_words;
-	for ( const std::string& word : query.plus_words) {
-		if (word_to_document_freqs_.count(word) == 0) {
-			continue;
-		}
-		if (word_to_document_freqs_.at(word).count(document_id)) {
-			matched_words.push_back(word);
-		}
-	}
-	for ( const std::string& word : query.minus_words) {
-		if (word_to_document_freqs_.count(word) == 0) {
-			continue;
-		}
-		if (word_to_document_freqs_.at(word).count(document_id)) {
-			matched_words.clear();
-			break;
-		}
-	}
-
-	auto last = std::unique(matched_words.begin(), matched_words.end());
-	matched_words.erase(last, matched_words.end());
-	std::sort(matched_words.begin(), matched_words.end());
-
-	return { matched_words, documents_.at(document_id).status };
-}*/
-
+//Многопоточный match
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const {
-        const auto query = ParseQuery( raw_query);
+        const auto query = ParseQuery(policy, raw_query);
         std::vector<std::string> matched_words(query.plus_words.size());
  
         if(any_of(policy, query.minus_words.begin(), query.minus_words.end(), [&](const auto& word){
@@ -193,7 +165,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
         auto it = unique(policy, matched_words.begin(), end);
         matched_words.erase(it, matched_words.end());
         //matched_words.erase(matched_words.begin());
-        std::cout << "matched_words.size() : " << matched_words.size() <<std::endl;
+        //std::cout << "matched_words.size() : " << matched_words.size() <<std::endl;
     return { matched_words, documents_.at(document_id).status };
 }
 
