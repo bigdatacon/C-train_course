@@ -127,7 +127,7 @@ std::set<int>::iterator SearchServer::end()
 
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::string_view& raw_query, int document_id) const {
     std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
-	const auto query = ParseQuery(raw_query);
+	const auto query = ParseQuery(raw_quer_s);
 	std::vector<std::string_view> matched_words;
 	for (const std::string& word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
