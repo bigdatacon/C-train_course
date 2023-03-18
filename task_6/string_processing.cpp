@@ -50,7 +50,7 @@ std::vector<std::string_view> SplitIntoWords(const std::string_view& text) {
 
 
 //MakeUniqueNonEmptyStrings для string_view
-std::set<std::string_view> MakeUniqueNonEmptyStrings(const std::vector<std::string_view>& strings) {
+/*std::set<std::string_view> MakeUniqueNonEmptyStrings(const std::vector<std::string_view>& strings) {
     std::set<std::string_view> non_empty_strings;
     for (const auto& str : strings) {
         if (!str.size()==0) {
@@ -58,4 +58,4 @@ std::set<std::string_view> MakeUniqueNonEmptyStrings(const std::vector<std::stri
         }
     }
     return non_empty_strings;
-}
+}*/
