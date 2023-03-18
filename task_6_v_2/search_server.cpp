@@ -160,9 +160,11 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
         std::vector<std::string_view> matched_words(query.plus_words.size());
  
         if(any_of(policy, query.minus_words.begin(), query.minus_words.end(), [&](const auto& word){
+            if (word_to_document_freqs_.count(word)){
             if (word_to_document_freqs_.at(word).count(document_id)) {
                 matched_words.clear();
                 return true;
+            }
             }
             return false;
         }) == true) return {matched_words, documents_.at(document_id).status};
