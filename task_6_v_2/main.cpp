@@ -116,7 +116,7 @@ int main() {
     
     {
         const auto [words, status] = search_server.MatchDocument(sw, 1);
-        cout << words.size() << " words for document 1"s << endl;
+        cout << words.size() << " words for document 1 with sv : "s << endl;
         // 1 words for document 1
     }
     
