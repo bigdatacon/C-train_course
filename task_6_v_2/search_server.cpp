@@ -47,9 +47,10 @@ void SearchServer::AddDocument(int document_id, const std::string_view& document
     const auto words = SplitIntoWordsNoStop(document_str);
 
 	const double inv_word_count = 1.0 / words.size();
-	for (const std::string_view& word : words) {
-		word_to_document_freqs_[word][document_id] += inv_word_count;
-		word_freqs_[document_id][word] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
+	for (const std::string& word : words) {
+        std::string_view word_view{word.data(), word.size()}; 
+		word_to_document_freqs_[word_view][document_id] += inv_word_count;
+		word_freqs_[document_id][word_view] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
 
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
