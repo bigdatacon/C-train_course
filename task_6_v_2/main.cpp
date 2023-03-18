@@ -96,7 +96,14 @@ int main() {
 
 int main() {
     SearchServer search_server("and with"s);
-
+    // Должен быть такой вывод:
+    /*
+    1 words for document 1
+2 words for document 2
+0 words for document 3 
+    */
+    
+    
     int id = 0;
     for (
         const string& text : {
