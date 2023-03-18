@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 
-std::vector<std::string> SplitIntoWords(const std::string& text) {
+/*std::vector<std::string> SplitIntoWords(const std::string& text) {
     std::vector<std::string> words;
     std::string word;
     for (const char c : text) {
@@ -21,7 +21,7 @@ std::vector<std::string> SplitIntoWords(const std::string& text) {
     }
 
     return words;
-}
+}*/
 
 // SplitIntoWords для Stringview
 std::vector<std::string_view> SplitIntoWords(const std::string_view& text) {
