@@ -27,14 +27,6 @@ public:
     explicit SearchServer(const std::string& stop_words_text);
     
     void AddDocument(int document_id, const std::string_view& document, DocumentStatus status, const std::vector<int>& ratings);
-    //void AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings); 
-
-    /*template <typename DocumentPredicate>
-    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const;
-
-    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus status) const;
-
-    std::vector<Document> FindTopDocuments(const std::string& raw_query) const ;*/
     
     template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments(const std::string_view& raw_query, DocumentPredicate document_predicate) const;
@@ -61,16 +53,7 @@ public:
     std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string_view& raw_query, int document_id) const;
     
     std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const;
-    
-    
-   /* std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
-    
-    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string& raw_query, int document_id) const;
-    
-    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string& raw_query, int document_id) const;*/
-    
-    
-
+       
         //3. Разработайте метод удаления документов из поискового сервера
     void RemoveDocument(int document_id);
     void RemoveDocument(const std::execution::sequenced_policy&, int document_id);
@@ -79,7 +62,6 @@ public:
     std::set<int> GetDoc_ids( ){return document_ids_;} ;
     
         //2.Разработайте метод получения частот слов по id документа: 
-    //const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
     const std::map<std::string_view, double>& GetWordFrequencies(int document_id) const;
     
     
@@ -91,8 +73,6 @@ private:
         DocumentStatus status;
     };
     const std::set<std::string, std::less<>> stop_words_;
-    //const std::set<std::string> stop_words_;
-    //std::map<std::string, std::map<int, double>> word_to_document_freqs_;
     std::map<std::string_view, std::map<int, double>> word_to_document_freqs_;
     std::map<int, DocumentData> documents_;
     std::set<int> document_ids_;   
@@ -159,24 +139,6 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string_view& raw
     }
     return matched_documents;
 }
-
-/*template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const {
-    const auto query = ParseQuery(raw_query);
-    auto matched_documents = FindAllDocuments(query, document_predicate);
-
-    sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-        if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
-            return lhs.rating > rhs.rating;
-        } else {
-            return lhs.relevance > rhs.relevance;
-        }
-    });
-    if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-        matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-    }
-    return matched_documents;
-}*/
 
 
 template <typename DocumentPredicate>
