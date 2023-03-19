@@ -13,6 +13,7 @@
 #include <deque>
 #include <numeric>
 #include <string_view>
+#include <deque>
 
 /*
 Следующие методы теперь должны позволять принять string_view вместо строки:
@@ -41,16 +42,20 @@ void SearchServer::AddDocument(int document_id, const std::string_view& document
 	if ((document_id < 0) || (documents_.count(document_id) > 0)) {
 		throw std::invalid_argument("Invalid document_id");
 	}
-
-	//const auto words = S plitIntoWordsNoStop(document);
-    std::string document_str = std::string{document.data(), document.size()};
-    const auto words = SplitIntoWordsNoStop(document_str);
-
+    //std::string document_str = std::string{document.data(), document.size()};
+    std::string document_str(document); 
+    std::deque<std::string> myDeque ;
+    myDeque.push_back(document_str);
+    //const auto words = SplitIntoWordsNoStop(document_str);
+    const auto words = SplitIntoWordsNoStop(myDeque.back());
+    
 	const double inv_word_count = 1.0 / words.size();
 	for (const std::string& word : words) {
-        std::string_view word_view{word.data(), word.size()}; 
-		word_to_document_freqs_[word_view][document_id] += inv_word_count;
-		word_freqs_[document_id][word_view] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
+        //std::string_view word_view{word.data(), word.size()}; 
+        word_to_document_freqs_[word][document_id] += inv_word_count;
+		word_freqs_[document_id][word] += inv_word_count; 
+		//word_to_document_freqs_[word_view][document_id] += inv_word_count;
+		//word_freqs_[document_id][word_view] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
 
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
@@ -131,7 +136,8 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 }
 
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const {
-    std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view    
+    //std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view    
+    std::string raw_quer_s(raw_query); // cоздаю строку из string_view  
     const auto query = ParseQuery(true, raw_quer_s);
         std::vector<std::string_view> matched_words(query.plus_words.size());
  
@@ -145,8 +151,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             return false;
         }) == true) return {matched_words, documents_.at(document_id).status};
  
-        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const std::string & raw_word){
-            std::string_view word(raw_word.data(), raw_word.size());
+        auto end = copy_if(policy, query.plus_words.begin(), query.plus_words.end(), matched_words.begin(), [&](const auto& word){
             if (word_to_document_freqs_.count(word ) == 0) {
         return false;
       }
@@ -173,6 +178,20 @@ bool SearchServer::IsValidWord(const std::string& word) {
 		return c >= '\0' && c < ' ';
 		});
 }
+
+/*std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string_view& text) const {
+	std::vector<std::string> words;
+	for (const std::string_view& word : SplitIntoWords(text)) {
+        std::string word_str = std::string{word.data(), word.size()};
+		if (!IsValidWord(word_str)) {
+			throw std::invalid_argument("Word " + word_str + " is invalid");
+		}
+		if (!IsStopWord(word_str)) {
+			words.push_back(word_str);
+		}
+	}
+	return words;
+}*/
 
 std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
 	std::vector<std::string> words;
