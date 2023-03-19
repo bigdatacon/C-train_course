@@ -63,10 +63,17 @@ const std::vector<int> ratings10 = {11, 2, -43, 4, 895};
         PrintDocumentUTest(document);
     }
  
-    std::cout << "Documents' statuses:" << std::endl;
+    std::cout << "Documents' statuses SEQUENCE :" << std::endl;
     const int document_count = search_server.GetDocumentCount();
     for (int document_id = 0; document_id < document_count; ++document_id) {
-        const auto [words, status] = search_server.MatchDocument(query, document_id);
+        const auto [words, status] = search_server.MatchDocument(execution::seq, query, document_id);
+        PrintMatchDocumentResultUTest(document_id, words, status);
+    }
+    
+    std::cout << "Documents' statuses PARALLEL :" << std::endl;
+    const int document_count_par = search_server.GetDocumentCount();
+    for (int document_id = 0; document_id < document_count_par; ++document_id) {
+        const auto [words, status] = search_server.MatchDocument(execution::par, query, document_id);
         PrintMatchDocumentResultUTest(document_id, words, status);
     }
 }
@@ -80,7 +87,7 @@ int main() {
 2 words for document 2
 0 words for document 3 
     */
-    std::cout << " MAIN MAIN :" << std::endl;
+    /*std::cout << " MAIN MAIN :" << std::endl;
     
     SearchServer search_server("and with"s);
     
@@ -132,7 +139,7 @@ int main() {
         const auto [words, status] = search_server.MatchDocument(execution::par, query, 3);
         cout << words.size() << " words for document 3"s << endl;
         // 0 words for document 3
-    }
+    }*/
 
     return 0;
 }
