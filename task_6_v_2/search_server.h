@@ -83,8 +83,6 @@ private:
 
     static bool IsValidWord(const std::string_view& word) ;
 
-
-    //std::vector<std::string> SplitIntoWordsNoStop(const std::string_view& text) const ;
     std::vector<std::string_view> SplitIntoWordsNoStop(const std::string_view& text) const;
 
     static int ComputeAverageRating(const std::vector<int>& ratings) ;
@@ -95,9 +93,8 @@ private:
         bool is_stop;
     };
 
-    //QueryWord ParseQueryWord(const std::string_view& text) const ;
     QueryWord ParseQueryWord(std::string_view& text) const ;
-    //QueryWord ParseQueryWord(const std::string& text) const ;
+
 
     struct Query {
         std::vector<std::string_view> plus_words;
@@ -105,9 +102,9 @@ private:
     };
     
     // Добавляю многопоточную версию ParseQuery
-    Query ParseQuery(const std::string& text) const ;
-    Query ParseQuery(const std::execution::sequenced_policy&, const std::string& text) const ;
-    Query ParseQuery(bool flag, const std::string& text) const ;
+    Query ParseQuery(const std::string_view& text) const ;
+    Query ParseQuery(const std::execution::sequenced_policy&, const std::string_view& text) const ;
+    Query ParseQuery(bool flag, const std::string_view& text) const ;
 
     // Existence required
     double ComputeWordInverseDocumentFreq(const std::string& word) const ;
