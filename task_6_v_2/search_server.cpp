@@ -103,9 +103,31 @@ std::set<int>::iterator SearchServer::end()
 	return document_ids_.end();
 }
 
+
+/*std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::string_view& raw_query, int document_id) const {
+    const auto query = ParseQuery(raw_query);
+    std::vector<std::string_view> matched_words;
+    for (const std::string_view word : query.plus_words) {
+        if (word_to_document_freqs_.count(word) == 0) {
+            continue;
+        }
+        if (word_to_document_freqs_.at(word).count(document_id)) {
+            matched_words.push_back(word);
+        }
+    }
+    for (const std::string_view word : query.minus_words) {
+        if (word_to_document_freqs_.count(word) == 0) {
+            continue;
+        }
+        if (word_to_document_freqs_.at(word).count(document_id)) {
+            matched_words.clear();
+            break;
+        }
+    }
+    return { matched_words, documents_.at(document_id).status };
+*/
+
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::string_view& raw_query, int document_id) const {
-    //std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
-    //std::string raw_quer_s(raw_query);
 	const auto query = ParseQuery(raw_query);
 	std::vector<std::string_view> matched_words;
 	for (const std::string_view& word : query.plus_words) {
@@ -113,7 +135,6 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 			continue;
 		}
 		if (word_to_document_freqs_.at(word).count(document_id)) {
-			//std::string_view word_sv(word.data(), word.size());
             matched_words.push_back(word);
 		}
 	}
@@ -126,6 +147,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 			break;
 		}
 	}
+    std::cout << " MATCH DOC SEQUENCE  SIZE : " << matched_words.size() << std::endl;
 	return { matched_words, documents_.at(document_id).status };
 }
 
@@ -133,12 +155,42 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 	return SearchServer::MatchDocument(raw_query, document_id);
 }
 
+/*std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy&, std::string_view raw_query, int document_id) const {
+ 
+    const auto result = ParseQuery(true, raw_query);
+    std::vector<std::string_view> matched_words(result.plus_words.size());
+ 
+    const auto check = [this, document_id](std::string_view word) {
+        const auto temp = word_to_document_freqs_.find(word);
+        return temp != word_to_document_freqs_.end() &&
+            temp->second.count(document_id);
+    };
+ 
+    if (std::any_of(std::execution::par,
+        result.minus_words.begin(),
+        result.minus_words.end(),
+        check)) {
+        return { {}, documents_.at(document_id).status };
+    }
+ 
+    auto end = std::copy_if(std::execution::par,
+        result.plus_words.begin(),
+        result.plus_words.end(),
+        matched_words.begin(),
+        check);
+ 
+    std::sort(matched_words.begin(), end);
+    end = std::unique(matched_words.begin(), end);
+    matched_words.erase(end, matched_words.end());
+ 
+    return { matched_words,
+            documents_.at(document_id).status };
+}*/
+ 
+
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const {
-    //std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view    
-    //std::string raw_quer_s(raw_query); // cоздаю строку из string_view  
     const auto query = ParseQuery(true, raw_query);
         std::vector<std::string_view> matched_words(query.plus_words.size());
- 
         if(any_of(policy, query.minus_words.begin(), query.minus_words.end(), [&](const auto& word){
             if (word_to_document_freqs_.count(word)){
             if (word_to_document_freqs_.at(word).count(document_id)) {
@@ -162,6 +214,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
         sort(policy, matched_words.begin(), end);
         auto it = unique(policy, matched_words.begin(), end);
         matched_words.erase(it, matched_words.end());
+    std::cout << " MATCH DOC PARALLEL SIZE : " << matched_words.size() << std::endl;
     return { matched_words, documents_.at(document_id).status };
 }
 
