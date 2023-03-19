@@ -40,7 +40,7 @@ SearchServer::SearchServer(const std::string& stop_words_text)
 
 
 void SearchServer::AddDocument(int document_id, const std::string_view& document, DocumentStatus status, const std::vector<int>& ratings) {
-	std::cout << std::string(document) << std::endl;
+	//std::cout << std::string(document) << std::endl;
     if ((document_id < 0) || (documents_.count(document_id) > 0)) {
 		throw std::invalid_argument("Invalid document_id");
 	}
@@ -169,9 +169,6 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 /*bool SearchServer::IsStopWord(const std::string& word) const {
 	return stop_words_.count(word) > 0;
 }
-
-
-
 bool SearchServer::IsValidWord(const std::string& word) {
 	// A valid word must not contain special characters
 	return none_of(word.begin(), word.end(), [](char c) {
@@ -212,30 +209,45 @@ int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
 	return rating_sum / static_cast<int>(ratings.size());
 }
 
+/*SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string_view& text) const {
+    if (text.empty()) {
+        throw std::invalid_argument("Query word is empty"s);
+    }
+    bool is_minus = false;
+    if (text[0] == '-') {
+        is_minus = true;
+        text = text.substr(1);
+    }
+    if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
+        throw std::invalid_argument("Query word "s + std::string(text) + " is invalid");
+    }
+ 
+    return { text, is_minus, IsStopWord(text) };
+}*/
 
-SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) const {
-	if (text.empty()) {
+SearchServer::QueryWord SearchServer::ParseQueryWord(std::string_view& text) const {
+	if (text.size()==0) {
 		throw std::invalid_argument("Query word is empty");
 	}
-	std::string word = text;
 	bool is_minus = false;
-	if (word[0] == '-') {
+	if (text[0] == '-') {
 		is_minus = true;
-		word = word.substr(1);
+		text = text.substr(1);
 	}
-	if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
-		throw std::invalid_argument("Query word " + text + " is invalid");
+	if (text.size()==0 || text[0] == '-' || !IsValidWord(text)) {
+		throw std::invalid_argument("Query word " + std::string(text) + " is invalid");
 	}
 
-	return { word, is_minus, IsStopWord(word) };
+	return { text, is_minus, IsStopWord(text) };
 }
 
 SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 	Query result;
-	for (const std::string_view& word : SplitIntoWords(text)) {
+	for (std::string_view& word : SplitIntoWords(text)) {
         //std::string word_str = std::string{word.data(), word.size()};
-        std::string word_str(word); // cоздаю строку из string_view  
-		const auto query_word = ParseQueryWord(word_str);
+        //std::string word_str(word); // cоздаю строку из string_view  
+		//const auto query_word = ParseQueryWord(word);
+        auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
 				//result.minus_words.insert(query_word.data);
@@ -262,10 +274,11 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_pol
 // параллельная версия 
 SearchServer::Query SearchServer::ParseQuery(bool flag, const std::string& text) const {
 	Query result;
-	for (const std::string_view& word : SplitIntoWords(text)) {
+	for (std::string_view& word : SplitIntoWords(text)) {
 		//std::string word_str = std::string{word.data(), word.size()};
-        std::string word_str(word); // cоздаю строку из string_view  
-        const auto query_word = ParseQueryWord(word_str);
+        //std::string word_str(word); // cоздаю строку из string_view  
+        //const auto query_word = ParseQueryWord(word);
+        auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
 				result.minus_words.push_back(query_word.data);
@@ -333,4 +346,3 @@ void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int d
 	//for_each(std::execution::par, qwe.begin(),qwe.end(),p);
 	for_each(std::execution::seq, qwe.begin(), qwe.end(), p);
 }
- 
