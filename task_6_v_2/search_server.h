@@ -90,12 +90,14 @@ private:
     static int ComputeAverageRating(const std::vector<int>& ratings) ;
     
     struct QueryWord {
-        std::string data;
+        std::string_view data;
         bool is_minus;
         bool is_stop;
     };
 
-    QueryWord ParseQueryWord(const std::string& text) const ;
+    //QueryWord ParseQueryWord(const std::string_view& text) const ;
+    QueryWord ParseQueryWord(std::string_view& text) const ;
+    //QueryWord ParseQueryWord(const std::string& text) const ;
 
     struct Query {
         std::vector<std::string_view> plus_words;
@@ -176,5 +178,3 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
     }
     return matched_documents;
 }
-
-
