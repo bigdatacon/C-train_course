@@ -9,7 +9,7 @@ template <typename StringContainer>
 std::set<std::string, std::less<>> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
     std::set<std::string, std::less<>> non_empty_strings;
     for (const  auto& str : strings) {
-        if (!str.empty()) {
+        if ( !str.size()==0) {
             std::string my_str = std::string{str.data(), str.size()};
             non_empty_strings.emplace(my_str);
         }
