@@ -38,24 +38,21 @@ SearchServer::SearchServer(const std::string& stop_words_text)
 {
 }
 
+
 void SearchServer::AddDocument(int document_id, const std::string_view& document, DocumentStatus status, const std::vector<int>& ratings) {
 	if ((document_id < 0) || (documents_.count(document_id) > 0)) {
 		throw std::invalid_argument("Invalid document_id");
 	}
-    //std::string document_str = std::string{document.data(), document.size()};
-    std::string document_str(document); 
-    std::deque<std::string> myDeque ;
-    myDeque.push_back(document_str);
+    //std::string document_str(document); 
+    std::deque<std::string_view> myDeque ;
+    myDeque.push_back(document);
     //const auto words = SplitIntoWordsNoStop(document_str);
     const auto words = SplitIntoWordsNoStop(myDeque.back());
     
 	const double inv_word_count = 1.0 / words.size();
-	for (const std::string& word : words) {
-        //std::string_view word_view{word.data(), word.size()}; 
+	for (const auto& word : words) {
         word_to_document_freqs_[word][document_id] += inv_word_count;
 		word_freqs_[document_id][word] += inv_word_count; 
-		//word_to_document_freqs_[word_view][document_id] += inv_word_count;
-		//word_freqs_[document_id][word_view] += inv_word_count; // добавил заполнене частов для id документа в разбивке           //по словам
 
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
@@ -169,28 +166,38 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 }
 
 
-bool SearchServer::IsStopWord(const std::string& word) const {
+/*bool SearchServer::IsStopWord(const std::string& word) const {
 	return stop_words_.count(word) > 0;
 }
+
+
 
 bool SearchServer::IsValidWord(const std::string& word) {
 	// A valid word must not contain special characters
 	return none_of(word.begin(), word.end(), [](char c) {
 		return c >= '\0' && c < ' ';
 		});
+}*/
+
+bool SearchServer::IsStopWord(const std::string_view& word ) const {
+    return stop_words_.count(word) > 0;
+}
+ 
+bool SearchServer::IsValidWord(const std::string_view& word) {
+    return std::none_of(word.begin(), word.end(), [](char c) {
+        return c >= '\0' && c < ' ';
+        });
 }
 
 
-std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
-	std::vector<std::string> words;
+std::vector<std::string_view> SearchServer::SplitIntoWordsNoStop(const std::string_view& text) const {
+	std::vector<std::string_view> words;
 	for (const std::string_view& word : SplitIntoWords(text)) {
-        //std::string word_str = std::string{word.data(), word.size()};
-        std::string word_str(word); // cоздаю строку из string_view  
-		if (!IsValidWord(word_str)) {
-			throw std::invalid_argument("Word " + word_str + " is invalid");
+		if (!IsValidWord(word)) {
+			throw std::invalid_argument("Word " + std::string(word) + " is invalid");
 		}
-		if (!IsStopWord(word_str)) {
-			words.push_back(word_str);
+		if (!IsStopWord(word)) {
+			words.push_back(word);
 		}
 	}
 	return words;
