@@ -107,7 +107,8 @@ std::set<int>::iterator SearchServer::end()
 }
 
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::string_view& raw_query, int document_id) const {
-    std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
+    //std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
+    std::string raw_quer_s(raw_query);
 	const auto query = ParseQuery(raw_quer_s);
 	std::vector<std::string_view> matched_words;
 	for (const std::string_view& word : query.plus_words) {
@@ -183,7 +184,8 @@ bool SearchServer::IsValidWord(const std::string& word) {
 std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
 	std::vector<std::string> words;
 	for (const std::string_view& word : SplitIntoWords(text)) {
-        std::string word_str = std::string{word.data(), word.size()};
+        //std::string word_str = std::string{word.data(), word.size()};
+        std::string word_str(word); // cоздаю строку из string_view  
 		if (!IsValidWord(word_str)) {
 			throw std::invalid_argument("Word " + word_str + " is invalid");
 		}
@@ -224,7 +226,8 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) co
 SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 	Query result;
 	for (const std::string_view& word : SplitIntoWords(text)) {
-        std::string word_str = std::string{word.data(), word.size()};
+        //std::string word_str = std::string{word.data(), word.size()};
+        std::string word_str(word); // cоздаю строку из string_view  
 		const auto query_word = ParseQueryWord(word_str);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
@@ -253,7 +256,8 @@ SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_pol
 SearchServer::Query SearchServer::ParseQuery(bool flag, const std::string& text) const {
 	Query result;
 	for (const std::string_view& word : SplitIntoWords(text)) {
-		std::string word_str = std::string{word.data(), word.size()};
+		//std::string word_str = std::string{word.data(), word.size()};
+        std::string word_str(word); // cоздаю строку из string_view  
         const auto query_word = ParseQueryWord(word_str);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
