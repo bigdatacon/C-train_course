@@ -178,7 +178,8 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
      
         //sort(policy, matched_words.begin(), end);
         sort( matched_words.begin(), end);
-        auto it = unique(policy, matched_words.begin(), end);
+        //auto it = unique(policy, matched_words.begin(), end);
+	auto it = unique( matched_words.begin(), end);
         matched_words.erase(it, matched_words.end());
     //std::cout << " MATCH DOC PARALLEL SIZE : " << matched_words.size() << std::endl;
     return { matched_words, documents_.at(document_id).status };
