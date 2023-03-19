@@ -102,12 +102,10 @@ std::set<int>::iterator SearchServer::end()
 }
 
 
-
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument( std::string_view raw_query, int document_id) const {
 	const auto query = ParseQuery(raw_query);
 	std::vector<std::string_view> matched_words;
-	
-    for ( std::string_view word : query.minus_words) {
+	    for ( std::string_view word : query.minus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
 			continue;
 		}
@@ -117,6 +115,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             return { matched_words, documents_.at(document_id).status };
 		}
 	}
+
     matched_words.resize(query.plus_words.size());
     for (std::string_view word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
@@ -126,6 +125,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             matched_words.push_back(word);
 		}
 	}
+
     //std::cout << " MATCH DOC SEQUENCE  SIZE : " << matched_words.size() << std::endl;
 	return { matched_words, documents_.at(document_id).status };
 }
