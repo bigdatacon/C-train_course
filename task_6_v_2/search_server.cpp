@@ -45,9 +45,9 @@ void SearchServer::AddDocument(int document_id, const std::string_view& document
 		throw std::invalid_argument("Invalid document_id");
 	}
     //std::string document_str(document); 
-    std::deque<std::string_view> myDeque ;
-    myDeque.push_back(document);
-    const auto words = SplitIntoWordsNoStop(myDeque.back());
+    std::deque<std::string> myDeque ;
+    myDeque.push_back(std::string(document));
+    const auto words = SplitIntoWordsNoStop(std::string_view(myDeque.back()));
     
 	const double inv_word_count = 1.0 / words.size();
 	for (const auto& word : words) {
