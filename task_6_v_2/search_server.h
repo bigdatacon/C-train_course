@@ -15,6 +15,7 @@
 #include <execution>
 #include <functional>
 #include <string_view>
+#include <deque>
 
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
@@ -67,6 +68,7 @@ public:
     
 private:
     //std::map<int, std::map<std::string, double>> word_freqs_;
+    std::deque<std::string> myDeque_ ;
     std::map<int, std::map<std::string_view, double>> word_freqs_;
     struct DocumentData {
         int rating;
