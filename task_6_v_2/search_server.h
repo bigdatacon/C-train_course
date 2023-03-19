@@ -27,6 +27,8 @@ public:
     explicit SearchServer( std::string_view stop_words_text);
     explicit SearchServer( const std::string& stop_words_text);
     
+    void PrintDocumentFreq();
+    
     void AddDocument(int document_id,  std::string_view document, DocumentStatus status, const std::vector<int>& ratings);
     
     template <typename DocumentPredicate>
