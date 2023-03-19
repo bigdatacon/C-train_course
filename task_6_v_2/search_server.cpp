@@ -115,8 +115,8 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 			continue;
 		}
 		if (word_to_document_freqs_.at(word).count(document_id)) {
-			std::string_view word_sv(word.data(), word.size());
-            matched_words.push_back(word_sv);
+			//std::string_view word_sv(word.data(), word.size());
+            matched_words.push_back(word);
 		}
 	}
 	for (const std::string_view& word : query.minus_words) {
@@ -179,19 +179,6 @@ bool SearchServer::IsValidWord(const std::string& word) {
 		});
 }
 
-/*std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string_view& text) const {
-	std::vector<std::string> words;
-	for (const std::string_view& word : SplitIntoWords(text)) {
-        std::string word_str = std::string{word.data(), word.size()};
-		if (!IsValidWord(word_str)) {
-			throw std::invalid_argument("Word " + word_str + " is invalid");
-		}
-		if (!IsStopWord(word_str)) {
-			words.push_back(word_str);
-		}
-	}
-	return words;
-}*/
 
 std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
 	std::vector<std::string> words;
