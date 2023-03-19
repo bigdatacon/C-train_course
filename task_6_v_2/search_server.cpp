@@ -40,13 +40,13 @@ SearchServer::SearchServer(const std::string& stop_words_text)
 
 
 void SearchServer::AddDocument(int document_id, const std::string_view& document, DocumentStatus status, const std::vector<int>& ratings) {
-	if ((document_id < 0) || (documents_.count(document_id) > 0)) {
+	std::cout << std::string(document) << std::endl;
+    if ((document_id < 0) || (documents_.count(document_id) > 0)) {
 		throw std::invalid_argument("Invalid document_id");
 	}
     //std::string document_str(document); 
     std::deque<std::string_view> myDeque ;
     myDeque.push_back(document);
-    //const auto words = SplitIntoWordsNoStop(document_str);
     const auto words = SplitIntoWordsNoStop(myDeque.back());
     
 	const double inv_word_count = 1.0 / words.size();
