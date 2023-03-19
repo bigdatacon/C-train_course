@@ -120,6 +120,12 @@ int main() {
         // 2 words for document 2
     }
     
+    {
+        const auto [words, status] = search_server.MatchDocument(execution::par, query, 2);
+        cout << words.size() << " words for document 2 par "s << endl;
+        // 2 words for document 2
+    }
+    
 
 
     {
