@@ -24,17 +24,17 @@ class SearchServer {
 public:
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words);
-    explicit SearchServer(const std::string_view& stop_words_text);
-    explicit SearchServer(const std::string& stop_words_text);
+    explicit SearchServer( std::string_view stop_words_text);
+    explicit SearchServer( const std::string& stop_words_text);
     
-    void AddDocument(int document_id, const std::string_view& document, DocumentStatus status, const std::vector<int>& ratings);
+    void AddDocument(int document_id,  std::string_view document, DocumentStatus status, const std::vector<int>& ratings);
     
     template <typename DocumentPredicate>
-    std::vector<Document> FindTopDocuments(const std::string_view& raw_query, DocumentPredicate document_predicate) const;
+    std::vector<Document> FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const;
 
-    std::vector<Document> FindTopDocuments(const std::string_view& raw_query, DocumentStatus status) const;
+    std::vector<Document> FindTopDocuments( std::string_view raw_query, DocumentStatus status) const;
 
-    std::vector<Document> FindTopDocuments(const std::string_view& raw_query) const ;
+    std::vector<Document> FindTopDocuments( std::string_view raw_query) const ;
 
     int GetDocumentCount() const ;
 
@@ -49,11 +49,12 @@ public:
     
     
     //доплняю многопоточную версию 
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::string_view& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(std::string_view raw_query, int document_id) const;
     
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&, const std::string_view& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::sequenced_policy&,  std::string_view raw_query, int document_id) const;
     
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const;
+    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy& policy,  std::string_view raw_query, int document_id) const;
+    /*std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::execution::parallel_policy&, std::string_view raw_query, int document_id) const;*/
        
         //3. Разработайте метод удаления документов из поискового сервера
     void RemoveDocument(int document_id);
@@ -79,11 +80,11 @@ private:
     std::map<int, DocumentData> documents_;
     std::set<int> document_ids_;   
 
-    bool IsStopWord(const std::string_view& word) const ;
+    bool IsStopWord( std::string_view word) const ;
 
-    static bool IsValidWord(const std::string_view& word) ;
+    static bool IsValidWord(std::string_view word) ;
 
-    std::vector<std::string_view> SplitIntoWordsNoStop(const std::string_view& text) const;
+    std::vector<std::string_view> SplitIntoWordsNoStop( std::string_view text) const;
 
     static int ComputeAverageRating(const std::vector<int>& ratings) ;
     
@@ -93,7 +94,7 @@ private:
         bool is_stop;
     };
 
-    QueryWord ParseQueryWord(std::string_view& text) const ;
+    QueryWord ParseQueryWord(std::string_view text) const ;
 
 
     struct Query {
@@ -102,9 +103,9 @@ private:
     };
     
     // Добавляю многопоточную версию ParseQuery
-    Query ParseQuery(const std::string_view& text) const ;
-    Query ParseQuery(const std::execution::sequenced_policy&, const std::string_view& text) const ;
-    Query ParseQuery(bool flag, const std::string_view& text) const ;
+    Query ParseQuery(std::string_view text) const ;
+    Query ParseQuery(const std::execution::sequenced_policy&,  std::string_view text) const ;
+    Query ParseQuery(bool flag,  std::string_view text) const ;
 
     // Existence required
     double ComputeWordInverseDocumentFreq(const std::string& word) const ;
@@ -123,10 +124,8 @@ SearchServer::SearchServer(const StringContainer& stop_words)
 }
 
 template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindTopDocuments(const std::string_view& raw_query, DocumentPredicate document_predicate) const {
-    //std::string raw_query_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
-    std::string raw_query_s(raw_query);
-    const auto query = ParseQuery(raw_query_s);
+std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const {
+    const auto query = ParseQuery(raw_query);
     auto matched_documents = FindAllDocuments(query, document_predicate);
 
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
@@ -146,7 +145,7 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string_view& raw
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
     std::map<int, double> document_to_relevance;
-    for (const std::string_view& word : query.plus_words) {
+    for (std::string_view word : query.plus_words) {
         if (word_to_document_freqs_.count(word) == 0) {
             continue;
         }
@@ -154,23 +153,23 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
         //std::string word_str = std::string{word.data(), word.size()}; 
         std::string word_str(word);
         const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
-        for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
+        for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
             const auto& document_data = documents_.at(document_id);
             if (document_predicate(document_id, document_data.status, document_data.rating)) {
                 document_to_relevance[document_id] += term_freq * inverse_document_freq;
             }
         }
     }
-    for (const std::string_view& word : query.minus_words) {
+    for ( std::string_view word : query.minus_words) {
         if (word_to_document_freqs_.count(word) == 0) {
             continue;
         }
-        for (const auto [document_id, _] : word_to_document_freqs_.at(word)) {
+        for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
             document_to_relevance.erase(document_id);
         }
     }
     std::vector<Document> matched_documents;
-    for (const auto [document_id, relevance] : document_to_relevance) {
+    for (const auto& [document_id, relevance] : document_to_relevance) {
         matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
     }
     return matched_documents;
