@@ -7,13 +7,13 @@
 using namespace std;
 
 
-void PrintMatchDocumentResultUTest(int document_id, const std::vector<std::string>& words,
+void PrintMatchDocumentResultUTest(int document_id, const std::vector<std::string_view>& words,
                                    DocumentStatus status) {
     std::cout << "{ "
               << "document_id = " << document_id << ", "
               << "status = " << static_cast<int>(status) << ", "
               << "words =";
-    for (const string& word : words) {
+    for (const string_view& word : words) {
         std::cout << ' ' << word;
     }
     std::cout << "}" << std::endl;
