@@ -38,6 +38,12 @@ SearchServer::SearchServer(const std::string& stop_words_text)
 {
 }
 
+void SearchServer::PrintDocumentFreq() {
+    std::cout << "word_to_document_freqs_.size() : " << word_to_document_freqs_.size()<< std::endl;
+    for (auto el : word_to_document_freqs_) {std::cout << el.first << std::endl;}
+    
+}
+
 
 void SearchServer::AddDocument(int document_id, std::string_view document, DocumentStatus status, const std::vector<int>& ratings) {
 	//std::cout << std::string(document) << std::endl;
@@ -55,6 +61,8 @@ void SearchServer::AddDocument(int document_id, std::string_view document, Docum
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 	document_ids_.insert(document_id);
+    std::cout << "Print Freqs : " << std::endl;
+    PrintDocumentFreq();
 
 }
 
@@ -115,7 +123,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             return { matched_words, documents_.at(document_id).status };
         }
     }
-    
+    //matched_words.resize(query.plus_words.size());
     for (const std::string_view word : query.plus_words) {
         if (word_to_document_freqs_.count(word) == 0) {
             continue;
