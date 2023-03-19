@@ -105,8 +105,8 @@ std::set<int>::iterator SearchServer::end()
 
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::string_view& raw_query, int document_id) const {
     //std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
-    std::string raw_quer_s(raw_query);
-	const auto query = ParseQuery(raw_quer_s);
+    //std::string raw_quer_s(raw_query);
+	const auto query = ParseQuery(raw_query);
 	std::vector<std::string_view> matched_words;
 	for (const std::string_view& word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
@@ -135,8 +135,8 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 
 std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::execution::parallel_policy& policy, const std::string_view& raw_query, int document_id) const {
     //std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view    
-    std::string raw_quer_s(raw_query); // cоздаю строку из string_view  
-    const auto query = ParseQuery(true, raw_quer_s);
+    //std::string raw_quer_s(raw_query); // cоздаю строку из string_view  
+    const auto query = ParseQuery(true, raw_query);
         std::vector<std::string_view> matched_words(query.plus_words.size());
  
         if(any_of(policy, query.minus_words.begin(), query.minus_words.end(), [&](const auto& word){
@@ -166,15 +166,6 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 }
 
 
-/*bool SearchServer::IsStopWord(const std::string& word) const {
-	return stop_words_.count(word) > 0;
-}
-bool SearchServer::IsValidWord(const std::string& word) {
-	// A valid word must not contain special characters
-	return none_of(word.begin(), word.end(), [](char c) {
-		return c >= '\0' && c < ' ';
-		});
-}*/
 
 bool SearchServer::IsStopWord(const std::string_view& word ) const {
     return stop_words_.count(word) > 0;
@@ -209,21 +200,6 @@ int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
 	return rating_sum / static_cast<int>(ratings.size());
 }
 
-/*SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string_view& text) const {
-    if (text.empty()) {
-        throw std::invalid_argument("Query word is empty"s);
-    }
-    bool is_minus = false;
-    if (text[0] == '-') {
-        is_minus = true;
-        text = text.substr(1);
-    }
-    if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
-        throw std::invalid_argument("Query word "s + std::string(text) + " is invalid");
-    }
- 
-    return { text, is_minus, IsStopWord(text) };
-}*/
 
 SearchServer::QueryWord SearchServer::ParseQueryWord(std::string_view& text) const {
 	if (text.size()==0) {
@@ -241,20 +217,15 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(std::string_view& text) con
 	return { text, is_minus, IsStopWord(text) };
 }
 
-SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
+SearchServer::Query SearchServer::ParseQuery(const std::string_view& text) const {
 	Query result;
 	for (std::string_view& word : SplitIntoWords(text)) {
-        //std::string word_str = std::string{word.data(), word.size()};
-        //std::string word_str(word); // cоздаю строку из string_view  
-		//const auto query_word = ParseQueryWord(word);
         auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
-				//result.minus_words.insert(query_word.data);
 				result.minus_words.push_back(query_word.data);
 			}
 			else {
-				//result.plus_words.insert(query_word.data);
 				result.plus_words.push_back(query_word.data);
 			}
 		}
@@ -269,15 +240,12 @@ SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
 	return result;
 }
 
-SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_policy&, const std::string& text) const { return SearchServer::ParseQuery(text); }
+SearchServer::Query SearchServer::ParseQuery(const std::execution::sequenced_policy&, const std::string_view& text) const { return SearchServer::ParseQuery(text); }
 
 // параллельная версия 
-SearchServer::Query SearchServer::ParseQuery(bool flag, const std::string& text) const {
+SearchServer::Query SearchServer::ParseQuery(bool flag, const std::string_view& text) const {
 	Query result;
 	for (std::string_view& word : SplitIntoWords(text)) {
-		//std::string word_str = std::string{word.data(), word.size()};
-        //std::string word_str(word); // cоздаю строку из string_view  
-        //const auto query_word = ParseQueryWord(word);
         auto query_word = ParseQueryWord(word);
 		if (!query_word.is_stop) {
 			if (query_word.is_minus) {
