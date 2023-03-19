@@ -7,7 +7,7 @@
 using namespace std;
 
 
-void PrintMatchDocumentResultUTest(int document_id, const std::vector<std::string_view>& words,
+/*void PrintMatchDocumentResultUTest(int document_id, const std::vector<std::string_view>& words,
                                    DocumentStatus status) {
     std::cout << "{ "
               << "document_id = " << document_id << ", "
@@ -78,18 +78,18 @@ const std::vector<int> ratings10 = {11, 2, -43, 4, 895};
         std::cout<<"SIZE PARALLEL: "<<words.size()<<std::endl;
         PrintMatchDocumentResultUTest(document_id, words, status);
     }
-}
+}*/
 
 int main() {
-    TestMatch();
+    //TestMatch();
     
     // Должен быть такой вывод:
-    /*
-    1 words for document 1
+    
+    /*1 words for document 1
 2 words for document 2
-0 words for document 3 
-    */
-    /*std::cout << " MAIN MAIN :" << std::endl;
+0 words for document 3 */
+    
+    //std::cout << " MAIN MAIN :" << std::endl;
     
     SearchServer search_server("and with"s);
     
@@ -141,7 +141,7 @@ int main() {
         const auto [words, status] = search_server.MatchDocument(execution::par, query, 3);
         cout << words.size() << " words for document 3"s << endl;
         // 0 words for document 3
-    }*/
+    }
 
     return 0;
 }
