@@ -67,6 +67,7 @@ const std::vector<int> ratings10 = {11, 2, -43, 4, 895};
     const int document_count = search_server.GetDocumentCount();
     for (int document_id = 0; document_id < document_count; ++document_id) {
         const auto [words, status] = search_server.MatchDocument(execution::seq, query, document_id);
+        std::cout<<"SIZE SEQUENCE: "<<words.size()<<std::endl;
         PrintMatchDocumentResultUTest(document_id, words, status);
     }
     
@@ -74,6 +75,7 @@ const std::vector<int> ratings10 = {11, 2, -43, 4, 895};
     const int document_count_par = search_server.GetDocumentCount();
     for (int document_id = 0; document_id < document_count_par; ++document_id) {
         const auto [words, status] = search_server.MatchDocument(execution::par, query, document_id);
+        std::cout<<"SIZE PARALLEL: "<<words.size()<<std::endl;
         PrintMatchDocumentResultUTest(document_id, words, status);
     }
 }
