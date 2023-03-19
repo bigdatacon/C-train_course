@@ -94,10 +94,8 @@ private:
     QueryWord ParseQueryWord(const std::string& text) const ;
 
     struct Query {
-        /*std::set<std::string> plus_words;
-        std::set<std::string> minus_words;*/
-        std::vector<std::string> plus_words;
-        std::vector<std::string> minus_words;
+        std::vector<std::string_view> plus_words;
+        std::vector<std::string_view> minus_words;
     };
     
     // Добавляю многопоточную версию ParseQuery
@@ -144,11 +142,12 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string_view& raw
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
     std::map<int, double> document_to_relevance;
-    for (const std::string& word : query.plus_words) {
+    for (const std::string_view& word : query.plus_words) {
         if (word_to_document_freqs_.count(word) == 0) {
             continue;
         }
-        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
+        std::string word_str = std::string{word.data(), word.size()}; 
+        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
         for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
             const auto& document_data = documents_.at(document_id);
             if (document_predicate(document_id, document_data.status, document_data.rating)) {
@@ -156,7 +155,7 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
             }
         }
     }
-    for (const std::string& word : query.minus_words) {
+    for (const std::string_view& word : query.minus_words) {
         if (word_to_document_freqs_.count(word) == 0) {
             continue;
         }
