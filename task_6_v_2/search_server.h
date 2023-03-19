@@ -121,7 +121,8 @@ SearchServer::SearchServer(const StringContainer& stop_words)
 
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments(const std::string_view& raw_query, DocumentPredicate document_predicate) const {
-    std::string raw_query_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
+    //std::string raw_query_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
+    std::string raw_query_s(raw_query);
     const auto query = ParseQuery(raw_query_s);
     auto matched_documents = FindAllDocuments(query, document_predicate);
 
@@ -146,7 +147,9 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
         if (word_to_document_freqs_.count(word) == 0) {
             continue;
         }
-        std::string word_str = std::string{word.data(), word.size()}; 
+
+        //std::string word_str = std::string{word.data(), word.size()}; 
+        std::string word_str(word);
         const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
         for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
             const auto& document_data = documents_.at(document_id);
