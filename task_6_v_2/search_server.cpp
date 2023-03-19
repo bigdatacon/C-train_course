@@ -105,7 +105,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
     std::string raw_quer_s{raw_query.data(), raw_query.size()}; // cоздаю строку из string_view
 	const auto query = ParseQuery(raw_quer_s);
 	std::vector<std::string_view> matched_words;
-	for (const std::string& word : query.plus_words) {
+	for (const std::string_view& word : query.plus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
 			continue;
 		}
@@ -114,7 +114,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             matched_words.push_back(word_sv);
 		}
 	}
-	for (const std::string& word : query.minus_words) {
+	for (const std::string_view& word : query.minus_words) {
 		if (word_to_document_freqs_.count(word) == 0) {
 			continue;
 		}
