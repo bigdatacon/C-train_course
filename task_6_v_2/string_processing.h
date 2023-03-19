@@ -10,7 +10,8 @@ std::set<std::string, std::less<>> MakeUniqueNonEmptyStrings(const StringContain
     std::set<std::string, std::less<>> non_empty_strings;
     for (const  auto& str : strings) {
         if ( !str.size()==0) {
-            std::string my_str = std::string{str.data(), str.size()};
+            //std::string my_str = std::string{str.data(), str.size()};
+            std::string my_str(str);
             non_empty_strings.emplace(my_str);
         }
     }
