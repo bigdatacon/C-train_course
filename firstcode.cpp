@@ -43,6 +43,7 @@ RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAc
     if (left == range_begin && !(*left < target)) {
         return left;
     }
+    if (*left == *right) { return right + 1; }
     else {
         return right;
     }
