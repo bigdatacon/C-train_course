@@ -1,96 +1,134 @@
-#include <algorithm>
-#include <execution>
 #include <iostream>
-#include <future>
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <iostream>
+#include <sstream>
+
+using std::istringstream;
+using std::string;
+using std::cout;
+
+using namespace std;
+// тут пример разбиения строк на слова через issstream 
+/*int main() {
+    std::vector<std::string> my_vector{ "Hello, world!", "How are you?", "Nice to meet you." };
+
+    std::vector<std::vector<std::string>> words_vector;
+
+    std::transform(my_vector.begin(), my_vector.end(), std::back_inserter(words_vector), [](std::string s) {
+    std::vector<std::string> words;
+    std::string word;
+    std::istringstream stream(s); // превращаем строку s в поток
+    while (stream >> word) { // парсим слова из потока
+        words.push_back(word);
+    }
+    return words;
+        });
+    
+
+    for (auto el : words_vector) { for (auto e : el) { cout << e << endl; } }
+    // выводим каждое слово вместе с номером строки
+    for (int i = 0; i < words_vector.size(); ++i) {
+        for (int j = 0; j < words_vector[i].size(); ++j) {
+            std::cout << "Строка " << i << ", слово " << j << ": " << words_vector[i][j] << std::endl;
+        }
+    }
+
+    return 0;
+}*/
+
 #include <functional>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <execution>
+#include <future>
+#include <algorithm>
 
 using namespace std;
 
+/* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
+Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
 
-
-int compare_string(const string &s1, const string &s2)
-{
-    return s1.compare(s2);
-}
-
-
-
-
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(const execution::sequenced_policy&, RandomAccessIterator range_begin, RandomAccessIterator range_end, const Value& target) {
-    auto left = range_begin;
-    auto right = range_end;
-    while (left +1 < right) {
-        const auto mid1 = left + (right - left) / 3;
-        const auto mid2 = right - (right - left) / 3;     
-        future<int> cmp1 = async([&target, mid2]{return compare_string(ref(target), ref(*mid2));});
-       if (*mid1 == target) {
-            return mid1;
-        }
-        else if (*mid2 == target) {
-            return mid2;
-        }
-        else if (target < *mid1) {
-            right = mid1;
-        }
-        else if (cmp1.get()) {
-            left = mid2;
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            }
         }
         else {
-            left = mid1 +1;
-            right = mid2 ;
+            if (isprint(c) == true) {
+                word += c;
+            }
         }
+    }
+    if (!word.empty()) {
+        words.push_back(word);
+    }
 
-    }
-    if (left == range_begin && !(*left < target)) {
-        return left;
-    }
-    else {
-        return right;
-    }
+    return words;
 }
 
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(RandomAccessIterator range_begin, RandomAccessIterator range_end,
-    const Value& value) {
-    return LowerBound(execution::seq, range_begin, range_end, value);
-}
 
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(const execution::parallel_policy&, RandomAccessIterator range_begin,
-    RandomAccessIterator range_end, const Value& value) {
-    return LowerBound(execution::seq, range_begin, range_end, value);
-}
+struct Stats {
+    map<string, int> word_frequences;
 
+    void operator+=(const Stats& other) {
+        // сложить частоты
+    }
+};
+
+using KeyWords = set<string, less<>>;
+/* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
+Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
+Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
+
+    Stats stat;
+    vector<string> all_words;
+
+    for_each(input.begin(), input.end(), [](auto& s) {
+        auto async_ = async([&s] { return SplitIntoWords(s); });
+        all_words.insert(async_.get().end(), async_.get().begin(), all_words.end());
+        });
+
+
+    for (auto el : input) {
+            vector<string> words = SplitIntoWords(el);
+            all_words.insert(words.end(), words.begin(), all_words.end());
+
+            words.clear();
+        }
+    for (auto word : all_words) {
+        if (key_words.count(word)) {
+            int freq = count(all_words.begin(), all_words.end(), word);
+            stat.word_frequences[word] = freq;
+        }
+    }
+
+    return stat;
+
+}
 
 int main() {
-    const vector<string> strings = { "cat", "dog", "dog", "horse" };
+    const KeyWords key_words = { "yangle", "rocks", "sucks", "all" };
 
-    const vector<string> requests = { "bear", "cat", "deer", "dog", "dogs", "horses" };
+    stringstream ss;
+    ss << "this new yangle service really rocks\n";
+    ss << "It sucks when yangle isn't available\n";
+    ss << "10 reasons why yangle is the best IT company\n";
+    ss << "yangle rocks others suck\n";
+    ss << "Goondex really sucks, but yangle rocks. Use yangle\n";
 
-    // последовательные версии
-    cout << "Request [" << requests[0] << "] → position "
-         << LowerBound(strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
-    cout << "Request [" << requests[1] << "] → position "
-         << LowerBound(execution::seq, strings.begin(), strings.end(), requests[1])
-            - strings.begin()
-         << endl;
-    cout << "Request [" << requests[2] << "] → position "
-         << LowerBound(execution::seq, strings.begin(), strings.end(), requests[2])
-            - strings.begin()
-         << endl;
+    for (const auto& [word, frequency] : ExploreKeyWords(key_words, ss).word_frequences) {
+        cout << word << " " << frequency << endl;
+    }
 
-    // параллельные
-    cout << "Request [" << requests[3] << "] → position "
-         << LowerBound(execution::par, strings.begin(), strings.end(), requests[3])
-            - strings.begin()
-         << endl;
-    cout << "Request [" << requests[4] << "] → position "
-         << LowerBound(execution::par, strings.begin(), strings.end(), requests[4])
-            - strings.begin()
-         << endl;
-    cout << "Request [" << requests[5] << "] → position "
-         << LowerBound(execution::par, strings.begin(), strings.end(), requests[5])
-            - strings.begin()
-         << endl;
+    return 0;
 }
