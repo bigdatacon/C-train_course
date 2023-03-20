@@ -5,14 +5,14 @@
 using namespace std;
 
 /*
-Если ваша программа зацикливается, поймайте значения границ, на которых это происходит — наверняка понадобится отдельно обработать крайний случай. 
+Если ваша программа зацикливается, поймайте значения границ, на которых это происходит — наверняка понадобится отдельно обработать крайний случай.
 Между созданием future и вызовом get для future должны выполняться некоторые сложные вычисления.
 */
 
 template <typename RandomAccessIterator, typename Value>
 RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAccessIterator range_begin, RandomAccessIterator range_end, const Value& target) {
     auto left = range_begin;
-    auto right = range_end ;
+    auto right = range_end;
     //cout << " " << endl;
     //cout <<   "target : " << target << endl;
 
@@ -20,26 +20,31 @@ RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAc
         const auto mid1 = left + (right - left) / 3;
         const auto mid2 = right - (right - left) / 3;
 
-        /*if (*mid1 == target) {
-            return mid1+1;
-        } else if (*mid2 == target) {
-            return mid2+1;*/
-        if (target < *mid1) {
-            right = mid1 ;
-        } else if (target > *mid2) {
-            left = mid2 ;
-        } else {
-            left = mid1 + 1;
-            right = mid2 - 1;
+        if (*mid1 == target) {
+            return mid1;
         }
-        
+        else if (*mid2 == target) {
+            return mid2;
+        }
+        else if (target < *mid1) {
+            right = mid1;
+        }
+        else if (target > *mid2) {
+            left = mid2;
+        }
+        else {
+            left = mid1+1 ;
+            right = mid2-1 ;
+        }
+
     }
     if (left == range_begin && !(*left < target)) {
         return left;
-    } else {
+    }
+    else {
         return right;
     }
-    }
+}
 
 
 
@@ -47,58 +52,60 @@ RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAc
 
 template <typename RandomAccessIterator, typename Value>
 RandomAccessIterator LowerBound(const execution::sequenced_policy&,
-                                RandomAccessIterator range_begin, RandomAccessIterator range_end,
-                                const Value& value) {
+    RandomAccessIterator range_begin, RandomAccessIterator range_end,
+    const Value& value) {
     auto left_bound = range_begin;
     auto right_bound = range_end;
     while (left_bound + 1 < right_bound) {
         const auto middle = left_bound + (right_bound - left_bound) / 2;
         if (*middle < value) {
             left_bound = middle;
-        } else {
+        }
+        else {
             right_bound = middle;
         }
     }
     if (left_bound == range_begin && !(*left_bound < value)) {
         return left_bound;
-    } else {
+    }
+    else {
         return right_bound;
     }
 }
 
 template <typename RandomAccessIterator, typename Value>
 RandomAccessIterator LowerBound(RandomAccessIterator range_begin, RandomAccessIterator range_end,
-                                const Value& value) {
+    const Value& value) {
     return LowerBound(execution::seq, range_begin, range_end, value);
 }
 
 template <typename RandomAccessIterator, typename Value>
 RandomAccessIterator LowerBound(const execution::parallel_policy&, RandomAccessIterator range_begin,
-                                RandomAccessIterator range_end, const Value& value) {
+    RandomAccessIterator range_end, const Value& value) {
     return LowerBound(execution::seq, range_begin, range_end, value);
 }
 
 int main() {
-    const vector<string> strings = {"cat", "dog", "dog", "horse"};
+    const vector<string> strings = { "cat", "dog", "dog", "horse" };
 
-    const vector<string> requests = {"bear", "cat", "deer", "dog", "dogs", "horses"};
-    
+    const vector<string> requests = { "bear", "cat", "deer", "dog", "dogs", "horses" };
+
     //cout << "базовая тернарная функция : " << endl;
-        cout << "Request [" << requests[0] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[0]) -strings.begin() << endl;
-                cout << "Request [" << requests[1] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[1]) -strings.begin() << endl;
-            cout << "Request [" << requests[2] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[2]) -strings.begin() << endl;
-            cout << "Request [" << requests[3] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[3]) -strings.begin() << endl;
-            cout << "Request [" << requests[4] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[4]) -strings.begin() << endl;
-            cout << "Request [" << requests[5] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[5]) -strings.begin() << endl;
-    
+    cout << "Request [" << requests[0] << "] → position ternar "
+        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
+    cout << "Request [" << requests[1] << "] → position ternar "
+        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[1]) - strings.begin() << endl;
+    cout << "Request [" << requests[2] << "] → position ternar "
+        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[2]) - strings.begin() << endl;
+    cout << "Request [" << requests[3] << "] → position ternar "
+        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[3]) - strings.begin() << endl;
+    cout << "Request [" << requests[4] << "] → position ternar "
+        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[4]) - strings.begin() << endl;
+    cout << "Request [" << requests[5] << "] → position ternar "
+        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[5]) - strings.begin() << endl;
+
     // последовательные версии
-    /*cout << "Request [" << requests[0] << "] → position "
+    cout << "Request [" << requests[0] << "] → position "
          << LowerBound(strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
     cout << "Request [" << requests[1] << "] → position "
          << LowerBound(execution::seq, strings.begin(), strings.end(), requests[1])
@@ -121,5 +128,5 @@ int main() {
     cout << "Request [" << requests[5] << "] → position "
          << LowerBound(execution::par, strings.begin(), strings.end(), requests[5])
             - strings.begin()
-         << endl;*/
+         << endl;
 }
