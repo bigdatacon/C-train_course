@@ -1,100 +1,39 @@
-#include <algorithm>
-#include <execution>
-#include <iostream>
-#include <future>
 #include <functional>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
+struct Stats {
+    map<string, int> word_frequences;
 
-
-int compare_string(const string &s1, const string &s2)
-{
-    return s1.compare(s2);
-}
-
-
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(const execution::sequenced_policy&, RandomAccessIterator range_begin, RandomAccessIterator range_end, const Value& target) {
-    auto left = range_begin;
-    auto right = range_end;
-    while (left +1 < right) {
-        const auto mid1 = left + (right - left) / 3;
-        const auto mid2 = right - (right - left) / 3;
-        future<int> cmp1 = async([&target, mid1]{return compare_string(ref(target), ref(*mid1));});
-        future<int> cmp2 = async([&target, mid2]{return compare_string(ref(target), ref(*mid2));});
-        int diff1 = cmp1.get();
-        int diff2 = cmp2.get();
-
-        if (!diff1) {
-            return mid1;
-        }
-        else if (!diff2) {
-            return mid2;
-        }
-        else if (diff1 < 0) {
-            right = mid1;
-        }
-        else if (diff2 > 0) {
-            left = mid2;
-        }
-        else {
-            left = mid1 +1;
-            right = mid2;
-        }
-
+    void operator+=(const Stats& other) {
+        // сложить частоты
     }
-    if (left == range_begin && !(*left < target)) {
-        return left;
-    }
-    else {
-        return right;
-    }
+};
+
+using KeyWords = set<string, less<>>;
+
+Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
+    // ...
 }
-
-
-
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(RandomAccessIterator range_begin, RandomAccessIterator range_end,
-    const Value& value) {
-    return LowerBound(execution::seq, range_begin, range_end, value);
-}
-
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(const execution::parallel_policy&, RandomAccessIterator range_begin,
-    RandomAccessIterator range_end, const Value& value) {
-    return LowerBound(execution::seq, range_begin, range_end, value);
-}
-
 
 int main() {
-    const vector<string> strings = { "cat", "dog", "dog", "horse" };
+    const KeyWords key_words = {"yangle", "rocks", "sucks", "all"};
 
-    const vector<string> requests = { "bear", "cat", "deer", "dog", "dogs", "horses" };
+    stringstream ss;
+    ss << "this new yangle service really rocks\n";
+    ss << "It sucks when yangle isn't available\n";
+    ss << "10 reasons why yangle is the best IT company\n";
+    ss << "yangle rocks others suck\n";
+    ss << "Goondex really sucks, but yangle rocks. Use yangle\n";
 
-    // последовательные версии
-    cout << "Request [" << requests[0] << "] → position "
-         << LowerBound(strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
-    cout << "Request [" << requests[1] << "] → position "
-         << LowerBound(execution::seq, strings.begin(), strings.end(), requests[1])
-            - strings.begin()
-         << endl;
-    cout << "Request [" << requests[2] << "] → position "
-         << LowerBound(execution::seq, strings.begin(), strings.end(), requests[2])
-            - strings.begin()
-         << endl;
+    for (const auto& [word, frequency] : ExploreKeyWords(key_words, ss).word_frequences) {
+        cout << word << " " << frequency << endl;
+    }
 
-    // параллельные
-    cout << "Request [" << requests[3] << "] → position "
-         << LowerBound(execution::par, strings.begin(), strings.end(), requests[3])
-            - strings.begin()
-         << endl;
-    cout << "Request [" << requests[4] << "] → position "
-         << LowerBound(execution::par, strings.begin(), strings.end(), requests[4])
-            - strings.begin()
-         << endl;
-    cout << "Request [" << requests[5] << "] → position "
-         << LowerBound(execution::par, strings.begin(), strings.end(), requests[5])
-            - strings.begin()
-         << endl;
+    return 0;
 }
