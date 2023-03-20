@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <execution>
 #include <iostream>
+#include <future>
+#include <functional>
 
 using namespace std;
 
@@ -33,7 +35,7 @@ RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAc
             left = mid2;
         }
         else {
-            left = mid1+1 ;
+            left = mid1 +1;
             right = mid2-1 ;
         }
 
@@ -89,7 +91,14 @@ int main() {
     const vector<string> strings = { "cat", "dog", "dog", "horse" };
 
     const vector<string> requests = { "bear", "cat", "deer", "dog", "dogs", "horses" };
-
+    
+    /*future<RandomAccessIterator> coat_future = async(ternary_search,  strings.begin(), strings.end(), requests[0]);
+    const auto report = coat_future.get(); */
+    
+    /*std::future<RandomAccessIterator> asyncFn = std::async(std::launch::async, ternary_search,  strings.begin(), strings.end(), requests[0]);
+  asyncFn.wait();*/
+    
+    
     //cout << "базовая тернарная функция : " << endl;
     cout << "Request [" << requests[0] << "] → position ternar "
         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
