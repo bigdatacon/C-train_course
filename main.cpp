@@ -92,19 +92,24 @@ Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
 
     Stats stat;
     vector<string> all_words;
-
-    for_each(input.begin(), input.end(), [](auto& s) {
-        auto async_ = async([&s] { return SplitIntoWords(s); });
+    std::string line;
+    //std::istream& input = std::cin; // можно использовать любой 
+    while (std::getline(input, line)) { // читаем строку из входного потока, пока не достигнем конца
+        
+        for_each(line.begin(), line.end(), [&all_words](auto& s) {
+            auto async_ = async([&s] { return SplitIntoWords(*s); });
         all_words.insert(async_.get().end(), async_.get().begin(), all_words.end());
-        });
+            });
 
-
-    for (auto el : input) {
+        // вариант без async - дублирует то что выше, но тоже не работает
+        for (auto el : line) {
             vector<string> words = SplitIntoWords(el);
             all_words.insert(words.end(), words.begin(), all_words.end());
 
             words.clear();
         }
+    }
+
     for (auto word : all_words) {
         if (key_words.count(word)) {
             int freq = count(all_words.begin(), all_words.end(), word);
