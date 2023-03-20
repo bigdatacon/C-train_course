@@ -9,56 +9,39 @@ using namespace std;
 Между созданием future и вызовом get для future должны выполняться некоторые сложные вычисления.
 */
 
-/*int ternary_search(vector<string> arr, string target) {
-    int left = 0;
-    int right = arr.size() - 1;
-
-    while (left <= right) {
-        int mid1 = left + (right - left) / 3;
-        int mid2 = right - (right - left) / 3;
-
-        if (arr[mid1] == target) {
-            return mid1;
-        } else if (arr[mid2] == target) {
-            return mid2;
-        } else if (target < arr[mid1]) {
-            right = mid1 - 1;
-        } else if (target > arr[mid2]) {
-            left = mid2 + 1;
-        } else {
-            left = mid1 + 1;
-            right = mid2 - 1;
-        }
-    }
-
-    return -1; // Искомый элемент не найден
-}*/
-
 template <typename RandomAccessIterator, typename Value>
 RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAccessIterator range_begin, RandomAccessIterator range_end, const Value& target) {
     auto left = range_begin;
     auto right = range_end ;
+    //cout << " " << endl;
+    //cout <<   "target : " << target << endl;
 
-    while (left <= right) {
+    while (left +1 < right) {
         const auto mid1 = left + (right - left) / 3;
         const auto mid2 = right - (right - left) / 3;
 
-        if (*mid1 == target) {
-            return mid1;
+        /*if (*mid1 == target) {
+            return mid1+1;
         } else if (*mid2 == target) {
-            return mid2;
-        } else if (target < *mid1) {
-            right = mid1 - 1;
+            return mid2+1;*/
+        if (target < *mid1) {
+            right = mid1 ;
         } else if (target > *mid2) {
-            left = mid2 + 1;
+            left = mid2 ;
         } else {
             left = mid1 + 1;
             right = mid2 - 1;
         }
+        
+    }
+    if (left == range_begin && !(*left < target)) {
+        return left;
+    } else {
+        return right;
+    }
     }
 
-    return range_begin /*-1*/; // Искомый элемент не найден
-}
+
 
 
 
@@ -100,13 +83,22 @@ int main() {
 
     const vector<string> requests = {"bear", "cat", "deer", "dog", "dogs", "horses"};
     
-    cout << "базовая тернарная функция : " << endl;
-        cout << "Request [" << requests[1] << "] → position ternar "
-         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[1])  << endl;
-    
+    //cout << "базовая тернарная функция : " << endl;
+        cout << "Request [" << requests[0] << "] → position ternar "
+         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[0]) -strings.begin() << endl;
+                cout << "Request [" << requests[1] << "] → position ternar "
+         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[1]) -strings.begin() << endl;
+            cout << "Request [" << requests[2] << "] → position ternar "
+         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[2]) -strings.begin() << endl;
+            cout << "Request [" << requests[3] << "] → position ternar "
+         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[3]) -strings.begin() << endl;
+            cout << "Request [" << requests[4] << "] → position ternar "
+         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[4]) -strings.begin() << endl;
+            cout << "Request [" << requests[5] << "] → position ternar "
+         << ternary_search(execution::seq, strings.begin(), strings.end(), requests[5]) -strings.begin() << endl;
     
     // последовательные версии
-    cout << "Request [" << requests[0] << "] → position "
+    /*cout << "Request [" << requests[0] << "] → position "
          << LowerBound(strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
     cout << "Request [" << requests[1] << "] → position "
          << LowerBound(execution::seq, strings.begin(), strings.end(), requests[1])
@@ -129,5 +121,5 @@ int main() {
     cout << "Request [" << requests[5] << "] → position "
          << LowerBound(execution::par, strings.begin(), strings.end(), requests[5])
             - strings.begin()
-         << endl;
+         << endl;*/
 }
