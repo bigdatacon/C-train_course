@@ -6,75 +6,53 @@
 
 using namespace std;
 
-/*
-Если ваша программа зацикливается, поймайте значения границ, на которых это происходит — наверняка понадобится отдельно обработать крайний случай.
-Между созданием future и вызовом get для future должны выполняться некоторые сложные вычисления.
-*/
+
+
+int compare_string(const string &s1, const string &s2)
+{
+    return s1.compare(s2);
+}
+
 
 template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator ternary_search(const execution::sequenced_policy&, RandomAccessIterator range_begin, RandomAccessIterator range_end, const Value& target) {
+RandomAccessIterator LowerBound(const execution::sequenced_policy&, RandomAccessIterator range_begin, RandomAccessIterator range_end, const Value& target) {
     auto left = range_begin;
     auto right = range_end;
-    //cout << " " << endl;
-    //cout <<   "target : " << target << endl;
-
     while (left +1 < right) {
         const auto mid1 = left + (right - left) / 3;
         const auto mid2 = right - (right - left) / 3;
+        future<int> cmp1 = async([&target, mid1]{return compare_string(ref(target), ref(*mid1));});
+        future<int> cmp2 = async([&target, mid2]{return compare_string(ref(target), ref(*mid2));});
+        int diff1 = cmp1.get();
+        int diff2 = cmp2.get();
 
-        if (*mid1 == target) {
+        if (!diff1) {
             return mid1;
         }
-        else if (*mid2 == target) {
+        else if (!diff2) {
             return mid2;
         }
-        else if (target < *mid1) {
+        else if (diff1 < 0) {
             right = mid1;
         }
-        else if (target > *mid2) {
+        else if (diff2 > 0) {
             left = mid2;
         }
         else {
             left = mid1 +1;
-            right = mid2 ;
+            right = mid2;
         }
 
     }
     if (left == range_begin && !(*left < target)) {
         return left;
     }
-    //if (*left == *right) { return right + 1; }
     else {
         return right;
     }
 }
 
 
-
-
-
-template <typename RandomAccessIterator, typename Value>
-RandomAccessIterator LowerBound(const execution::sequenced_policy&,
-    RandomAccessIterator range_begin, RandomAccessIterator range_end,
-    const Value& value) {
-    auto left_bound = range_begin;
-    auto right_bound = range_end;
-    while (left_bound + 1 < right_bound) {
-        const auto middle = left_bound + (right_bound - left_bound) / 2;
-        if (*middle < value) {
-            left_bound = middle;
-        }
-        else {
-            right_bound = middle;
-        }
-    }
-    if (left_bound == range_begin && !(*left_bound < value)) {
-        return left_bound;
-    }
-    else {
-        return right_bound;
-    }
-}
 
 template <typename RandomAccessIterator, typename Value>
 RandomAccessIterator LowerBound(RandomAccessIterator range_begin, RandomAccessIterator range_end,
@@ -88,31 +66,11 @@ RandomAccessIterator LowerBound(const execution::parallel_policy&, RandomAccessI
     return LowerBound(execution::seq, range_begin, range_end, value);
 }
 
+
 int main() {
     const vector<string> strings = { "cat", "dog", "dog", "horse" };
 
     const vector<string> requests = { "bear", "cat", "deer", "dog", "dogs", "horses" };
-    
-    /*future<RandomAccessIterator> coat_future = async(ternary_search,  strings.begin(), strings.end(), requests[0]);
-    const auto report = coat_future.get(); */
-    
-    /*std::future<RandomAccessIterator> asyncFn = std::async(std::launch::async, ternary_search,  strings.begin(), strings.end(), requests[0]);
-  asyncFn.wait();*/
-    
-    
-    //cout << "базовая тернарная функция : " << endl;
-    cout << "Request [" << requests[0] << "] → position ternar "
-        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[0]) - strings.begin() << endl;
-    cout << "Request [" << requests[1] << "] → position ternar "
-        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[1]) - strings.begin() << endl;
-    cout << "Request [" << requests[2] << "] → position ternar "
-        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[2]) - strings.begin() << endl;
-    cout << "Request [" << requests[3] << "] → position ternar "
-        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[3]) - strings.begin() << endl;
-    cout << "Request [" << requests[4] << "] → position ternar "
-        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[4]) - strings.begin() << endl;
-    cout << "Request [" << requests[5] << "] → position ternar "
-        << ternary_search(execution::seq, strings.begin(), strings.end(), requests[5]) - strings.begin() << endl;
 
     // последовательные версии
     cout << "Request [" << requests[0] << "] → position "
