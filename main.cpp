@@ -96,7 +96,7 @@ Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
     //std::istream& input = std::cin; // можно использовать любой 
     while (std::getline(input, line)) { // читаем строку из входного потока, пока не достигнем конца
         
-        for_each(line.begin(), line.end(), [&all_words](auto& s) {
+        /*for_each(line.begin(), line.end(), [&all_words](auto& s) {
             auto async_ = async([&s] { return SplitIntoWords(*s); });
         all_words.insert(async_.get().end(), async_.get().begin(), all_words.end());
             });
@@ -107,7 +107,12 @@ Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
             all_words.insert(words.end(), words.begin(), all_words.end());
 
             words.clear();
-        }
+        }*/
+
+        vector<string> words = SplitIntoWords(line);
+        all_words.insert(words.end(), words.begin(), all_words.end());
+
+        words.clear();
     }
 
     for (auto word : all_words) {
