@@ -27,6 +27,18 @@ using namespace std;
 /* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
 Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
 
+struct Stats {
+    map<string, int> word_frequences;
+
+    void operator+=(const Stats& other) {
+        for (const auto& [word, frequence] : other.word_frequences) {
+            word_frequences[word] += frequence;
+        }
+    }
+};
+
+using KeyWords = set<string, less<>>;
+
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
     string word;
@@ -51,15 +63,21 @@ vector<string> SplitIntoWords(const string& text) {
 }
 
 
-struct Stats {
-    map<string, int> word_frequences;
+Stats SplittoStat(const KeyWords& key_words, const string& s) {
+    Stats result;
+    vector<string> words = SplitIntoWords(s);
 
-    void operator+=(const Stats& other) {
-        // сложить частоты
+    for (string word : words) {
+        if (key_words.count(word)) {
+            result.word_frequences[word] += 1;
+        }
     }
-};
+    return result;
+}
 
-using KeyWords = set<string, less<>>;
+
+
+
 
 std::string safe_getline(istream& input) {
     std::string line;
@@ -72,35 +90,20 @@ std::string safe_getline(istream& input) {
 Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
 
     Stats stat;
-    vector<string> all_words;
+    vector<future<Stats>> all_words;
     std::string line;
-    //std::istream& input = std::cin; // можно использовать любой 
-    while  (!(line = safe_getline(input)).empty())
+    while (!(line = safe_getline(input)).empty())
 
     { // читаем строку из входного потока, пока не достигнем конца
         //std::string line = safe_getline(input);
         cout << "line before : " << line << endl;
-       
-        auto async_ = async(SplitIntoWords, line);
-        //all_words.push_back(async(SplitIntoWords, line));
-        all_words.insert(all_words.end(), async_.get().begin(), async_.get().end());
-        
-  
 
-       /* vector<string> words = SplitIntoWords(line);
-        cout << "words.size() : " << words.size() << endl;
-        //all_words.insert(all_words.end(), words.begin(), words.begin() );
-        all_words.insert(all_words.end(), words.begin(), words.end());
-
-        words.clear();*/
+        all_words.push_back(async(SplittoStat, cref(key_words),  line));
     }
 
-    for (auto word : all_words) {
-        if (key_words.count(word)) {
-            int freq = count(all_words.begin(), all_words.end(), word);
-            stat.word_frequences[word] = freq;
-        }
-    }
+
+    for_each(execution::par, all_words.begin(), all_words.end(),
+        [&stat](auto& item) {stat += item.get(); });
 
     return stat;
 
