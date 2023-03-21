@@ -101,22 +101,17 @@ Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
         
         /*for_each(line.begin(), line.end(), [&all_words](auto& s) {
             auto async_ = async([&s] { return SplitIntoWords(*s); });
-        all_words.insert(async_.get().end(), async_.get().begin(), all_words.end());
-            });
+        all_words.insert(all_words.end(), async_.get().begin(), async_.get().end() );
+            });*/
 
-        // вариант без async - дублирует то что выше, но тоже не работает
-        for (auto el : line) {
-            vector<string> words = SplitIntoWords(el);
-            all_words.insert(words.end(), words.begin(), all_words.end());
 
-            words.clear();
-        }*/
 
         vector<string> words = SplitIntoWords(line);
         cout << "words.size() : " << words.size() << endl;
-        all_words.insert(all_words.end(), words.begin(), words.begin() );
+        //all_words.insert(all_words.end(), words.begin(), words.begin() );
+        all_words.insert(all_words.end(), words.begin(), words.end());
 
-        words.clear();
+        //words.clear();
     }
 
     for (auto word : all_words) {
