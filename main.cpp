@@ -64,7 +64,7 @@ vector<string> SplitIntoWords(const string& text) {
             }
         }
         else {
-            if (isprint(c) == true) {
+            if (isprint(c) ) {
                 word += c;
             }
         }
@@ -113,6 +113,7 @@ Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
         }*/
 
         vector<string> words = SplitIntoWords(line);
+        cout << "words.size() : " << words.size() << endl;
         all_words.insert(all_words.end(), words.begin(), words.begin() );
 
         words.clear();
