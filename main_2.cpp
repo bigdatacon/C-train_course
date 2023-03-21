@@ -1,140 +1,124 @@
-#include <algorithm>
-#include <cassert>
+#include <iostream>
 #include <string>
+#include <algorithm>
 #include <vector>
+#include <iostream>
+#include <sstream>
+
+using std::istringstream;
+using std::string;
+using std::cout;
 
 using namespace std;
 
-// Объявляем Sentence<Token> для произвольного типа Token
-// синонимом vector<Token>.
-// Благодаря этому в качестве возвращаемого значения
-// функции можно указать не малопонятный вектор векторов,
-// а вектор предложений — vector<Sentence<Token>>.
-template <typename Token>
-using Sentence = vector<Token>;
 
-template <typename TokenForwardIt>
-TokenForwardIt FindSentenceEnd(TokenForwardIt tokens_begin, TokenForwardIt tokens_end) {
-    const TokenForwardIt before_sentence_end
-        = adjacent_find(tokens_begin, tokens_end, [](const auto& left_token, const auto& right_token) {
-              return left_token.IsEndSentencePunctuation() && !right_token.IsEndSentencePunctuation();
-          });
-    return before_sentence_end == tokens_end ? tokens_end : next(before_sentence_end);
+#include <functional>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <execution>
+#include <future>
+#include <algorithm>
+
+using namespace std;
+
+/* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
+Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
+
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    string word;
+    for (const char c : text) {
+        if (c == ' ') {
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            }
+        }
+        else {
+            if (isprint(c)) {
+                word += c;
+            }
+        }
+    }
+    if (!word.empty()) {
+        words.push_back(word);
+    }
+
+    return words;
 }
 
-// Класс Token имеет метод bool IsEndSentencePunctuation() const
-// Через объект по значению вообще не компилирует https://disk.yandex.ru/i/nSnng2aANSzW4A
-/*vector<Sentence<Token>> SplitIntoSentences(vector<Token> tokens) {
-    vector<Sentence<Token>> res;
-    Sentence<Token> sent_res;
-    for (Token tok: tokens){
-        if (!tok.IsEndSentencePunctuation()){
-            sent_res.push_back(std::move(tok));
-        }
-        else {
-            sent_res.push_back(std::move(tok));
-            res.push_back(sent_res);
-            sent_res.clear(); 
-        }
-    }
-    return res;
-}*/
 
+struct Stats {
+    map<string, int> word_frequences;
 
-
-
-
-// Через rvalues ссылку : так вообще не компилруется https://disk.yandex.ru/i/_KlMbAtizDUIaQ
-/*vector<Sentence<Token>> SplitIntoSentences(vector<Token> tokens) {
-    vector<Sentence<Token>> res;
-    Sentence<Token> sent_res;
-    for (const Token&& tok: tokens){
-        if (!tok.IsEndSentencePunctuation()){
-            sent_res.push_back(std::move(tok));
-        }
-        else {
-            sent_res.push_back(std::move(tok));
-            res.push_back(sent_res);
-            sent_res.clear(); 
-        }
-    }
-    return res;
-}*/
-
-
-
-
-
-// Через константную ссылку на тестах такая ошибка: https://disk.yandex.ru/i/ZR5RSjAPkqevRw
-template <typename Token>
-/*vector<Sentence<Token>> SplitIntoSentences(vector<Token> tokens) {
-    vector<Sentence<Token>> res;
-    Sentence<Token> sent_res;
-    for (const Token& tok: tokens){
-        if (!tok.IsEndSentencePunctuation()){
-            sent_res.push_back(tok);
-        }
-        else {
-            sent_res.push_back(tok);
-            res.push_back(sent_res);
-            sent_res.clear(); 
-        }
-    }
-    return res;
-}*/
-
-
-template <typename Token> // Просто через ссылку
-vector<Sentence<Token>> SplitIntoSentences(vector<Token> tokens) {
-    vector<Sentence<Token>> res;
-    Sentence<Token> sent_res;
-    for (Token &tok: tokens){
-        bool end = false;
-        if (tok.IsEndSentencePunctuation()){
-            end = true;
-        }
-        sent_res.push_back(std::move(tok));
-        if (end) {
-            res.push_back(std::move(sent_res));
-        }
-    }
-    return res;
-}
-
-struct TestToken {
-    string data;
-    bool is_end_sentence_punctuation = false;
-
-    bool IsEndSentencePunctuation() const {
-        return is_end_sentence_punctuation;
-    }
-    bool operator==(const TestToken& other) const {
-        return data == other.data && is_end_sentence_punctuation == other.is_end_sentence_punctuation;
+    void operator+=(const Stats& other) {
+        // сложить частоты
     }
 };
 
-ostream& operator<<(ostream& stream, const TestToken& token) {
-    return stream << token.data;
+using KeyWords = set<string, less<>>;
+
+std::string safe_getline(istream& input) {
+    std::string line;
+    getline(input, line);
+    return move(line);
 }
 
-// Тест содержит копирования объектов класса TestToken.
-// Для проверки отсутствия копирований в функции SplitIntoSentences
-// необходимо написать отдельный тест.
-void TestSplitting() {
-    assert(SplitIntoSentences(vector<TestToken>({{"Split"s}, {"into"s}, {"sentences"s}, {"!"s}}))
-           == vector<Sentence<TestToken>>({{{"Split"s}, {"into"s}, {"sentences"s}, {"!"s}}}));
+/* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
+Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
+Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
 
-    assert(SplitIntoSentences(vector<TestToken>({{"Split"s}, {"into"s}, {"sentences"s}, {"!"s, true}}))
-           == vector<Sentence<TestToken>>({{{"Split"s}, {"into"s}, {"sentences"s}, {"!"s, true}}}));
+    Stats stat;
+    vector<string> all_words;
+    std::string line;
+    //std::istream& input = std::cin; // можно использовать любой 
+    while  (!(line = safe_getline(input)).empty())
 
-    assert(SplitIntoSentences(vector<TestToken>(
-               {{"Split"s}, {"into"s}, {"sentences"s}, {"!"s, true}, {"!"s, true}, {"Without"s}, {"copies"s}, {"."s, true}}))
-           == vector<Sentence<TestToken>>({
-               {{"Split"s}, {"into"s}, {"sentences"s}, {"!"s, true}, {"!"s, true}},
-               {{"Without"s}, {"copies"s}, {"."s, true}},
-           }));
+    { // читаем строку из входного потока, пока не достигнем конца
+        //std::string line = safe_getline(input);
+        cout << "line before : " << line << endl;
+       
+        auto async_ = async(SplitIntoWords, line);
+        //all_words.push_back(async(SplitIntoWords, line));
+        all_words.insert(all_words.end(), async_.get().begin(), async_.get().end());
+        
+  
+
+       /* vector<string> words = SplitIntoWords(line);
+        cout << "words.size() : " << words.size() << endl;
+        //all_words.insert(all_words.end(), words.begin(), words.begin() );
+        all_words.insert(all_words.end(), words.begin(), words.end());
+
+        words.clear();*/
+    }
+
+    for (auto word : all_words) {
+        if (key_words.count(word)) {
+            int freq = count(all_words.begin(), all_words.end(), word);
+            stat.word_frequences[word] = freq;
+        }
+    }
+
+    return stat;
+
 }
 
 int main() {
-    TestSplitting();
+    const KeyWords key_words = { "yangle", "rocks", "sucks", "all" };
+
+    stringstream ss;
+    ss << "this new yangle service really rocks\n";
+    ss << "It sucks when yangle isn't available\n";
+    ss << "10 reasons why yangle is the best IT company\n";
+    ss << "yangle rocks others suck\n";
+    ss << "Goondex really sucks, but yangle rocks. Use yangle\n";
+
+    for (const auto& [word, frequency] : ExploreKeyWords(key_words, ss).word_frequences) {
+        cout << word << " " << frequency << endl;
+    }
+
+    return 0;
 }
