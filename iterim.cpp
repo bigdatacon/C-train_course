@@ -1,203 +1,86 @@
-#pragma once
+#include <functional>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <future>
 
-#include <cassert>
-#include <initializer_list>
-#include "array_ptr.h"
 #include <algorithm>
-#include<stdexcept>
+#include <execution>
+//#include <list>
 
 using namespace std;
 
-/*
-В методе Resize отдельно обработайте три ситуации: новый размер меньше или равен текущему, новый размер не превышает его вместимости, новый размер превышает текущую вместимость вектора.
-Если при изменении размера массива новый размер вектора превышает его текущую вместимость, создайте новый массив с нужной вместимостью, скопируйте в него прежнее содержимое и заполните остальные элементы значением по умолчанию. Затем старый массив можно удалить и использовать копию. После этого не забудьте обновить размер и вместимость вектора.
-Если при увеличении размера массива новый размер вектора не превышает его вместимость, заполните добавленные элементы значением по умолчанию для типа Type.
-При уменьшении размера вектора просто уменьшите его размер.
-Примените алгоритмы std::copy и std::fill для копирования элементов массива и заполнения их некоторым значением.
-В методе Clear достаточно обнулить размер массива.
-*/
+struct Stats {
+    map<string, int> word_frequences;
 
-template <typename Type>
-class SimpleVector {
-public:
-	using Iterator = Type*;
-	using ConstIterator = const Type*;
+    void operator+=(const Stats& other) {
+        for (const auto& [word, frequence] : other.word_frequences) {
+            word_frequences[word] += frequence;
+        }
+    }
+};
 
-	SimpleVector() noexcept = default;
+vector<string_view> SplitIntoWords(string_view text) {
+    vector<string_view> result;
+    size_t pos = text.find_first_not_of(" ");
+    text.remove_prefix(min(text.size(), pos));
+    const size_t pos_end = text.npos;
 
-	// Создаёт вектор из size элементов, инициализированных значением по умолчанию
-	explicit SimpleVector(size_t size) :
-		array_ptr_(size) {
-		size_ = size;
-		capacity_ = size;
-	}
+    while (!text.empty()) {
+        size_t space = text.find(' ');
+        result.push_back(space == pos_end ? text.substr(0, pos_end) : text.substr(0, space));
+        pos = text.find_first_not_of(" ", space);
+        text.remove_prefix(min(text.size(), pos));
+    }
+    return result;
+}
 
-	// Создаёт вектор из size элементов, инициализированных значением value
-	SimpleVector(size_t size, const Type& value) :
-		array_ptr_(size) {
-		size_ = size;
-		capacity_ = size;
-		for (size_t i = 0; i < size; i++) {
-			array_ptr_[i] = value;
-		}
-	}
+using KeyWords = set<string, less<>>;
 
-	// Создаёт вектор из std::initializer_list
-	SimpleVector(std::initializer_list<Type> init) :  array_ptr_(init.size()) {
-        std::copy (init.begin(), init.end(), std::back_inserter(array_ptr_));
-        size_ = init.size();
-		capacity_ = size_;
-        
-	}
+Stats ExploreKeyWordsStr(const KeyWords& key_words, const string& s) {
+    Stats result;
+    vector<string_view> words = SplitIntoWords(s);
 
-	// Возвращает количество элементов в массиве
-	size_t GetSize() const noexcept {
-		return size_;
-	}
+    for (string_view word : words) {
+        if (key_words.count(word)) {
+            result.word_frequences[std::string(word)] += 1;
+        }
+    }
+    return result;
+}
 
-	// Возвращает вместимость массива
-	size_t GetCapacity() const noexcept {
-		return capacity_;
-	}
+Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
+    Stats result;
+    vector<future<Stats>> processes;
 
-	// Сообщает, пустой ли массив
-	bool IsEmpty() const noexcept {
-		return size_ == 0;
-	}
+    for (string s; getline(input, s); ) {
+        processes.push_back(async(ExploreKeyWordsStr, cref(key_words), s));
+        if (processes.size() >= 5000 || (input.peek() == EOF || input.eof())) {
+            for_each(execution::par, processes.begin(), processes.end(), //Вариант 2
+                [&result](auto& item) {result += item.get(); });
+             //return result;
 
-	// Возвращает ссылку на элемент с индексом index
-	Type& operator[](size_t index) noexcept {
-		return array_ptr_[index];
-	}
+        }
+    }
+    return result;
+}
 
-	// Возвращает константную ссылку на элемент с индексом index
-	const Type& operator[](size_t index) const noexcept {
-		return array_ptr_[index];
-	}
+int main() {
+    const KeyWords key_words = { "yangle", "rocks", "sucks", "all" };
 
-	// Возвращает константную ссылку на элемент с индексом index
-	// Выбрасывает исключение std::out_of_range, если index >= size
-	Type& At(size_t index) {
-		if (index >= size_) {
-			throw std::out_of_range("index out of range");
-            //throw out_of_range("index out of range");
-		}
-		return array_ptr_[index];
-	}
+    stringstream ss;
+    ss << "this new yangle service really rocks\n";
+    ss << "It sucks when yangle isn't available\n";
+    ss << "10 reasons why yangle is the best IT company\n";
+    ss << "yangle rocks others suck\n";
+    ss << "Goondex really sucks, but yangle rocks. Use yangle\n";
 
-	// Возвращает константную ссылку на элемент с индексом index
-	// Выбрасывает исключение std::out_of_range, если index >= size
-	const Type& At(size_t index) const {
-		// Напишите тело самостоятельно
-		if (index >= size_) {
-			throw std::out_of_range("index out of range");
-		}
-		return array_ptr_[index];
-	}
+    for (const auto& [word, frequency] : ExploreKeyWords(key_words, ss).word_frequences) {
+        cout << word << " " << frequency << endl;
+    }
+    // rocks - 2, sucks - 1, yangle - 6
 
-	// Обнуляет размер массива, не изменяя его вместимость
-	void Clear() noexcept {
-		// Напишите тело самостоятельно
-		Resize(0);
-	}
-
-	// Изменяет размер массива.
-	// При увеличении размера новые элементы получают значение по умолчанию для типа Type
-	void Resize(size_t new_size) {
-		// Напишите тело самостоятельно
-		if (new_size <= size_) { size = new_size; }
-
-		// случай когда увеличивается размер вектора до размера <= capacity
-		if (new_size > size_ && new_size <= capacity_) {
-			Type& last_el = array_ptr_[-1]; // получаю послдений элемент вектора 
-			auto last_it = std::find(array_ptr_.begin(), array_ptr_.end(), last_el); // нахожу итератор на последний элемента вектора 
-
-			size_t add_new_el = new_size - size_;  // количество элементов сколько нужно добавить 
-			Type el; // создаю переменную со значением типа T
-			for (size_t i = 1; i < add_new_el; ++i) {
-
-				std::fill(last_it, ++last_it, el);   // заполняю вектор значениями типа T
-				++last_it; // увеличиваю итератор на 1 шаг вперед 
-			}
-		}
-		// случай когда увеличивается размер вектора до размера > capacity
-		/*
-		Самое интересное происходит, когда новый размер превышает текущую вместимость SimpleVector. В этом случае SimpleVector создаёт новый массив большего размера в динамической памяти, куда копирует элементы исходного массива и инициализирует остальные элементы значением по умолчанию. Для копирования элементов подходит алгоритм std::copy.
-Подобно std::vector во многих реализациях стандартной библиотеки, новую вместимость SimpleVector можно выбрать как максимум из new_capacity и capacity_ * 2. Удваивание вместимости минимизирует частоту копирований элементов из одного массива в другой.
-После копирования и заполнения элементов нулевым значением можно обновить size_ и capacity_, а старый массив — удалить. Так вы обеспечите строгую гарантию безопасности исключений. Умный указатель ArrayPtr позволит сделать код не только надёжнее, но и проще.
-		*/
-		if (new_size > capacity_) {
-			//0. определяю новую вместимость 
-			//Подобно std::vector во многих реализациях стандартной библиотеки, новую вместимость SimpleVector можно выбрать как максимум из new_capacity и capacity_
-			new_size = max(new_size, capacity_ * 2);
-
-				ArrayPtr<Type> new_array_ptr_(new_size); // 1. создаю новый массив 
-			array_ptr_.swap(new_array_ptr_); // обмениваю новый и старый массив 
-			std::copy(new_array_ptr_.begin(), new_array_ptr_.end(), array_ptr_.begin());  // копирую в него элементы из прежнего массива 
-			//инициализирует остальные элементы значением по умолчанию
-			Type el; // создаю переменную со значением типа T
-			size_t add_new_el = new_size - size_;
-			Type& last_el = array_ptr_[-1]; // получаю послдений элемент вектора 
-			auto last_it = std::find(array_ptr_.begin(), array_ptr_.end(), last_el); // нахожу итератор на последний элемента вектора 
-			//заполняю остальные элементы значениями пол умолчанию 
-			for (size_t i = 1; i < add_new_el; ++i) {
-				fill(last_it, array_ptr_.end(), el);  // заполняю вектор значениями типа T
-			}
-
-			//После копирования и заполнения элементов нулевым значением можно обновить size_ и capacity_, а старый массив — удалить. Так вы обеспечите строгую гарантию безопасности исключений. Умный указатель ArrayPtr позволит сделать код не только надёжнее, но и проще.
-
-			capacity_ = new_size; //емкость становится как величина на которую делал resize, при этом size_ не меняю, ведь вектор при resize заполнялся 
-			//элементами из старого вектора. Не знаю как удалить старый вектор 
-
-
-		}
-	}
-
-			// Возвращает итератор на начало массива
-			// Для пустого массива может быть равен (или не равен) nullptr
-			Iterator begin() noexcept {
-				// Напишите тело самостоятельно
-				return array_ptr_.begin();
-			}
-
-			// Возвращает итератор на элемент, следующий за последним
-			// Для пустого массива может быть равен (или не равен) nullptr
-			Iterator end() noexcept {
-				// Напишите тело самостоятельно
-				return array_ptr_.end();
-			}
-
-			// Возвращает константный итератор на начало массива
-			// Для пустого массива может быть равен (или не равен) nullptr
-			ConstIterator begin() const noexcept {
-				// Напишите тело самостоятельно
-				return array_ptr_.cbegin();
-			}
-
-			// Возвращает итератор на элемент, следующий за последним
-			// Для пустого массива может быть равен (или не равен) nullptr
-			ConstIterator end() const noexcept {
-				// Напишите тело самостоятельно
-				return array_ptr_.cend();
-			}
-
-			// Возвращает константный итератор на начало массива
-			// Для пустого массива может быть равен (или не равен) nullptr
-			ConstIterator cbegin() const noexcept {
-				// Напишите тело самостоятельно
-				return array_ptr_.cbegin();
-			}
-
-			// Возвращает итератор на элемент, следующий за последним
-			// Для пустого массива может быть равен (или не равен) nullptr
-			ConstIterator cend() const noexcept {
-				// Напишите тело самостоятельно
-				return array_ptr_.cend();
-			}
-
-private:
-	ArrayPtr<Type> array_ptr_;
-	size_t size_ = 0;
-	size_t capacity_ = 0;
-
-	};
+    return 0;
+}
