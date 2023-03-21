@@ -22,20 +22,27 @@ struct Stats {
     }
 };
 
-vector<string_view> SplitIntoWords(string_view text) {
-    vector<string_view> result;
-    size_t pos = text.find_first_not_of(" ");
-    text.remove_prefix(min(text.size(), pos));
-    const size_t pos_end = text.npos;
 
-    while (!text.empty()) {
-        size_t space = text.find(' ');
-        result.push_back(space == pos_end ? text.substr(0, pos_end) : text.substr(0, space));
-        pos = text.find_first_not_of(" ", space);
-        text.remove_prefix(min(text.size(), pos));
+std::vector<std::string_view> SplitIntoWords(const std::string_view& str) {
+    std::vector<std::string_view> result;
+    // 1
+    int64_t pos = str.find_first_not_of(" ");
+    // 2
+    const int64_t pos_end = str.npos;
+    // 3
+    while (pos != pos_end) {
+        // 4
+        int64_t space = str.find(' ', pos);
+        // 5
+        result.push_back(space == pos_end ? str.substr(pos) : str.substr(pos, space - pos));
+        // 6
+        pos = str.find_first_not_of(" ", space);
     }
+
     return result;
 }
+
+
 
 using KeyWords = set<string, less<>>;
 
@@ -64,6 +71,7 @@ Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
 
         }
     }
+
     return result;
 }
 
