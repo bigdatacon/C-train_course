@@ -63,8 +63,12 @@ RandomAccessIterator LowerBound(const execution::sequenced_policy&,
   return std::lower_bound(range_begin, range_end, value);
 }*/
 
-template <typename ForwardRange, typename Function>
-void ForEach(const ExecutionPolicy::parallel_policy &, ForwardRange& range, Function function) {
+template <typename ForwardRange, typename Function, typename Policy> void ForEach(const Policy& policy, ForwardRange& range, Function function) 
+void ForEach( ForwardRange& range, Function function) {
+       return for_each(execution::par, range.begin(), range.end(), function); // если без политики то базовую  функцию 
+  }
+
+template <typename ForwardRange, typename Function, typename Policy> void ForEach(const Policy& policy, ForwardRange& range, Function function)  {
     // ускорьте эту реализацию
         //for_each(execution::par, range.begin(), range.end(), function);
     int size_ = range.size(); 
@@ -97,23 +101,24 @@ void ForEach(const ExecutionPolicy::parallel_policy &, ForwardRange& range, Func
     for (auto& task : asyncs) { task.get(); }
 }
 
-template <typename ForwardRange, typename Function>
-void ForEach(const ExecutionPolicy&,  ForwardRange& range, Function function) {
-  if constexpr (is_same_v<decay_t<ExecutionPolicy>, ExecutionPolicy::sequenced_policy> ) {
-       return for_each(execution::par, range.begin(), range.end(), function); // если параллельная то базовую функцию 
+
+
+template <typename ForwardRange, typename Function, typename Policy> 
+void ForEach(const Policy& policy, ForwardRange& range, Function function)  {
+  /*if constexpr (! (is_same_v<decay_t<policy>, execution::parallel_policy >) ) {
+       ForEach(ForwardRange,  function); // если не параллельна то базовую функцию 
   }
-  if constexpr (is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator> && ! (is_same_v<decay_t<ExecutionPolicy>, ExecutionPolicy::sequenced_policy>)  { 
+    if constexpr (! is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator>) ) {
+       ForEach(ForwardRange,  function); // если итерратор  рандомный то обычную 
+  }*/
   
-  ForEach(execution::par, range, range_end, function);
+  if constexpr ( !(is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator>) &&  is_same_v<decay_t<policy>>, execution::parallel_policy>)  { 
+  
+  ForEach(policy, range,  function); //если итератор не рандомный и политика параллельная то вызываю свою
   
   }
+  else {ForEach(ForwardRange,  function); //во всех остальных обычную   рандомный то обычную} 
 }
-
-template <typename ForwardRange, typename Function>
-void ForEach( ForwardRange& range, Function function) {
-       return for_each(execution::par, range.begin(), range.end(), function); // если параллельная то базовую функцию 
-  }
-
 
 
 int main() {
