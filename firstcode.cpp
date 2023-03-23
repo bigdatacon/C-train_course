@@ -1,153 +1,149 @@
-#include <iostream>
-#include <string>
 #include <algorithm>
-#include <vector>
-#include <iostream>
-#include <sstream>
-
-using std::istringstream;
-using std::string;
-using std::cout;
-
-using namespace std;
-// тут пример разбиения строк на слова через issstream 
-/*int main() {
-    std::vector<std::string> my_vector{ "Hello, world!", "How are you?", "Nice to meet you." };
-
-    std::vector<std::vector<std::string>> words_vector;
-
-    std::transform(my_vector.begin(), my_vector.end(), std::back_inserter(words_vector), [](std::string s) {
-    std::vector<std::string> words;
-    std::string word;
-    std::istringstream stream(s); // превращаем строку s в поток
-    while (stream >> word) { // парсим слова из потока
-        words.push_back(word);
-    }
-    return words;
-        });
-    
-
-    for (auto el : words_vector) { for (auto e : el) { cout << e << endl; } }
-    // выводим каждое слово вместе с номером строки
-    for (int i = 0; i < words_vector.size(); ++i) {
-        for (int j = 0; j < words_vector[i].size(); ++j) {
-            std::cout << "Строка " << i << ", слово " << j << ": " << words_vector[i][j] << std::endl;
-        }
-    }
-
-    return 0;
-}*/
-
-#include <functional>
-#include <iostream>
-#include <map>
-#include <set>
-#include <sstream>
-#include <string>
 #include <execution>
+#include <iostream>
+#include <list>
+#include <random>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <vector>
+#include <thread>
 #include <future>
-#include <algorithm>
-
+ 
+#include "log_duration.h"
+ 
 using namespace std;
-
-/* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
-Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
-
-vector<string> SplitIntoWords(const string& text) {
-    vector<string> words;
-    string word;
-    for (const char c : text) {
-        if (c == ' ') {
-            if (!word.empty()) {
-                words.push_back(word);
-                word.clear();
-            }
-        }
-        else {
-            if (isprint(c) ) {
-                word += c;
-            }
-        }
+ 
+template <typename Strings>
+void PrintStrings(const Strings& strings) {
+    for (string_view s : strings) {
+        cout << s << " ";
     }
-    if (!word.empty()) {
-        words.push_back(word);
-    }
-
-    return words;
+    cout << endl;
 }
-
-
-struct Stats {
-    map<string, int> word_frequences;
-
-    void operator+=(const Stats& other) {
-        // сложить частоты
+ 
+string GenerateWord(mt19937& generator, int max_length) {
+    const int length = uniform_int_distribution(1, max_length)(generator);
+    string word;
+    word.reserve(length);
+    for (int i = 0; i < length; ++i) {
+        word.push_back(uniform_int_distribution('a', 'z')(generator));
+    }
+    return word;
+}
+ 
+template <template <typename> typename Container>
+Container<string> GenerateDictionary(mt19937& generator, int word_count, int max_length) {
+    vector<string> words;
+    words.reserve(word_count);
+    for (int i = 0; i < word_count; ++i) {
+        words.push_back(GenerateWord(generator, max_length));
+    }
+    return Container(words.begin(), words.end());
+}
+ 
+struct Reverser {
+    void operator()(string& value) const {
+        reverse(value.begin(), value.end());
     }
 };
-
-using KeyWords = set<string, less<>>;
-
-std::string safe_getline(istream& input) {
-    std::string line;
-    getline(input, line);
-    return move(line);
+ 
+template <typename Container, typename Function>
+void Test(string_view mark, Container keys, Function function) {
+    LOG_DURATION(mark);
+    function(keys, Reverser{});
 }
-
-/* Подсказка Разные строки текста или наборы этих строк можно обрабатывать параллельно, а затем складывать полученные словари.
-Если собираетесь добавлять future в вектор, имейте в виду: это некопируемый тип.*/
-Stats ExploreKeyWords(const KeyWords& key_words, istream& input) {
-
-    Stats stat;
-    vector<string> all_words;
-    std::string line;
-    //std::istream& input = std::cin; // можно использовать любой 
-    while (safe_getline(input).size()!=0)
-    
-    { // читаем строку из входного потока, пока не достигнем конца
-        std::string line = safe_getline(input);
-        cout << "line before : " << line << endl;
-        //line.erase(std::remove(line.begin(), line.end(), '"'));
-        //cout << "line after : " << line << endl;
-        
-        /*for_each(line.begin(), line.end(), [&all_words](auto& s) {
-            auto async_ = async([&s] { return SplitIntoWords(*s); });
-        all_words.insert(all_words.end(), async_.get().begin(), async_.get().end() );
-            });*/
-
-
-
-        vector<string> words = SplitIntoWords(line);
-        cout << "words.size() : " << words.size() << endl;
-        //all_words.insert(all_words.end(), words.begin(), words.begin() );
-        all_words.insert(all_words.end(), words.begin(), words.end());
-
-        //words.clear();
+ 
+#define TEST(function) Test(#function, keys, function<remove_const_t<decltype(keys)>, Reverser>)
+ 
+/*template <typename RandomAccessIterator, typename Value>
+RandomAccessIterator LowerBound(const execution::sequenced_policy&,
+  RandomAccessIterator range_begin, RandomAccessIterator range_end,
+  const Value& value) {
+  return std::lower_bound(range_begin, range_end, value);
+}*/
+ 
+template <typename ForwardRange, typename Function>
+void ForEach(const ExecutionPolicy::parallel_policy &, ForwardRange& range, Function function) {
+    // ускорьте эту реализацию
+        //for_each(execution::par, range.begin(), range.end(), function);
+    int size_ = range.size(); 
+    unsigned int task_count = std::thread::hardware_concurrency();
+    int chunc_size = size_ / task_count;
+    int left_size = size_ % task_count;
+    int first_chunc_size = 0;
+    vector<future<void>> asyncs;
+    if (left_size) {
+        first_chunc_size = chunc_size + left_size;
     }
-
-    for (auto word : all_words) {
-        if (key_words.count(word)) {
-            int freq = count(all_words.begin(), all_words.end(), word);
-            stat.word_frequences[word] = freq;
+    auto left_boarder = range.begin();
+	bool first = true;
+    for (auto itr = left_boarder; itr != range.end(); next(itr, first_chunc_size) ) {
+        if (first) {
+            auto begin_it = itr; // получают итератор на начало отрезка 
+            std::advance(itr, first_chunc_size); // получаю итератор на конец  отрезка 
+            asyncs.push_back(async([function, begin_it, itr] { for_each(begin_it, itr, function); }));
+            first = false;
+            left_boarder = itr;
+            first_chunc_size = chunc_size;
+        }
+        else {
+            auto begin_it = itr; // получают итератор на начало отрезка 
+            std::advance(itr, first_chunc_size); // получаю итератор на конец  отрезка 
+            asyncs.push_back(async([function, begin_it, itr] { for_each(begin_it, itr, function); }));
+            left_boarder = itr;
         }
     }
-
-    return stat;
-
+    for (auto& task : asyncs) { task.get(); }
 }
-
+ 
+template <typename ForwardRange, typename Function>
+void ForEach(const ExecutionPolicy&,  ForwardRange& range, Function function) {
+  if constexpr (is_same_v<decay_t<ExecutionPolicy>, ExecutionPolicy::sequenced_policy> ) {
+       return for_each(execution::par, range.begin(), range.end(), function); // если параллельная то базовую функцию 
+  }
+  if constexpr (is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator> && ! (is_same_v<decay_t<ExecutionPolicy>, ExecutionPolicy::sequenced_policy>)  { 
+ 
+  ForEach(execution::par, range, range_end, function);
+ 
+  }
+ 
+ 
+}
+ 
+ 
 int main() {
-    const KeyWords key_words = { "yangle", "rocks", "sucks", "all" };
-
-    stringstream ss;
-    ss << "this new yangle service really rocks\n";
-    ss << "It sucks when yangle isn't available\n";
-    ss << "10 reasons why yangle is the best IT company\n";
-    ss << "yangle rocks others suck\n";
-    ss << "Goondex really sucks, but yangle rocks. Use yangle\n";
-
-    for (const auto& [word, frequency] : ExploreKeyWords(key_words, ss).word_frequences) {
-        cout << word << " " << frequency << endl;
-    }
-
+    auto reverser = [](string& s) { reverse(s.begin(), s.end()); };
+ 
+    list<string> strings_list = {"cat", "dog", "code"};
+ 
+    ForEach(strings_list, reverser);
+    PrintStrings(strings_list);
+    // tac god edoc
+ 
+    ForEach(execution::seq, strings_list, reverser);
+    PrintStrings(strings_list);
+    // cat dog code
+ 
+    // единственный из вызовов, где должна работать ваша версия
+    // из предыдущего задания
+    ForEach(execution::par, strings_list, reverser);
+    PrintStrings(strings_list);
+    // tac god edoc
+ 
+    vector<string> strings_vector = {"cat", "dog", "code"};
+ 
+    ForEach(strings_vector, reverser);
+    PrintStrings(strings_vector);
+    // tac god edoc
+ 
+    ForEach(execution::seq, strings_vector, reverser);
+    PrintStrings(strings_vector);
+    // cat dog code
+ 
+    ForEach(execution::par, strings_vector, reverser);
+    PrintStrings(strings_vector);
+    // tac god edoc
+ 
     return 0;
-}
+} 
