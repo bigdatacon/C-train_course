@@ -63,7 +63,7 @@ template <typename ForwardRange, typename Function> void ForEach(ForwardRange& r
 
 // проверку какую функцию вызвать - если и параллельная политика и итератор не произвольного доступа(не random то вызывается моя функция , в остальных случаях обычная )
 template <typename ForwardRange, typename Function, typename Policy>
-void ForEach(const Policy& policy, ForwardRange& range, Function function) {
+void ForEach(const Policy& /*policy*/, ForwardRange& range, Function function) {
 	if constexpr (!(is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator>) && is_same_v<decay_t<Policy>, execution::parallel_policy > ) {// если итератор не рандомный и политика пололлельная то свою
 
 		int size_ = range.size();
