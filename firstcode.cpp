@@ -64,12 +64,8 @@ template <typename ForwardRange, typename Function> void ForEach(ForwardRange& r
 // проверку какую функцию вызвать - если и параллельная политика и итератор не произвольного доступа(не random то вызывается моя функция , в остальных случаях обычная )
 template <typename ForwardRange, typename Function, typename Policy>
 void ForEach(const Policy& policy, ForwardRange& range, Function function) {
-	if constexpr (!(is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator>) && is_same_v<decay_t<Policy>>, execution::parallel_policy > ) {
+	if constexpr (!(is_same_v<decay_t<random_access_iterator_tag>, typename ForwardRange::iterator>) && is_same_v<decay_t<Policy>, execution::parallel_policy > ) {// если итератор не рандомный и политика пололлельная то свою
 
-		ForEach(policy, range, function); //если итератор не рандомный и политика параллельная то вызываю свою
-
-	}
-	else { //во всех остальных обычную   рандомный то обычную} 
 		int size_ = range.size();
 		unsigned int task_count = std::thread::hardware_concurrency();
 		int chunc_size = size_ / task_count;
@@ -98,6 +94,14 @@ void ForEach(const Policy& policy, ForwardRange& range, Function function) {
 			}
 		}
 		for (auto& task : asyncs) { task.get(); }
+
+	}
+	else { 
+    
+    ForEach(range, function); 
+    
+    //во всех остальных обычную   рандомный то обычную} 
+		
 
 
 	}
