@@ -43,7 +43,6 @@ public:
 
     Access GetAccess(){
         Access acc(value_, value_mutex_);
-        //std::lock_guard<std::mutex> lock(acc.struct_value_mutex);
         return std::move(acc);
     };
     
@@ -51,7 +50,8 @@ public:
 private:
     T value_;
     mutex value_mutex_;
-    Access acc;
+
+   
 };
 
 
