@@ -16,7 +16,11 @@ using namespace std;
 template <typename T>
 class Synchronized {
 public:
-    explicit Synchronized(T initial = T());
+    //explicit Synchronized(T initial = T());
+    explicit Synchronized(T initial = T()):
+    value_(initial)
+  {
+  }
   
     struct Access {
 	Access() = default;
@@ -37,9 +41,6 @@ public:
     mutex& struct_value_mutex;
 };
 
-    
-};
-
     Access GetAccess(){
         Access acc(value_, value_mutex_);
         //std::lock_guard<std::mutex> lock(acc.struct_value_mutex);
@@ -52,6 +53,9 @@ private:
     mutex value_mutex_;
     Access acc;
 };
+
+
+
  
 void TestConcurrentUpdate() {
     Synchronized<string> common_string;
