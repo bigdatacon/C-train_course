@@ -1,130 +1,134 @@
-#include <future>
-#include <mutex>
+#include <algorithm>
+#include <iostream>
 #include <numeric>
-#include <queue>
+#include <random>
 #include <string>
-#include <thread>
+#include <string_view>
 #include <vector>
 #include <mutex>
- 
-#include "test_framework.h"
- 
+#include <future>
+#include <execution>
+
+
+
+
+#include "log_duration.h"
+
 using namespace std;
- 
-// Реализуйте шаблон Synchronized<T>.
-// Метод GetAccess должен возвращать структуру, в которой есть поле T& ref_to_value.
-template <typename T>
-class Synchronized {
-public:
-    //explicit Synchronized(T initial = T());
-    explicit Synchronized(T initial = T()):
-    value_(initial)
-  {
-  }
-  
-    struct Access {
-	Access() = default;
 
-	Access(T& value_, mutex& value_mutex_)
-		: ref_to_value(value_)
-		, struct_value_mutex(value_mutex_)
-		 {
-            struct_value_mutex.lock();
-	}
-        
-    ~ Access() {
-        //std::unique_lock<std::mutex> lock(struct_value_mutex);
-        struct_value_mutex.unlock();
+/*
+Как вы, возможно, помните, алгоритм copy_if фильтрует элементы из данного диапазона и сохраняет подходящие в указанный выходной итератор, сохраняя их исходный порядок. Ваша задача — ускорить copy_if за счёт параллельности и отказа от требования сохранения порядка элементов.
+Напишите шаблонную функцию CopyIfUnordered, которая:
+принимает контейнер элементов и предикат — функцию, принимающую элемент и возвращающую bool;
+возвращает вектор элементов, для которых предикат вернул true;
+порядок элементов в итоговом векторе не имеет значения, но каждый элемент, удовлетворяющий предикату, должен присутствовать в результате ровно столько же раз, сколько в исходном контейнере.
+В заготовке кода вам дана последовательная версия этой функции. Ускорьте её.
+*/
+
+string GenerateWord(mt19937& generator, int max_length) {
+    const int length = uniform_int_distribution(1, max_length)(generator);
+    string word;
+    word.reserve(length);
+    for (int i = 0; i < length; ++i) {
+        word.push_back(uniform_int_distribution('a', 'z')(generator));
     }
+    return word;
+}
 
-    T& ref_to_value;
-    mutex& struct_value_mutex;
-};
+template <template <typename> typename Container>
+Container<string> GenerateDictionary(mt19937& generator, int word_count, int max_length) {
+    vector<string> words;
+    words.reserve(word_count);
+    for (int i = 0; i < word_count; ++i) {
+        words.push_back(GenerateWord(generator, max_length));
+    }
+    return Container(words.begin(), words.end());
+}
 
-    Access GetAccess(){
-        Access acc(value_, value_mutex_);
-        return std::move(acc);
-    };
+template <typename Strings, typename Predicate, typename Function>
+void Test(string_view mark, const Strings& strings, Predicate predicate, Function function) {
+    LOG_DURATION(mark);
+    const auto result = function(strings, predicate);
+    cout << result.size() << " " << result[5].substr(0, 5) << endl;
+}
+
+#define TEST(function) \
+    Test(#function, strings, predicate, function<vector<string>, decltype(predicate)>)
+
+/*template <typename Container, typename Predicate>
+vector<typename Container::value_type> CopyIfUnordered(const Container& container,
+                                                       Predicate predicate) {
+    vector<typename Container::value_type> result;
+    for (const auto& value : container) {
+        if (predicate(value)) {
+            result.push_back(value);
+        }
+    }
+    return result;
+}*/
+
+
+/*
+vector<int> CountFrequenciesForEachSeparateMutexes(const vector<int>& numbers) {
+    vector<int> freqs(MAX_VALUE + 1);
+    vector<mutex> freqs_mutexes(MAX_VALUE + 1);
+    for_each(
+        execution::par,
+        numbers.begin(), numbers.end(),
+        [&freqs, &freqs_mutexes](int number) {
+            lock_guard guard(freqs_mutexes[number]);
+            ++freqs[number];
+        }
+    );
+    return freqs;
+}
+*/
+
+template <typename Container, typename Predicate>
+vector<typename Container::value_type> CopyIfUnordered(const Container& container,
+                                                       Predicate predicate) {
+    vector<mutex> freqs_mutexes(container.size() + 1);
+    vector<typename Container::value_type> result;
+    /*for (const auto& value : container) {
+        if (predicate(value)) {
+            result.push_back(value);
+        }
+    }*/
     
- 
-private:
-    T value_;
-    mutex value_mutex_;
-
-   
-};
-
-
-
- 
-void TestConcurrentUpdate() {
-    Synchronized<string> common_string;
- 
-    const size_t add_count = 50000;
-    auto updater = [&common_string, add_count] {
-        for (size_t i = 0; i < add_count; ++i) {
-            auto access = common_string.GetAccess();
-            access.ref_to_value += 'a';
+    for_each(
+        execution::par,
+        container.begin(), container.end(),
+        [&result, &freqs_mutexes, &predicate](auto number) {
+            lock_guard guard(freqs_mutexes[number]);
+            if (predicate(number)){
+            result.push_back(number);}
         }
-    };
- 
-    auto f1 = async(updater);
-    auto f2 = async(updater);
- 
-    f1.get();
-    f2.get();
- 
-    ASSERT_EQUAL(common_string.GetAccess().ref_to_value.size(), 2 * add_count);
+    );
+    
+    
+    return result;
 }
- 
-vector<int> Consume(Synchronized<deque<int>>& common_queue) {
-    vector<int> got;
- 
-    for (;;) {
-        deque<int> q;
- 
-        {
-            // Мы специально заключили эти две строчки в операторные скобки, чтобы
-            // уменьшить размер критической секции. Поток-потребитель захватывает
-            // мьютекс, перемещает всё содержимое общей очереди в свою
-            // локальную переменную и отпускает мьютекс. После этого он обрабатывает
-            // объекты в очереди за пределами критической секции, позволяя
-            // потоку-производителю параллельно помещать в очередь новые объекты.
-            //
-            // Размер критической секции существенно влияет на быстродействие
-            // многопоточных программ.
-            auto access = common_queue.GetAccess();
-            q = move(access.ref_to_value);
-        }
- 
-        for (int item : q) {
-            if (item > 0) {
-                got.push_back(item);
-            } else {
-                return got;
-            }
-        }
-    }
-}
- 
-void TestProducerConsumer() {
-    Synchronized<deque<int>> common_queue;
- 
-    auto consumer = async(Consume, ref(common_queue));
- 
-    const size_t item_count = 100000;
-    for (size_t i = 1; i <= item_count; ++i) {
-        common_queue.GetAccess().ref_to_value.push_back(i);
-    }
-    common_queue.GetAccess().ref_to_value.push_back(-1);
- 
-    vector<int> expected(item_count);
-    iota(begin(expected), end(expected), 1);
-    ASSERT_EQUAL(consumer.get(), expected);
-}
- 
+
+
 int main() {
-    TestRunner tr;
-    RUN_TEST(tr, TestConcurrentUpdate);
-    RUN_TEST(tr, TestProducerConsumer);
+    vector<int> numbers(1'000);
+    iota(numbers.begin(), numbers.end(), 0);
+
+    const vector<int> even_numbers = CopyIfUnordered(numbers, [](int number) {
+        return number % 2 == 0;
+    });
+    for (const int number : even_numbers) {
+        cout << number << " "s;
+    }
+    cout << endl;
+    // выведет все чётные числа от 0 до 999
+
+    mt19937 generator;
+
+    const auto strings = GenerateDictionary<vector>(generator, 50'000, 3000);
+    auto predicate = [](const string& s) {
+        return count(s.begin(), s.end(), 'a') < 100;
+    };
+
+    TEST(CopyIfUnordered);
 }
