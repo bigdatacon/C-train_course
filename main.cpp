@@ -5,6 +5,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <mutex>
 
 #include "test_framework.h"
 
@@ -23,12 +24,14 @@ public:
 
     Access GetAccess(){ //Метод GetAccess должен возвращать структуру, в которой есть поле T& ref_to_value
         Access structura;
+        std::lock_guard<std::mutex> lock(value_mutex_);
         structura.ref_to_value = value_;
         return structura;
     };
 
 private:
     T value_;
+    mutex value_mutex_;
 };
 
 void TestConcurrentUpdate() {
