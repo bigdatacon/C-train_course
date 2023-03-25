@@ -94,14 +94,15 @@ vector<typename Container::value_type> CopyIfUnordered(const Container& containe
             result.push_back(value);
         }
     }*/
-    
+    int index_mutexex = 0;
     for_each(
         execution::par,
         container.begin(), container.end(),
-        [&result, &freqs_mutexes, &predicate](auto number) {
-            lock_guard guard(freqs_mutexes[number]);
+        [&result, &freqs_mutexes, &predicate, &index_mutexex](auto number) {
+            lock_guard guard(freqs_mutexes[index_mutexex ]);
             if (predicate(number)){
             result.push_back(number);}
+            ++ index_mutexex;
         }
     );
     
