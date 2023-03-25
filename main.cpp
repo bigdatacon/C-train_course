@@ -25,10 +25,12 @@ public:
 		: ref_to_value(value_)
 		, struct_value_mutex(value_mutex_)
 		 {
+            struct_value_mutex.lock();
 	}
         
     ~ Access() {
-        std::unique_lock<std::mutex> lock(struct_value_mutex);
+        //std::unique_lock<std::mutex> lock(struct_value_mutex);
+        struct_value_mutex.unlock();
     }
 
     T& ref_to_value;
@@ -40,7 +42,7 @@ public:
 
     Access GetAccess(){
         Access acc(value_, value_mutex_);
-        std::lock_guard<std::mutex> lock(acc.struct_value_mutex);
+        //std::lock_guard<std::mutex> lock(acc.struct_value_mutex);
         return std::move(acc);
     };
     
