@@ -11,8 +11,9 @@
 
 #include "log_duration.h"
 #include "test_framework.h"
-
+using namespace std;
 using namespace std::string_literals;
+
 
 template <typename Key, typename Value>
 class ConcurrentMap {
@@ -39,7 +40,7 @@ public:
 		lock_guard guard(locks_[i_l]);
 
 		auto it = sub_maps_[sub_map_index].find(key);
-		if (it != m.end()) {
+		if (it != sub_maps_[sub_map_index].end()) {
 			return { it->second, lock_guard guard(locks_[i_l]) };
 		}
 		else {
