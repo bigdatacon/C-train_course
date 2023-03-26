@@ -16,6 +16,8 @@
 #include <functional>
 #include <string_view>
 #include <deque>
+#include <future>
+
 
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
@@ -32,11 +34,33 @@ public:
     void AddDocument(int document_id,  std::string_view document, DocumentStatus status, const std::vector<int>& ratings);
     
     template <typename DocumentPredicate>
+    std::vector<Document> FindTopDocuments(std::string_view raw_query, DocumentPredicate document_predicate) const;
+
+    std::vector<Document> FindTopDocuments(std::string_view raw_query, DocumentStatus status) const;
+
+    std::vector<Document> FindTopDocuments(std::string_view raw_query) const;
+
+    template <typename DocumentPredicate>
+    std::vector<Document> FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
+
+    std::vector<Document> FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query, DocumentStatus status) const;
+
+    std::vector<Document> FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query) const;
+
+    template <typename DocumentPredicate>
+    std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
+
+    std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentStatus status) const;
+
+    std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query) const;
+    
+    
+    /*template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const;
 
     std::vector<Document> FindTopDocuments( std::string_view raw_query, DocumentStatus status) const;
 
-    std::vector<Document> FindTopDocuments( std::string_view raw_query) const ;
+    std::vector<Document> FindTopDocuments( std::string_view raw_query) const ;*/
 
     int GetDocumentCount() const ;
 
