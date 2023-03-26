@@ -29,7 +29,7 @@ public:
 	}
 
 	struct Access {
-		T& ref_to_value;
+		Value& ref_to_value;
 		lock_guard<mutex> guard;
 	};
 
