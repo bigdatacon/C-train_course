@@ -184,12 +184,21 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
     return matched_documents;
 }
 
-
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
+    auto start_time = std::chrono::high_resolution_clock::now();
     const auto query = ParseQuery(raw_query);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time = end_time - start_time;
+    std::cout << "Elapsed time ParseQuery SEQUENCED / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    
+    auto start_time_fad = std::chrono::high_resolution_clock::now();
     auto matched_documents = FindAllDocuments(query, document_predicate);
-
+    auto end_time_fad = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_fad = end_time_fad - start_time_fad;
+    std::cout << "Elapsed time FindAllDocuments SEQUENCED / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
+    
+    auto start_time_sort = std::chrono::high_resolution_clock::now();
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
             return lhs.rating > rhs.rating;
@@ -197,6 +206,10 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::seque
             return lhs.relevance > rhs.relevance;
         }
     });
+    auto end_time_sort = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_sort = end_time_sort - start_time_sort;
+    std::cout << "Elapsed time sort SEQUENCED / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
+    
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
     }
@@ -205,9 +218,19 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::seque
 
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
+    auto start_time = std::chrono::high_resolution_clock::now();
     const auto query = ParseQuery(raw_query);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time = end_time - start_time;
+    std::cout << "Elapsed time ParseQuery PARALLEL / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    
+    auto start_time_fad = std::chrono::high_resolution_clock::now();
     auto matched_documents = FindAllDocuments(query, document_predicate);
-
+    auto end_time_fad = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_fad = end_time_fad - start_time_fad;
+    std::cout << "Elapsed time FindAllDocuments PARALLEL / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
+    
+    auto start_time_sort = std::chrono::high_resolution_clock::now();
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
             return lhs.rating > rhs.rating;
@@ -215,6 +238,11 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
             return lhs.relevance > rhs.relevance;
         }
     });
+    
+    auto end_time_sort = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_sort = end_time_sort - start_time_sort;
+    std::cout << "Elapsed time sort PARALLEL / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
+    
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
     }
