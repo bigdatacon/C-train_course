@@ -154,14 +154,18 @@ template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const {
 
     auto start_time = std::chrono::high_resolution_clock::now();
-    
     const auto query = ParseQuery(raw_query);
-    
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;
-    std::cout << "Elapsed time: " << elapsed_time.count() << " seconds\n";
-       
+    std::cout << "Elapsed time ParseQuery / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    
+    auto start_time_fad = std::chrono::high_resolution_clock::now();
     auto matched_documents = FindAllDocuments(query, document_predicate);
+    auto end_time_fad = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_fad = end_time_fad - start_time_fad;
+    std::cout << "Elapsed time FindAllDocuments / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
+    
+     auto start_time_sort = std::chrono::high_resolution_clock::now();
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
             return lhs.rating > rhs.rating;
@@ -170,53 +174,15 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
         }
     });
     
-    /*const auto query;
-    { 
-    LOG_DURATION("ParseQuery(raw_query) : ");
-    const auto query = ParseQuery(raw_query);
-    }*/
-
-    /*
-    {
-    LOG_DURATION("FindAllDocuments(query, document_predicate) : ");
-    auto matched_documents = FindAllDocuments(query, document_predicate);
-    }
-
-    {
-    LOG_DURATION("sort(matched_documents : ");
-    sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-        if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
-            return lhs.rating > rhs.rating;
-        } else {
-            return lhs.relevance > rhs.relevance;
-        }
-    });
-    }*/
-    
+    auto end_time_sort = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_sort = end_time_sort - start_time_sort;
+    std::cout << "Elapsed time sort / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
+   
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
     }
     return matched_documents;
 }
-
-/*template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const {
-    const auto query = ParseQuery(raw_query);
-    
-    auto matched_documents = FindAllDocuments(query, document_predicate);
-
-    sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-        if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
-            return lhs.rating > rhs.rating;
-        } else {
-            return lhs.relevance > rhs.relevance;
-        }
-    });
-    if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-        matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-    }
-    return matched_documents;
-}*/
 
 
 template <typename DocumentPredicate>
