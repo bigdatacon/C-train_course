@@ -16,16 +16,6 @@
 #include <deque>
 #include <execution>
 
-/*
-Следующие методы теперь должны позволять принять string_view вместо строки:
-конструктор;
-AddDocument;
-FindTopDocuments;
-MatchDocument.
-Эти методы должны возвращать string_view вместо строк:
-MatchDocument;
-GetWordFrequencies.
-*/
 
 SearchServer::SearchServer( std::string_view stop_words_text)
 	: SearchServer(
@@ -38,13 +28,6 @@ SearchServer::SearchServer(const std::string& stop_words_text)
 		SplitIntoWords(stop_words_text))  // Invoke delegating constructor from string container
 {
 }
-
-/*void SearchServer::PrintDocumentFreq() {
-    std::cout << "word_to_document_freqs_.size() : " << word_to_document_freqs_.size()<< std::endl;
-    for (auto el : word_to_document_freqs_) {std::cout << el.first << std::endl;}
-    
-}*/
-
 
 void SearchServer::AddDocument(int document_id, std::string_view document, DocumentStatus status, const std::vector<int>& ratings) {
 	//std::cout << std::string(document) << std::endl;
@@ -62,8 +45,6 @@ void SearchServer::AddDocument(int document_id, std::string_view document, Docum
 	}
 	documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
 	document_ids_.insert(document_id);
-    //std::cout << "Print Freqs : " << std::endl;
-    //PrintDocumentFreq();
 
 }
 
@@ -99,10 +80,6 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query) const {
 	return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
 }
-
-
-
-
 
 int SearchServer::GetDocumentCount() const {
 	return static_cast<int>(documents_.size());
