@@ -1,184 +1,123 @@
 #include <algorithm>
-#include <iostream>
+#include <cstdlib>
+#include <future>
+#include <map>
 #include <numeric>
 #include <random>
 #include <string>
-#include <string_view>
 #include <vector>
-#include <mutex>
-#include <future>
-#include <execution>
-
-
-
 
 #include "log_duration.h"
+#include "test_framework.h"
+
+using namespace std::string_literals;
+
+template <typename Key, typename Value>
+class ConcurrentMap {
+public:
+    static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
+
+    struct Access {
+        Value& ref_to_value;
+
+        // ...
+    };
+
+    explicit ConcurrentMap(size_t bucket_count);
+
+    Access operator[](const Key& key);
+
+    std::map<Key, Value> BuildOrdinaryMap();
+
+private:
+    // ...
+};
 
 using namespace std;
 
-/*
-Как вы, возможно, помните, алгоритм copy_if фильтрует элементы из данного диапазона и сохраняет подходящие в указанный выходной итератор, сохраняя их исходный порядок. Ваша задача — ускорить copy_if за счёт параллельности и отказа от требования сохранения порядка элементов.
-Напишите шаблонную функцию CopyIfUnordered, которая:
-принимает контейнер элементов и предикат — функцию, принимающую элемент и возвращающую bool;
-возвращает вектор элементов, для которых предикат вернул true;
-порядок элементов в итоговом векторе не имеет значения, но каждый элемент, удовлетворяющий предикату, должен присутствовать в результате ровно столько же раз, сколько в исходном контейнере.
-В заготовке кода вам дана последовательная версия этой функции. Ускорьте её.
-*/
+void RunConcurrentUpdates(ConcurrentMap<int, int>& cm, size_t thread_count, int key_count) {
+    auto kernel = [&cm, key_count](int seed) {
+        vector<int> updates(key_count);
+        iota(begin(updates), end(updates), -key_count / 2);
+        shuffle(begin(updates), end(updates), mt19937(seed));
 
-string GenerateWord(mt19937& generator, int max_length) {
-	const int length = uniform_int_distribution(1, max_length)(generator);
-	string word;
-	word.reserve(length);
-	for (int i = 0; i < length; ++i) {
-		//word.push_back(uniform_int_distribution('a', 'z')(generator));
-		word.push_back(uniform_int_distribution(0, 26)(generator) + 'a');
+        for (int i = 0; i < 2; ++i) {
+            for (auto key : updates) {
+                ++cm[key].ref_to_value;
+            }
+        }
+    };
 
-	}
-	return word;
+    vector<future<void>> futures;
+    for (size_t i = 0; i < thread_count; ++i) {
+        futures.push_back(async(kernel, i));
+    }
 }
 
-template <template <typename> typename Container>
-Container<string> GenerateDictionary(mt19937& generator, int word_count, int max_length) {
-	vector<string> words;
-	words.reserve(word_count);
-	for (int i = 0; i < word_count; ++i) {
-		words.push_back(GenerateWord(generator, max_length));
-	}
-	return Container(words.begin(), words.end());
+void TestConcurrentUpdate() {
+    constexpr size_t THREAD_COUNT = 3;
+    constexpr size_t KEY_COUNT = 50000;
+
+    ConcurrentMap<int, int> cm(THREAD_COUNT);
+    RunConcurrentUpdates(cm, THREAD_COUNT, KEY_COUNT);
+
+    const auto result = cm.BuildOrdinaryMap();
+    ASSERT_EQUAL(result.size(), KEY_COUNT);
+    for (auto& [k, v] : result) {
+        AssertEqual(v, 6, "Key = " + to_string(k));
+    }
 }
 
-template <typename Strings, typename Predicate, typename Function>
-void Test(string_view mark, const Strings& strings, Predicate predicate, Function function) {
-	LOG_DURATION(mark);
-	const auto result = function(strings, predicate);
-	cout << result.size() << " " << result[5].substr(0, 5) << endl;
+void TestReadAndWrite() {
+    ConcurrentMap<size_t, string> cm(5);
+
+    auto updater = [&cm] {
+        for (size_t i = 0; i < 50000; ++i) {
+            cm[i].ref_to_value.push_back('a');
+        }
+    };
+    auto reader = [&cm] {
+        vector<string> result(50000);
+        for (size_t i = 0; i < result.size(); ++i) {
+            result[i] = cm[i].ref_to_value;
+        }
+        return result;
+    };
+
+    auto u1 = async(updater);
+    auto r1 = async(reader);
+    auto u2 = async(updater);
+    auto r2 = async(reader);
+
+    u1.get();
+    u2.get();
+
+    for (auto f : {&r1, &r2}) {
+        auto result = f->get();
+        ASSERT(all_of(result.begin(), result.end(), [](const string& s) {
+            return s.empty() || s == "a" || s == "aa";
+        }));
+    }
 }
 
-#define TEST(function) \
-    Test(#function, strings, predicate, function<vector<string>, decltype(predicate)>)
+void TestSpeedup() {
+    {
+        ConcurrentMap<int, int> single_lock(1);
 
-/*template <typename Container, typename Predicate>
-vector<typename Container::value_type> CopyIfUnordered(const Container& container,
-													   Predicate predicate) {
-	vector<typename Container::value_type> result;
-	for (const auto& value : container) {
-		if (predicate(value)) {
-			result.push_back(value);
-		}
-	}
-	return result;
-}*/
+        LOG_DURATION("Single lock");
+        RunConcurrentUpdates(single_lock, 4, 50000);
+    }
+    {
+        ConcurrentMap<int, int> many_locks(100);
 
-
-/*
-vector<int> CountFrequenciesForEachSeparateMutexes(const vector<int>& numbers) {
-	vector<int> freqs(MAX_VALUE + 1);
-	vector<mutex> freqs_mutexes(MAX_VALUE + 1);
-	for_each(
-		execution::par,
-		numbers.begin(), numbers.end(),
-		[&freqs, &freqs_mutexes](int number) {
-			lock_guard guard(freqs_mutexes[number]);
-			++freqs[number];
-		}
-	);
-	return freqs;
+        LOG_DURATION("100 locks");
+        RunConcurrentUpdates(many_locks, 4, 50000);
+    }
 }
-*/
-
-/*template <typename Container, typename Predicate>
-vector<typename Container::value_type> CopyIfUnordered(const Container& container,
-													   Predicate predicate) {
-	vector<mutex> freqs_mutexes(container.size() + 1);
-	vector<typename Container::value_type> result;
-
-	int index_mutexex = 0;
-	for_each(
-		execution::par,
-		container.begin(), container.end(),
-		[&result, &freqs_mutexes, &predicate, &index_mutexex](auto number) {
-			lock_guard guard(freqs_mutexes[index_mutexex ]);
-			if (predicate(number)){
-			result.push_back(number);}
-			++ index_mutexex;
-		}
-	);
-
-
-	return result;
-}*/
-
-/*template <typename Container, typename Predicate>
-vector<typename Container::value_type> CopyIfUnordered(const Container& container,
-													   Predicate predicate) {
-	mutex mutex;
-	vector<typename Container::value_type> result;
-	for_each(
-		execution::par,
-		container.begin(), container.end(),
-		[&result, &predicate, &mutex](auto number) {
-			if (predicate(number)){
-				lock_guard guard(mutex);
-				result.push_back(number);
-			}
-		}
-	);
-
-
-	return result;
-}*/
-
-template <typename Container, typename Predicate>
-vector<typename Container::value_type> CopyIfUnordered(const Container& container,
-	Predicate predicate) {
-
-	vector<typename Container::value_type> result;
-	result.reserve(container.size());
-	mutex m_;
-
-	//int index_mutexex = 0;
-	for_each(
-		execution::par,
-		container.begin(), container.end(),
-		[&result, &predicate, &m_](const auto& number) {
-
-			if (predicate(number)) {
-				typename Container::value_type* insert_;
-				{
-					lock_guard guard(m_);
-					insert_ = &result.emplace_back();
-				}
-				*insert_ = number;
-
-			}
-		}
-	);
-    return result;
-}
-
-
-
-
 
 int main() {
-	vector<int> numbers(1'000);
-	iota(numbers.begin(), numbers.end(), 0);
-
-	const vector<int> even_numbers = CopyIfUnordered(numbers, [](int number) {
-		return number % 2 == 0;
-		});
-	for (const int number : even_numbers) {
-		cout << number << " "s;
-	}
-	cout << endl;
-	// выведет все чётные числа от 0 до 999
-
-	mt19937 generator;
-
-	const auto strings = GenerateDictionary<vector>(generator, 50'000, 3000);
-	auto predicate = [](const string& s) {
-		return count(s.begin(), s.end(), 'a') < 100;
-	};
-
-	TEST(CopyIfUnordered);
+    TestRunner tr;
+    RUN_TEST(tr, TestConcurrentUpdate);
+    RUN_TEST(tr, TestReadAndWrite);
+    RUN_TEST(tr, TestSpeedup);
 }
