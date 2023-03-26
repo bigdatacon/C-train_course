@@ -40,11 +40,13 @@ public:
 		lock_guard guard(locks_[i_l]);
 		auto it = sub_maps_[sub_map_index].find(key);
 		if (it != sub_maps_[sub_map_index].end()) {
-			return { it->second, lock_guard guard(locks_[i_l]) };
+			//return { it->second, lock_guard guard(locks_[i_l]) };
+			return { it->second, lock_guard(locks_[i_l]) };
 		}
 		else {
 			it = sub_maps_[sub_map_index].emplace(key, Value()).first;
-			return { it->second, lock_guard guard(locks_[i_l])  };
+			//return { it->second, lock_guard guard(locks_[i_l])  };
+			return { it->second, lock_guard(locks_[i_l]) };
 		}
 	}
 
