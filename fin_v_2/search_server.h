@@ -151,15 +151,13 @@ SearchServer::SearchServer(const StringContainer& stop_words)
 LOG_DURATION("ACTUAL by default SPEED");
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const {
-    { LOG_DURATION("ParseQuery(raw_query) : ");
+    const auto query;
+    { 
+    LOG_DURATION("ParseQuery(raw_query) : ");
     const auto query = ParseQuery(raw_query);
     }
+    //nst auto query = ParseQuery(raw_query);
     auto matched_documents = FindAllDocuments(query, document_predicate);
-    /*{
-    LOG_DURATION("FindAllDocuments(query, document_predicate) : ");
-    auto matched_documents = FindAllDocuments(query, document_predicate);
-    }*/
-    
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
             return lhs.rating > rhs.rating;
@@ -168,7 +166,14 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
         }
     });
     
-    /*{
+
+    /*
+    {
+    LOG_DURATION("FindAllDocuments(query, document_predicate) : ");
+    auto matched_documents = FindAllDocuments(query, document_predicate);
+    }
+
+    {
     LOG_DURATION("sort(matched_documents : ");
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
@@ -176,8 +181,8 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
         } else {
             return lhs.relevance > rhs.relevance;
         }
-    });*/
-    }
+    });
+    }*/
     
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
