@@ -1,109 +1,171 @@
 #include <algorithm>
-#include <iostream>
+#include <cstdlib>
+#include <future>
+#include <map>
 #include <numeric>
 #include <random>
 #include <string>
-#include <string_view>
 #include <vector>
 #include <mutex>
-#include <future>
-#include <execution>
-#include <atomic>
-
 
 
 #include "log_duration.h"
+#include "test_framework.h"
+
+using namespace std::string_literals;
+
+template <typename Key, typename Value>
+class ConcurrentMap {
+public:
+	static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
+	
+	explicit ConcurrentMap(size_t bucket_count) {
+		for (unsigned int i = 0; i < bucket_count; ++i) {
+			sub_maps_.push_back(map<Key, Value>());
+		}
+	}
+
+	/*struct Access {
+		Value& ref_to_value;
+		lock_guard<mutex> guard;
+	};*/
+
+	struct Access {
+		Access() = default;
+
+		Access(Value& value_, mutex& value_mutex_)
+			: ref_to_value(value_)
+			, struct_value_mutex(value_mutex_)
+		{
+			struct_value_mutex.lock();
+		}
+
+		~Access() {
+			//std::unique_lock<std::mutex> lock(struct_value_mutex);
+			struct_value_mutex.unlock();
+		}
+
+		Value& ref_to_value;
+		mutex& struct_value_mutex;
+	};
+
+
+
+	/*Добавление в словарь — непростая операция, которая может изменить всю его структуру. Поэтому не получится увеличить количество мьютексов*/
+	Access operator[](const Key& key) {
+		auto it = itog_map.find(key);
+		if (it != itog_map.end()) {
+			//return { it->second, lock_guard(m_) };
+			return Access(it->second, m_);
+		}
+		else {
+			unsigned int sub_map_index = key % sub_maps_.size();
+			std::lock_guard<std::mutex> lock(m_);
+			sub_maps_[sub_map_index][key] = Value();
+			//return { Value(), lock_guard(m_) };
+			return Access(Value(), m_);
+		}
+	}
+
+	std::map<Key, Value> BuildOrdinaryMap() {
+		std::lock_guard<std::mutex> lock(m_);
+		for (auto el : sub_maps_) {
+			itog_map.insert(el.begin(), el.end());
+		}
+	}
+
+private:
+	Value value_;
+	vector<map<Key, Value>> sub_maps_;
+	map < Key, Value> itog_map;
+	mutex m_;
+};
 
 using namespace std;
 
+void RunConcurrentUpdates(ConcurrentMap<int, int>& cm, size_t thread_count, int key_count) {
+	auto kernel = [&cm, key_count](int seed) {
+		vector<int> updates(key_count);
+		iota(begin(updates), end(updates), -key_count / 2);
+		shuffle(begin(updates), end(updates), mt19937(seed));
 
-
-string GenerateWord(mt19937& generator, int max_length) {
-	const int length = uniform_int_distribution(1, max_length)(generator);
-	string word;
-	word.reserve(length);
-	for (int i = 0; i < length; ++i) {
-		//word.push_back(uniform_int_distribution('a', 'z')(generator));
-		word.push_back(uniform_int_distribution(0, 26)(generator) + 'a');
-
-	}
-	return word;
-}
-
-template <template <typename> typename Container>
-Container<string> GenerateDictionary(mt19937& generator, int word_count, int max_length) {
-	vector<string> words;
-	words.reserve(word_count);
-	for (int i = 0; i < word_count; ++i) {
-		words.push_back(GenerateWord(generator, max_length));
-	}
-	return Container(words.begin(), words.end());
-}
-
-template <typename Strings, typename Predicate, typename Function>
-void Test(string_view mark, const Strings& strings, Predicate predicate, Function function) {
-	LOG_DURATION(mark);
-	const auto result = function(strings, predicate);
-	cout << result.size() << " " << result[5].substr(0, 5) << endl;
-}
-
-#define TEST(function) \
-    Test(#function, strings, predicate, function<vector<string>, decltype(predicate)>)
-
-
-/*
-Используйте конструктор или метод resize, чтобы выделить память для вектора с запасом. Храните настоящий размер в атомарной переменной size. Тогда вставка нового элемента — это его запись в result[size] с последующим увеличением размера. Но учтите: не конфликтуют друг с другом только операции непосредственного использования или изменения атомарной переменной. Операция result[size] = value; может выполниться в двух потоках одновременно для одного и того же size,  и это приведёт к состоянию гонки.
-*/
-
-template <typename Container, typename Predicate>
-vector<typename Container::value_type> CopyIfUnordered(const Container& container,
-	Predicate predicate) {
-    vector < atomic<typename Container::value_type> > result;
-	result.reserve(container.size());
-    atomic<int> size = 0; 
-	for_each(
-		execution::par,
-		container.begin(), container.end(),
-		[&result, &predicate, &size ](const auto& number) {
-			if (predicate(number)) {
-                ::atomic<typename Container::value_type*> atom_ptr;
-                //typename Container::value_type* atom_ptr;
-				{
-                    atom_ptr = &result[size]; // получаю указатель на последний элемент вектора;
-				}
-                * atom_ptr =  number; // присваиваю значение последнему элементу вектора 
-                ++size; // увеличиваю размер вектора на 1
-
+		for (int i = 0; i < 2; ++i) {
+			for (auto key : updates) {
+				++cm[key].ref_to_value;
 			}
 		}
-	);
-    return {result.begin(), result.end()};
-}
-
-
-
-
-
-
-int main() {
-	vector<int> numbers(1'000);
-	iota(numbers.begin(), numbers.end(), 0);
-
-	const vector<int> even_numbers = CopyIfUnordered(numbers, [](int number) {
-		return number % 2 == 0;
-		});
-	for (const int number : even_numbers) {
-		cout << number << " "s;
-	}
-	cout << endl;
-	// выведет все чётные числа от 0 до 999
-
-	mt19937 generator;
-
-	const auto strings = GenerateDictionary<vector>(generator, 50'000, 3000);
-	auto predicate = [](const string& s) {
-		return count(s.begin(), s.end(), 'a') < 100;
 	};
 
-	TEST(CopyIfUnordered);
+	vector<future<void>> futures;
+	for (size_t i = 0; i < thread_count; ++i) {
+		futures.push_back(async(kernel, i));
+	}
+}
+
+void TestConcurrentUpdate() {
+	constexpr size_t THREAD_COUNT = 3;
+	constexpr size_t KEY_COUNT = 50000;
+
+	ConcurrentMap<int, int> cm(THREAD_COUNT);
+	RunConcurrentUpdates(cm, THREAD_COUNT, KEY_COUNT);
+
+	const auto result = cm.BuildOrdinaryMap();
+	ASSERT_EQUAL(result.size(), KEY_COUNT);
+	for (auto& [k, v] : result) {
+		AssertEqual(v, 6, "Key = " + to_string(k));
+	}
+}
+
+void TestReadAndWrite() {
+	ConcurrentMap<size_t, string> cm(5);
+
+	auto updater = [&cm] {
+		for (size_t i = 0; i < 50000; ++i) {
+			cm[i].ref_to_value.push_back('a');
+		}
+	};
+	auto reader = [&cm] {
+		vector<string> result(50000);
+		for (size_t i = 0; i < result.size(); ++i) {
+			result[i] = cm[i].ref_to_value;
+		}
+		return result;
+	};
+
+	auto u1 = async(updater);
+	auto r1 = async(reader);
+	auto u2 = async(updater);
+	auto r2 = async(reader);
+
+	u1.get();
+	u2.get();
+
+	for (auto f : { &r1, &r2 }) {
+		auto result = f->get();
+		ASSERT(all_of(result.begin(), result.end(), [](const string& s) {
+			return s.empty() || s == "a" || s == "aa";
+			}));
+	}
+}
+
+void TestSpeedup() {
+	{
+		ConcurrentMap<int, int> single_lock(1);
+
+		LOG_DURATION("Single lock");
+		RunConcurrentUpdates(single_lock, 4, 50000);
+	}
+	{
+		ConcurrentMap<int, int> many_locks(100);
+
+		LOG_DURATION("100 locks");
+		RunConcurrentUpdates(many_locks, 4, 50000);
+	}
+}
+
+int main() {
+	TestRunner tr;
+	RUN_TEST(tr, TestConcurrentUpdate);
+	RUN_TEST(tr, TestReadAndWrite);
+	RUN_TEST(tr, TestSpeedup);
 }
