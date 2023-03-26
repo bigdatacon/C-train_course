@@ -14,6 +14,7 @@
 #include <numeric>
 #include <string_view>
 #include <deque>
+#include <execution>
 
 /*
 Следующие методы теперь должны позволять принять string_view вместо строки:
@@ -78,13 +79,13 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
 }
 
 
-std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query, DocumentStatus status) const {
+std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentStatus status) const {
 	return FindTopDocuments(raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
 		return document_status == status;
 		});
 }
 
-std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query) const {
+std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query) const {
 	return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
 }
 
