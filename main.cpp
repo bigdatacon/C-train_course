@@ -22,11 +22,11 @@ public:
 
 	explicit ConcurrentMap(size_t bucket_count)
 	
-		:locks_(bucket_count) // определаю размер вектора mutex_ов 
+		:locks_(bucket_count)
+		, sub_maps_(bucket_count)// определаю размер вектора mutex_ов 
+		, count_(bucket_count)
 	{
-		for (unsigned int i = 0; i < bucket_count; ++i) {
-			sub_maps_.push_back(map<Key, Value>());  // добавляю в вектор пустые map
-		}
+
 	}
 
 	struct Access {
@@ -34,38 +34,29 @@ public:
 		lock_guard<mutex> guard;
 	};
 
+
 	Access operator[](const Key& key) {
 		unsigned int i_l = key % sub_maps_.size();
-		unsigned int sub_map_index = key % sub_maps_.size();
-		lock_guard guard(locks_[i_l]);
-		//lock_guard(locks_[i_l]
-		auto it = sub_maps_[sub_map_index].find(key);
-		if (it != sub_maps_[sub_map_index].end()) {
-			//return { it->second, lock_guard guard(locks_[i_l]) };
-			return { it->second, lock_guard(locks_[i_l]) };
-		}
-		else {
-			it = sub_maps_[sub_map_index].emplace(key, Value()).first;
-			//return { it->second, lock_guard guard(locks_[i_l])  };
-			return { it->second, lock_guard(locks_[i_l]) };
-		}
+		std::map<Key, Value>& result = sub_maps_[i_l];
+		return { result[key], lock_guard(locks_[i_l]) };
+
 	}
 
 	std::map<Key, Value> BuildOrdinaryMap() {
 		std::map<Key, Value> result;
-		for (size_t i = 0; i < sub_maps_.size(); ++i) {
+		for (int i = 0; i < count_; ++i) {
 			lock_guard guard(locks_[i]);  // выставляю мютекс по индексу подсловаря 
-			for (const auto& [key, value] : sub_maps_[i]) {
-				result[key] = value;
-			}
+			result.insert(sub_maps_[i].begin(), sub_maps_[i].end());
 		}
 		return result;
 	}
+
 
 private:
 	std::vector<std::map<Key, Value>> sub_maps_;
 	std::vector<std::mutex> locks_;
 	mutex m_;
+	int count_;
 };
 
 using namespace std;
