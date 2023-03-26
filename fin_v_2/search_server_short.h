@@ -307,9 +307,13 @@ std::vector<Document> SearchServer::FindAllDocuments(const std::execution::paral
     std::chrono::duration<double> elapsed_time_mw = end_time_mw - start_time_mw;
     std::cout << "Elapsed time MINUS WORDS FINDALLDOCUMENTS PARALLEL  / 1000 000: " << elapsed_time_mw.count()*1000000 << " seconds\n";
     
+    auto start_time_dr = std::chrono::high_resolution_clock::now();
     std::vector<Document> matched_documents;
     for (const auto& [document_id, relevance] : document_to_relevance) {
         matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
     }
+    auto end_time_dr = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_dr = end_time_dr - start_time_dr;
+    std::cout << "Elapsed time DOCUMENT_TO_RELEVANCE FINDALLDOCUMENTS PARALLEL / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
     return matched_documents;
 }
