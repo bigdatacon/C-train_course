@@ -53,14 +53,6 @@ public:
     std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentStatus status) const;
 
     std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query) const;
-    
-    
-    /*template <typename DocumentPredicate>
-    std::vector<Document> FindTopDocuments( std::string_view raw_query, DocumentPredicate document_predicate) const;
-
-    std::vector<Document> FindTopDocuments( std::string_view raw_query, DocumentStatus status) const;
-
-    std::vector<Document> FindTopDocuments( std::string_view raw_query) const ;*/
 
     int GetDocumentCount() const ;
 
@@ -138,6 +130,12 @@ private:
     
     template <typename DocumentPredicate>
     std::vector<Document> FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const;
+    
+    template <typename DocumentPredicate>
+    std::vector<Document> FindAllDocuments(const std::execution::sequenced_policy, const Query& query, DocumentPredicate document_predicate) const;
+    
+    template <typename DocumentPredicate>
+    std::vector<Document> FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const;
 };
 
 template <typename StringContainer>
@@ -252,6 +250,83 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
 
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const Query& query, DocumentPredicate document_predicate) const {
+    std::map<int, double> document_to_relevance;
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
+    for (std::string_view word : query.plus_words) {
+        if (word_to_document_freqs_.count(word) == 0) {
+            continue;
+        }
+
+        std::string word_str(word);
+        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
+        for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
+            const auto& document_data = documents_.at(document_id);
+            if (document_predicate(document_id, document_data.status, document_data.rating)) {
+                document_to_relevance[document_id] += term_freq * inverse_document_freq;
+            }
+        }
+    }
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time = end_time - start_time;
+    std::cout << "Elapsed time PLUS WORDS FINDALLDOCUMENTS  / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    
+    auto start_time_mw = std::chrono::high_resolution_clock::now();
+    for ( std::string_view word : query.minus_words) {
+        if (word_to_document_freqs_.count(word) == 0) {
+            continue;
+        }
+        for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
+            document_to_relevance.erase(document_id);
+        }
+    }
+    auto end_time_mw = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time_mw = end_time_mw - start_time_mw;
+    std::cout << "Elapsed time MINUS WORDS FINDALLDOCUMENTS  / 1000 000: " << elapsed_time_mw.count()*1000000 << " seconds\n";
+    
+    std::vector<Document> matched_documents;
+    for (const auto& [document_id, relevance] : document_to_relevance) {
+        matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
+    }
+    return matched_documents;
+}
+
+template <typename DocumentPredicate>
+std::vector<Document> SearchServer::FindAllDocuments(const std::execution::sequenced_policy, const Query& query, DocumentPredicate document_predicate) const {
+    std::map<int, double> document_to_relevance;
+    
+    for (std::string_view word : query.plus_words) {
+        if (word_to_document_freqs_.count(word) == 0) {
+            continue;
+        }
+
+        //std::string word_str = std::string{word.data(), word.size()}; 
+        std::string word_str(word);
+        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
+        for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
+            const auto& document_data = documents_.at(document_id);
+            if (document_predicate(document_id, document_data.status, document_data.rating)) {
+                document_to_relevance[document_id] += term_freq * inverse_document_freq;
+            }
+        }
+    }
+    for ( std::string_view word : query.minus_words) {
+        if (word_to_document_freqs_.count(word) == 0) {
+            continue;
+        }
+        for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
+            document_to_relevance.erase(document_id);
+        }
+    }
+    std::vector<Document> matched_documents;
+    for (const auto& [document_id, relevance] : document_to_relevance) {
+        matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
+    }
+    return matched_documents;
+}
+
+template <typename DocumentPredicate>
+std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
     std::map<int, double> document_to_relevance;
     for (std::string_view word : query.plus_words) {
         if (word_to_document_freqs_.count(word) == 0) {
