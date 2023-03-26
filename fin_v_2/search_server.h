@@ -40,11 +40,11 @@ public:
     std::vector<Document> FindTopDocuments(std::string_view raw_query) const;
 
     template <typename DocumentPredicate>
-    std::vector<Document> FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
+    std::vector<Document> FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
 
-    std::vector<Document> FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query, DocumentStatus status) const;
+    std::vector<Document> FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentStatus status) const;
 
-    std::vector<Document> FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query) const;
+    std::vector<Document> FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query) const;
 
     template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
@@ -168,7 +168,7 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
 
 
 template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequential_policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
+std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
     const auto query = ParseQuery(raw_query);
     auto matched_documents = FindAllDocuments(query, document_predicate);
 
