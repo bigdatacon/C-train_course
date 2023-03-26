@@ -18,66 +18,50 @@ template <typename Key, typename Value>
 class ConcurrentMap {
 public:
 	static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
+
+	explicit ConcurrentMap(size_t bucket_count)
 	
-	explicit ConcurrentMap(size_t bucket_count) {
+		:locks_(bucket_count) // определаю размер вектора mutex_ов 
+	{
 		for (unsigned int i = 0; i < bucket_count; ++i) {
-			sub_maps_.push_back(map<Key, Value>());
+			sub_maps_.push_back(map<Key, Value>());  // добавляю в вектор пустые map
 		}
 	}
 
-	/*struct Access {
-		Value& ref_to_value;
-		lock_guard<mutex> guard;
-	};*/
-
 	struct Access {
-		Access() = default;
-
-		Access(Value& value_, mutex& value_mutex_)
-			: ref_to_value(value_)
-			, struct_value_mutex(value_mutex_)
-		{
-			struct_value_mutex.lock();
-		}
-
-		~Access() {
-			//std::unique_lock<std::mutex> lock(struct_value_mutex);
-			struct_value_mutex.unlock();
-		}
-
-		Value& ref_to_value;
-		mutex& struct_value_mutex;
+		T& ref_to_value;
+		lock_guard<mutex> guard;
 	};
 
-
-
-	/*Добавление в словарь — непростая операция, которая может изменить всю его структуру. Поэтому не получится увеличить количество мьютексов*/
 	Access operator[](const Key& key) {
-		auto it = itog_map.find(key);
-		if (it != itog_map.end()) {
-			//return { it->second, lock_guard(m_) };
-			return Access(it->second, m_);
+		unsigned int i_l = key % sub_maps_.size();
+		unsigned int sub_map_index = key % sub_maps_.size();
+		lock_guard guard(locks_[i_l]);
+
+		auto it = sub_maps_[sub_map_index].find(key);
+		if (it != m.end()) {
+			return { it->second, lock_guard guard(locks_[i_l]) };
 		}
 		else {
-			unsigned int sub_map_index = key % sub_maps_.size();
-			std::lock_guard<std::mutex> lock(m_);
-			sub_maps_[sub_map_index][key] = Value();
-			//return { Value(), lock_guard(m_) };
-			return Access(Value(), m_);
+			it = m.emplace(key, Value()).first;
+			return { it->second, lock_guard guard(locks_[i_l]) };
 		}
 	}
 
 	std::map<Key, Value> BuildOrdinaryMap() {
-		std::lock_guard<std::mutex> lock(m_);
-		for (auto el : sub_maps_) {
-			itog_map.insert(el.begin(), el.end());
+		std::map<Key, Value> result;
+		for (size_t i = 0; i < sub_maps_.size(); ++i) {
+			lock_guard guard(locks_[i]);  // выставляю мютекс по индексу подсловаря 
+			for (const auto& [key, value] : sub_maps_[i]) {
+				result[key] = value;
+			}
 		}
+		return result;
 	}
 
 private:
-	Value value_;
-	vector<map<Key, Value>> sub_maps_;
-	map < Key, Value> itog_map;
+	std::vector<std::map<Key, Value>> sub_maps_;
+	std::vector<std::mutex> locks_;
 	mutex m_;
 };
 
