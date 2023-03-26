@@ -1,38 +1,142 @@
 Подсказка : 
-Ключи — целые числа. Так что операция взятия остатка от деления поможет вам выбрать, в подсловаре с каким индексом хранить данный ключ. Чтобы не мучиться с отрицательными числами, предварительно приведите ключ к типу uint64_t.
+Начните с обучения всех версий методов FindTopDocuments и FindAllDocuments приёму аргументов execution::seq и execution::par.
+Попрофилируйте и определите, где узкое место: в сортировке документов или в FindAllDocuments в циклах по плюс- и минус-словам?
+Вам пригодится ConcurrentMap и, возможно, ConcurrentSet.
+
+
 Задание
-Задание
-Напишите шаблонный класс ConcurrentMap со следующим интерфейсом:
-template <typename Key, typename Value>
-class ConcurrentMap {
-public:
-    static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
-
-    struct Access {
-        Value& ref_to_value;
-
-        // ...
-    };
-
-    explicit ConcurrentMap(size_t bucket_count);
-
-    Access operator[](const Key& key);
-
-    std::map<Key, Value> BuildOrdinaryMap();
-
-private:
-    // ...
-}; 
-static_assert в начале класса не даст программе скомпилироваться при попытке использовать в качестве типа ключа что-либо, кроме целых чисел.
-Конструктор класса ConcurrentMap<Key, Value> принимает количество подсловарей, на которые надо разбить всё пространство ключей.
-operator[] должен вести себя так же, как аналогичный оператор у map: если ключ key есть в словаре, должен возвращаться объект класса Access, содержащий ссылку на соответствующее ему значение. Если key в словаре нет, в него надо добавить пару (key, Value()) и вернуть объект класса Access, содержащий ссылку на только что добавленное значение.
-Структура Access должна вести себя так же, как в шаблоне Synchronized: предоставлять ссылку на значение словаря и обеспечивать синхронизацию доступа к нему.
-Метод BuildOrdinaryMap должен сливать вместе части словаря и возвращать весь словарь целиком. При этом он должен быть потокобезопасным, то есть корректно работать, когда другие потоки выполняют операции с ConcurrentMap.
-В заготовке кода используются тесты на основе фреймворка test_framework.h, с которым вы уже знакомы. Для проверки решения на вашем компьютере загрузите этот фреймворк по ссылке из урока «mutex и lock_guard».
+Реализуйте многопоточную версию метода FindTopDocuments в дополнение к однопоточной. Это нужно сделать для всех перегрузок метода: без фильтраций, с фильтрацией по статусу и по произвольному предикату.
+Пример
+#include "process_queries.h"
+#include "search_server.h"
+#include <execution>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+void PrintDocument(const Document& document) {
+    cout << "{ "s
+         << "document_id = "s << document.id << ", "s
+         << "relevance = "s << document.relevance << ", "s
+         << "rating = "s << document.rating << " }"s << endl;
+}
+int main() {
+    SearchServer search_server("and with"s);
+    int id = 0;
+    for (
+        const string& text : {
+            "white cat and yellow hat"s,
+            "curly cat curly tail"s,
+            "nasty dog with big eyes"s,
+            "nasty pigeon john"s,
+        }
+    ) {
+        search_server.AddDocument(++id, text, DocumentStatus::ACTUAL, {1, 2});
+    }
+    cout << "ACTUAL by default:"s << endl;
+    // последовательная версия
+    for (const Document& document : search_server.FindTopDocuments("curly nasty cat"s)) {
+        PrintDocument(document);
+    }
+    cout << "BANNED:"s << endl;
+    // последовательная версия
+    for (const Document& document : search_server.FindTopDocuments(execution::seq, "curly nasty cat"s, DocumentStatus::BANNED)) {
+        PrintDocument(document);
+    }
+    cout << "Even ids:"s << endl;
+    // параллельная версия
+    for (const Document& document : search_server.FindTopDocuments(execution::par, "curly nasty cat"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
+        PrintDocument(document);
+    }
+    return 0;
+} 
+Вывод:
+ACTUAL by default:
+{ document_id = 2, relevance = 0.866434, rating = 1 }
+{ document_id = 4, relevance = 0.231049, rating = 1 }
+{ document_id = 1, relevance = 0.173287, rating = 1 }
+{ document_id = 3, relevance = 0.173287, rating = 1 }
+BANNED:
+Even ids:
+{ document_id = 2, relevance = 0.866434, rating = 1 }
+{ document_id = 4, relevance = 0.231049, rating = 1 } 
 Ограничения
-Ваш класс должен гарантировать потокобезопасную работу со словарём, как описано в условии. При этом он должен быть как минимум вдвое эффективнее обычного словаря с общим мьютексом.
-Гарантируется, что тип Value имеет конструктор по умолчанию и конструктор копирования.
+Как и прежде, в метод FindTopDocuments может быть передан любой поисковый запрос.
 Что отправлять на проверку
-cpp-файл, содержащий шаблонный класс ConcurrentMap, а также нужные для его работы подключения библиотек и другие функции. Ваша программа не должна содержать подстроку copy_if. Функция main будет проигнорирована при тестировании.
+Заголовочные файлы и файлы с реализацией, содержащие класс SearchServer и написанные ранее вспомогательные функции. Функция main будет проигнорирована.
 Как будет тестироваться ваш код
-Пример тестов и бенчмарка вы найдёте в заготовке кода.
+Правильность работы функции будет проверена юнит-тестами.
+Производительность всех версий метода будет проверена аналогично бенчмарку, приведённому ниже.
+Для многопоточной версии время работы должно быть по крайней мере на 30% меньше, чем для однопоточной версии.
+Также ваше решение не должно уступать авторскому сильнее, чем в 1,5 раза для всех соответствующих версий.
+#include "search_server.h"
+#include "log_duration.h"
+#include <execution>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
+using namespace std;
+string GenerateWord(mt19937& generator, int max_length) {
+    const int length = uniform_int_distribution(1, max_length)(generator);
+    string word;
+    word.reserve(length);
+    for (int i = 0; i < length; ++i) {
+        word.push_back(uniform_int_distribution('a', 'z')(generator));
+    }
+    return word;
+}
+vector<string> GenerateDictionary(mt19937& generator, int word_count, int max_length) {
+    vector<string> words;
+    words.reserve(word_count);
+    for (int i = 0; i < word_count; ++i) {
+        words.push_back(GenerateWord(generator, max_length));
+    }
+    words.erase(unique(words.begin(), words.end()), words.end());
+    return words;
+}
+string GenerateQuery(mt19937& generator, const vector<string>& dictionary, int word_count, double minus_prob = 0) {
+    string query;
+    for (int i = 0; i < word_count; ++i) {
+        if (!query.empty()) {
+            query.push_back(' ');
+        }
+        if (uniform_real_distribution<>(0, 1)(generator) < minus_prob) {
+            query.push_back('-');
+        }
+        query += dictionary[uniform_int_distribution<int>(0, dictionary.size() - 1)(generator)];
+    }
+    return query;
+}
+vector<string> GenerateQueries(mt19937& generator, const vector<string>& dictionary, int query_count, int max_word_count) {
+    vector<string> queries;
+    queries.reserve(query_count);
+    for (int i = 0; i < query_count; ++i) {
+        queries.push_back(GenerateQuery(generator, dictionary, max_word_count));
+    }
+    return queries;
+}
+template <typename ExecutionPolicy>
+void Test(string_view mark, const SearchServer& search_server, const vector<string>& queries, ExecutionPolicy&& policy) {
+    LOG_DURATION(mark);
+    double total_relevance = 0;
+    for (const string_view query : queries) {
+        for (const auto& document : search_server.FindTopDocuments(policy, query)) {
+            total_relevance += document.relevance;
+        }
+    }
+    cout << total_relevance << endl;
+}
+#define TEST(policy) Test(#policy, search_server, queries, execution::policy)
+int main() {
+    mt19937 generator;
+    const auto dictionary = GenerateDictionary(generator, 1000, 10);
+    const auto documents = GenerateQueries(generator, dictionary, 10'000, 70);
+    SearchServer search_server(dictionary[0]);
+    for (size_t i = 0; i < documents.size(); ++i) {
+        search_server.AddDocument(i, documents[i], DocumentStatus::ACTUAL, {1, 2, 3});
+    }
+    const auto queries = GenerateQueries(generator, dictionary, 100, 70);
+    TEST(seq);
+    TEST(par);
+} 
