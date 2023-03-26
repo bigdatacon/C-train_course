@@ -1,41 +1,42 @@
-#ifndef CONCURRENT_MAP_H
-#define CONCURRENT_MAP_H
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
 
-#include <map>
-#include <mutex>
+#include "concurrent_map.h" // заголовочный файл для реализации ConcurrentMap
 
-template<typename K, typename V>
-class ConcurrentMap {
-public:
-    /*using Iterator = Type*;
-    using ConstIterator = const Type*;*/
+ConcurrentMap<std::string, int> word_count; // создание ConcurrentMap для подсчета количества слов
 
- 
+void add_word(const std::string& word) {
+    word_count[std::move(word)]++; // добавление слова в ConcurrentMap
+}
 
-    void Insert(K key, V value) {
-        std::lock_guard<std::mutex> guard(mutex_);
-        data_[std::move(key)] = std::move(value);
+void process_data() {
+    // создание вектора, содержащего все слова в ConcurrentMap
+    std::vector<std::pair<std::string, int>> words(word_count.begin(), word_count.end());
+
+    // сортировка вектора по количеству вхождений слов
+    std::sort(words.begin(), words.end(), [](const auto& a, const auto& b) {
+        return a.second > b.second;
+        });
+
+    // вывод первых 10 слов с наибольшим количеством вхождений
+    for (int i = 0; i < 10 && i < words.size(); ++i) {
+        std::cout << words[i].first << ": " << words[i].second << std::endl;
     }
+}
 
-    V& operator[](const K& key) {
-        std::lock_guard<std::mutex> guard(mutex_);
-        return data_[key];
-    }
+int main() {
+    // добавление слов в ConcurrentMap
+    add_word("apple");
+    add_word("orange");
+    add_word("banana");
+    add_word("orange");
+    add_word("orange");
+    add_word("apple");
 
-    std::map<K, V> BuildOrdinaryMap() {
-        std::lock_guard<std::mutex> guard(mutex_);
-        return data_;
-    }
+    // обработка данных
+    process_data();
 
-    auto begin() { return data_.begin(); }
-    auto end() { return data_.end(); }
-
-private:
-    std::map<K, V> data_;
-    std::mutex mutex_;
-
-
-
-};
-
-#endif // CONCURRENT_MAP_H
+    return 0;
+}
