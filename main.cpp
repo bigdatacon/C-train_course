@@ -38,14 +38,15 @@ public:
 		unsigned int i_l = key % sub_maps_.size();
 		unsigned int sub_map_index = key % sub_maps_.size();
 		lock_guard guard(locks_[i_l]);
+		//lock_guard(locks_[i_l]);
 
 		auto it = sub_maps_[sub_map_index].find(key);
 		if (it != sub_maps_[sub_map_index].end()) {
 			return { it->second, lock_guard guard(locks_[i_l]) };
 		}
 		else {
-			it = m.emplace(key, Value()).first;
-			return { it->second, lock_guard guard(locks_[i_l]) };
+			it = sub_maps_[sub_map_index].emplace(key, Value()).first;
+			return { it->second, lock_guard guard(locks_[i_l])  };
 		}
 	}
 
