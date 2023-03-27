@@ -158,13 +158,13 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
     const auto query = ParseQuery(raw_query);
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;
-    std::cout << "Elapsed time ParseQuery / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time ParseQuery / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
     
     auto start_time_fad = std::chrono::high_resolution_clock::now();
     auto matched_documents = FindAllDocuments(query, document_predicate);
     auto end_time_fad = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time_fad = end_time_fad - start_time_fad;
-    std::cout << "Elapsed time FindAllDocuments / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time FindAllDocuments / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
     
      auto start_time_sort = std::chrono::high_resolution_clock::now();
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
@@ -177,7 +177,7 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
     
     auto end_time_sort = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time_sort = end_time_sort - start_time_sort;
-    std::cout << "Elapsed time sort / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time sort / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
    
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
@@ -197,13 +197,13 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
     const auto query = ParseQuery(true, raw_query);
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;
-    std::cout << "Elapsed time ParseQuery PARALLEL / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time ParseQuery PARALLEL / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
     
     auto start_time_fad = std::chrono::high_resolution_clock::now();
     auto matched_documents = FindAllDocuments(std::execution::par, query, document_predicate);
     auto end_time_fad = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time_fad = end_time_fad - start_time_fad;
-    std::cout << "Elapsed time FindAllDocuments PARALLEL / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time FindAllDocuments PARALLEL / 1000 000: " << elapsed_time_fad.count()*1000000 << " seconds\n";
     
     auto start_time_sort = std::chrono::high_resolution_clock::now();
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
@@ -216,7 +216,7 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
     
     auto end_time_sort = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time_sort = end_time_sort - start_time_sort;
-    std::cout << "Elapsed time sort PARALLEL / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time sort PARALLEL / 1000 000: " << elapsed_time_sort.count()*1000000 << " seconds\n";
     
     if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
@@ -246,7 +246,7 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
     }
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;
-    std::cout << "Elapsed time PLUS WORDS FINDALLDOCUMENTS  / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time PLUS WORDS FINDALLDOCUMENTS  / 1000 000: " << elapsed_time.count()*1000000 << " seconds\n";
     
     auto start_time_mw = std::chrono::high_resolution_clock::now();
     for ( std::string_view word : query.minus_words) {
@@ -259,7 +259,7 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
     }
     auto end_time_mw = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time_mw = end_time_mw - start_time_mw;
-    std::cout << "Elapsed time MINUS WORDS FINDALLDOCUMENTS  / 1000 000: " << elapsed_time_mw.count()*1000000 << " seconds\n";
+    //std::cout << "Elapsed time MINUS WORDS FINDALLDOCUMENTS  / 1000 000: " << elapsed_time_mw.count()*1000000 << " seconds\n";
     
     std::vector<Document> matched_documents;
     for (const auto& [document_id, relevance] : document_to_relevance) {
@@ -276,29 +276,21 @@ return SearchServer::FindAllDocuments(query, document_predicate);}
 
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
-    //std::map<int, double> document_to_relevance;
-    //std::map<int, std::atomic<double>> document_to_relevance;
-    ConcurrentMap<std::int, std::double> document_to_relevance(3); 
-    //std::mutex freqs_mutex;
-    
+    int buckets = 3;
+    ConcurrentMap<int, double> document_to_relevance(buckets);   
     for_each(
         std::execution::par,
         query.plus_words.begin(), query.plus_words.end(),
-        [&,  /*&freqs_mutex,*/ document_predicate](auto word ) {
-            
+        [&,   document_predicate](auto word ) {
             if (word_to_document_freqs_.count(word) != 0) {
-
         std::string word_str(word);
         const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
         for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
             const auto& document_data = documents_.at(document_id);
             if (document_predicate(document_id, document_data.status, document_data.rating)) {
-                //std::lock_guard g(freqs_mutex);
-                //document_to_relevance[document_id] += term_freq * inverse_document_freq;
-                document_to_relevance[document_id].second += term_freq * inverse_document_freq;
+                document_to_relevance[document_id].ref_to_value += term_freq * inverse_document_freq;
             }
         }
-        
          }
          }
     );  
@@ -309,33 +301,17 @@ std::vector<Document> SearchServer::FindAllDocuments(const std::execution::paral
         [&](auto word ) {if (word_to_document_freqs_.count(word) != 0){
             for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
             document_to_relevance.Delete(document_id);
-        }
-        }
-        }
-        )
-    
-    
-    /*for ( std::string_view word : query.minus_words) {
-        if (word_to_document_freqs_.count(word) == 0) {
-            continue;
-        }
-        for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
             //document_to_relevance.erase(document_id);
-            document_to_relevance.Delete(document_id);
         }
-    }*/
-    
-    auto document_to_relevance_map = document_to_relevance.BuildOrdinaryMap(); 
+        }
+        }
+        );
+
     std::vector<Document> matched_documents;
-    for (const auto& [document_id, relevance] : document_to_relevance_map) {
+    for (const auto& [document_id, relevance] : document_to_relevance.BuildOrdinaryMap()) {
         matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
     }
-    
-    
-    /*std::vector<Document> matched_documents;
-    for (const auto& [document_id, relevance] : document_to_relevance) {
-        matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
-    }*/
+
 
     return matched_documents;
 }
