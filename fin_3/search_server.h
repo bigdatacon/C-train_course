@@ -168,7 +168,6 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::seque
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
     const auto query = ParseQuery(raw_query);
-    //const auto query = ParseQuery(true, raw_query); // параллельную версию не вызываю так как после нее нужно делать сортировку  
     
     auto matched_documents = FindAllDocuments(std::execution::par, query, document_predicate);
     sort(std::execution::par, matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
@@ -222,40 +221,6 @@ template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const std::execution::sequenced_policy, const Query& query, DocumentPredicate document_predicate) const {
 return SearchServer::FindAllDocuments(query, document_predicate);}
 
-
-
-
-/*template < typename DocumentPredicate>
-std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
-    ConcurrentMap<int, double> document_to_relevance_map(NUM_CPUS);
-    for_each(std::execution::par, query.plus_words.begin(), query.plus_words.end(), [&](std::string_view word) {
-        if (word_to_document_freqs_.count(word) ) {
-            const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
-                for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-                    const auto& document_data = documents_.at(document_id);
-                        if (document_predicate(document_id, document_data.status, document_data.rating)) {
-                            document_to_relevance_map[document_id].ref_to_value += term_freq * inverse_document_freq;
-                        }
-                }
-        }
-            });
-     std::map<int, double> document_to_relevance(document_to_relevance_map.BuildOrdinaryMap());
-    for (std::string_view word : query.minus_words) {
-        if (word_to_document_freqs_.count(word) == 0) {
-            continue;
-        }
-        for (const auto [document_id, _] : word_to_document_freqs_.at(word)) {
-            document_to_relevance.erase(document_id);
-        }
-    }
-    std::vector<Document> matched_documents;
-    for (const auto [document_id, relevance] : document_to_relevance) {
-        matched_documents.push_back(
-            { document_id, relevance, documents_.at(document_id).rating });
-    }
-    return matched_documents;
-}*/
-
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
     ConcurrentMap<int, double> document_to_relevance(NUM_CPUS);
@@ -304,48 +269,4 @@ std::vector<Document> SearchServer::FindAllDocuments(const std::execution::paral
     }
 }
 
-/*
-template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
-    ConcurrentMap<int, double> document_to_relevance(NUM_CPUS);   
-    for_each(
-        std::execution::par,
-        query.plus_words.begin(), query.plus_words.end(),
-        [&,   document_predicate](std::string_view word ) {
-            if (word_to_document_freqs_.count(word) ) {
-        //std::string word_str(word);
-        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
-        for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-            const auto& document_data = documents_.at(document_id);
-            if (document_predicate(document_id, document_data.status, document_data.rating)) {
-                document_to_relevance[document_id].ref_to_value += term_freq * inverse_document_freq;
-            }
-        }
-         }
-         }
-    );  
-    
-    std::map<int, double> document_to_relevance_c(document_to_relevance.BuildOrdinaryMap());
 
-    
-        for_each(
-        std::execution::par,
-        query.minus_words.begin(), query.minus_words.end(),
-        [&](auto word ) {if (word_to_document_freqs_.count(word) != 0){
-            for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
-            //document_to_relevance.Delete(document_id);
-            document_to_relevance_c.erase(document_id);
-        }
-        }
-        }
-        );
-    
-    std::vector<Document> matched_documents;
-    for (const auto& [document_id, relevance] : document_to_relevance_c) {
-        matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
-    }
-
-
-
-    return matched_documents;
-}*/
