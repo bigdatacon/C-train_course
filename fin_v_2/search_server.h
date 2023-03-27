@@ -277,9 +277,9 @@ return SearchServer::FindAllDocuments(query, document_predicate);}
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
     std::map<int, double> document_to_relevance;
-    //std::map<int, atomic<double>> document_to_relevance;
+    //std::map<int, std::atomic<double>> document_to_relevance;
     //ConcurrentMap<std::int, std::double> document_to_relevance;
-    //mutex freqs_mutex;
+    std::mutex freqs_mutex;
     
     for_each(
         std::execution::par,
@@ -293,7 +293,7 @@ std::vector<Document> SearchServer::FindAllDocuments(const std::execution::paral
         for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
             const auto& document_data = documents_.at(document_id);
             if (document_predicate(document_id, document_data.status, document_data.rating)) {
-                //lock_guard g(freqs_mutex);
+                std::lock_guard g(freqs_mutex);
                 document_to_relevance[document_id] += term_freq * inverse_document_freq;
             }
         }
