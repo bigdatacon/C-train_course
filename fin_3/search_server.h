@@ -26,6 +26,7 @@
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 const unsigned int NUM_CPUS = std::thread::hardware_concurrency();
+const double ERR_NUM = 1e-6;
 
 class SearchServer {
 public:
@@ -44,6 +45,25 @@ public:
 
     std::vector<Document> FindTopDocuments(std::string_view raw_query) const;
 
+        
+    template <typename DocumentPredicate, typename Policy>
+    std::vector<Document> FindTopDocuments(const Policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
+    
+    template < typename Policy>
+    std::vector<Document> FindTopDocuments(const Policy, std::string_view raw_query, DocumentStatus status) const;
+    
+    template < typename Policy>
+    std::vector<Document> FindTopDocuments(const Policy, std::string_view raw_query) const;
+
+    template <typename DocumentPredicate, typename Policy>
+    std::vector<Document> FindTopDocuments(const Policy policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
+     template < typename Policy>
+    std::vector<Document> FindTopDocuments(const Policy policy, std::string_view raw_query, DocumentStatus status) const;
+    template < typename Policy>
+    std::vector<Document> FindTopDocuments(const Policy policy, std::string_view raw_query) const;
+    
+    
+    /*
     template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentPredicate document_predicate) const;
 
@@ -57,6 +77,7 @@ public:
     std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentStatus status) const;
 
     std::vector<Document> FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query) const;
+    */
 
     int GetDocumentCount() const ;
 
@@ -147,6 +168,30 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
     const auto query = ParseQuery(raw_query);
     auto matched_documents = FindAllDocuments(query, document_predicate);
     sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
+        if (std::abs(lhs.relevance - rhs.relevance) <  ERR_NUM) {
+            return lhs.rating > rhs.rating;
+        } else {
+            return lhs.relevance > rhs.relevance;
+        }
+    });
+
+    if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
+        matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
+    }
+    return matched_documents;
+}
+
+template <typename DocumentPredicate, typename Policy>
+std::vector<Document> SearchServer::FindTopDocuments(const Policy&, std::string_view raw_query, DocumentPredicate document_predicate) const {
+    return SearchServer::FindTopDocuments( raw_query, document_predicate);}
+
+
+template <typename DocumentPredicate, typename Policy>
+std::vector<Document> SearchServer::FindTopDocuments(const Policy& policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
+    const auto query = ParseQuery(raw_query);
+    
+    auto matched_documents = FindAllDocuments(policy, query, document_predicate);
+    sort(policy, matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
             return lhs.rating > rhs.rating;
         } else {
@@ -160,7 +205,8 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
     return matched_documents;
 }
 
-template <typename DocumentPredicate>
+
+/*template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::sequenced_policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
     return SearchServer::FindTopDocuments( raw_query, document_predicate);}
 
@@ -182,7 +228,7 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
         matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
     }
     return matched_documents;
-}
+}*/
 
 
 template <typename DocumentPredicate>
