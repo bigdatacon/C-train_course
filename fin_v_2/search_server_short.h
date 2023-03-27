@@ -21,9 +21,11 @@
 #include "concurrent_map.h" 
 #include <mutex>
 #include <atomic>
+#include <thread>
 
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
+const unsigned int num_cpus = std::thread::hardware_concurrency();
 
 class SearchServer {
 public:
@@ -276,8 +278,8 @@ return SearchServer::FindAllDocuments(query, document_predicate);}
 
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindAllDocuments(const std::execution::parallel_policy, const Query& query, DocumentPredicate document_predicate) const {
-    int buckets = 3;
-    ConcurrentMap<int, double> document_to_relevance(buckets);   
+    //int buckets = 3;
+    ConcurrentMap<int, double> document_to_relevance(/*buckets*/ num_cpus);   
     for_each(
         std::execution::par,
         query.plus_words.begin(), query.plus_words.end(),
