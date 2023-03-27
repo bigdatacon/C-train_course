@@ -171,7 +171,7 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::paral
     //const auto query = ParseQuery(true, raw_query); // параллельную версию не вызываю так как после нее нужно делать сортировку  
     
     auto matched_documents = FindAllDocuments(std::execution::par, query, document_predicate);
-    sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
+    sort(std::execution::par, matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
         if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
             return lhs.rating > rhs.rating;
         } else {
