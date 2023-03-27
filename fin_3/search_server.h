@@ -264,10 +264,10 @@ std::vector<Document> SearchServer::FindAllDocuments(const std::execution::paral
     for_each(
         std::execution::par,
         query.plus_words.begin(), query.plus_words.end(),
-        [&,   document_predicate](auto word ) {
+        [&,   document_predicate](const auto &word  ) {
             if (word_to_document_freqs_.count(word) != 0) {
-        std::string word_str(word);
-        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word_str);
+        //std::string word_str(word);
+        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
         for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
             const auto& document_data = documents_.at(document_id);
             if (document_predicate(document_id, document_data.status, document_data.rating)) {
