@@ -72,14 +72,16 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::execution::seque
 
 
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query, DocumentStatus status) const {
-	return FindTopDocuments(raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
-		return document_status == status;
-		});
+  return FindTopDocuments(std::execution::par, raw_query, [status](int document_id, DocumentStatus document_status, int rating) {
+    return document_status == status;
+    });
 }
 
 std::vector<Document> SearchServer::FindTopDocuments(const std::execution::parallel_policy, std::string_view raw_query) const {
-	return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
+  return FindTopDocuments(std::execution::par, raw_query, DocumentStatus::ACTUAL);
 }
+
+
 
 int SearchServer::GetDocumentCount() const {
 	return static_cast<int>(documents_.size());
