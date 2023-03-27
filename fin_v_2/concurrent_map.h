@@ -34,13 +34,12 @@ public:
         return result;
     }
     
-   void Delete(const std::string& key) {
+   void Delete(const Key& key) {
     auto index = static_cast<uint64_t>(key) % bucket_count_;
-    std::map<Key, Value>& bucket = map_[index];
-
-      auto it = map_.find(key);
-      if (it != map_.end()) {
-        map_.erase(it);
+    //std::map<Key, Value>& bucket = map_[index];
+      auto it = map_[index].find(key);
+      if (it != map_[index].end()) {
+        map_[index].erase(it);
       }
     }
     
