@@ -4,7 +4,7 @@
 template <typename Key, typename Value>
 class ConcurrentMap {
 public:
-    static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
+    static_assert(std::is_integral_v<Key> /*, "ConcurrentMap supports only integer keys"s*/);
  
     struct Access {
     std::lock_guard<std::mutex> guard;
@@ -33,6 +33,17 @@ public:
         }
         return result;
     }
+    
+   void Delete(const std::string& key) {
+    auto index = static_cast<uint64_t>(key) % bucket_count_;
+    std::map<Key, Value>& bucket = map_[index];
+
+      auto it = map_.find(key);
+      if (it != map_.end()) {
+        map_.erase(it);
+      }
+    }
+    
  
 private:
     std::vector<std::mutex> mtx_;
