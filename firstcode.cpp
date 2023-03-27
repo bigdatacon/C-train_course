@@ -1,39 +1,50 @@
-template <typename Key, typename Value>
-class ConcurrentMap {
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class MoneyBox {
 public:
-    static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
- 
-    struct Access {
-    std::lock_guard<std::mutex> guard;
-    Value& ref_to_value;
-    };
- 
-    explicit ConcurrentMap(size_t bucket_count)
-    :
-    mtx_(bucket_count),
-    map_(bucket_count),
-    bucket_count_(bucket_count)
-    {
+    explicit MoneyBox(vector<int64_t> nominals)
+        : nominals_(move(nominals))
+        , counts_(nominals_.size()) {
     }
- 
-    Access operator[](const Key& key){
-    auto index = static_cast<uint64_t>(key) % bucket_count_;
-    std::map<Key, Value>& bucket = map_[index];
-        return {std::lock_guard(mtx_[index]), bucket[key]};
+
+    const vector<int>& GetCounts() const {
+        return counts_;
     }
- 
-    std::map<Key, Value> BuildOrdinaryMap(){
-        std::map<Key, Value> result;
-        for (int i = 0; i < bucket_count_; ++i){
-            std::lock_guard guard_(mtx_[i]);
-    result.insert(map_[i].begin(), map_[i].end());
-        }
-        return result;
+
+    void PushCoin(int64_t value) {
+        // реализуйте метод добавления купюры или монеты
     }
- 
+
+    void PrintCoins(ostream& out) const {
+        // реализуйте метод печати доступных средств
+    }
+
 private:
-    std::vector<std::mutex> mtx_;
-    std::vector<std::map<Key, Value>> map_;
-    //std::mutex mtx_;
-    int bucket_count_;
+    const vector<int64_t> nominals_;
+    vector<int> counts_;
 };
+
+ostream& operator<<(ostream& out, const MoneyBox& cash) {
+    cash.PrintCoins(out);
+    return out;
+}
+
+int main() {
+    MoneyBox cash({10, 50, 100, 200, 500, 1000, 2000, 5000});
+
+    int times;
+    cout << "Enter number of coins you have:"s << endl;
+    cin >> times;
+
+    cout << "Enter all nominals:"s << endl;
+    for (int i = 0; i < times; ++i) {
+        int64_t value;
+        cin >> value;
+        cash.PushCoin(value);
+    }
+
+    cout << cash << endl;
+}
