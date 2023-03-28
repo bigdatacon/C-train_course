@@ -66,6 +66,9 @@ ostream& operator<<(ostream& out, VehiclePlate plate) {
 }
 /*В класс VehiclePlateHasher добавьте поле класса hash<string> hasher_. Чтобы вычислить хеш строки, его можно использовать так: hasher_("abc"s).
 Примените хешер к строковому представлению номера для вычисления его хеша.*/
+
+
+
 class VehiclePlateHasher {
 public:
     size_t operator()(const VehiclePlate& plate) const {
@@ -73,8 +76,7 @@ public:
         // рекомендуется использовать метод ToString() и существующий 
         // //return static_cast<size_t>(plate.Hash());
         // класс hash<string>
-        std::hash<std::string> hasher;
-        return hasher(plate.ToString());
+        return hasher_(plate.ToString());
         
     }
 private: 
@@ -107,6 +109,7 @@ private:
     // для хранения данных используйте контейнер unordered_map
     // назовите поле класса car_to_parks_
     unordered_map<VehiclePlate, int, VehiclePlateHasher> car_to_parks_;
+
     //unordered_map<size_t, int, VehiclePlateHasher> car_to_parks_;  -- так не работает 
     
 };
