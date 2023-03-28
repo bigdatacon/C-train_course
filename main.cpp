@@ -1,191 +1,130 @@
-#include <algorithm>
-#include <cstdlib>
-#include <future>
-#include <map>
-#include <numeric>
-#include <random>
+#include <array>
+#include <iomanip>
+#include <iostream>
+#include <optional>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <mutex>
 
 
-#include "log_duration.h"
-#include "test_framework.h"
 using namespace std;
-using namespace std::string_literals;
-
-
-template <typename Key, typename Value>
-class ConcurrentMap {
-public:
-	static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
-
-	struct Access {
-		std::lock_guard<std::mutex> guard;
-		Value& ref_to_value;
-	};
-
-	explicit ConcurrentMap(size_t bucket_count)
-		:
-		mtx_(bucket_count),
-		map_(bucket_count),
-		bucket_count_(bucket_count)
-	{
-	}
-
-	Access operator[](const Key& key) {
-		auto index = static_cast<uint64_t>(key) % bucket_count_;
-		std::map<Key, Value>& bucket = map_[index];
-		return { std::lock_guard(mtx_[index]), bucket[key] };
-	}
-
-	std::map<Key, Value> BuildOrdinaryMap() {
-		std::map<Key, Value> result;
-		for (int i = 0; i < bucket_count_; ++i) {
-			std::lock_guard guard_(mtx_[i]);
-			result.insert(map_[i].begin(), map_[i].end());
-		}
-		return result;
-	}
-
-private:
-	std::vector<std::mutex> mtx_;
-	std::vector<std::map<Key, Value>> map_;
-	//std::mutex mtx_;
-	int bucket_count_;
-};
 
 /*
-template <typename Key, typename Value>
-class ConcurrentMap {
+Используйте в классе HashableContainer одно поле типа vector<vector<T>>.
+operator== для класса VehiclePlate должен проверять равенство всех компонентов номера.
+При добавлении номера примените алгоритм find, чтобы выяснить, дублируется ли он.
+*/
+
+class VehiclePlate {
 public:
-	static_assert(std::is_integral_v<Key>, "ConcurrentMap supports only integer keys"s);
+    VehiclePlate(char l0, char l1, int digits, char l2, int region)
+        : letters_{ l0, l1, l2 }
+        , digits_(digits)
+        , region_(region) {
+    }
 
-	explicit ConcurrentMap(size_t bucket_count)
-	
-		:locks_(bucket_count)
-		, sub_maps_(bucket_count)// определаю размер вектора mutex_ов 
-		, count_(bucket_count)
-	{
+    string ToString() const {
+        ostringstream out;
+        out << letters_[0] << letters_[1];
+        // чтобы дополнить цифровую часть номера слева нулями
+        // до трёх цифр, используем подобные манипуляторы:
+        // setfill задаёт символ для заполнения,
+        // right задаёт выравнивание по правому краю,
+        // setw задаёт минимальное желаемое количество знаков
+        out << setfill('0') << right << setw(3) << digits_;
+        out << letters_[2] << setw(2) << region_;
 
-	}
+        return out.str();
+    }
 
-	struct Access {
-		Value& ref_to_value;
-		lock_guard<mutex> guard;
-	};
+    int Hash() const {
+        return digits_;
+    }
 
-
-	Access operator[](const Key& key) {
-		unsigned int i_l = key % sub_maps_.size();
-		std::map<Key, Value>& result = sub_maps_[i_l];
-		return { result[key], lock_guard(locks_[i_l]) };
-
-	}
-
-	std::map<Key, Value> BuildOrdinaryMap() {
-		std::map<Key, Value> result;
-		for (int i = 0; i < count_; ++i) {
-			lock_guard guard(locks_[i]);  // выставляю мютекс по индексу подсловаря 
-			result.insert(sub_maps_[i].begin(), sub_maps_[i].end());
-		}
-		return result;
-	}
+    bool operator==(const VehiclePlate& other) const {
+        return ToString()[0] == other.ToString()[0]
+            && ToString()[1] == other.ToString()[1]
+            && ToString()[2] == other.ToString()[2]
+            && ToString()[3] == other.ToString()[3]
+            && ToString()[4] == other.ToString()[4]
+            && ToString()[5] == other.ToString()[5];
+    }
 
 
 private:
-	std::vector<std::map<Key, Value>> sub_maps_;
-	std::vector<std::mutex> locks_;
-	mutex m_;
-	int count_;
+    array<char, 3> letters_;
+    int digits_;
+    int region_;
 };
-*/
 
-using namespace std;
-
-void RunConcurrentUpdates(ConcurrentMap<int, int>& cm, size_t thread_count, int key_count) {
-	auto kernel = [&cm, key_count](int seed) {
-		vector<int> updates(key_count);
-		iota(begin(updates), end(updates), -key_count / 2);
-		shuffle(begin(updates), end(updates), mt19937(seed));
-
-		for (int i = 0; i < 2; ++i) {
-			for (auto key : updates) {
-				++cm[key].ref_to_value;
-			}
-		}
-	};
-
-	vector<future<void>> futures;
-	for (size_t i = 0; i < thread_count; ++i) {
-		futures.push_back(async(kernel, i));
-	}
+ostream& operator<<(ostream& out, VehiclePlate plate) {
+    out << plate.ToString();
+    return out;
 }
 
-void TestConcurrentUpdate() {
-	constexpr size_t THREAD_COUNT = 3;
-	constexpr size_t KEY_COUNT = 50000;
+bool operator == (const& VehiclePlate l, const& VehiclePlate r) {
+    return ( l.ToString()[0] == r.ToString()[0] )
+        && (l.ToString()[1] == r.ToString()[1])
+    && (l.ToString()[2] == r.ToString()[2])
+    && (l.ToString()[3] == r.ToString()[3])
+    && (l.ToString()[4] == r.ToString()[4])
+    && (l.ToString()[5] == r.ToString()[5]);
+    //&& {l.[6] == r[6]}
+    //&& {l.[0] == r[0]}
 
-	ConcurrentMap<int, int> cm(THREAD_COUNT);
-	RunConcurrentUpdates(cm, THREAD_COUNT, KEY_COUNT);
-
-	const auto result = cm.BuildOrdinaryMap();
-	ASSERT_EQUAL(result.size(), KEY_COUNT);
-	for (auto& [k, v] : result) {
-		AssertEqual(v, 6, "Key = " + to_string(k));
-	}
 }
 
-void TestReadAndWrite() {
-	ConcurrentMap<size_t, string> cm(5);
+template <typename T>
+class HashableContainer {
+public:
+    void Insert(T elem) {
+        int index = elem.Hash();
 
-	auto updater = [&cm] {
-		for (size_t i = 0; i < 50000; ++i) {
-			cm[i].ref_to_value.push_back('a');
-		}
-	};
-	auto reader = [&cm] {
-		vector<string> result(50000);
-		for (size_t i = 0; i < result.size(); ++i) {
-			result[i] = cm[i].ref_to_value;
-		}
-		return result;
-	};
+        // если вектор недостаточно велик для этого индекса,
+        // то увеличим его, выделив место с запасом
+        if (index >= int(elements_.size())) {
+            elements_.resize(index * 2 + 1);
+        }
 
-	auto u1 = async(updater);
-	auto r1 = async(reader);
-	auto u2 = async(updater);
-	auto r2 = async(reader);
+        auto it = std::find(elements_[index].begin(), elements_[index].end(), elem);
+        if (it == = elements_[index].end()) {
+            elements_[index] = move(elem);
+        }
 
-	u1.get();
-	u2.get();
 
-	for (auto f : { &r1, &r2 }) {
-		auto result = f->get();
-		ASSERT(all_of(result.begin(), result.end(), [](const string& s) {
-			return s.empty() || s == "a" || s == "aa";
-			}));
-	}
-}
+        void PrintAll(ostream & out) const {
+            for (auto& e : elements_) {
+                if (!e.has_value()) {
+                    continue;
+                }
+                out << e.value() << endl;
+            }
+        }
 
-void TestSpeedup() {
-	{
-		ConcurrentMap<int, int> single_lock(1);
+        const auto& GetVector() const {
+            return elements_;
+        }
 
-		LOG_DURATION("Single lock");
-		RunConcurrentUpdates(single_lock, 4, 50000);
-	}
-	{
-		ConcurrentMap<int, int> many_locks(100);
+private:
+    //vector<optional<T>> elements_;
+    vector<vector<T>> elements_;
+    };
 
-		LOG_DURATION("100 locks");
-		RunConcurrentUpdates(many_locks, 4, 50000);
-	}
-}
+    int main() {
+        HashableContainer<VehiclePlate> plate_base;
+        plate_base.Insert({ 'B', 'H', 840, 'E', 99 });
+        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
+        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
+        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
+        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
+        plate_base.Insert({ 'H', 'E', 968, 'C', 79 });
+        plate_base.Insert({ 'T', 'A', 326, 'X', 83 });
+        plate_base.Insert({ 'H', 'H', 831, 'P', 116 });
+        plate_base.Insert({ 'P', 'M', 884, 'K', 23 });
+        plate_base.Insert({ 'O', 'C', 34, 'P', 24 });
+        plate_base.Insert({ 'M', 'Y', 831, 'M', 43 });
+        plate_base.Insert({ 'K', 'T', 478, 'P', 49 });
+        plate_base.Insert({ 'X', 'P', 850, 'A', 50 });
 
-int main() {
-	TestRunner tr;
-	RUN_TEST(tr, TestConcurrentUpdate);
-	RUN_TEST(tr, TestReadAndWrite);
-	RUN_TEST(tr, TestSpeedup);
-}
+        plate_base.PrintAll(cout);
+    }
