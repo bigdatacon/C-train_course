@@ -70,7 +70,7 @@ ostream& operator<<(ostream& out, VehiclePlate plate) {
 
 
 
-bool operator==(const VehiclePlate& l, const VehiclePlate& r) {
+/*bool operator==(const VehiclePlate& l, const VehiclePlate& r) {
     return  l.ToString()[0] == r.ToString()[0] 
         && l.ToString()[1] == r.ToString()[1]
     && l.ToString()[2] == r.ToString()[2]
@@ -80,7 +80,7 @@ bool operator==(const VehiclePlate& l, const VehiclePlate& r) {
     //&& {l.[6] == r[6]}
     //&& {l.[0] == r[0]}
 
-}
+}*/
 
 template <typename T>
 class HashableContainer {
@@ -102,9 +102,22 @@ public:
         if (find(vec.begin(), vec.end(), elem) == vec.end()) {
             vec.push_back(elem);
         }
+    }
+
+        
+        void PrintAll(ostream& out) const {
+            for (auto& e : elements_) {
+                if (e.empty()) {
+                    continue;
+                }
+                for (auto& elem : e) {
+                    out << elem << endl;
+                }
+            }
+        }
 
 
-        void PrintAll(ostream & out) const {
+        /*void PrintAll(ostream& out) const {
             for (auto& e : elements_) {
                 if (!e.has_value()) {
                     continue;
@@ -115,7 +128,7 @@ public:
 
         const auto& GetVector() const {
             return elements_;
-        }
+        }*/
 
 private:
     //vector<optional<T>> elements_;
