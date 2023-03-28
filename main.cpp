@@ -94,9 +94,13 @@ public:
             elements_.resize(index * 2 + 1);
         }
 
-        auto it = std::find(elements_[index].begin(), elements_[index].end(), elem);
+        /*auto it = std::find(elements_[index].begin(), elements_[index].end(), elem);
         if (it == = elements_[index].end()) {
             elements_[index] = move(elem);
+        }*/
+        auto& vec = elements_[index];
+        if (find(vec.begin(), vec.end(), elem) == vec.end()) {
+            vec.push_back(elem);
         }
 
 
