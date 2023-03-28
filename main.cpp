@@ -42,20 +42,22 @@ public:
         return digits_;
     }
 
-    bool operator==(const VehiclePlate& rhs) {
+    /*bool operator==(const VehiclePlate& rhs) {
         return letters_ == rhs.letters_ &&
             digits_ == rhs.digits_ &&
             region_ == rhs.region_;
-    }
+    }*/
 
-    /*bool operator==(const VehiclePlate& other) const {
+    bool operator==(const VehiclePlate& other) const {
         return ToString()[0] == other.ToString()[0]
             && ToString()[1] == other.ToString()[1]
             && ToString()[2] == other.ToString()[2]
             && ToString()[3] == other.ToString()[3]
             && ToString()[4] == other.ToString()[4]
             && ToString()[5] == other.ToString()[5];
-    }*/
+            //&& ToString()[6] == other.ToString()[6]
+            //&& ToString()[7] == other.ToString()[7];
+    }
 
 
 private:
@@ -136,35 +138,25 @@ private:
     vector<vector<T>> elements_;
     };
 
-    int main() {
-        HashableContainer<VehiclePlate> plate_base;
-        plate_base.Insert({ 'B', 'H', 840, 'E', 99 });
-        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
-        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
-        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
-        plate_base.Insert({ 'O', 'K', 942, 'K', 78 });
-        plate_base.Insert({ 'H', 'E', 968, 'C', 79 });
-        plate_base.Insert({ 'T', 'A', 326, 'X', 83 });
-        plate_base.Insert({ 'H', 'H', 831, 'P', 116 });
-        plate_base.Insert({ 'P', 'M', 884, 'K', 23 });
-        plate_base.Insert({ 'O', 'C', 34, 'P', 24 });
-        plate_base.Insert({ 'M', 'Y', 831, 'M', 43 });
-        plate_base.Insert({ 'K', 'T', 478, 'P', 49 });
-        plate_base.Insert({ 'X', 'P', 850, 'A', 50 });
+int main() {
+    HashableContainer<VehiclePlate> plate_base;
+    plate_base.Insert({'B','H', 840, 'E', 99});
+    plate_base.Insert({'O','K', 942, 'K', 78});
+    plate_base.Insert({'O','K', 942, 'K', 78});
+    plate_base.Insert({'O','K', 942, 'K', 78});
+    plate_base.Insert({'O','K', 942, 'K', 78});
+    plate_base.Insert({'H','E', 968, 'C', 79});
+    plate_base.Insert({'T','A', 326, 'X', 83});
+    plate_base.Insert({'H','H', 831, 'P', 116});
+    plate_base.Insert({'A','P', 831, 'Y', 99});
+    plate_base.Insert({'P','M', 884, 'K', 23});
+    plate_base.Insert({'O','C', 34, 'P', 24});
+    plate_base.Insert({'M','Y', 831, 'M', 43});
+    plate_base.Insert({'B','P', 831, 'M', 79});
+    plate_base.Insert({'K','T', 478, 'P', 49});
+    plate_base.Insert({'X','P', 850, 'A', 50});
 
-        plate_base.PrintAll(cout);
-    }
- /*
-    OC034P24
-TA326X83
-KT478P49
-HH831P116
-AP831Y99
-MY831M43
-BP831M79
-BH840E99
-XP850A50
-PM884K23
-OK942K78
-HE968C79
-    */
+    plate_base.PrintAll(cout);
+}
+
+  
