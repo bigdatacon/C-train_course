@@ -70,17 +70,17 @@ ostream& operator<<(ostream& out, VehiclePlate plate) {
 
 
 
-/*bool operator == (const& VehiclePlate l, const& VehiclePlate r) {
-    return ( l.ToString()[0] == r.ToString()[0] )
-        && (l.ToString()[1] == r.ToString()[1])
-    && (l.ToString()[2] == r.ToString()[2])
-    && (l.ToString()[3] == r.ToString()[3])
-    && (l.ToString()[4] == r.ToString()[4])
-    && (l.ToString()[5] == r.ToString()[5]);
+bool operator==(const VehiclePlate& l, const VehiclePlate& r) {
+    return  l.ToString()[0] == r.ToString()[0] 
+        && l.ToString()[1] == r.ToString()[1]
+    && l.ToString()[2] == r.ToString()[2]
+    && l.ToString()[3] == r.ToString()[3]
+    && l.ToString()[4] == r.ToString()[4]
+    && l.ToString()[5] == r.ToString()[5];
     //&& {l.[6] == r[6]}
     //&& {l.[0] == r[0]}
 
-}*/
+}
 
 template <typename T>
 class HashableContainer {
