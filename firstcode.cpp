@@ -120,7 +120,7 @@ public:
     static void SetNow(int seconds) {
         current_time_ = seconds;
     }
-
+ 
     static time_point now() {
         return start_point_ + chrono::seconds(current_time_);
     }
