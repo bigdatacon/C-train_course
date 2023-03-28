@@ -41,6 +41,12 @@ public:
         return digits_;
     }
 
+    /*bool operator==(const VehiclePlate& rhs) {
+        return letters_ == rhs.letters_ &&
+            digits_ == rhs.digits_ &&
+            region_ == rhs.region_;
+    }*/
+
     bool operator==(const VehiclePlate& other) const {
         return ToString()[0] == other.ToString()[0]
             && ToString()[1] == other.ToString()[1]
@@ -62,7 +68,9 @@ ostream& operator<<(ostream& out, VehiclePlate plate) {
     return out;
 }
 
-bool operator == (const& VehiclePlate l, const& VehiclePlate r) {
+
+
+/*bool operator == (const& VehiclePlate l, const& VehiclePlate r) {
     return ( l.ToString()[0] == r.ToString()[0] )
         && (l.ToString()[1] == r.ToString()[1])
     && (l.ToString()[2] == r.ToString()[2])
@@ -72,7 +80,7 @@ bool operator == (const& VehiclePlate l, const& VehiclePlate r) {
     //&& {l.[6] == r[6]}
     //&& {l.[0] == r[0]}
 
-}
+}*/
 
 template <typename T>
 class HashableContainer {
