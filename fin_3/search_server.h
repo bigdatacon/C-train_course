@@ -177,11 +177,6 @@ std::vector<Document> SearchServer::FindTopDocuments( std::string_view raw_query
 }
 
 template <typename DocumentPredicate, typename Policy>
-std::vector<Document> SearchServer::FindTopDocuments(const Policy&, std::string_view raw_query, DocumentPredicate document_predicate) const {
-    return SearchServer::FindTopDocuments( raw_query, document_predicate);}
-
-
-template <typename DocumentPredicate, typename Policy>
 std::vector<Document> SearchServer::FindTopDocuments(const Policy& policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
     const auto query = ParseQuery(raw_query);
     
@@ -199,6 +194,16 @@ std::vector<Document> SearchServer::FindTopDocuments(const Policy& policy, std::
     }
     return matched_documents;
 }
+
+template <typename DocumentPredicate, typename Policy>
+std::vector<Document> SearchServer::FindTopDocuments(const Policy& policy, std::string_view raw_query, DocumentPredicate document_predicate) const {
+    if (!is_same_v<decay_t<Policy>, execution::parallel_policy >){ return FindTopDocuments( raw_query, document_predicate) ;}
+    else {return FindTopDocuments(policy, raw_query, document_predicate) ;}
+    
+    }
+
+
+
 
 
 /*template <typename DocumentPredicate>
