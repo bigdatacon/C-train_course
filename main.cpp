@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 
 using namespace std;
@@ -41,20 +42,20 @@ public:
         return digits_;
     }
 
-    /*bool operator==(const VehiclePlate& rhs) {
+    bool operator==(const VehiclePlate& rhs) {
         return letters_ == rhs.letters_ &&
             digits_ == rhs.digits_ &&
             region_ == rhs.region_;
-    }*/
+    }
 
-    bool operator==(const VehiclePlate& other) const {
+    /*bool operator==(const VehiclePlate& other) const {
         return ToString()[0] == other.ToString()[0]
             && ToString()[1] == other.ToString()[1]
             && ToString()[2] == other.ToString()[2]
             && ToString()[3] == other.ToString()[3]
             && ToString()[4] == other.ToString()[4]
             && ToString()[5] == other.ToString()[5];
-    }
+    }*/
 
 
 private:
@@ -153,3 +154,17 @@ private:
 
         plate_base.PrintAll(cout);
     }
+ /*
+    OC034P24
+TA326X83
+KT478P49
+HH831P116
+AP831Y99
+MY831M43
+BP831M79
+BH840E99
+XP850A50
+PM884K23
+OK942K78
+HE968C79
+    */
