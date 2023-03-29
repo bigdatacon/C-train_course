@@ -14,6 +14,9 @@ using namespace std;
 Где можно используйте move для слов
 */
 
+
+
+
 template <typename Hash>
 int FindCollisions(const Hash& hasher, istream& text) {
     // место для вашей реализации
@@ -28,7 +31,7 @@ int FindCollisions(const Hash& hasher, istream& text) {
         }
         else {
             ++colision;
-            res[hash_string].insert(move(word));
+            //res[hash_string].insert(move(word));
         }
 
     }
