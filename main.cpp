@@ -7,35 +7,30 @@
 
 using namespace std;
 
-/*
-Читайте слова из потока в переменную string word таким образом: while (text >> word)
-Создайте ассоциативный контейнер, который будет хранить слова по хешу
-Подойдёт unordered_map<size_t, unordered_set<string>>
-Если для хеша есть слово, и вы нашли другое, возникает коллизия
-Где можно используйте move для слов
-*/
-
 template <typename Hash>
 int FindCollisions(const Hash& hasher, istream& text) {
-    // место для вашей реализации
     int colision = 0;
     unordered_map<size_t, unordered_set<string>> res;
 
     string word;
     while (text >> word) {
-        if (word.empty()) { break; }
+        //if (word.empty()) { break; }
         size_t hash_string = hasher(word);
-        if (!res.count(hash_string)) {
+        res[hash_string].insert(move(word));
+        if (res[hash_string].size() !=1) {++colision;}
+        
+        
+        /*if (!res.count(hash_string)) {
             res[hash_string].insert(move(word));
         }
         else {
             ++colision;
-            //res[hash_string].insert(move(word));
-        }
+        }*/
 
     }
     return colision;
 }
+
 
 // Это плохой хешер. Его можно использовать для тестирования.
 // Подумайте, в чём его недостаток
@@ -54,28 +49,3 @@ int main() {
     int collisions = FindCollisions(str_hasher, cin);
     cout << "Found collisions: "s << collisions << endl;
 }
-
-// тестировочный код
-
-/*struct DummyHash {
-    size_t operator()(const string&) const {
-        return 42;
-    }
-};
-
-int main() {
-    DummyHash dummy_hash;
-    hash<string> good_hash;
-
-    {
-        istringstream stream("I love C++"s);
-        cout << FindCollisions(dummy_hash, stream) << endl;
-    }
-    {
-        istringstream stream("I love C++"s);
-        cout << FindCollisions(good_hash, stream) << endl;
-    }
-}*/
-
-
-
