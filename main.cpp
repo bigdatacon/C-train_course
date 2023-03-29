@@ -14,9 +14,6 @@ using namespace std;
 Где можно используйте move для слов
 */
 
-
-
-
 template <typename Hash>
 int FindCollisions(const Hash& hasher, istream& text) {
     // место для вашей реализации
@@ -55,3 +52,28 @@ int main() {
     int collisions = FindCollisions(str_hasher, cin);
     cout << "Found collisions: "s << collisions << endl;
 }
+
+// тестировочный код
+/*
+struct DummyHash {
+    size_t operator()(const string&) const {
+        return 42;
+    }
+};
+
+int main() {
+    DummyHash dummy_hash;
+    hash<string> good_hash;
+
+    {
+        istringstream stream("I love C++"s);
+        cout << FindCollisions(dummy_hash, stream) << endl;
+    }
+    {
+        istringstream stream("I love C++"s);
+        cout << FindCollisions(good_hash, stream) << endl;
+    }
+}
+
+
+*/
