@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -22,6 +23,7 @@ int FindCollisions(const Hash& hasher, istream& text) {
 
     string word;
     while (text >> word) {
+        if (word.empty()) { break; }
         size_t hash_string = hasher(word);
         if (!res.count(hash_string)) {
             res[hash_string].insert(move(word));
@@ -47,15 +49,15 @@ struct HasherDummy {
     }
 };
 
-int main() {
+/*int main() {
     hash<string> str_hasher;
     int collisions = FindCollisions(str_hasher, cin);
     cout << "Found collisions: "s << collisions << endl;
-}
+}*/
 
 // тестировочный код
-/*
-struct DummyHash {
+
+/*struct DummyHash {
     size_t operator()(const string&) const {
         return 42;
     }
@@ -73,7 +75,7 @@ int main() {
         istringstream stream("I love C++"s);
         cout << FindCollisions(good_hash, stream) << endl;
     }
-}
+}*/
 
 
-*/
+
