@@ -49,11 +49,11 @@ struct HasherDummy {
     }
 };
 
-/*int main() {
+int main() {
     hash<string> str_hasher;
     int collisions = FindCollisions(str_hasher, cin);
     cout << "Found collisions: "s << collisions << endl;
-}*/
+}
 
 // тестировочный код
 
