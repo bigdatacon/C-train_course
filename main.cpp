@@ -76,13 +76,15 @@ public:
 	}
 
 	void Withdraw(const VehiclePlate& car) {
-		auto it = now_parked_.find(car);
-		if (it != now_parked_.end()) {
-			auto end_time = Clock::now();
-			auto duration_time = end_time - now_parked_.at(car);
-			complete_parks_[car] += duration_time; // тут не в секундах , увеличиваю время в завершенных парковках не время текущей парковки которая закончилась
-			now_parked_.erase(car); // удаление элемента по ключу
+		if (now_parked_.count(car)==0) {
+			throw ParkingException();
 		}
+		else {
+			complete_parks_[car] += Clock::now()- now_parked_.at(car);
+			now_parked_.erase(car); // удаление элемента по ключу
+
+		}
+
 	}
 
 	// получить счёт за конкретный автомобиль
