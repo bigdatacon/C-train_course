@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <algorithm>
 
 using namespace std;
 
@@ -21,13 +22,13 @@ int FindCollisions(const Hash& hasher, istream& text) {
 
     string word;
     while (text >> word) {
-        unordered_set<string> words;
-        if (!res.count(hasher)) {
-            res[hasher].insert(std::move(word));
+        size_t hash_string = hasher(word);
+        if (!res.count(hash_string)) {
+            res[hash_string].insert(move(word));
         }
         else {
             ++colision;
-            res[hasher].insert(std::move(word));
+            res[hash_string].insert(move(word));
         }
 
     }
