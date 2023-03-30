@@ -24,19 +24,22 @@ void DeleteTree(TreeNode<T>* node) {
 }
 
 template <typename T>
-bool CheckTreeProperty(const TreeNode<T>* node , const T* min, const T* max) {
+bool CheckTreeProperty(const TreeNode<T>* node, const T* min, const T* max) {
 	if (!node) {
 		return true;
 	}
 	if (node->value < *min || node->value > *max) {
 		return false;
 	}
-	return CheckTreeProperty(node->left, nullptr, &(node->value)) && CheckTreeProperty(node->right, node->value, nullptr);
+
+	const T* el = nullptr;
+
+	return CheckTreeProperty(node->left, el, &(node->value)) && CheckTreeProperty(node->right, &(node->value), el);
 }
 
 template <typename T>
 bool CheckTreeProperty(const TreeNode<T>* node) {
-	return
+	return !node ||
 		CheckTreeProperty(node, &(node->left->value), &(node->right->value));
 
 }
@@ -75,7 +78,7 @@ int main() {
 
 
 
-	T* root6_5 = new T{100,
+	T* root6_5 = new T{ 100,
 		new T { 80, new T{60}, new T{350, new T{40}, new  T {550}} } , new T {800} };
 	assert(CheckTreeProperty(root6_5));
 
@@ -95,7 +98,7 @@ int main() {
 
 	T* root9 = new T{ 100,
 	new T{80, new T{60, new T {40} , new T {100}}, new T{700}} , new T {800, new T{100} , new T {1500}} }; //значение в левой ветке равное корню 
-		assert(CheckTreeProperty(root9));
+	assert(CheckTreeProperty(root9));
 
 
 	DeleteTree(root1);
