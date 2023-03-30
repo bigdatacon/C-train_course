@@ -1,51 +1,75 @@
+#include <cassert>
+#include <stack>
 #include <iostream>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <algorithm>
-#include <sstream>
 
 using namespace std;
 
-template <typename Hash>
-int FindCollisions(const Hash& hasher, istream& text) {
-    int colision = 0;
-    unordered_map<size_t, unordered_set<string>> res;
 
-    string word;
-    while (text >> word) {
-        //if (word.empty()) { break; }
-        size_t hash_string = hasher(word);
-        res[hash_string].insert(move(word));
-        if (res[hash_string].size() !=1) {++colision;}
-        
-        
-        /*if (!res.count(hash_string)) {
-            res[hash_string].insert(move(word));
-        }
-        else {
-            ++colision;
-        }*/
-
-    }
-    return colision;
-}
-
-
-// Это плохой хешер. Его можно использовать для тестирования.
-// Подумайте, в чём его недостаток
-struct HasherDummy {
-    size_t operator() (const string& str) const {
-        size_t res = 0;
-        for (char c : str) {
-            res += static_cast<size_t>(c);
-        }
-        return res;
-    }
+template <typename T>
+struct TreeNode {
+	T value;
+	TreeNode* left = nullptr;
+	TreeNode* right = nullptr;
 };
 
-int main() {
-    hash<string> str_hasher;
-    int collisions = FindCollisions(str_hasher, cin);
-    cout << "Found collisions: "s << collisions << endl;
-}
+
+	template <typename T>
+	void DeleteTree(TreeNode<T>* node) {
+		if (!node) {
+			return;
+		}
+		DeleteTree(node->left);
+		DeleteTree(node->right);
+		delete node;
+	}
+
+	template <typename T>
+	bool CheckTreeProperty(const TreeNode<T>* node, const T* min, const T* max) {
+		return (!min || node->value > min->value) && (!max || node->value < max->value);
+	}
+
+
+	template <typename T>
+	bool CheckTreeProperty(const TreeNode<T>* node) {
+		const TreeNode<T>* current = node;
+		stack<const TreeNode<T>*> s;
+
+		const T* left = nullptr;
+		const T* right = nullptr;
+
+		if (current != nullptr) {
+
+			left = current->left;
+			right = current->right;
+			if (CheckTreeProperty(node, left, right)) {
+				s.push(current);
+				current = current->left;
+			}
+			else { return false; }
+		}
+		else {
+			current = s.top();
+			s.pop();
+			cout << current->value << " ";
+			if (CheckTreeProperty(node, left, right)) {
+				current = current->right;
+			}
+			else { return false; }
+		}
+		return true;
+	}
+
+
+	int main() {
+		using T = TreeNode<int>;
+		T* root1 = new T{ 6,
+			new T{4, new T{3}, new T{5}}, new T{7} };
+		assert(CheckTreeProperty(root1));
+
+		T* root2 = new T{ 6,
+			new T{4, new T{3}, new T{5}}, new T{7, new T{8}} };
+		assert(!CheckTreeProperty(root2));
+
+		DeleteTree(root1);
+		DeleteTree(root2);
+	}
