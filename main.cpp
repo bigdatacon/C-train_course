@@ -24,34 +24,50 @@ void DeleteTree(TreeNode<T>* node) {
 }
 
 
+
+
 template <typename T>
 bool CheckTreeProperty(const TreeNode<T>* node, const T* min, const T* max) {
+	
 	if (!node) {
 		return true;
 	}
-	if ((min && node->value < *min) || (max && node->value > *max)) {
+	if (
+		(min && node->value < *min) || (max && node->value > *max)) {
 		return false;
 	}
+	if (   node->right!= nullptr && node->left != nullptr  ) {
+		if (node->right->value < node->left->value) { return false; }
+	}
 
+
+	return true;
 }
+
 template <typename T>
 bool CheckTreeProperty(const TreeNode<T>* node) {
-	return !node ||
-		CheckTreeProperty(node->left, &(node->left->value), &(node->value)) && CheckTreeProperty(node->right, &(node->value), &(node->right->value));
+	if (!node) { return true; }
 
+
+
+	if (!node || CheckTreeProperty(node, &(node->left->value), &(node->right->value)) ) {
+		return CheckTreeProperty(node->left) && CheckTreeProperty(node->right); }
+	else { return false; }
 }
+
+
 int main() {
 	using T = TreeNode<int>;
-	/*T* root1 = new T{6,
+	T* root1 = new T{ 6,
 		new T{4, new T{3}, new T{5}}, new T{7} };
-	assert(CheckTreeProperty(root1));*/
+	assert(CheckTreeProperty(root1));
 
-	T* root2 = new T{ 6,
+	T* root2 = new T{6,
 		new T{4, new T{3}, new T{5}}, new T{7, new T{8}} };
 	assert(!CheckTreeProperty(root2));
 
 
-	/*T* root3 = new T{6,
+	T* root3 = new T{ 6,
 	new T{4, new T{3}, new T{5}}, new T{2} };
 	assert(!CheckTreeProperty(root3));
 
@@ -93,12 +109,12 @@ int main() {
 
 	T* root9 = new T{ 100,
 	new T{80, new T{60, new T {40} , new T {100}}, new T{700}} , new T {800, new T{100} , new T {1500}} }; //значение в левой ветке равное корню 
-	assert(CheckTreeProperty(root9));*/
+	assert(CheckTreeProperty(root9));
 
 
-	//DeleteTree(root1);
+	DeleteTree(root1);
 	DeleteTree(root2);
-	/*DeleteTree(root3);
+	DeleteTree(root3);
 	DeleteTree(root4);
 	DeleteTree(root5);
 	DeleteTree(root6);
@@ -106,6 +122,6 @@ int main() {
 	DeleteTree(root7_5);
 	DeleteTree(root6_5);
 	DeleteTree(root8);
-	DeleteTree(root9);*/
+	DeleteTree(root9);
 
 }
