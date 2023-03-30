@@ -31,7 +31,7 @@ bool CheckTreeProperty(const TreeNode<T>* node , const T* min, const T* max) {
 	if (node->value < *min || node->value > *max) {
 		return false;
 	}
-	return CheckTreeProperty(node, nullptr, &(node->value)) && CheckTreeProperty(node, node->value, nullptr);
+	return CheckTreeProperty(node->left, nullptr, &(node->value)) && CheckTreeProperty(node->right, node->value, nullptr);
 }
 
 template <typename T>
