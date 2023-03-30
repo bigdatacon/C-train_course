@@ -25,7 +25,7 @@ void DeleteTree(TreeNode<T>* node) {
 
 template <typename T>
 bool CheckTreeProperty(const TreeNode<T>* node , const T* min, const T* max) {
-	if (node == NULL) {
+	if (!node) {
 		return true;
 	}
 	if (node->value < *min || node->value > *max) {
