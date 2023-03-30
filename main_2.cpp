@@ -25,21 +25,16 @@ struct TreeNode {
 
 	template <typename T>
 	bool CheckTreeProperty(const TreeNode<T>* node, const T* min, const T* max) {
-		if (node != nullptr) {
-			return (!min || node->value > *min) && (!max || node->value < *max);
-		}
-		else { return false; }
+		return (! (node->left) || node->value > *min) && (! (node->right) || node->value < *max);
+
 	}
+
 
 	template <typename T>
 	bool CheckTreeProperty(const TreeNode<T>* node) {
-		auto min = nullptr;
-		auto max = nullptr;
-		if (node != nullptr) {
-			return	CheckTreeProperty(node, &(node->left->value), &(node->right->value)) &&
-				CheckTreeProperty(node->left) && CheckTreeProperty(node->right);
-		}
-		else { return false; }
+			return	 CheckTreeProperty(node, &(node->left->value), &(node->right->value))  &&
+				 CheckTreeProperty(node->left) && CheckTreeProperty(node->right) ;
+
 	}
 
 	int main() {
