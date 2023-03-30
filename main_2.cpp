@@ -25,55 +25,22 @@ struct TreeNode {
 
 	template <typename T>
 	bool CheckTreeProperty(const TreeNode<T>* node, const T* min, const T* max) {
-		return (!min || node->value > *min) && (!max || node->value < *max);
+		if (node != nullptr) {
+			return (!min || node->value > *min) && (!max || node->value < *max);
+		}
+		else { return false; }
 	}
 
-	/*template <typename T>
-	bool CheckTreeProperty(const TreeNode<T>* node, const TreeNode<T>* min = nullptr, const TreeNode<T>* max = nullptr) {
-	
-	}*/
 	template <typename T>
 	bool CheckTreeProperty(const TreeNode<T>* node) {
 		auto min = nullptr;
 		auto max = nullptr;
-		return	CheckTreeProperty(node, &(node->left->value) , &(node->right->value)) &&
-			
-			//(!min || node->value > node->left->value ) && (!max || node->value < node->right->value ) &&
-			CheckTreeProperty(node->left) && CheckTreeProperty(node->right);
+		if (node != nullptr) {
+			return	CheckTreeProperty(node, &(node->left->value), &(node->right->value)) &&
+				CheckTreeProperty(node->left) && CheckTreeProperty(node->right);
+		}
+		else { return false; }
 	}
-
-
-
-	/*template <typename T>
-	bool CheckTreeProperty(const TreeNode<T>* node) {
-		const TreeNode<T>* current = node;
-		stack<const TreeNode<T>*> s;
-
-		const T* left = nullptr;
-		const T* right = nullptr;
-
-		if (current != nullptr) {
-
-			left = current->left;
-			right = current->right;
-			if (CheckTreeProperty(node, left, right)) {
-				s.push(current);
-				current = current->left;
-			}
-			else { return false; }
-		}
-		else {
-			current = s.top();
-			s.pop();
-			cout << current->value << " ";
-			if (CheckTreeProperty(node, left, right)) {
-				current = current->right;
-			}
-			else { return false; }
-		}
-		return true;
-	}*/
-
 
 	int main() {
 		using T = TreeNode<int>;
