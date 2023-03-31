@@ -4,10 +4,16 @@
 #include <numeric>
 #include <vector>
 
+
+
 // не меняйте файлы json.h и json.cpp
 #include "json.h"
 
 using namespace std;
+
+
+
+
 
 struct Spending {
     string category;
@@ -46,13 +52,20 @@ vector<Spending> LoadFromJson(istream& input) {
     as_array_ = first.GetRoot().AsArray();
     for (auto el : as_array_) {
         auto maps = el.AsMap(); // получаю доступ к внутреннему словарю
-        for (auto el_it : maps) {
+
+        //auto it = maps.begin(); // получаем итератор на первую пару в словаре
+        //std::cout << "First key: " << maps.GetRoot().AsInt() << std::endl;
+        //std::cout << "First value: " << it->second << std::endl;
+
+
+
+        /*for (auto el_it : maps) {
             // заполняю vector<Spending> res структурами
             Spending sp;
             sp.category = el_it.AsString();
             sp.amount = el_it.AsInt();
             res.push_back(sp);
-        }
+        }*/
     }
     // ниже не работает
     //auto maps = as_array_.AsMap();
