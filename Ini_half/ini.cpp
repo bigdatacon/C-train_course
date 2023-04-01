@@ -39,10 +39,6 @@ namespace ini {
             return it->second;
         }
 
-        std::size_t Document::GetSectionCount() const {
-            return sections_.size();
-        }
-    
         
 
         //private:
