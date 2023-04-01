@@ -91,17 +91,19 @@ namespace ini {
                 if (pos != string::npos) {
                     auto name = line.substr(0, pos); // обрезаю строку для ключа 
                     auto raw_val = line.substr(pos); // обрезаю строку со значением до конца
+                    size_t pos_2 = raw_val.find_first_not_of(excludedChars);
+                    size_t pos_3 = raw_val.find_last_not_of(excludedChars);
+                    if (pos_2 != string::npos && pos_3 != string::npos) {
+
+
+                        auto value = raw_val.substr(pos_2, pos_3 );
+                        doc.GetSectionSimple(current_section).emplace(name, value);
+                    }
                 }
                 
-                size_t pos_2 = raw_val.find_first_not_of(excludedChars);
-                size_t pos_3 = raw_val.find_last_not_of(excludedChars);
-
-                if (pos_2 != string::npos && pos_3 != string::npos) {
 
 
-                    auto value = raw_val.substr(pos_2, pos_3 - 1);
-                    doc.GetSectionSimple(current_section).emplace(name, value);
-                }
+
             }
         }
 
