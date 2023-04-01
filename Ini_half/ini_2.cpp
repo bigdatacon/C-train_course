@@ -30,7 +30,7 @@ namespace ini {
     std::size_t Document::GetSectionCount() const {
         return sections_.size();
     }
-    
+
     Section& Document::GetSectionSimple(const std::string& name) {
         static Section empty_section;
         empty_section.clear();
@@ -40,17 +40,17 @@ namespace ini {
         }
         return it->second;
     }
-    
 
 
-   /* void Document::AddData(const std::string& name, const std::string& key,  const std::string& value)  {
-        sections_.at(name)[key] = value;
-    }*/
+
+    /* void Document::AddData(const std::string& name, const std::string& key,  const std::string& value)  {
+         sections_.at(name)[key] = value;
+     }*/
 
 
 
     std::string RemSpace(std::string str) {
-    
+
         str.erase(std::find_if(str.rbegin(), str.rend(), [](int ch) {
             return !std::isspace(ch);
             }).base(), str.end());
@@ -69,6 +69,10 @@ namespace ini {
     Document Load(std::istream& input) {
         Document doc;
         std::string line;
+        std::string raw_val;
+        std::string name;
+        std::string value;
+
         std::string current_section;
 
         while (std::getline(input, line)) {
@@ -76,9 +80,9 @@ namespace ini {
                 continue;
             }
 
-/*
-find_first_not_of, find_last_not_of, find, substr.
-*/
+            /*
+            find_first_not_of, find_last_not_of, find, substr.
+            */
             line = RemSpace(line);
 
 
@@ -87,16 +91,21 @@ find_first_not_of, find_last_not_of, find, substr.
                 doc.AddSection(current_section);
             }
             else {
-                 size_t pos = line.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-                auto name = line.substr(0, pos-1); // обрезаю строку для ключа 
-                auto raw_val = line.substr(pos); // обрезаю строку со значением до конца
+                size_t pos = line.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                if (pos != string::npos) {
+                    auto name = line.substr(0, pos); // обрезаю строку для ключа 
+                    auto raw_val = line.substr(pos); // обрезаю строку со значением до конца
+                }
+                
+                size_t pos_2 = raw_val.find_first_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~");
+                size_t pos_3 = raw_val.find_last_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~");
 
-                size_t pos_2 = raw_val.find_first_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~"); 
-                size_t pos_3 = raw_val.find_last_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~"); 
+                if (pos_2 != string::npos && pos_3 != string::npos) {
 
-                auto value = raw_val.substr(pos_2, pos_3-1);
-                doc.GetSectionSimple(current_section).emplace(name, value);
 
+                    auto value = raw_val.substr(pos_2, pos_3 - 1);
+                    doc.GetSectionSimple(current_section).emplace(name, value);
+                }
             }
         }
 
