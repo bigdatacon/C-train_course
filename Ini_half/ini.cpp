@@ -28,6 +28,22 @@ namespace ini {
         std::size_t Document::GetSectionCount() const {
             return sections_.size();
         }
+    
+    
+        Section Document::GetSectionSimple(const std::string& name) const {
+            Section empty_section;
+            auto it = sections_.find(name);
+            if (it == sections_.end()) {
+                return empty_section;
+            }
+            return it->second;
+        }
+
+        std::size_t Document::GetSectionCount() const {
+            return sections_.size();
+        }
+    
+        
 
         //private:
         //std::unordered_map<std::string, Section> sections_;
@@ -51,7 +67,7 @@ namespace ini {
                 auto delimiter_pos = line.find('=');
                 auto name = line.substr(0, delimiter_pos);
                 auto value = line.substr(delimiter_pos + 1);
-                doc.GetSection(current_section).emplace(name, value);
+                doc.GetSectionSimple(current_section).emplace(name, value);
             }
         }
 
