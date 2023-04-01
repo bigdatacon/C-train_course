@@ -79,24 +79,15 @@ namespace ini {
             if (line.empty() || line[0] == '#') {
                 continue;
             }
-
-            /*
-            find_first_not_of, find_last_not_of, find, substr.
-            */
             line = RemSpace(line);
-
-
             if (line[0] == '[' && line[line.size() - 1] == ']') {
                 current_section = line.substr(1, line.size() - 2);
                 doc.AddSection(current_section);
             }
             else {
-                // Набор символов, которые необходимо исключить из поиска
-                std::string excludedChars = " \t\r\n\f\v!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
-
-                // Ищем первый символ, не входящий в заданный набор символов
-                size_t pos = line.find_last_not_of(excludedChars);
-
+                 std::string excludedChars = " \t\r\n\f\v!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
+                std::string inludedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                size_t pos = line.find_first_not_of(inludedChars);
                 if (pos != string::npos) {
                     auto name = line.substr(0, pos); // обрезаю строку для ключа 
                     auto raw_val = line.substr(pos); // обрезаю строку со значением до конца
