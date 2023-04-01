@@ -86,7 +86,7 @@ namespace ini {
             }
             else {
                  std::string excludedChars = " \t\r\n\f\v!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
-                std::string inludedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                std::string inludedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
                 size_t pos = line.find_first_not_of(inludedChars);
                 if (pos != string::npos) {
                     auto name = line.substr(0, pos); // обрезаю строку для ключа 
