@@ -70,9 +70,10 @@ namespace ini {
 
 
     std::string EraseFirstSpace(std::string line) {
-        if (!line.empty() && line[0] == ' ') {
+        while (!line.empty() && line[0] == ' ') {
             line.erase(0, 1);
         }
+
         return line;
     }
 
