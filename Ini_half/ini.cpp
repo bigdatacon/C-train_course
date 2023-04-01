@@ -30,24 +30,22 @@ namespace ini {
     std::size_t Document::GetSectionCount() const {
         return sections_.size();
     }
-  
-    /*Section& Document::GetSectionSimple(const std::string& name) const {
+    
+    Section& Document::GetSectionSimple(const std::string& name) {
         static Section empty_section;
+        empty_section.clear();
         auto it = sections_.find(name);
         if (it == sections_.end()) {
             return empty_section;
         }
         return it->second;
-    }*/
-
-    /*Section& Document::GetSectionSimple(const std::string& name) const {
-        Section& el = GetSection(name);
-        return el;
-    }*/
-
-    void Document::AddData(std::string& name, std::string& key,  std::string& value)  {
-        sections_.at(name)[key] = value;
     }
+    
+
+
+   /* void Document::AddData(const std::string& name, const std::string& key,  const std::string& value)  {
+        sections_.at(name)[key] = value;
+    }*/
 
 
 
@@ -78,7 +76,9 @@ namespace ini {
                 continue;
             }
 
-
+/*
+find_first_not_of, find_last_not_of, find, substr.
+*/
             line = RemSpace(line);
 
 
@@ -87,13 +87,18 @@ namespace ini {
                 doc.AddSection(current_section);
             }
             else {
-                auto delimiter_pos = line.find('=');
+                
+                std::string chars_to_exclude = " =";
+                size_t index = line.find_last_not_of(chars_to_exclude);
+                auto name = line.substr(0, index);
+                auto value = line.substr(index + 1);
+                /*auto delimiter_pos = line.find('=');
                 auto name = line.substr(0, delimiter_pos);
-                auto value = line.substr(delimiter_pos + 1);
+                auto value = line.substr(delimiter_pos + 1);*/
                 name = RemSpace(name);
                 value = EraseFirstSpace(value);
-                //doc.GetSectionSimple(current_section).emplace(name, value
-                doc.AddData(current_section, name, value);
+                doc.GetSectionSimple(current_section).emplace(name, value);
+                //doc.AddData(current_section, name, value);
             }
         }
 
