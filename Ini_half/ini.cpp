@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <algorithm>
+
 using namespace std;
 
 
@@ -28,16 +30,20 @@ namespace ini {
     std::size_t Document::GetSectionCount() const {
         return sections_.size();
     }
-
-
-    Section Document::GetSectionSimple(const std::string& name) const {
-        Section empty_section;
+  
+    /*Section& Document::GetSectionSimple(const std::string& name) const {
+        static Section empty_section;
         auto it = sections_.find(name);
         if (it == sections_.end()) {
             return empty_section;
         }
         return it->second;
-    }
+    }*/
+
+    /*Section& Document::GetSectionSimple(const std::string& name) const {
+        Section& el = GetSection(name);
+        return el;
+    }*/
 
     void Document::AddData(std::string& name, std::string& key,  std::string& value)  {
         sections_.at(name)[key] = value;
@@ -45,27 +51,12 @@ namespace ini {
 
 
 
-    //private:
-    //std::unordered_map<std::string, Section> sections_;
-//};
-/*    std::istringstream input{
-        "[vegetables]\n"
-        "potatoes=10\n"
-        "onions=1 \n"
-        "\n"
-        "cucumbers=12\n"
-        "\n"
-        "[guests] \n"
-        "guest1_name = Ivan Durak\n"
-        "guest2_name =  Vasilisa Premudraya\n"
-        "[guest black list]" };*/
-
-    std::string RemSpace(std::string line) {
-        size_t lastChar = line.find_last_not_of(" \t\n\v\f\r");
-        if (lastChar != std::string::npos) {
-            line.erase(lastChar + 1);
-        }
-        return line;
+    std::string RemSpace(std::string str) {
+    
+        str.erase(std::find_if(str.rbegin(), str.rend(), [](int ch) {
+            return !std::isspace(ch);
+            }).base(), str.end());
+        return str;
     }
 
 
