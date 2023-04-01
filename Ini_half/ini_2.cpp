@@ -91,14 +91,19 @@ namespace ini {
                 doc.AddSection(current_section);
             }
             else {
-                size_t pos = line.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                // Набор символов, которые необходимо исключить из поиска
+                std::string excludedChars = " \t\r\n\f\v!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
+
+                // Ищем первый символ, не входящий в заданный набор символов
+                size_t pos = line.find_last_not_of(excludedChars);
+
                 if (pos != string::npos) {
                     auto name = line.substr(0, pos); // обрезаю строку для ключа 
                     auto raw_val = line.substr(pos); // обрезаю строку со значением до конца
                 }
                 
-                size_t pos_2 = raw_val.find_first_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~");
-                size_t pos_3 = raw_val.find_last_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~");
+                size_t pos_2 = raw_val.find_first_not_of(excludedChars);
+                size_t pos_3 = raw_val.find_last_not_of(excludedChars);
 
                 if (pos_2 != string::npos && pos_3 != string::npos) {
 
