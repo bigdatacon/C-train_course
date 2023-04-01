@@ -15,7 +15,7 @@ namespace ini {
 
         std::size_t GetSectionCount() const;
 
-        Section GetSectionSimple(const std::string& name) const;
+        Section& GetSectionSimple(const std::string& name) const;
         void AddData( std::string& name,  std::string& key,  std::string& value) ;
 
 
