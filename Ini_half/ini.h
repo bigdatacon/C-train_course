@@ -12,7 +12,11 @@ public:
     // реализация методов должна быть в файле ini.cpp
     Section& AddSection(std::string name);
     const Section& GetSection(const std::string& name) const;
+    
     std::size_t GetSectionCount() const;
+    
+    Section GetSectionSimple(const std::string& name) const;
+    
 
 private:
     std::unordered_map<std::string, Section> sections_;
