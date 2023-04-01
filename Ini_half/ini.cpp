@@ -8,43 +8,57 @@ using namespace std;
 
 namespace ini {
     //using Section = std::unordered_map<std::string, std::string>;
-    
+
     // методы Document 
     //class Document {
         //public:
-        Section& Document::AddSection(std::string name) {
-            return sections_[std::move(name)];
+    Section& Document::AddSection(std::string name) {
+        return sections_[std::move(name)];
+    }
+
+    const Section& Document::GetSection(const std::string& name) const {
+        static const Section empty_section;
+        auto it = sections_.find(name);
+        if (it == sections_.end()) {
+            return empty_section;
         }
+        return it->second;
+    }
 
-        const Section& Document::GetSection(const std::string& name) const {
-            static const Section empty_section;
-            auto it = sections_.find(name);
-            if (it == sections_.end()) {
-                return empty_section;
-            }
-            return it->second;
+    std::size_t Document::GetSectionCount() const {
+        return sections_.size();
+    }
+
+
+    Section Document::GetSectionSimple(const std::string& name) const {
+        Section empty_section;
+        auto it = sections_.find(name);
+        if (it == sections_.end()) {
+            return empty_section;
         }
+        return it->second;
+    }
 
-        std::size_t Document::GetSectionCount() const {
-            return sections_.size();
-        }
-    
-    
-        Section Document::GetSectionSimple(const std::string& name) const {
-            Section empty_section;
-            auto it = sections_.find(name);
-            if (it == sections_.end()) {
-                return empty_section;
-            }
-            return it->second;
-        }
+    void Document::AddData(std::string& name, std::string& key,  std::string& value)  {
+        sections_.at(name)[key] = value;
+    }
 
-        
 
-        //private:
-        //std::unordered_map<std::string, Section> sections_;
-    //};
 
+    //private:
+    //std::unordered_map<std::string, Section> sections_;
+//};
+/*    std::istringstream input{
+        "[vegetables]\n"
+        "potatoes=10\n"
+        "onions=1 \n"
+        "\n"
+        "cucumbers=12\n"
+        "\n"
+        "[guests] \n"
+        "guest1_name = Ivan Durak\n"
+        "guest2_name =  Vasilisa Premudraya\n"
+        "[guest black list]" };*/
     Document Load(std::istream& input) {
         Document doc;
         std::string line;
@@ -63,7 +77,8 @@ namespace ini {
                 auto delimiter_pos = line.find('=');
                 auto name = line.substr(0, delimiter_pos);
                 auto value = line.substr(delimiter_pos + 1);
-                doc.GetSectionSimple(current_section).emplace(name, value);
+                //doc.GetSectionSimple(current_section).emplace(name, value
+                doc.AddData(current_section, name, value);
             }
         }
 
