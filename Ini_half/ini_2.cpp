@@ -88,21 +88,15 @@ find_first_not_of, find_last_not_of, find, substr.
             }
             else {
                  size_t pos = line.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-
-
                 auto name = line.substr(0, pos-1); // обрезаю строку для ключа 
                 auto raw_val = line.substr(pos); // обрезаю строку со значением до конца
 
-                size_t pos_2 = raw_val.find_first_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~"); // первый буквенный символ для значения 
-                size_t pos_3 = raw_val.find_last_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~"); // последний буквенный символ 
+                size_t pos_2 = raw_val.find_first_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~"); 
+                size_t pos_3 = raw_val.find_last_not_of("0123456789!@#$%^&*()_+-=\\|]}[{;:'\",.<>/?`~"); 
 
                 auto value = raw_val.substr(pos_2, pos_3-1);
-
                 doc.GetSectionSimple(current_section).emplace(name, value);
-                
 
-                doc.GetSectionSimple(current_section).emplace(name, value);
-                //doc.AddData(current_section, name, value);
             }
         }
 
