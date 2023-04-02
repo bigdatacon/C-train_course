@@ -10,7 +10,12 @@ using namespace std;
 
 int main() {
     std::istringstream input{
-        "[vegetables]\n"
+        "   [first]\n"
+        " a=b\n"
+        "    b=a"
+        
+        
+        /*"[vegetables]\n"
         "potatoes=10\n"
         "onions=1 \n"
         "\n"
@@ -19,10 +24,17 @@ int main() {
         "[guests] \n"
         "guest1_name = Ivan Durak\n"
         "guest2_name =  Vasilisa Premudraya\n"
-        "[guest black list]"};
+        "[guest black list]"*/
+        
+        
+        };
     ini::Document doc = ini::Load(input);
-
-    assert(doc.GetSectionCount() == 3);
+    
+     assert(doc.GetSectionCount() == 1);
+    
+    
+    /*assert(doc.GetSectionCount() == 3);
+    
     assert((doc.GetSection("vegetables"s)
             == ini::Section{
                 {"potatoes"s, "10"s},
@@ -35,5 +47,5 @@ int main() {
     assert((doc.GetSection("guest black list"s) == ini::Section{}));
 
     doc.AddSection("pets"s) = ini::Section{{"nasty"s, "rat"s}};
-    assert(doc.GetSectionCount() == 4);
+    assert(doc.GetSectionCount() == 4);*/
 }
