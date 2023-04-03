@@ -17,9 +17,9 @@ namespace aggregations {
 class /*SumAggregation*/ Sum {
 public:
     void PutValue(double value);
-    optional<double> Get() const;
+    std::optional<double> Get() const;
 
-    static string_view GetValueName() {
+    static std::string_view GetValueName() {
         return "sum"sv;
     }
 
@@ -30,22 +30,22 @@ private:
 class /*AggregateMaximum*/  Max{
 public:
     void PutValue(double value);
-    optional<double> Get() const;
+    std::optional<double> Get() const;
 
-    static string_view GetValueName() {
+    static std::string_view GetValueName() {
         return "max"sv;
     }
 
 private:
-    optional<double> cur_max_;
+    std::optional<double> cur_max_;
 };
 
 class /*AggregatorAverage*/ Mean{
 public:
     void PutValue(double value);
-    optional<double> Get() const;
+    std::optional<double> Get() const;
 
-    static string_view GetValueName() {
+    static std::string_view GetValueName() {
         return "mean"sv;
     }
 
@@ -57,9 +57,9 @@ private:
 class /*AggregStd*/ StandardDeviation {
 public:
     void PutValue(double value);
-    optional<double> Get() const;
+    std::optional<double> Get() const;
 
-    static string_view GetValueName() {
+    static std::string_view GetValueName() {
         return "standard deviation"sv;
     }
 
@@ -72,9 +72,9 @@ private:
 class Mode {
 public:
     void PutValue(double value);
-    optional<double> Get() const;
+    std::optional<double> Get() const;
 
-    static string_view GetValueName() {
+    static std::string_view GetValueName() {
         return "mode"sv;
     }
 
@@ -109,7 +109,7 @@ public:
         inner_.PutValue(value);
     }
 
-    void Print(ostream& out) const {
+    void Print(std::ostream& out) const {
         auto val = inner_.Get();
         out << inner_.GetValueName() << " is "sv;
         if (val) {
