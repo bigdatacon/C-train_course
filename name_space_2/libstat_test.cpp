@@ -94,6 +94,7 @@ void /*TestStat*/AggregMode() {
 void /*TestStat*/AggregPrinter() {
     //AggregPrinter</*Aggregate*/Max/*imum*/> printer;
     //AggregPrinter<Max> printer;  -- не работает 
+    //AggregPrinter<statistics::Max> printer; -- не работает 
     AggregPrinter<statistics::aggregations::Max> printer;
 
     assert(GetPrinterValue(printer) == "max is undefined\n"s);
