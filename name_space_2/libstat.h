@@ -6,13 +6,18 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 //using namespace std; //6.уберите using namespace std; из h-файлов,
 
-
+using namespace std::string_view_literals;
 namespace statistics {
 
 namespace aggregations {
+//using namespace std::literals;
+using namespace std::string_view_literals;
+    
+//using namespace std::literals::string_view_literals;
 
 class /*SumAggregation*/ Sum {
 public:
@@ -50,7 +55,7 @@ public:
     }
 
 private:
-    ::SumAggregation sum_;
+    /*::*/Sum/*Aggregation*/ sum_;
     size_t count_ = 0;
 };
 
@@ -64,8 +69,8 @@ public:
     }
 
 private:
-    ::SumAggregation sum_;
-    ::SumAggregation sum_sq_;
+    /*::*/Sum/*Aggregation*/ sum_;
+    /*::*/Sum/*Aggregation*/ sum_sq_;
     size_t count_ = 0;
 };
 
@@ -79,8 +84,8 @@ public:
     }
 
 private:
-    ::unordered_map<double, size_t> counts_;
-    optional<double> cur_max_;
+    std::unordered_map<double, size_t> counts_;
+    std::optional<double> cur_max_;
     size_t cur_count_ = 0;
 };
 
@@ -89,7 +94,7 @@ private:
 
 namespace tests {
     //В пространстве имён statistics::tests используйте using namespace aggregations, чтобы не прибегать каждый раз к квалификации. При этом могут возникнуть конфликты
-using namespace aggregations    
+using namespace aggregations;    
     
 
 //переименуйте тесты, убрав общий префикс TestStat, но оставив Aggreg,    
@@ -117,7 +122,7 @@ public:
         } else {
             out << "undefined"sv;
         }
-        out << endl;
+        out << std::endl;
     }
 
 private:
