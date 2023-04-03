@@ -7,7 +7,7 @@
 namespace statistics {
 namespace tests {
     //В пространстве имён statistics::tests используйте using namespace aggregations, чтобы не прибегать каждый раз к квалификации. При этом могут возникнуть конфликты
-using namespace aggregations  
+using namespace aggregations;
     
     
 namespace detail {    
