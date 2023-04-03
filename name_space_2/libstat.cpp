@@ -1,5 +1,5 @@
 #include "libstat.h"
-
+using namespace std;
 namespace statistics {
 
 namespace aggregations {
