@@ -13,8 +13,8 @@ using namespace aggregations;
 namespace detail {    
     
 template <typename T>
-string GetPrinterValue(AggregPrinter<T>& printer) {
-    ostringstream out;
+std::string GetPrinterValue(statistics::AggregPrinter<T>& printer) {
+    std::ostringstream out;
     printer.Print(out);
 
     return std::move(out).str();
@@ -22,7 +22,7 @@ string GetPrinterValue(AggregPrinter<T>& printer) {
 } // закрыт detail
 
 void /*TestStat*/AggregSum() {
-    SumAggregation aggreg;
+    Sum/*Aggregation*/ aggreg;
     assert(*aggreg.Get() == 0);
 
     aggreg.PutValue(10.);
@@ -33,7 +33,7 @@ void /*TestStat*/AggregSum() {
 }
 
 void /*TestStat*/AggregMax() {
-    AggregateMaximum aggreg;
+    /*Aggregate*/Max/*imum*/ aggreg;
     assert(!aggreg.Get());
 
     aggreg.PutValue(10.);
@@ -44,7 +44,7 @@ void /*TestStat*/AggregMax() {
 }
 
 void /*TestStat*/AggregMean() {
-    AggregatorAverage aggreg;
+    /*AggregatorAverage*/ Mean aggreg;
     assert(!aggreg.Get());
 
     aggreg.PutValue(10.);
@@ -56,7 +56,7 @@ void /*TestStat*/AggregMean() {
 }
 
 void /*TestStat*/AggregStandardDeviation() {
-    AggregStd aggreg;
+    /*AggregStd*/ StandardDeviation aggreg;
     assert(!aggreg.Get());
 
     aggreg.PutValue(10.);
@@ -92,7 +92,9 @@ void /*TestStat*/AggregMode() {
 }
 
 void /*TestStat*/AggregPrinter() {
-    AggregPrinter<AggregateMaximum> printer;
+    //AggregPrinter</*Aggregate*/Max/*imum*/> printer;
+    //AggregPrinter<Max> printer;  -- не работает 
+    AggregPrinter<statistics::aggregations::Max> printer;
 
     assert(GetPrinterValue(printer) == "max is undefined\n"s);
     printer.PutValue(10.);
