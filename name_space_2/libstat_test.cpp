@@ -5,6 +5,7 @@
 #include <sstream>
 
 namespace statistics {
+    //using namespace aggregation;
 namespace tests {
     //В пространстве имён statistics::tests используйте using namespace aggregations, чтобы не прибегать каждый раз к квалификации. При этом могут возникнуть конфликты
 using namespace aggregations;
@@ -92,10 +93,7 @@ void /*TestStat*/AggregMode() {
 }
 
 void /*TestStat*/AggregPrinter() {
-    //AggregPrinter</*Aggregate*/Max/*imum*/> printer;
-    //AggregPrinter<Max> printer;  -- не работает 
-    //AggregPrinter<statistics::Max> printer; -- не работает 
-    AggregPrinter<statistics::aggregations::Max> printer;
+    statistics::AggregPrinter<Max> printer;
 
     assert(GetPrinterValue(printer) == "max is undefined\n"s);
     printer.PutValue(10.);
@@ -105,7 +103,7 @@ void /*TestStat*/AggregPrinter() {
     std::ostringstream out;
     out << 20.;
 
-    assert(GetPrinterValue(printer) == "max is "s + out.str() + "\n"s);
+    assert(statistics::tests::detail::GetPrinterValue(printer) == "max is "s + out.str() + "\n"s);
 }
 
 } // // закрыт tests  
