@@ -34,13 +34,22 @@ Bus 751
 
 enum class QueryType {
     Stop,
-    Bus,
+    Bus
+};
+struct Coordinates {
+    double lat;
+    double lng;
+    bool operator==(const Coordinates& other) const {
+        return lat == other.lat && lng == other.lng;
+    }
+    bool operator!=(const Coordinates& other) const {
+        return !(*this == other);
+    }
 };
 
 struct Stop {
     string stop;
-    double lat;
-    double longit;
+    Coordinates coordinates;
 };
 
 struct Bus {
@@ -100,8 +109,8 @@ istream& operator>>(istream& is, Query& q) {
         q.type = QueryType::Stop;
         q.stop.stop = request_section.substr(space_colon, pos_colon);
         pair<double, double> coordinates = SplitStringByComma(list_section);
-        q.stop.lat = coordinates.first;
-        q.stop.longit = coordinates.second;
+        q.stop.coordinates.lat = coordinates.first;
+        q.stop.coordinates.lng = coordinates.second;
 
         //deq_.push_back(q);
     }
