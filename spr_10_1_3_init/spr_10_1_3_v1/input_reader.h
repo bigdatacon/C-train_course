@@ -90,71 +90,39 @@ pair<double, double> SplitStringByComma(string str) {
     return coordinates;
 }
 
-
 istream& operator>>(istream& is, Query& q) {
     string line;
     getline(is, line);
     auto pos_colon = line.find(":");  // : отделяет название автобуса или остановки 
-    auto space_colon = line.find_first_not_of(" ");  // : отделяет название запроса 
+     // : отделяет название запроса 
 
     string request_section = line.substr(0, pos_colon);
     string list_section = line.substr(pos_colon + 1);
-    if (request_section.substr(0, space_colon) == "Bus"s) {
+    auto space_colon = line.find(" ");
+    string req_name = request_section.substr(0, space_colon);
+
+    if (req_name == "Bus"s) {
         vector<string> bus_stops = SplitStringBySign(list_section);
-        q.type = QueryType::Bus;
-        q.bus.bus = request_section.substr(space_colon, pos_colon);
+        q.type = QueryType::Bus  /*"Bus"s*/;
+        q.bus.bus = request_section.substr(space_colon+1, pos_colon);
         q.bus.stops = bus_stops;
     }
-    else if (request_section.substr(0, space_colon) == "Stop"s) {
+    else if (req_name == "Stop"s) {
         q.type = QueryType::Stop;
-        q.stop.stop = request_section.substr(space_colon, pos_colon);
+        //q.type = /*QueryType::Bus*/  "Stop"s;
+        q.stop.stop = request_section.substr(space_colon+1, pos_colon);
         pair<double, double> coordinates = SplitStringByComma(list_section);
         q.stop.coordinates.lat = coordinates.first;
         q.stop.coordinates.lng = coordinates.second;
 
         //deq_.push_back(q);
     }
-
-
-    else { return is >> q; }
-
-    return is;
-}
-
-int main() {
-    deque<pair <string, string>> deq_; // тут перечень запросов на вывод 
-
-    int query_count;
-    Query q;
-    cin >> query_count;
-    for (int i = 0; i < query_count; ++i) {
-        cin >> q;
-        switch (q.type) {
-        case QueryType::Bus:
-            continue;
-        case QueryType::Stop:
-            continue;
-        }
-
-        int query_count2;
-        cin >> query_count2;
-
-        for (int j = 0; j < query_count2; ++j) {
-            string line;
-            // После заполнения базы читаю и записываю запросы на вывод 
-            while (std::getline(std::cin, line)) {
-                auto space_colon = line.find_first_not_of(" ");  // : отделяет название запроса
-                string type_req = line.substr(0, space_colon);
-                string number = line.substr(space_colon);
-                deq_.push_back(std::make_pair(type_req, number));
-
-            }
-        }
-
-
+    else if (line == ""s) {
+        return is >> q;
     }
-    return 0;
-};
+    return is;
+
+}
 
 
 class Input_reader {
