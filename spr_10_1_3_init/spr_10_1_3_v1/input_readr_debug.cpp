@@ -138,6 +138,7 @@ inline double ComputeDistance(Coordinates from, Coordinates to) {
 
 struct AllBusInfoBusResponse {
     // Наполните полями эту структуру
+    string bus;
     int stops;
     int uniq_stops;
     int r_length;
@@ -173,6 +174,7 @@ public:
         int uniq_stops;
         int r_length ;*/
         vector<string> stops_v = FindBus(bus);
+        all_r.bus = bus;
         all_r.stops = stops_v.size();
         all_r.uniq_stops = countUnique(stops_v);
         // подсчет расстояния ComputeDistance
@@ -192,6 +194,7 @@ public:
         }
         //Bus 750: 5 stops on route, 3 unique stops, 20939.5 route length
         //cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
+        return all_r;
     }
 
 
@@ -207,6 +210,30 @@ private:
 
 };
 
+ostream& operator<<(ostream& os,  const AllBusInfoBusResponse& r) {
+    // Реализуйте эту функцию
+    //cout << "BusesForStopResponse"s << endl;
+    if (r.stops == 0 ) {
+        cout << "No stop for Bus";
+    }
+    else {
+        cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
+    }
+    return os;
+}
+
+/*
+4
+Stop Tolstopaltsevo: 55.611087, 37.208290
+Stop Marushkino: 55.595884, 37.209755
+Bus 256: Biryulyovo Zapadnoye > Biryusinka > Universam > Biryulyovo Tovarnaya > Biryulyovo Passazhirskaya > Biryulyovo Zapadnoye
+Bus 750: Tolstopaltsevo - Marushkino - Rasskazovka
+3
+Bus 256
+Bus 750
+Bus 751
+
+*/
 
 int main() {
     deque<pair <string, string>> deq_; // тут перечень запросов на вывод 
@@ -221,30 +248,33 @@ int main() {
         switch (q.type) {
         case QueryType::Bus:
             tc.AddBus(q);
-            //break;
         case QueryType::Stop:
             tc.AddStop(q);
-            //break;
         }
-   
 
-        /*int query_count2;
-        cin >> query_count2;
+    }
 
-        for (int j = 0; j < query_count2; ++j) {
-            string line;
-            // После заполнения базы читаю и записываю запросы на вывод 
-            while (std::getline(std::cin, line)) {
-                auto space_colon = line.find_first_not_of(" ");  // : отделяет название запроса
+    int query_count2;
+    cin >> query_count2;
+
+    for (int j = 0; j < query_count2; ++j) {
+        string line;
+        // После заполнения базы читаю и записываю запросы на вывод 
+        // (std::getline(std::cin, line)) 
+        getline(std::cin, line);
+        if (!line.empty()) {
+                auto space_colon = line.find(" ");  // : отделяет название запроса
                 string type_req = line.substr(0, space_colon);
-                string number = line.substr(space_colon);
+                string number = line.substr(space_colon+1);
                 deq_.push_back(std::make_pair(type_req, number));
 
             }
-        }*/
-
-
+        }
+    
+    for (const auto& element : deq_) {
+        if (element.first == "Bus"s) { cout << tc.GetAllBusInfo(element.second) << endl; }
     }
+
     return 0;
 };
 
