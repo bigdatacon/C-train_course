@@ -59,7 +59,10 @@ public:
 
     pair<double, double> FindStop(const string stop) {
         pair<double, double> res;
-        if (stops_.count(stop)) { return stops_[stop]; }
+        auto space_colon = stop.find_first_not_of(" ");
+        auto space_colon_l = stop.find_last_not_of(" ");
+        string stop_new = stop.substr(space_colon, space_colon_l);
+        if (stops_.count(stop_new)) { return stops_[stop_new]; }
         else { cout << "Stop " << stop << ": not found" << endl; return res; }
     }
 
