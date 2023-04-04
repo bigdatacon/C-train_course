@@ -41,16 +41,15 @@ enum class QueryType {
     Bus
 };
 
-enum class Stop {
-    string stop,
-    double lat,
-    double long
+struct Stop {
+    string stop;
+    double lat;
+    double longit;
 };
 
-enum class Bus {
-    string bus,
-    vector<string> stops,
-    //bool circle
+struct Bus {
+    string bus;
+    vector<string> stops;
 };
 
 struct Query {
