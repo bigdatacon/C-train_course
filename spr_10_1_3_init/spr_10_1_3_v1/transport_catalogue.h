@@ -33,7 +33,6 @@ struct Query {
     }
 };*/
 
-
 struct AllBusInfoBusResponse {
     // Наполните полями эту структуру
     int stops;
@@ -48,7 +47,7 @@ public:
     }
 
     void AddStop(const Query q) {
-        stops_.[q.stop.stop] = make_pair(q.stop.lat, q.stop.lng);
+        stops_[q.stop.stop] = make_pair(q.stop.coordinates.lat, q.stop.coordinates.lng);
     }
 
     vector<string> FindBus(const string bus) {
@@ -78,25 +77,16 @@ public:
             pair<double, double> one = FindStop(stops_v[i]);
             pair<double, double> two = FindStop(stops_v[i + 1]);
 
-            Coordinates c_one.lat = one.first;
-            Coordinates c_one.lng = one.second;
-            Coordinates c_two.lat = two.first;
-            Coordinates c_two.lng = two.second;
+
+            Coordinates c_one;
+            Coordinates c_two;
+
+            c_one.lat = one.first;
+            c_one.lng = one.second;
+            c_two.lat = two.first;
+            c_two.lng = two.second;
             all_r.r_length += ComputeDistance(c_one, c_two);
         }
         //Bus 750: 5 stops on route, 3 unique stops, 20939.5 route length
         //cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
     }
-
-
-private:
-    unordered_map<string, vector<string>> buses_;
-    unordered_map<string, pair<double, double>> stops_;
-
-    int countUnique(std::vector<string> vec) {
-        std::sort(vec.begin(), vec.end());
-        auto last = std::unique(vec.begin(), vec.end());
-        return std::distance(vec.begin(), last);
-    }
-
-};
