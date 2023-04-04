@@ -34,7 +34,7 @@ Bus 751
 
 enum class QueryType {
     Stop,
-    Bus
+    Bus,
 };
 
 struct Stop {
