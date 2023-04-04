@@ -22,7 +22,7 @@ struct Query {
 };
 */
 
-struct Coordinates {
+/*struct Coordinates {
     double lat;
     double lng;
     bool operator==(const Coordinates& other) const {
@@ -31,6 +31,14 @@ struct Coordinates {
     bool operator!=(const Coordinates& other) const {
         return !(*this == other);
     }
+};*/
+
+
+struct AllBusInfoBusResponse {
+    // Наполните полями эту структуру
+	    int stops;
+        int uniq_stops;
+        int r_length ;
 };
 
 class TransportCatalogue {
@@ -55,14 +63,16 @@ public:
         else { cout << "Stop "<< stop << ": not found" << endl; return res; }
     }
     
-    void GetAllBusInfo(const string bus){
+    AllBusInfoBusResponse GetAllBusInfo(const string bus){
         //6 stops on route, 5 unique stops, 4371.02 route length
-        int stops;
+        AllBusInfoBusResponse all_r;
+        
+        /*int stops;
         int uniq_stops;
-        int r_length ;
+        int r_length ;*/
         vecror<string> stops_v = FindBus(bus);
-        stops = stops_v.size();
-        uniq_stops = countUnique(stops_v);
+        all_r.stops = stops_v.size();
+        all_r.uniq_stops = countUnique(stops_v);
         // подсчет расстояния ComputeDistance
         for (int i = 0; i < stops_v.size() - 1; i++) {
             pair<double, double> one =  FindStop(stops_v[i]);
@@ -72,10 +82,10 @@ public:
             Coordinates c_one.lng = one.second;   
             Coordinates c_two.lat = two.first;
             Coordinates c_two.lng = two.second;   
-            r_length += ComputeDistance(c_one, c_two); 
+            all_r.r_length += ComputeDistance(c_one, c_two); 
         }
         //Bus 750: 5 stops on route, 3 unique stops, 20939.5 route length
-        cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
+        //cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
     }
     
 
