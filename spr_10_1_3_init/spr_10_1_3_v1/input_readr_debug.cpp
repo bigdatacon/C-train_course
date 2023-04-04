@@ -71,11 +71,18 @@ vector<string> SplitStringBySign(string str) {
     stringstream ss(str);
     string token;
 
-    while (getline(ss, token, '>')) {
+    while (getline(ss, token, '>'))
+    //while (getline(ss, std::ws, token, ' >'))
+    {
+        //auto space_colon = token.find_first_not_of(" ");
+        //auto space_colon_l = token.find_last_not_of(" ");
+        //token.substr(space_colon, space_colon_l);
         tokens.push_back(token);
     }
     return tokens;
+
 }
+
 
 
 pair<double, double> SplitStringByComma(string str) {
@@ -163,7 +170,10 @@ public:
 
     pair<double, double> FindStop(const string stop) {
         pair<double, double> res;
-        if (stops_.count(stop)) { return stops_[stop]; }
+        auto space_colon = stop.find_first_not_of(" ");
+        auto space_colon_l = stop.find_last_not_of(" ");
+        string stop_new = stop.substr(space_colon, space_colon_l);
+        if (stops_.count(stop_new)) { return stops_[stop_new]; }
         else { cout << "Stop " << stop << ": not found" << endl; return res; }
     }
 
