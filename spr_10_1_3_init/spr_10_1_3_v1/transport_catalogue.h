@@ -35,6 +35,7 @@ struct Query {
 
 struct AllBusInfoBusResponse {
     // Наполните полями эту структуру
+    string bus;
     int stops;
     int uniq_stops;
     int r_length;
@@ -70,6 +71,7 @@ public:
         int uniq_stops;
         int r_length ;*/
         vector<string> stops_v = FindBus(bus);
+        all_r.bus = bus;
         all_r.stops = stops_v.size();
         all_r.uniq_stops = countUnique(stops_v);
         // подсчет расстояния ComputeDistance
@@ -89,4 +91,5 @@ public:
         }
         //Bus 750: 5 stops on route, 3 unique stops, 20939.5 route length
         //cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
+        return all_r;
     }
