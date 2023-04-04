@@ -1,7 +1,5 @@
 // напишите решение с нуля
 // код сохраните в свой git-репозиторий
-// напишите решение с нуля
-// код сохраните в свой git-репозиторий
 
 
 //AllBusInfoBusResponse
@@ -13,6 +11,17 @@ struct AllBusInfoBusResponse {
         int r_length ;
 };
 */
+ostream& operator<<(ostream& os,  const AllBusInfoBusResponse& r) {
+    // Реализуйте эту функцию
+    //cout << "BusesForStopResponse"s << endl;
+    if (r.stops == 0 ) {
+        cout << "No stop for Bus";
+    }
+    else {
+        cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
+    }
+    return os;
+}
 
 class Stat_reader {
 public:
@@ -32,20 +41,11 @@ public:
     }
         
         
-    ostream& operator<<(ostream &os, const AllBusInfoBusResponse &r) {
-	// Реализуйте эту функцию
-	//cout << "BusesForStopResponse"s << endl;
-	if (r.stops == ) {
-		cout << "No stop for Bus";
-	} else {
-        cout << "Bus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
-	}
-	return os;
-}
+
         
     void Output(){
         for (const auto& element : deq_) {
-        if (element.first == "Bus"s) {cout <<tc.GetAllBusInfo; } 
+        if (element.first == "Bus"s) {cout <<tc.GetAllBusInfo(element.second); } 
         }
         break;
 
