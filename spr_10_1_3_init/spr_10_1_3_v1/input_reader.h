@@ -56,13 +56,14 @@ struct Query {
 
 vector<string> SplitStringBySign(string str) {
 
-        vector<string> tokens;
-        stringstream ss(str);
-        string token;
+    vector<string> tokens;
+    stringstream ss(str);
+    string token;
 
-        while (getline(ss, token, '>')) {
-            tokens.push_back(token);
-        }
+    while (getline(ss, token, '>')) {
+        tokens.push_back(token);
+    }
+    return tokens;
 }
 
 
@@ -92,12 +93,12 @@ istream& operator>>(istream& is, Query& q) {
     if (request_section.substr(0, space_colon) == "Bus"s) {
         vector<string> bus_stops = SplitStringBySign(list_section);
         q.type = QueryType::Bus;
-        q.bus = request_section.substr(space_colon, pos_colon);
+        q.bus.bus = request_section.substr(space_colon, pos_colon);
         q.bus.stops = bus_stops;
     }
     else if (request_section.substr(0, space_colon) == "Stop"s) {
         q.type = QueryType::Stop;
-        q.stop = request_section.substr(space_colon, pos_colon);
+        q.stop.stop = request_section.substr(space_colon, pos_colon);
         pair<double, double> coordinates = SplitStringByComma(list_section);
         q.stop.lat = coordinates.first;
         q.stop.longit = coordinates.second;
@@ -110,7 +111,6 @@ istream& operator>>(istream& is, Query& q) {
 
     return is;
 }
-
 class Input_reader {
 public:
     istream& operator>>(istream& is, Query& q, TransportCatalogue tc) {
