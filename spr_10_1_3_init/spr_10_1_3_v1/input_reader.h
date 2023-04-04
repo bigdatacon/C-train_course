@@ -36,11 +36,20 @@ enum class QueryType {
     Stop,
     Bus
 };
+struct Coordinates {
+    double lat;
+    double lng;
+    bool operator==(const Coordinates& other) const {
+        return lat == other.lat && lng == other.lng;
+    }
+    bool operator!=(const Coordinates& other) const {
+        return !(*this == other);
+    }
+};
 
 struct Stop {
     string stop;
-    double lat;
-    double longit;
+    Coordinates coordinates;
 };
 
 struct Bus {
@@ -100,8 +109,8 @@ istream& operator>>(istream& is, Query& q) {
         q.type = QueryType::Stop;
         q.stop.stop = request_section.substr(space_colon, pos_colon);
         pair<double, double> coordinates = SplitStringByComma(list_section);
-        q.stop.lat = coordinates.first;
-        q.stop.longit = coordinates.second;
+        q.stop.coordinates.lat = coordinates.first;
+        q.stop.coordinates.lng = coordinates.second;
 
         //deq_.push_back(q);
     }
@@ -111,6 +120,43 @@ istream& operator>>(istream& is, Query& q) {
 
     return is;
 }
+
+int main() {
+    deque<pair <string, string>> deq_; // тут перечень запросов на вывод 
+
+    int query_count;
+    Query q;
+    cin >> query_count;
+    for (int i = 0; i < query_count; ++i) {
+        cin >> q;
+        switch (q.type) {
+        case QueryType::Bus:
+            continue;
+        case QueryType::Stop:
+            continue;
+        }
+
+        int query_count2;
+        cin >> query_count2;
+
+        for (int j = 0; j < query_count2; ++j) {
+            string line;
+            // После заполнения базы читаю и записываю запросы на вывод 
+            while (std::getline(std::cin, line)) {
+                auto space_colon = line.find_first_not_of(" ");  // : отделяет название запроса
+                string type_req = line.substr(0, space_colon);
+                string number = line.substr(space_colon);
+                deq_.push_back(std::make_pair(type_req, number));
+
+            }
+        }
+
+
+    }
+    return 0;
+};
+
+
 class Input_reader {
 public:
     istream& operator>>(istream& is, Query& q, TransportCatalogue tc) {
