@@ -63,6 +63,7 @@ vector<string> SplitStringBySign(string str) {
     while (getline(ss, token, '>')) {
         tokens.push_back(token);
     }
+    return tokens;
 }
 
 
@@ -92,12 +93,12 @@ istream& operator>>(istream& is, Query& q) {
     if (request_section.substr(0, space_colon) == "Bus"s) {
         vector<string> bus_stops = SplitStringBySign(list_section);
         q.type = QueryType::Bus;
-        q.bus = request_section.substr(space_colon, pos_colon);
+        q.bus.bus = request_section.substr(space_colon, pos_colon);
         q.bus.stops = bus_stops;
     }
     else if (request_section.substr(0, space_colon) == "Stop"s) {
         q.type = QueryType::Stop;
-        q.stop = request_section.substr(space_colon, pos_colon);
+        q.stop.stop = request_section.substr(space_colon, pos_colon);
         pair<double, double> coordinates = SplitStringByComma(list_section);
         q.stop.lat = coordinates.first;
         q.stop.longit = coordinates.second;
@@ -129,7 +130,7 @@ int main() {
         int query_count2;
         cin >> query_count2;
 
-        for (int i = 0; i < query_count2; ++i) {
+        for (int j = 0; j < query_count2; ++j) {
             string line;
             // После заполнения базы читаю и записываю запросы на вывод 
             while (std::getline(std::cin, line)) {
@@ -143,5 +144,6 @@ int main() {
 
 
     }
+    return 0;
 };
 
