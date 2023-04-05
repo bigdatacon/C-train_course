@@ -42,7 +42,7 @@ struct Bus {
     vector<string> stops;
 };
 
-struct Query {
+struct UpdateQuery {
     QueryType type;
     Bus bus;
     Stop stop;
@@ -74,7 +74,7 @@ auto SplitStringBySign(string str, char symbol) {
     else {return false;}
 }
 
-istream& operator>>(istream& is, Query& q) {
+istream& operator>>(istream& is, UpdateQuery& q) {
     string line;
     getline(is, line);
     auto pos_colon =  line.find(":");  
@@ -106,9 +106,9 @@ istream& operator>>(istream& is, Query& q) {
     return is;
 }
 
-class Input_reader {
+/*class Input_reader {
 public:
-    istream& operator>>(istream& is, Query& q, TransportCatalogue tc) {
+    istream& operator>>(istream& is, UpdateQuery& q, TransportCatalogue tc) {
     int query_count;
     Query q;
     cin >> query_count;
@@ -125,5 +125,59 @@ public:
     }
 private:
     deque<pair <string, string>> deq_;
+};*/
+
+class InputReader {
+public:
+	InputReader(istream& is) : is_(is) {
+	}
+
+	int getNumUpdateQueries() {
+		int query_count;
+		cin /*is_*/ >> num_update_q_;
+		return num_update_q_;
+	}
+
+	UpdateQuery getUpdateQuery() {
+		UpdateQuery q;
+		string line;
+		getline(is_, line);
+		auto pos_colon = line.find(":");
+		string request_section = line.substr(0, pos_colon);
+		string list_section = line.substr(pos_colon + 1);
+		auto space_colon = line.find(" ");
+		string req_name = request_section.substr(0, space_colon);
+
+		if (req_name == "Bus"s) {
+			vector<string> bus_stops = SplitStringBySign(list_section);
+			q.type = QueryType::Bus  /*"Bus"s*/;
+			q.bus.bus = request_section.substr(space_colon + 1, pos_colon);
+			q.bus.stops = bus_stops;
+		}
+		else if (req_name == "Stop"s) {
+			q.type = QueryType::Stop;
+			q.stop.stop = request_section.substr(space_colon + 1, pos_colon);
+			pair<double, double> coordinates = SplitStringByComma(list_section);
+			q.stop.coordinates.lat = coordinates.first;
+			q.stop.coordinates.lng = coordinates.second;
+
+		}
+		else if (line == ""s) {
+			return is_ >> q;
+		}
+		return q;
+	}
+
+private:
+	istream is_;
+	int num_update_q_;
 };
+
+
+
+
+
+    
+    
+    
 
