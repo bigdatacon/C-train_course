@@ -63,16 +63,44 @@ struct Query {
     Stop stop;
 };
 
-vector<string> SplitStringBySign(string str) {
+/*vector<string> SplitStringBySign(string str) {
 
     vector<string> tokens;
     stringstream ss(str);
     string token;
 
-    while (getline(ss, token, '>')) {
+    while (getline(ss, token, '>'))
+    //while (getline(ss, std::ws, token, ' >'))
+    {
+        //auto space_colon = token.find_first_not_of(" ");
+        //auto space_colon_l = token.find_last_not_of(" ");
+        //token.substr(space_colon, space_colon_l);
         tokens.push_back(token);
     }
     return tokens;
+
+}*/
+
+vector<string> SplitStringBySign(std::string str)
+{
+    vector<string> tokens;
+    string token;
+
+    while (true) {
+        size_t pos = str.find_first_of(">-");
+        if (pos != std::string::npos) {
+            token = str.substr(0, pos);
+            tokens.push_back(token);
+            std::cout << "THIS OSTANOVKA : " <<  token << std::endl;
+            str = str.substr(pos + 1);
+        }
+        else {
+            if (str.size() != 0) { 
+                std::cout << "THIS LAST !! OSTANOVKA : " << str << std::endl;
+                tokens.push_back(str); }
+            return tokens;
+        }
+    }
 }
 
 
