@@ -1,6 +1,6 @@
 #pragma once
-// напишите решение с нуля
-// код сохраните в свой git-репозиторий
+// РЅР°РїРёС€РёС‚Рµ СЂРµС€РµРЅРёРµ СЃ РЅСѓР»СЏ
+// РєРѕРґ СЃРѕС…СЂР°РЅРёС‚Рµ РІ СЃРІРѕР№ git-СЂРµРїРѕР·РёС‚РѕСЂРёР№
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -50,7 +50,7 @@ istream& operator>>(istream& is, UpdateQuery& q);
 
 class InputReader {
 public:
-    InputReader(istream& is) : is_(is) {};
+    InputReader(istream& is) ; 
     int getNumUpdateQueries(); 
     UpdateQuery getUpdateQuery(); 
 
