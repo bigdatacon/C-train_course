@@ -15,73 +15,6 @@
 #include <regex>
 using namespace std;
 
-/*
-10
-Stop Tolstopaltsevo: 55.611087, 37.208290
-Stop Marushkino: 55.595884, 37.209755
-Bus 256: Biryulyovo Zapadnoye > Biryusinka > Universam > Biryulyovo Tovarnaya > Biryulyovo Passazhirskaya > Biryulyovo Zapadnoye
-Bus 750: Tolstopaltsevo - Marushkino - Rasskazovka
-Stop Rasskazovka: 55.632761, 37.333324
-Stop Biryulyovo Zapadnoye: 55.574371, 37.651700
-Stop Biryusinka: 55.581065, 37.648390
-Stop Universam: 55.587655, 37.645687
-Stop Biryulyovo Tovarnaya: 55.592028, 37.653656
-Stop Biryulyovo Passazhirskaya: 55.580999, 37.659164
-3
-Bus 256
-Bus 750
-Bus 751
-*/
-
-
-enum class QueryType {
-    Stop,
-    Bus
-};
-struct Coordinates {
-    double lat;
-    double lng;
-    bool operator==(const Coordinates& other) const {
-        return lat == other.lat && lng == other.lng;
-    }
-    bool operator!=(const Coordinates& other) const {
-        return !(*this == other);
-    }
-};
-
-struct Stop {
-    string stop;
-    Coordinates coordinates;
-};
-
-struct Bus {
-    string bus;
-    vector<string> stops;
-};
-
-struct Query {
-    QueryType type;
-    Bus bus;
-    Stop stop;
-};
-
-/*vector<string> SplitStringBySign(string str) {
-
-    vector<string> tokens;
-    stringstream ss(str);
-    string token;
-
-    while (getline(ss, token, '>'))
-    //while (getline(ss, std::ws, token, ' >'))
-    {
-        //auto space_colon = token.find_first_not_of(" ");
-        //auto space_colon_l = token.find_last_not_of(" ");
-        //token.substr(space_colon, space_colon_l);
-        tokens.push_back(token);
-    }
-    return tokens;
-
-}*/
 
 vector<string> SplitStringBySign(std::string str)
 {
@@ -264,18 +197,6 @@ ostream& operator<<(ostream& os,  const AllBusInfoBusResponse& r) {
     return os;
 }
 
-/*
-4
-Stop Tolstopaltsevo: 55.611087, 37.208290
-Stop Marushkino: 55.595884, 37.209755
-Bus 256: Biryulyovo Zapadnoye > Biryusinka > Universam > Biryulyovo Tovarnaya > Biryulyovo Passazhirskaya > Biryulyovo Zapadnoye
-Bus 750: Tolstopaltsevo - Marushkino - Rasskazovka
-3
-Bus 256
-Bus 750
-Bus 751
-
-*/
 
 int main() {
     deque<pair <string, string>> deq_; // тут перечень запросов на вывод 
