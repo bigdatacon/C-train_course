@@ -206,31 +206,36 @@ public:
         int uniq_stops;
         int r_length ;*/
         vector<string> stops_v = FindBus(bus);
-        all_r.bus = bus;
-        all_r.stops = stops_v.size();
-        all_r.uniq_stops = countUnique(stops_v);
-        // подсчет расстояния ComputeDistance
-        int lap = 0;
-        for (int i = 0; i < stops_v.size() - 1; i++) {
-            
-            
-            pair<double, double> one = FindStop(stops_v[i]);
-            pair<double, double> two = FindStop(stops_v[i + 1]);
-            ++lap;
-            cout << "lap : " << lap << "  FIRST STATION : " << stops_v[i] << "SECOND STATION : " << stops_v[i + 1] << endl;
+
+        if (stops_v.size() != 0) {
+
+            all_r.bus = bus;
+            all_r.stops = stops_v.size();
+            all_r.uniq_stops = countUnique(stops_v);
+            // подсчет расстояния ComputeDistance
+            int lap = 0;
+            for (int i = 0; i < stops_v.size() - 1; i++) {
 
 
-            Coordinates c_one;
-            Coordinates c_two;
+                pair<double, double> one = FindStop(stops_v[i]);
+                pair<double, double> two = FindStop(stops_v[i + 1]);
+                ++lap;
+                //cout << "lap : " << lap << "  FIRST STATION : " << stops_v[i] << "SECOND STATION : " << stops_v[i + 1] << endl;
 
-            c_one.lat = one.first;
-            c_one.lng = one.second;
-            c_two.lat = two.first;
-            c_two.lng = two.second;
-            all_r.r_length += ComputeDistance(c_one, c_two);
+
+                Coordinates c_one;
+                Coordinates c_two;
+
+                c_one.lat = one.first;
+                c_one.lng = one.second;
+                c_two.lat = two.first;
+                c_two.lng = two.second;
+                all_r.r_length += ComputeDistance(c_one, c_two);
+            }
         }
-        //Bus 750: 5 stops on route, 3 unique stops, 20939.5 route length
-        //cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
+        else {
+            all_r.bus = bus; all_r.stops = 0;
+        }
         return all_r;
     }
 
@@ -251,7 +256,7 @@ ostream& operator<<(ostream& os,  const AllBusInfoBusResponse& r) {
     // Реализуйте эту функцию
     //cout << "BusesForStopResponse"s << endl;
     if (r.stops == 0 ) {
-        cout << "No stop for Bus";
+        cout << "Bus " << r.bus << " Not Found"s << endl;
     }
     else {
         cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
