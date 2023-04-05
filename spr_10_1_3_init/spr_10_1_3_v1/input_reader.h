@@ -48,30 +48,41 @@ struct UpdateQuery {
     Stop stop;
 };
 
-auto SplitStringBySign(string str, char symbol) {
-    if (symbol == ','){
-        pair<double, double> coordinates;
-        stringstream ss(str);
-        string token;
-    
-        getline(ss, token, ',');
-        coordinates.first = stod(token);
-    
-        getline(ss, token, ',');
-        coordinates.second = stod(token);
-        
-        return coordinates;
-    }
-    else if (symbol == '>'){
-        vector<string> tokens;
-        stringstream ss(str);
-        string token;
+vector<string> SplitStringBySign(std::string str)
+{
+    vector<string> tokens;
+    string token;
 
-        while (getline(ss, token, '>')) {
+    while (true) {
+        size_t pos = str.find_first_of(">-");
+        if (pos != std::string::npos) {
+            token = str.substr(0, pos);
             tokens.push_back(token);
+            //std::cout << "THIS OSTANOVKA : " <<  token << std::endl;
+            str = str.substr(pos + 1);
+        }
+        else {
+            if (str.size() != 0) { 
+                //std::cout << "THIS LAST !! OSTANOVKA : " << str << std::endl;
+                tokens.push_back(str); }
+            return tokens;
         }
     }
-    else {return false;}
+}
+
+
+pair<double, double> SplitStringByComma(string str) {
+    pair<double, double> coordinates;
+    stringstream ss(str);
+    string token;
+
+    getline(ss, token, ',');
+    coordinates.first = stod(token);
+
+    getline(ss, token, ',');
+    coordinates.second = stod(token);
+
+    return coordinates;
 }
 
 istream& operator>>(istream& is, UpdateQuery& q) {
