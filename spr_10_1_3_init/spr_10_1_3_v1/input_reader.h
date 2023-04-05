@@ -180,7 +180,7 @@ public:
 	}
 
 private:
-	istream is_;
+	istream& is_;
 	int num_update_q_;
 };
 
