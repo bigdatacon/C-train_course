@@ -1,37 +1,23 @@
 // напишите решение с нуля
 // код сохраните в свой git-репозиторий
 #include "input_reader.h"
+#include <cassert>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+#include <set>
+#include <algorithm>
+#include <deque>
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <unordered_map>
+#include <utility>
+#include <math.h>
+#include <regex>
 
-/*
-enum class Stop {
-    string stop,
-    double lat,
-    double long
-};
-
-enum class Bus {
-    string bus,
-    vector<string> stops,
-    //bool circle
-};
-
-struct Query {
-    QueryType type;
-    Bus bus;
-    Stop stop;
-};
-*/
-
-/*struct Coordinates {
-    double lat;
-    double lng;
-    bool operator==(const Coordinates& other) const {
-        return lat == other.lat && lng == other.lng;
-    }
-    bool operator!=(const Coordinates& other) const {
-        return !(*this == other);
-    }
-};*/
+using namespace std;
 
 struct AllBusInfoBusResponse {
     // Наполните полями эту структуру
@@ -42,6 +28,19 @@ struct AllBusInfoBusResponse {
 };
 
 class TransportCatalogue {
+public:
+    void AddBus(const Query q);
+
+    void AddStop(const Query q);
+
+    vector<string> FindBus(const string bus);
+    pair<double, double> FindStop(const string stop);
+
+    AllBusInfoBusResponse GetAllBusInfo(const string bus);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*class TransportCatalogue {
 public:
     void AddBus(const Query q) {
         buses_[q.bus.bus] = q.bus.stops;
@@ -59,30 +58,19 @@ public:
 
     pair<double, double> FindStop(const string stop) {
         pair<double, double> res;
-        auto space_colon = stop.find_first_not_of(" ");
-        auto space_colon_l = stop.find_last_not_of(" ");
-        string stop_new = stop.substr(space_colon, space_colon_l);
-        if (stops_.count(stop_new)) { return stops_[stop_new]; }
+        if (stops_.count(stop)) { return stops_[stop]; }
         else { cout << "Stop " << stop << ": not found" << endl; return res; }
     }
 
     AllBusInfoBusResponse GetAllBusInfo(const string bus) {
-        //6 stops on route, 5 unique stops, 4371.02 route length
         AllBusInfoBusResponse all_r;
-
-        /*int stops;
-        int uniq_stops;
-        int r_length ;*/
         vector<string> stops_v = FindBus(bus);
         all_r.bus = bus;
         all_r.stops = stops_v.size();
         all_r.uniq_stops = countUnique(stops_v);
-        // подсчет расстояния ComputeDistance
         for (int i = 0; i < stops_v.size() - 1; i++) {
             pair<double, double> one = FindStop(stops_v[i]);
             pair<double, double> two = FindStop(stops_v[i + 1]);
-
-
             Coordinates c_one;
             Coordinates c_two;
 
@@ -92,7 +80,5 @@ public:
             c_two.lng = two.second;
             all_r.r_length += ComputeDistance(c_one, c_two);
         }
-        //Bus 750: 5 stops on route, 3 unique stops, 20939.5 route length
-        //cout << "Dus " << bus << ":"s << stops << " stops on route, "s << uniq_stops << " unique stops, "s <<r_length << " route length"s  << endl;
         return all_r;
-    }
+    }*/
