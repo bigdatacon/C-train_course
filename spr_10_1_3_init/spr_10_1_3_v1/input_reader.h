@@ -1,3 +1,5 @@
+// напишите решение с нуля
+// код сохраните в свой git-репозиторий
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -11,26 +13,9 @@
 #include <sstream>
 #include <unordered_map>
 #include <utility>
-
+#include <math.h>
+#include <regex>
 using namespace std;
-
-/*
-10
-Stop Tolstopaltsevo: 55.611087, 37.208290
-Stop Marushkino: 55.595884, 37.209755
-Bus 256: Biryulyovo Zapadnoye > Biryusinka > Universam > Biryulyovo Tovarnaya > Biryulyovo Passazhirskaya > Biryulyovo Zapadnoye
-Bus 750: Tolstopaltsevo - Marushkino - Rasskazovka
-Stop Rasskazovka: 55.632761, 37.333324
-Stop Biryulyovo Zapadnoye: 55.574371, 37.651700
-Stop Biryusinka: 55.581065, 37.648390
-Stop Universam: 55.587655, 37.645687
-Stop Biryulyovo Tovarnaya: 55.592028, 37.653656
-Stop Biryulyovo Passazhirskaya: 55.580999, 37.659164
-3
-Bus 256
-Bus 750
-Bus 751
-*/
 
 enum class QueryType {
     Stop,
@@ -63,95 +48,63 @@ struct Query {
     Stop stop;
 };
 
-/*vector<string> SplitStringBySign(string str) {
-
-    vector<string> tokens;
-    stringstream ss(str);
-    string token;
-
-    while (getline(ss, token, '>'))
-    //while (getline(ss, std::ws, token, ' >'))
-    {
-        //auto space_colon = token.find_first_not_of(" ");
-        //auto space_colon_l = token.find_last_not_of(" ");
-        //token.substr(space_colon, space_colon_l);
-        tokens.push_back(token);
+auto SplitStringBySign(string str, char symbol) {
+    if (symbol == ','){
+        pair<double, double> coordinates;
+        stringstream ss(str);
+        string token;
+    
+        getline(ss, token, ',');
+        coordinates.first = stod(token);
+    
+        getline(ss, token, ',');
+        coordinates.second = stod(token);
+        
+        return coordinates;
     }
-    return tokens;
+    else if (symbol == '>'){
+        vector<string> tokens;
+        stringstream ss(str);
+        string token;
 
-}*/
-
-vector<string> SplitStringBySign(std::string str)
-{
-    vector<string> tokens;
-    string token;
-
-    while (true) {
-        size_t pos = str.find_first_of(">-");
-        if (pos != std::string::npos) {
-            token = str.substr(0, pos);
+        while (getline(ss, token, '>')) {
             tokens.push_back(token);
-            std::cout << "THIS OSTANOVKA : " <<  token << std::endl;
-            str = str.substr(pos + 1);
-        }
-        else {
-            if (str.size() != 0) { 
-                std::cout << "THIS LAST !! OSTANOVKA : " << str << std::endl;
-                tokens.push_back(str); }
-            return tokens;
         }
     }
-}
-
-
-pair<double, double> SplitStringByComma(string str) {
-    pair<double, double> coordinates;
-    stringstream ss(str);
-    string token;
-
-    getline(ss, token, ',');
-    coordinates.first = stod(token);
-
-    getline(ss, token, ',');
-    coordinates.second = stod(token);
-
-    return coordinates;
+    else {return false;}
 }
 
 istream& operator>>(istream& is, Query& q) {
     string line;
     getline(is, line);
-    auto pos_colon = line.find(":");  // : отделяет название автобуса или остановки 
-     // : отделяет название запроса 
-
-    string request_section = line.substr(0, pos_colon);
-    string list_section = line.substr(pos_colon + 1);
-    auto space_colon = line.find(" ");
-    string req_name = request_section.substr(0, space_colon);
-
-    if (req_name == "Bus"s) {
-        vector<string> bus_stops = SplitStringBySign(list_section);
-        q.type = QueryType::Bus  /*"Bus"s*/;
-        q.bus.bus = request_section.substr(space_colon+1, pos_colon);
+    auto pos_colon =  line.find(":");  
+    auto space_colon =  line.find_first_not_of(" ");  
+    request_section = line.substr(0, pos_colon );
+    list_section = line.substr(pos_colon + 1);
+    if (request_section.substr(0, space_colon) == "Bus"s) {
+        vector<string> bus_stops =  SplitStringBySign(list_section, '>');
+        q.type = QueryType::Bus;
+        q.bus.bus = request_section.substr(space_colon, pos_colon);
         q.bus.stops = bus_stops;
-    }
-    else if (req_name == "Stop"s) {
+        }
+    else if (request_section.substr(0, space_colon) == "Stop"s) {
         q.type = QueryType::Stop;
-        //q.type = /*QueryType::Bus*/  "Stop"s;
-        q.stop.stop = request_section.substr(space_colon+1, pos_colon);
-        pair<double, double> coordinates = SplitStringByComma(list_section);
+        q.stop.stop = request_section.substr(space_colon, pos_colon);
+        pair<double, double> coordinates =  SplitStringBySign(list_section, ',');
         q.stop.coordinates.lat = coordinates.first;
         q.stop.coordinates.lng = coordinates.second;
-
-        //deq_.push_back(q);
     }
-    else if (line == ""s) {
-        return is >> q;
+    
+    else if (pos_colon  == npos) {
+        q.type = QueryType::Stop;
+        q.stop = request_section.substr(space_colon, pos_colon);
+        pair<double, double> coordinates =  SplitStringBySign(list_section, ',');
+        q.lat = coordinates.first;
+        q.lat = coordinates.second;
     }
+    else {return is >> q;} 
     return is;
-
 }
-
 
 class Input_reader {
 public:
@@ -168,24 +121,9 @@ public:
             case QueryType::Stop:
                 tc.AddStop(q);
                 break;
-         // заполняю класс сначала всеми данными 
     }
-        
-    int query_count2;
-    cin >> query_count2;
-
-    for (int i = 0; i < query_count2; ++i) {
-    string line;
-    // После заполнения базы читаю и записываю запросы на вывод 
-    while (std::getline(std::cin, line)) {
-        auto space_colon =  line.find_first_not_of(" ");  // : отделяет название запроса
-        string type_req   = line.substr(0, space_colon);
-        string number   = line.substr(space_colon);
-        deq_.push_back(std::make_pair(type_req, number));
-        
-    }     
     }
-
 private:
-    deque<pair <string, string>> deq_; // тут перечень запросов на вывод 
+    deque<pair <string, string>> deq_;
 };
+
