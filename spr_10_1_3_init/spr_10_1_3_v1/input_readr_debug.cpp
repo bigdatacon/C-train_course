@@ -93,12 +93,12 @@ vector<string> SplitStringBySign(std::string str)
         if (pos != std::string::npos) {
             token = str.substr(0, pos);
             tokens.push_back(token);
-            std::cout << "THIS OSTANOVKA : " <<  token << std::endl;
+            //std::cout << "THIS OSTANOVKA : " <<  token << std::endl;
             str = str.substr(pos + 1);
         }
         else {
             if (str.size() != 0) { 
-                std::cout << "THIS LAST !! OSTANOVKA : " << str << std::endl;
+                //std::cout << "THIS LAST !! OSTANOVKA : " << str << std::endl;
                 tokens.push_back(str); }
             return tokens;
         }
@@ -210,9 +210,14 @@ public:
         all_r.stops = stops_v.size();
         all_r.uniq_stops = countUnique(stops_v);
         // подсчет расстояния ComputeDistance
+        int lap = 0;
         for (int i = 0; i < stops_v.size() - 1; i++) {
+            
+            
             pair<double, double> one = FindStop(stops_v[i]);
             pair<double, double> two = FindStop(stops_v[i + 1]);
+            ++lap;
+            cout << "lap : " << lap << "  FIRST STATION : " << stops_v[i] << "SECOND STATION : " << stops_v[i + 1] << endl;
 
 
             Coordinates c_one;
