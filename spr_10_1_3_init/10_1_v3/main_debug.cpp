@@ -140,13 +140,13 @@ public:
 	Busptr FindBus(string bus) {
 		Busptr res;
 		if (bus_name_to_bus_.count(bus)) { return *bus_name_to_bus_[bus]; }
-		else { cout << "Bus " << bus << ": not found" << endl; return res; }
+		else { /*cout << "Bus " << bus << ": not found" << endl;*/ return res; }
 	}
 
 	Stop FindStop(string stop) {
 		Stop res;
 		if (stop_name_to_stop_.count(stop)) { return *stop_name_to_stop_[stop]; }
-		else { cout << "Stop " << stop << ": not found" << endl; return res; }
+		else { /*cout << "Stop " << stop << ": not found" << endl;*/ return res; }
 	}
 
 	AllBusInfoBusResponse GetAllBusInfo( string bus) {
@@ -276,7 +276,8 @@ ostream& operator<<(ostream& os, const AllBusInfoBusResponse& r) {
 	// Реализуйте эту функцию
 	//cout << "BusesForStopResponse"s << endl;
 	if (r.stops == 0) {
-		cout << "not found";
+		cout << "not found bus ";
+		
 	}
 	else {
 		cout << "Bus " << r.bus << " :"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
@@ -321,7 +322,7 @@ public:
 			if (element.name == "Bus"s) {
 				AllBusInfoBusResponse r = tc.GetAllBusInfo(element.str);
 				if (r.stops == 0) {
-					cout << "not found" << endl;
+					cout << "Bus " << element.str << ": "s << "not found" << endl;
 				}
 				else {
 					cout << "Bus " << r.bus << ": "s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
@@ -345,7 +346,7 @@ int main()
 	TransportCatalogue tc;
     InputReader reader(std::cin);
     int count = reader.GetNumUpdateQueries();
-    std::cout << "COUNT : " << count << std::endl;
+    //std::cout << "COUNT : " << count << std::endl;
 	reader.FillRequests();
 
 	reader.GetUpdStop(tc);
