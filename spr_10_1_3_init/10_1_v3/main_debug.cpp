@@ -259,9 +259,8 @@ int main()
     InputReader reader(std::cin);
     int count = reader.GetNumUpdateQueries();
     std::cout << "COUNT : " << count << std::endl;
-    for (int i = 0; i < count; i++) {
-		reader.FillRequests();
-    }
+	reader.FillRequests();
+
 	reader.GetUpdStop(tc);
 
     return 0;
