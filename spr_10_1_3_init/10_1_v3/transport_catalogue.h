@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "input_reader.h"
 #include <cassert>
 #include <iostream>
@@ -12,37 +12,38 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <math.h>
 #include <regex>
+#include "geo.h"
+#include "input_reader.h"
 
-using namespace std;
 
 struct AllBusInfoBusResponse {
-    // Íàïîëíèòå ïîëÿìè ýòó ñòðóêòóðó
-    string bus;
-    int stops;
-    int uniq_stops;
-    int r_length;
+	std::string bus;
+	int stops;
+	int uniq_stops;
+	double r_length = 0; 
+};
+
+struct Busptr {
+	std::string bus;
+	std::deque<std::string*> stops;
+	std::string type;
 };
 
 class TransportCatalogue {
 public:
-    void AddBus(const UpdateQuery q);
+	void AddBus(Bus b);
+	void AddStop(Stop s); 
+	Busptr FindBus(std::string bus);
+	Stop FindStop(std::string stop);
+	AllBusInfoBusResponse GetAllBusInfo(std::string bus);
 
-    void AddStop(const UpdateQuery q);
-
-    vector<string> FindBus(const string bus);
-    pair<double, double> FindStop(const string stop);
-
-    AllBusInfoBusResponse GetAllBusInfo(const string bus);
 private:
-    unordered_map<string, vector<string>> buses_;
-    unordered_map<string, pair<double, double>> stops_;
-
-    int countUnique(std::vector<string> vec) {
-        std::sort(vec.begin(), vec.end());
-        auto last = std::unique(vec.begin(), vec.end());
-        return std::distance(vec.begin(), last);
-    }
+	std::deque<Busptr> buses_;
+	std::deque<Stop> stops_;
+	std::unordered_map<std::string, Stop*> stop_name_to_stop_;
+	std::unordered_map<std::string, Busptr*> bus_name_to_bus_;
 };
