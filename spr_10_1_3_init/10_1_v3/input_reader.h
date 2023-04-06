@@ -1,6 +1,4 @@
 #pragma once
-// напишите решение с нуля
-// код сохраните в свой git-репозиторий
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -18,53 +16,44 @@
 #include <regex>
 
 #include "geo.h"
+#include "transport_catalogue.h"
 
-using namespace std;
 
-enum class QueryType {
-    Stop,
-    Bus
-};
 
+
+std::vector<std::string> SplitStringBySignPlain(std::string str);
+
+std::vector<std::string> SplitStringBySignCircle(std::string str);
+
+std::pair<double, double> SplitStringByComma(std::string str);
 
 struct Stop {
-    string stop;
-    Coordinates coordinates;
+	std::string stop;
+	Coordinates coordinates;
 };
 
 struct Bus {
-    string bus;
-    vector<string> stops;
+	std::string bus;
+	std::vector<std::string> stops;
+	std::string type;
 };
-
-struct UpdateQuery {
-    QueryType type;
-    Bus bus;
-    Stop stop;
-
-    string toString() const {
-        if (type == QueryType::Bus) {
-            return "Bus "s + bus.bus;
-        }
-        if (type == QueryType::Stop) {
-            return "Stop "s + stop.stop;
-        }
-        return ""s;
-    }
-};
-
-vector<string> SplitStringBySign(std::string str);
-pair<double, double> SplitStringByComma(string str);
-istream& operator>>(istream& is, UpdateQuery& q);
 
 
 class InputReader {
 public:
-    InputReader(istream& is);
-    int getNumUpdateQueries();
-    UpdateQuery getUpdateQuery();
+	InputReader(std::istream& is) : is_(is) {};
+
+	int GetNumUpdateQueries(); 
+
+	void FillRequests(); 
+
+	void GetUpdStop(TransportCatalogue& tc); 
+
+	void GetUpdBus(TransportCatalogue& tc);
 
 private:
-    istream& is_;
-    int num_update_q_;
+	istream& is_;
+	std::deque<Bus> upd_req_bus_;
+	std::deque<Stop> upd_req_stop_;
+	int num_update_q_;
 };
