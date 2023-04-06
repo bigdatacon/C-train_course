@@ -159,19 +159,31 @@ public:
 				all_r.stops = stops_v.size() ;
 				unordered_set<string*> us(stops_v.begin(), stops_v.end());
 				all_r.uniq_stops = us.size();
+				for (int i = 0; i < stops_v.size() - 1; i++) {
+					Stop one = FindStop(*stops_v[i]);
+					Stop two = FindStop(*stops_v[i + 1]);
+					all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
+				}
+				//all_r.r_length += all_r.r_length;
 			}
 			else {
 				all_r.stops = stops_v.size() * 2 - 1;
 				all_r.uniq_stops = stops_v.size();
+				for (int i = 0; i < stops_v.size() - 1; i++) {
+					Stop one = FindStop(*stops_v[i]);
+					Stop two = FindStop(*stops_v[i + 1]);
+					all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
+				}
+				all_r.r_length += all_r.r_length;
 			}
-			int lap = 0;
+			/*int lap = 0;
 			for (int i = 0; i < stops_v.size() - 1; i++) {
 				Stop one = FindStop(*stops_v[i]);
 				Stop two = FindStop(*stops_v[i + 1]); 
 				++lap;
 				all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
 			}
-			all_r.r_length += all_r.r_length;
+			all_r.r_length += all_r.r_length;*/
 		}
 		else {
 			all_r.bus = bus; all_r.stops = 0;
@@ -239,14 +251,14 @@ public:
 
 	void GetUpdStop(TransportCatalogue& tc) {
 		for (int i = 0; i < upd_req_stop_.size(); ++i) {
-			cout << "UPDT : " << upd_req_stop_[i].stop << endl;
+			//cout << "UPDT : " << upd_req_stop_[i].stop << endl;
 			tc.AddStop(upd_req_stop_[i]);
 		}
 	}
 
 	void GetUpdBus(TransportCatalogue& tc) {
 		for (int i = 0; i < upd_req_bus_.size(); ++i) {
-			cout << "UPDT BUS : " << upd_req_bus_[i].bus << endl;
+			//cout << "UPDT BUS : " << upd_req_bus_[i].bus << endl;
 			tc.AddBus(upd_req_bus_[i]);
 		}
 	}
@@ -267,7 +279,7 @@ ostream& operator<<(ostream& os, const AllBusInfoBusResponse& r) {
 		cout << "not found";
 	}
 	else {
-		cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
+		cout << "Bus " << r.bus << " :"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
 	}
 	return os;
 }
@@ -312,7 +324,7 @@ public:
 					cout << "not found" << endl;
 				}
 				else {
-					cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
+					cout << "Bus " << r.bus << ": "s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
 				}
 			}
 		}
