@@ -108,34 +108,28 @@ struct Busptr {
 
 class TransportCatalogue {
 public:
+
 	void AddBus(Bus b) {
 		Busptr bptr;
 		deque <string*> stops_ptr;
 		for (auto stop : b.stops) {
 			auto first_space_colon = stop.find_first_not_of(" ");
 			auto last_space_colon = stop.find_last_not_of(" ");
-			stop = stop.substr(first_space_colon , last_space_colon);
-			auto it = stop_name_to_stop_.find(stop);  
+			stop = stop.substr(first_space_colon, last_space_colon);
+			auto it = stop_name_to_stop_.find(stop);
 			if (it != stop_name_to_stop_.end()) {
-				Stop stopPtr = *(it->second);
-				string stopNamePtr = stopPtr.stop;
-				stops_ptr.push_back(&stopNamePtr);
+				stops_ptr.push_back(&it->second->stop);
 			}
 		}
 		bptr.bus = b.bus;
 		bptr.type = b.type;  // sv
 		bptr.stops = stops_ptr;
+		Busptr* bptr_bus = &buses_.back();
 		buses_.push_back(bptr); //move
-		Busptr* bptr_bus = &bptr;
 		bus_name_to_bus_.emplace(b.bus, bptr_bus);
 
 	}
 
-	/*void AddStop(Stop s) {
-		Stop* ptr_stop = &s;
-		stop_name_to_stop_.emplace(s.stop, ptr_stop);
-		stops_.push_back(s); //move
-	}*/
 
 	void AddStop(Stop s) {
 		stops_.push_back(s); //move
