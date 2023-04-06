@@ -124,8 +124,8 @@ public:
 		bptr.bus = b.bus;
 		bptr.type = b.type;  // sv
 		bptr.stops = stops_ptr;
-		Busptr* bptr_bus = &buses_.back();
 		buses_.push_back(bptr); //move
+		Busptr* bptr_bus = &buses_.back();
 		bus_name_to_bus_.emplace(b.bus, bptr_bus);
 
 	}
@@ -170,6 +170,7 @@ public:
 				++lap;
 				all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
 			}
+			all_r.r_length += all_r.r_length;
 		}
 		else {
 			all_r.bus = bus; all_r.stops = 0;
@@ -345,7 +346,7 @@ int main()
 		getline(cin, line);
 		auto space_colon = line.find(" ");  // : отделяет название запроса
 		string str = line.substr(space_colon + 1);
-		tc.GetAllBusInfo(str);
+		cout << tc.GetAllBusInfo(str) << endl;
 	}
 
 
