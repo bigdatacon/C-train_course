@@ -113,6 +113,9 @@ public:
 		deque <string*> stops_ptr;
 		// тут нужно в buses добавить вместо string названий остановок - ссылки на остановки 
 		for (auto stop : b.stops) {
+			auto first_space_colon = stop.find_first_not_of(" ");
+			auto last_space_colon = stop.find_last_not_of(" ");
+			stop = stop.substr(first_space_colon , last_space_colon);
 			auto it = stop_name_to_stop_.find(stop);  
 			if (it != stop_name_to_stop_.end()) {
 				Stop stopPtr = *(it->second);
@@ -206,7 +209,7 @@ public:
 			if (req_name == "Bus"s) {
 				Bus q;
 				auto circle = list_section.find(">");
-				if (circle) {
+				if (circle!= std::string::npos) {
 					vector<string> bus_stops = SplitStringBySignCircle(list_section);
 					q.type = "c"s;
 					q.bus = request_section.substr(space_colon + 1, pos_colon);
