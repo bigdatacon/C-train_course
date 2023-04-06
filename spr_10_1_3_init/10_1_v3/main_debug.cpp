@@ -161,7 +161,7 @@ public:
 			}
 			else {
 				all_r.stops = stops_v.size() * 2 - 1;
-				all_r.uniq_stops = stops_v.size();
+				all_r.uniq_stops = stops_v.size()*2-1;
 			}
 			int lap = 0;
 			for (int i = 0; i < stops_v.size() - 1; i++) {
@@ -305,9 +305,18 @@ public:
 	}
 	void Output(TransportCatalogue& tc) {
 		for (const auto& element : req_) {
-			if (element.name == "Bus"s) { cout << tc.GetAllBusInfo(element.str); }
+			if (element.name == "Bus"s) {
+				AllBusInfoBusResponse r = tc.GetAllBusInfo(element.str);
+				if (r.stops == 0) {
+					cout << "No stop for Bus";
+				}
+				else {
+					cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
+				}
+			}
 		}
 	}
+	
 
 private:
 	istream& is_;
@@ -335,6 +344,11 @@ int main()
 
 	StatReader streader(std::cin);
 	int count_out = streader.GetNumOutQueries();
+	streader.FillRequests();
+	streader.Output(tc);
+	
+	/*
+	
 	for (int i = 0; i < count_out; ++i) {
 		streader.Output(tc);
 	}
@@ -349,6 +363,6 @@ int main()
 		cout << tc.GetAllBusInfo(str) << endl;
 	}
 
-
+	*/
     return 0;
 }
