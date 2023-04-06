@@ -18,30 +18,16 @@
 #include "geo.h"
 #include "transport_catalogue.h"
 
-
-
-
 std::vector<std::string> SplitStringBySignPlain(std::string str);
 
 std::vector<std::string> SplitStringBySignCircle(std::string str);
 
 std::pair<double, double> SplitStringByComma(std::string str);
 
-struct Stop {
-	std::string stop;
-	Coordinates coordinates;
-};
-
-struct Bus {
-	std::string bus;
-	std::vector<std::string> stops;
-	std::string type;
-};
-
 
 class InputReader {
 public:
-	InputReader(std::istream& is) : is_(is) {};
+	InputReader(std::istream& is) ;
 
 	int GetNumUpdateQueries(); 
 
@@ -52,7 +38,7 @@ public:
 	void GetUpdBus(TransportCatalogue& tc);
 
 private:
-	istream& is_;
+	std::istream& is_;
 	std::deque<Bus> upd_req_bus_;
 	std::deque<Stop> upd_req_stop_;
 	int num_update_q_;
