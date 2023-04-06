@@ -1,6 +1,6 @@
 #pragma once
-// напишите решение с нуля
-// код сохраните в свой git-репозиторий
+// РЅР°РїРёС€РёС‚Рµ СЂРµС€РµРЅРёРµ СЃ РЅСѓР»СЏ
+// РєРѕРґ СЃРѕС…СЂР°РЅРёС‚Рµ РІ СЃРІРѕР№ git-СЂРµРїРѕР·РёС‚РѕСЂРёР№
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -41,6 +41,16 @@ struct UpdateQuery {
     QueryType type;
     Bus bus;
     Stop stop;
+
+    string toString() const {
+        if (type == QueryType::Bus) {
+            return "Bus "s + bus.bus;
+        }
+        if (type == QueryType::Stop) {
+            return "Stop "s + stop.stop;
+        }
+        return ""s;
+    }
 };
 
 vector<string> SplitStringBySign(std::string str);
