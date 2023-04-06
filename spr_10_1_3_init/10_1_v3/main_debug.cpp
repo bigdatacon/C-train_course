@@ -13,6 +13,7 @@
 #include <utility>
 #include <math.h>
 #include <regex>
+#include <cmath>
 
 using namespace std;
 
@@ -48,16 +49,7 @@ struct AllBusInfoBusResponse {
 	int uniq_stops;
 	int r_length;
 };
-struct Stop {
-	string stop;
-	Coordinates coordinates;
-};
 
-struct Bus {
-	string bus;
-	vector<string> stops;
-	string type;
-};
 
 vector<string> SplitStringBySignPlain(string str) {
 	vector<string> tokens;
@@ -98,6 +90,16 @@ pair<double, double> SplitStringByComma(string str) {
 
 	return coordinates;
 }
+struct Stop {
+	string stop;
+	Coordinates coordinates;
+};
+
+struct Bus {
+	string bus;
+	vector<string> stops;
+	string type;
+};
 struct Busptr {
 	string bus;
 	deque<string*> stops;
@@ -133,21 +135,21 @@ public:
 		stops_.push_back(s); //move
 	}
 
-	Busptr* FindBus(const string bus) {
-		Busptr* res;
-		if (bus_name_to_bus_.count(bus)) { return bus_name_to_bus_[bus]; }
+	Busptr FindBus(const string bus) {
+		Busptr res;
+		if (bus_name_to_bus_.count(bus)) { return *bus_name_to_bus_[bus]; }
 		else { cout << "Bus " << bus << ": not found" << endl; return res; }
 	}
 
-	Stop* FindStop(const string stop) {
-		Stop* res;
-		if (stop_name_to_stop_.count(stop)) { return stop_name_to_stop_[stop]; }
+	Stop FindStop(const string stop) {
+		Stop res;
+		if (stop_name_to_stop_.count(stop)) { return *stop_name_to_stop_[stop]; }
 		else { cout << "Stop " << stop << ": not found" << endl; return res; }
 	}
 
 	AllBusInfoBusResponse GetAllBusInfo(const string bus) {
 		AllBusInfoBusResponse all_r;
-		Busptr fb = *(FindBus(bus));
+		Busptr fb = FindBus(bus);
 		deque<string*> stops_v = fb.stops;
 		if (stops_v.size() != 0) {
 			all_r.bus = bus;
@@ -161,8 +163,8 @@ public:
 			}
 			int lap = 0;
 			for (int i = 0; i < stops_v.size() - 1; i++) {
-				Coordinates one  = (*(FindStop(stops_v[i]))).coordinates;
-				Coordinates two = (*(FindStop(stops_v[i+1]))).coordinates;
+				Coordinates one  = FindStop(stops_v[i]).coordinates;
+				Coordinates two = FindStop(stops_v[i+1]).coordinates;
 				++lap;
 				all_r.r_length += ComputeDistance(one, two);
 			}
