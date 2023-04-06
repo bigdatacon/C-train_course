@@ -111,7 +111,6 @@ public:
 	void AddBus(Bus b) {
 		Busptr bptr;
 		deque <string*> stops_ptr;
-		// тут нужно в buses добавить вместо string названий остановок - ссылки на остановки 
 		for (auto stop : b.stops) {
 			auto first_space_colon = stop.find_first_not_of(" ");
 			auto last_space_colon = stop.find_last_not_of(" ");
@@ -132,10 +131,16 @@ public:
 
 	}
 
-	void AddStop(Stop s) {
+	/*void AddStop(Stop s) {
 		Stop* ptr_stop = &s;
 		stop_name_to_stop_.emplace(s.stop, ptr_stop);
 		stops_.push_back(s); //move
+	}*/
+
+	void AddStop(Stop s) {
+		stops_.push_back(s); //move
+		Stop* ptr_stop = &stops_.back();
+		stop_name_to_stop_.emplace(s.stop, ptr_stop);
 	}
 
 	Busptr FindBus(string bus) {
