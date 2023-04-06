@@ -242,6 +242,7 @@ public:
 
 	void GetUpdBus(TransportCatalogue& tc) {
 		for (int i = 0; i < upd_req_bus_.size(); ++i) {
+			cout << "UPDT BUS : " << upd_req_bus_[i].bus << endl;
 			tc.AddBus(upd_req_bus_[i]);
 		}
 	}
@@ -262,6 +263,7 @@ int main()
 	reader.FillRequests();
 
 	reader.GetUpdStop(tc);
+	reader.GetUpdBus(tc);
 
     return 0;
 }
