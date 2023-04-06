@@ -135,19 +135,19 @@ public:
 		stops_.push_back(s); //move
 	}
 
-	Busptr FindBus(const string bus) {
+	Busptr FindBus(string bus) {
 		Busptr res;
 		if (bus_name_to_bus_.count(bus)) { return *bus_name_to_bus_[bus]; }
 		else { cout << "Bus " << bus << ": not found" << endl; return res; }
 	}
 
-	Stop FindStop(const string stop) {
+	Stop FindStop(string stop) {
 		Stop res;
 		if (stop_name_to_stop_.count(stop)) { return *stop_name_to_stop_[stop]; }
 		else { cout << "Stop " << stop << ": not found" << endl; return res; }
 	}
 
-	AllBusInfoBusResponse GetAllBusInfo(const string bus) {
+	AllBusInfoBusResponse GetAllBusInfo( string bus) {
 		AllBusInfoBusResponse all_r;
 		Busptr fb = FindBus(bus);
 		deque<string*> stops_v = fb.stops;
@@ -163,10 +163,10 @@ public:
 			}
 			int lap = 0;
 			for (int i = 0; i < stops_v.size() - 1; i++) {
-				Coordinates one  = FindStop(stops_v[i]).coordinates;
-				Coordinates two = FindStop(stops_v[i+1]).coordinates;
+				Stop one = FindStop(*stops_v[i]);
+				Stop two = FindStop(*stops_v[i + 1]); 
 				++lap;
-				all_r.r_length += ComputeDistance(one, two);
+				all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
 			}
 		}
 		else {
