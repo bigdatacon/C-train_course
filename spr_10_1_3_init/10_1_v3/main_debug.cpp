@@ -257,6 +257,64 @@ private:
 	int num_update_q_;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////OUTPUT//////////////////////////////////////
+
+ostream& operator<<(ostream& os, const AllBusInfoBusResponse& r) {
+	// Реализуйте эту функцию
+	//cout << "BusesForStopResponse"s << endl;
+	if (r.stops == 0) {
+		cout << "No stop for Bus";
+	}
+	else {
+		cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
+	}
+	return os;
+}
+
+struct StatR {
+	string name;
+	string str;
+};
+
+class StatReader {
+public:
+	StatReader(istream& is) : is_(is) {
+	}
+
+	int GetNumOutQueries() {
+		string line;
+		getline(is_, line);
+		num_update_q_ = std::stoi(line);
+		return num_update_q_;
+	}
+
+	void FillRequests() {
+
+		for (int i = 0; i < num_update_q_; ++i) {
+			StatR r;
+			string line;
+			getline(is_, line);
+			auto space_colon = line.find(" ");  // : отделяет название запроса
+			r.name = line.substr(0, space_colon);
+			r.str = line.substr(space_colon + 1);
+			req_.push_back(r);
+		}
+	}
+	void Output(TransportCatalogue& tc) {
+		for (const auto& element : req_) {
+			if (element.name == "Bus"s) { cout << tc.GetAllBusInfo(element.str); }
+		}
+	}
+
+private:
+	istream& is_;
+	deque<StatR> req_;
+	int num_update_q_;
+};
+
+
+
+
 int main()
 {
 	TransportCatalogue tc;
@@ -267,6 +325,27 @@ int main()
 
 	reader.GetUpdStop(tc);
 	reader.GetUpdBus(tc);
+
+	string b = "750"s;
+
+	tc.GetAllBusInfo(b);
+
+	StatReader streader(std::cin);
+	int count_out = streader.GetNumOutQueries();
+	for (int i = 0; i < count_out; ++i) {
+		streader.Output(tc);
+	}
+
+
+	// как говорили на вэбинаре для класса out не нужно записывать запросы в контейнер поэтому делаю обычный вывод из cin
+	for (int i = 0; i < count_out; ++i) {
+		string line;
+		getline(cin, line);
+		auto space_colon = line.find(" ");  // : отделяет название запроса
+		string str = line.substr(space_colon + 1);
+		tc.GetAllBusInfo(str);
+	}
+
 
     return 0;
 }
