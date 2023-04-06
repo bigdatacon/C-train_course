@@ -14,6 +14,7 @@
 #include <math.h>
 #include <regex>
 #include <cmath>
+#include <unordered_set>
 
 using namespace std;
 
@@ -70,11 +71,11 @@ vector<string> SplitStringBySignCircle(string str) {
 	{
 		tokens.push_back(token);
 	}
-	int half_size = tokens.size() / 2;
+	/*int half_size = tokens.size() / 2;
 	vector<string>::iterator first = tokens.begin();
 	vector<string>::iterator last = tokens.begin() + half_size;
-	vector<string> half_vec(first, last);
-	return half_vec;
+	vector<string> half_vec(first, last*/
+	return tokens;
 }
 
 pair<double, double> SplitStringByComma(string str) {
@@ -156,12 +157,13 @@ public:
 		if (stops_v.size() != 0) {
 			all_r.bus = bus;
 			if (fb.type == "c"s) {
-				all_r.stops = stops_v.size() * 2;
-				all_r.uniq_stops = stops_v.size();
+				all_r.stops = stops_v.size() ;
+				unordered_set<string*> us(stops_v.begin(), stops_v.end());
+				all_r.uniq_stops = us.size();
 			}
 			else {
 				all_r.stops = stops_v.size() * 2 - 1;
-				all_r.uniq_stops = stops_v.size()*2-1;
+				all_r.uniq_stops = stops_v.size();
 			}
 			int lap = 0;
 			for (int i = 0; i < stops_v.size() - 1; i++) {
