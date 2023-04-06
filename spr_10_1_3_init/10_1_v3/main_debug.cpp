@@ -44,11 +44,10 @@ inline double ComputeDistance(Coordinates from, Coordinates to) {
 }
 
 struct AllBusInfoBusResponse {
-	// Наполните полями эту структуру
 	string bus;
 	int stops;
 	int uniq_stops;
-	int r_length;
+	int r_length = 0; // значение r_length по умолчанию установлено на 0
 };
 
 
@@ -349,11 +348,7 @@ int main()
 	streader.FillRequests();
 	streader.Output(tc);
 	
-	/*
-	
-	for (int i = 0; i < count_out; ++i) {
-		streader.Output(tc);
-	}
+
 
 
 	// как говорили на вэбинаре для класса out не нужно записывать запросы в контейнер поэтому делаю обычный вывод из cin
@@ -365,6 +360,6 @@ int main()
 		cout << tc.GetAllBusInfo(str) << endl;
 	}
 
-	*/
+	
     return 0;
 }
