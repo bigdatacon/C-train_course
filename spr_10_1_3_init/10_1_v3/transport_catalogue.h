@@ -20,6 +20,17 @@
 #include "input_reader.h"
 
 
+struct Stop {
+	std::string stop;
+	Coordinates coordinates;
+};
+
+struct Bus {
+	std::string bus;
+	std::vector<std::string> stops;
+	std::string type;
+};
+
 struct AllBusInfoBusResponse {
 	std::string bus;
 	int stops;
