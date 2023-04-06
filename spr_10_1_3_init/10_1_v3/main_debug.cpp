@@ -309,7 +309,7 @@ public:
 			if (element.name == "Bus"s) {
 				AllBusInfoBusResponse r = tc.GetAllBusInfo(element.str);
 				if (r.stops == 0) {
-					cout << "No stop for Bus";
+					cout << "No stop for Bus" << endl;
 				}
 				else {
 					cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
