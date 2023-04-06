@@ -283,9 +283,12 @@ public:
 	int GetNumOutQueries() {
 		string line;
 		getline(is_, line);
-		num_update_q_ = std::stoi(line);
-		return num_update_q_;
+		if (line.size() != 0) {
+			num_update_q_ = std::stoi(line);
+			return num_update_q_; }
+		else { return 0; }
 	}
+
 
 	void FillRequests() {
 
