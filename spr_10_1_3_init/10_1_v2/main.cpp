@@ -1,4 +1,4 @@
-﻿// напишите решение с нуля
+// напишите решение с нуля
 // код сохраните в свой git-репозиторий
 #include "input_reader.h"
 #include "transport_catalogue.h"
@@ -12,6 +12,6 @@ int main()
     std::cout << count << std::endl;
     for (int i = 0; i < count; i++) {
         UpdateQuery q = reader.getUpdateQuery();
-        std::cout << q.type << std::endl;
+        std::cout << int(q.type) << std::endl;
     }
 }
