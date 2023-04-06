@@ -47,7 +47,7 @@ struct AllBusInfoBusResponse {
 	string bus;
 	int stops;
 	int uniq_stops;
-	int r_length = 0; // значение r_length по умолчанию установлено на 0
+	double r_length = 0; // значение r_length по умолчанию установлено на 0
 };
 
 
@@ -264,7 +264,7 @@ ostream& operator<<(ostream& os, const AllBusInfoBusResponse& r) {
 	// Реализуйте эту функцию
 	//cout << "BusesForStopResponse"s << endl;
 	if (r.stops == 0) {
-		cout << "No stop for Bus";
+		cout << "not found";
 	}
 	else {
 		cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
@@ -309,7 +309,7 @@ public:
 			if (element.name == "Bus"s) {
 				AllBusInfoBusResponse r = tc.GetAllBusInfo(element.str);
 				if (r.stops == 0) {
-					cout << "No stop for Bus" << endl;
+					cout << "not found" << endl;
 				}
 				else {
 					cout << "Bus " << r.bus << ":"s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
