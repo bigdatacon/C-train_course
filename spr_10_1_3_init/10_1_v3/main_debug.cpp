@@ -339,8 +339,6 @@ private:
 };
 
 
-
-
 int main()
 {
 	TransportCatalogue tc;
