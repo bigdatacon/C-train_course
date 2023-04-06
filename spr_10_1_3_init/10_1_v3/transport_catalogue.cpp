@@ -1,49 +1,80 @@
+#pragma once
 #include "input_reader.h"
+#include "geo.h"
 #include "transport_catalogue.h"
 
 using namespace std;
 
 
-void TransportCatalogue::AddBus(const UpdateQuery q) {
-    buses_[q.bus.bus] = q.bus.stops;
+
+void TransportCatalogue::AddBus(Bus b) {
+	Busptr bptr;
+	deque <string*> stops_ptr;
+	for (auto stop : b.stops) {
+		auto first_space_colon = stop.find_first_not_of(" ");
+		auto last_space_colon = stop.find_last_not_of(" ");
+		stop = stop.substr(first_space_colon, last_space_colon);
+		auto it = stop_name_to_stop_.find(stop);
+		if (it != stop_name_to_stop_.end()) {
+			stops_ptr.push_back(&it->second->stop);
+		}
+	}
+	bptr.bus = b.bus;
+	bptr.type = b.type;  // sv
+	bptr.stops = stops_ptr;
+	buses_.push_back(bptr); //move
+	Busptr* bptr_bus = &buses_.back();
+	bus_name_to_bus_.emplace(b.bus, bptr_bus);
+
 }
 
-void TransportCatalogue::AddStop(const UpdateQuery q) {
-    stops_[q.stop.stop] = make_pair(q.stop.coordinates.lat, q.stop.coordinates.lng);
+void TransportCatalogue::AddStop(Stop s) {
+	stops_.push_back(s); //move
+	Stop* ptr_stop = &stops_.back();
+	stop_name_to_stop_.emplace(s.stop, ptr_stop);
 }
 
-vector<string> TransportCatalogue::FindBus(const string bus) {
-    vector<string> res;
-    if (buses_.count(bus)) { return buses_[bus]; }
-    else { cout << "Bus " << bus << ": not found" << endl; return res; }
+Busptr TransportCatalogue::FindBus(string bus) {
+	Busptr res;
+	if (bus_name_to_bus_.count(bus)) { return *bus_name_to_bus_[bus]; }
+	else { return res; }
 }
 
-pair<double, double> TransportCatalogue::FindStop(const string stop) {
-    pair<double, double> res;
-    if (stops_.count(stop)) { return stops_[stop]; }
-    else { cout << "Stop " << stop << ": not found" << endl; return res; }
+Stop TransportCatalogue::FindStop(string stop) {
+	Stop res;
+	if (stop_name_to_stop_.count(stop)) { return *stop_name_to_stop_[stop]; }
+	else { return res; }
 }
 
-AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(const string bus) {
-    AllBusInfoBusResponse all_r;
-    vector<string> stops_v = FindBus(bus);
-    all_r.bus = bus;
-    all_r.stops = stops_v.size();
-    all_r.uniq_stops = countUnique(stops_v);
-    // ïîäñ÷åò ðàññòîÿíèÿ ComputeDistance
-    for (int i = 0; i < stops_v.size() - 1; i++) {
-        pair<double, double> one = FindStop(stops_v[i]);
-        pair<double, double> two = FindStop(stops_v[i + 1]);
-
-
-        Coordinates c_one;
-        Coordinates c_two;
-
-        c_one.lat = one.first;
-        c_one.lng = one.second;
-        c_two.lat = two.first;
-        c_two.lng = two.second;
-        all_r.r_length += ComputeDistance(c_one, c_two);
-    }
-    return all_r;
+AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(string bus) {
+	AllBusInfoBusResponse all_r;
+	Busptr fb = FindBus(bus);
+	deque<string*> stops_v = fb.stops;
+	if (stops_v.size() != 0) {
+		all_r.bus = bus;
+		if (fb.type == "c"s) {
+			all_r.stops = stops_v.size();
+			unordered_set<string*> us(stops_v.begin(), stops_v.end());
+			all_r.uniq_stops = us.size();
+			for (int i = 0; i < stops_v.size() - 1; i++) {
+				Stop one = FindStop(*stops_v[i]);
+				Stop two = FindStop(*stops_v[i + 1]);
+				all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
+			}
+		}
+		else {
+			all_r.stops = stops_v.size() * 2 - 1;
+			all_r.uniq_stops = stops_v.size();
+			for (int i = 0; i < stops_v.size() - 1; i++) {
+				Stop one = FindStop(*stops_v[i]);
+				Stop two = FindStop(*stops_v[i + 1]);
+				all_r.r_length += ComputeDistance(one.coordinates, two.coordinates);
+			}
+			all_r.r_length += all_r.r_length;
+		}
+	}
+	else {
+		all_r.bus = bus; all_r.stops = 0;
+	}
+	return all_r;
 }
