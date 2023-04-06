@@ -189,7 +189,8 @@ public:
 	int GetNumUpdateQueries() {
 		string line;
 		getline(is_, line);
-		return std::stoi(line);
+		num_update_q_ = std::stoi(line);
+		return num_update_q_;
 	}
 
 	void FillRequests() {
