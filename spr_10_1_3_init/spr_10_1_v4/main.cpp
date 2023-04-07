@@ -27,9 +27,10 @@ using namespace std;
 
 int main()
 {
-	TransportCatalogue tc;
+	/*TransportCatalogue tc;
     InputReader reader(std::cin);
-    (void) reader.GetNumUpdateQueries();
+    int count = reader.GetNumUpdateQueries();
+    //std::cout << "COUNT : " << count << std::endl;
 	reader.FillRequests();
 
 	reader.GetUpdStop(tc);
@@ -40,14 +41,16 @@ int main()
 	tc.GetAllBusInfo(b);
 
 	StatReader streader(std::cin);
-    (void)streader.GetNumOutQueries();
+	int count_out = streader.GetNumOutQueries();
 	streader.FillRequests();
-	streader.Output(tc);
-    
-    
-    
-    // сравнение файлов 
-    /*ifstream file1("file11.txt");
+	streader.Output(tc);*/
+
+
+	//сравниваю файлы 
+    //ifstream file1("file1.txt");
+    //ifstream file2("file2.txt");
+
+    ifstream file1("file11.txt");
     ifstream file2("file22.txt");
 
     string line1, line2;
@@ -66,7 +69,22 @@ int main()
         return 0;
     }
 
-    cout << "Files are identical" << endl;*/
+    cout << "Files are identical" << endl;
+
+    std::ifstream file("file11.txt");  // открываем файл для чтения
+    std::string line;
+    while (std::getline(file, line)) {  // читаем строки по очереди
+        std::cout << line << std::endl;  // выводим каждую строку на экран
+    }
+
+    
+
+
+
+    return 0;
+
+
+
 	
     return 0;
 }
