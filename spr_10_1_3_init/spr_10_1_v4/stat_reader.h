@@ -20,7 +20,7 @@
 
 
 //std::ostream& operator<<(std::ostream& os, const AllBusInfoBusResponse& r); 
-ostream& operator<<(ostream& os, const set<string>& r);
+void operator<<(ostream& os, const set<string>& r);
 
 struct StatR {
 	std::string name;
