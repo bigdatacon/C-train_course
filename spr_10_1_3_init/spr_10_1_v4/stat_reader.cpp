@@ -14,6 +14,14 @@ using namespace std;
 }*/
 
 
+ostream& operator<<(ostream& os, const set<string>& r) {
+	for (auto el : r) {
+		cout << el << " ";
+	}
+	cout << endl;
+	return os;
+}
+
 
 int StatReader::GetNumOutQueries() {
 	string line;
@@ -48,6 +56,26 @@ void StatReader::Output(TransportCatalogue& tc) {
 				cout << "Bus " << r.bus << ": "s << r.stops << " stops on route, "s << r.uniq_stops << " unique stops, "s << r.r_length << " route length"s << endl;
 			}
 		}
+
+		if (element.name == "Stop"s) {
+			Stop myStop = tc.FindStop(element.str);
+
+			if (myStop.stop.empty()) {
+				cout << "Stop " << element.str << ": not found" << endl;
+			}
+
+		set<string> r = tc.GetStopInfo(element.str);
+		if (r.size() == 0) {
+				cout << "Stop " << element.str << ": no buses" << endl;
+			}
+			else {
+				cout << "Stop : buses "  << r << endl;
+			}
+		}
+
+
+
+
 	}
 }
 
