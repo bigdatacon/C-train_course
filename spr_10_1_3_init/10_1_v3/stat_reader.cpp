@@ -14,8 +14,6 @@ ostream& operator<<(ostream& os, const AllBusInfoBusResponse& r) {
 }
 
 
-StatReader::StatReader(istream& is) : is_(is) {
-}
 
 int StatReader::GetNumOutQueries() {
 	string line;
