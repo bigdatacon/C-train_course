@@ -17,7 +17,7 @@
 #include <math.h>
 #include <regex>
 #include "geo.h"
-#include "input_reader.h"
+
 
 
 struct Stop {
