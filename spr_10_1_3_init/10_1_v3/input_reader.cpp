@@ -53,8 +53,8 @@ pair<double, double> SplitStringByComma(string str) {
 }
 
 
-InputReader::InputReader(istream& is) : is_(is) {
-}
+/*InputReader::InputReader(istream& is) : is_(is) {
+}*/
 
 int InputReader::GetNumUpdateQueries() {
 	string line;
