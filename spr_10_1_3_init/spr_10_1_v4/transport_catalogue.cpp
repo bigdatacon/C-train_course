@@ -63,9 +63,7 @@ AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(string bus) {
 		}
 		else {
 			all_r.stops = stops_v.size() * 2 - 1;
-            unordered_set<string*> us(stops_v.begin(), stops_v.end());
-			all_r.uniq_stops = us.size();
-			//all_r.uniq_stops = stops_v.size();
+			all_r.uniq_stops = stops_v.size();
 			for (int i = 0; i < stops_v.size() - 1; i++) {
 				Stop one = FindStop(*stops_v[i]);
 				Stop two = FindStop(*stops_v[i + 1]);
@@ -78,4 +76,20 @@ AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(string bus) {
 		all_r.bus = bus; all_r.stops = 0;
 	}
 	return all_r;
+}
+
+
+set<string> GetStopInfo(string s) {
+	set<string> stop_buses;
+	for (auto el : bus_name_to_bus_) {
+		for (string* strPtr : el.second.stops) {
+			// проверяем указатель на соответствие искомой строке
+			if (*strPtr == s) {
+				stop_buses.insert(el.second.bus);
+			}
+		}
+	}
+	return stop_buses;
+
+
 }
