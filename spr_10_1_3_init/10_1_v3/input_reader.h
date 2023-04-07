@@ -15,8 +15,9 @@
 #include <math.h>
 #include <regex>
 
-#include "geo.h"
 #include "transport_catalogue.h"
+#include "geo.h"
+
 
 std::vector<std::string> SplitStringBySignPlain(std::string str);
 
@@ -33,7 +34,7 @@ public:
 
 	void FillRequests(); 
 
-	void GetUpdStop(TransportCatalogue& tc); 
+	void GetUpdStop(TransportCatalogue& tc);
 
 	void GetUpdBus(TransportCatalogue& tc);
 
