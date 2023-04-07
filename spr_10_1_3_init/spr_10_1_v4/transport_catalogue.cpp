@@ -79,9 +79,9 @@ AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(string bus) {
 }
 
 
-set<string> GetStopInfo(string s) {
+set<string> TransportCatalogue::GetStopInfo(string s) {
 	set<string> stop_buses;
-	for (auto el : bus_name_to_bus_) {
+	for (auto el: bus_name_to_bus_) {
 		for (string* strPtr : el.second.stops) {
 			// проверяем указатель на соответствие искомой строке
 			if (*strPtr == s) {
