@@ -1,5 +1,4 @@
 #pragma once
-#include "input_reader.h"
 #include <cassert>
 #include <iostream>
 #include <map>
