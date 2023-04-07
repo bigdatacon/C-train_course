@@ -1,3 +1,4 @@
+#include <iostream>
 #include "stat_reader.h"
 #include "transport_catalogue.h"
 using namespace std;
@@ -14,12 +15,10 @@ using namespace std;
 }*/
 
 
-ostream& operator<<(ostream& os, const set<string>& r) {
-	for (auto el : r) {
-		cout << el << " ";
-	}
-	cout << endl;
-	return os;
+void operator<<(ostream& os, const set<string>& r) {
+	cout << "Stop : buses "; 
+	for (const auto& el : r) { cout << el << " "; } 
+	cout << endl; 
 }
 
 
