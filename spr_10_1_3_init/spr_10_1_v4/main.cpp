@@ -43,8 +43,30 @@ int main()
     (void)streader.GetNumOutQueries();
 	streader.FillRequests();
 	streader.Output(tc);
+    
+    
+    
+    // сравнение файлов 
+    /*ifstream file1("file11.txt");
+    ifstream file2("file22.txt");
 
+    string line1, line2;
+    int line_num = 1;
 
+    while (getline(file1, line1) && getline(file2, line2)) {
+        if (line1 != line2) {
+            cout << "Files differ at line " << line_num << endl;
+            return 0;
+        }
+        line_num++;
+    }
+
+    if (file1.eof() != file2.eof()) {
+        cout << "Files differ in size" << endl;
+        return 0;
+    }
+
+    cout << "Files are identical" << endl;*/
 	
     return 0;
 }
