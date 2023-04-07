@@ -78,18 +78,20 @@ AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(string bus) {
 	return all_r;
 }
 
-
 set<string> TransportCatalogue::GetStopInfo(string s) {
 	set<string> stop_buses;
-	for (auto el: bus_name_to_bus_) {
-		for (string* strPtr : el.second.stops) {
-			// проверяем указатель на соответствие искомой строке
-			if (*strPtr == s) {
-				stop_buses.insert(el.second.bus);
+
+	for (const auto& kvp : bus_name_to_bus_) {
+		deque<string*> stops = kvp.second->stops;
+		for (auto el : stops) {
+			if (*el == s)
+			{
+				stop_buses.insert(kvp.second->bus);
 			}
+
 		}
 	}
+	
 	return stop_buses;
-
 
 }
