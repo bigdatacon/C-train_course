@@ -1,4 +1,3 @@
-#pragma once
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -15,6 +14,43 @@
 #include "transport_catalogue.h"
 
 using namespace std;
+
+
+vector<string> SplitStringBySignPlain(string str) {
+	vector<string> tokens;
+	stringstream ss(str);
+	string token;
+	while (getline(ss, token, '-'))
+	{
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+
+vector<string> SplitStringBySignCircle(string str) {
+	vector<string> tokens;
+	stringstream ss(str);
+	string token;
+	while (getline(ss, token, '>'))
+	{
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+
+pair<double, double> SplitStringByComma(string str) {
+	pair<double, double> coordinates;
+	stringstream ss(str);
+	string token;
+
+	getline(ss, token, ',');
+	coordinates.first = stod(token);
+
+	getline(ss, token, ',');
+	coordinates.second = stod(token);
+
+	return coordinates;
+}
 
 
 InputReader::InputReader(istream& is) : is_(is) {
