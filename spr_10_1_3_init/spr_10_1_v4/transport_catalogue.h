@@ -51,9 +51,13 @@ public:
 	Stop FindStop(std::string stop);
 	AllBusInfoBusResponse GetAllBusInfo(std::string bus);
 
+	std::set<std::string> GetStopInfo(std::string s);
+
 private:
 	std::deque<Busptr> buses_;
 	std::deque<Stop> stops_;
 	std::unordered_map<std::string, Stop*> stop_name_to_stop_;
 	std::unordered_map<std::string, Busptr*> bus_name_to_bus_;
+
+	//std::unordered_map<std::string, set<string>> stop_info_;
 };
