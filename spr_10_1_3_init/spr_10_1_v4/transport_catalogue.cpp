@@ -63,7 +63,9 @@ AllBusInfoBusResponse TransportCatalogue::GetAllBusInfo(string bus) {
 		}
 		else {
 			all_r.stops = stops_v.size() * 2 - 1;
-			all_r.uniq_stops = stops_v.size();
+            unordered_set<string*> us(stops_v.begin(), stops_v.end());
+			all_r.uniq_stops = us.size();
+			//all_r.uniq_stops = stops_v.size();
 			for (int i = 0; i < stops_v.size() - 1; i++) {
 				Stop one = FindStop(*stops_v[i]);
 				Stop two = FindStop(*stops_v[i + 1]);
