@@ -15,11 +15,11 @@ using namespace std;
 }*/
 
 
-void operator<<(ostream& os, const set<string>& r) {
-	cout << "Stop : buses "; 
-	for (const auto& el : r) { cout << el << " "; } 
-	cout << endl; 
-}
+/*void operator<<(ostream& os, const set<string>& r) {
+	cout << "Stop : buses ";
+	for (const auto& el : r) { cout << el << " "; }
+	cout << endl;
+}*/
 
 
 int StatReader::GetNumOutQueries() {
@@ -68,7 +68,10 @@ void StatReader::Output(TransportCatalogue& tc) {
 				cout << "Stop " << element.str << ": no buses" << endl;
 			}
 			else {
-				cout << "Stop : buses "  << r << endl;
+			cout << "Stop "<< element.str<< ": "s << "buses ";
+			for (const auto& el : r) { cout << el << " "; }
+			cout << endl;
+			//operator<<(cout, r);
 			}
 		}
 
