@@ -17,10 +17,21 @@
 using namespace std;
 
 
+struct pair_hash {
+	inline std::size_t operator()(const std::pair<std::string, int>& p) const {
+		// Хэшируем строку и целое число с помощью стандартных функций хэширования
+		std::size_t str_hash = std::hash<std::string>{}(p.first);
+		std::size_t int_hash = std::hash<int>{}(p.second);
+
+		// Объединяем хэши двух элементов в один
+		return str_hash ^ (int_hash + 0x9e3779b9 + (str_hash << 6) + (str_hash >> 2));
+	}
+};
+
 unordered_set<pair<string, int>> SplitStringByForDist(string distance_section) {
 	//7500m to Rossoshanskaya ulitsa, 1800m to Biryusinka, 2400m to Universam
-	unordered_set<std::pair<string, int>> res;
-	unordered_set<string> str_set;
+	unordered_set<std::pair<string, int>  , pair_hash> res;
+	set<string> str_set;
 
 	std::stringstream ss(distance_section);
 	std::string substring;
@@ -98,7 +109,7 @@ void InputReader::FillRequests() {
 		auto pos_colon = line.find(":");
 		string request_section = line.substr(0, pos_colon);
 		string list_section = line.substr(pos_colon + 1);
-		auto space_colon = line.find(" "); // �������� �� request_section
+		auto space_colon = line.find(" "); // ïîìåíÿòü íà request_section
 		string req_name = request_section.substr(0, space_colon);
 		string instance_distance = "m to ";
 		auto is_distance = list_section.find(instance_distance);
@@ -174,4 +185,3 @@ void InputReader::GetUpdBus(TransportCatalogue& tc) {
 		tc.AddBus(upd_req_bus_[i]);
 	}
 }
-
