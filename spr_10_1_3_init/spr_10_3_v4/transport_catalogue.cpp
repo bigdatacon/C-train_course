@@ -1,4 +1,4 @@
-﻿#include "input_reader.h"
+#include "input_reader.h"
 #include "geo.h"
 #include "transport_catalogue.h"
 #include <functional>
@@ -48,7 +48,7 @@ Busptr TransportCatalogue::FindBus(string bus) {
 }*/
 
 Stop* TransportCatalogue::FindStop(string stop) {
-	Stop* res;
+	Stop* res =nullptr;
 	if (stop_name_to_stop_.count(stop)) { return stop_name_to_stop_[stop]; }
 	else { return res; }
 }
