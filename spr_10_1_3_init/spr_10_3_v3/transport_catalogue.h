@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -17,7 +17,8 @@
 #include <regex>
 #include "geo.h"
 
-
+#include <utility> 
+#include <functional> 
 
 struct Stop {
 	std::string stop;
@@ -45,12 +46,34 @@ struct Busptr {
 	std::string type;
 };
 
+
 struct PairHash {
 	std::size_t operator()(const std::pair<Stop*, Stop*>& p) const {
 		std::size_t hash1 = std::hash<Stop*>{}(p.first);
 		std::size_t hash2 = std::hash<Stop*>{}(p.second);
 		std::size_t combined_hash = hash1 + hash2;
 		return combined_hash;
+	}
+};
+
+struct StringHasher {
+	std::size_t operator()(const std::pair<Stop*, Stop*>& p) const {
+		const std::size_t constantal = 31; 
+		std::size_t hash_value_one = 0;
+		std::size_t hash_value_two = 0;
+		std::size_t p_pow = 1;
+		for (char c : p.first->stop) {
+			hash_value_one = (hash_value_one + (c - 'a' + 1) * p_pow) % std::size_t(-1);
+			p_pow = (p_pow * constantal) % std::size_t(-1);
+		}
+
+		for (char c : p.second->stop) {
+			hash_value_one = (hash_value_two + (c - 'a' + 1) * p_pow) % std::size_t(-1);
+			p_pow = (p_pow * constantal) % std::size_t(-1);
+		}
+
+
+		return hash_value_one + hash_value_two*constantal;
 	}
 };
 
@@ -76,5 +99,5 @@ private:
 	std::unordered_map<std::string, Busptr*> bus_name_to_bus_;
 
 	std::unordered_map<std::string, std::set<std::string>> stop_info_;
-	std::unordered_map<std::pair<Stop*, Stop*>, int, PairHash> stops_distance_;
+	std::unordered_map<std::pair<Stop*, Stop*>, int , StringHasher /*PairHash*/> stops_distance_;
 };
