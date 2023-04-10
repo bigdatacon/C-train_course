@@ -40,7 +40,7 @@ public:
             std::string& row = image[y];
             for (int x = position_.x; x < position_.x + size_.width; ++x) {
         
-                if (IsPointInEllipse({ x, y }, s)) {
+                if (! (x > s.width || y > s.height) ) {
                     char pixel = texture_->GetPixelColor({ x, y });
                     row[x] = pixel; 
                 }
@@ -54,27 +54,21 @@ public:
     }
 
     void DrawEllipse(Image& image) const {
-        double a = size_.width / 2.0;
-        double b = size_.height / 2.0;
-        double x0 = position_.x + a;
-        double y0 = position_.y + b;
         Size s = texture_->GetSize();
         for (int y = position_.y; y < position_.y + size_.height; ++y) {
             std::string& row = image[y];
             for (int x = position_.x; x < position_.x + size_.width; ++x) {
 
                 if (IsPointInEllipse({ x, y }, s)) {
-                    double dx = x - x0;
-                    double dy = y - y0;
-                    if (std::abs(dx / a) < 0.5 && std::abs(dy / b) < 0.5) {
-                        char pixel = texture_->GetPixelColor({ x, y });
+
+                    char pixel = texture_->GetPixelColor({ x, y });
                         row[x] = pixel;
                     }
                     else {
                         row[x] = '.';
                     }
                 }
-            }
+            
             std::cout << row << std::endl;
         }
     }
