@@ -36,7 +36,8 @@ public:
 
     void DrawRectangle(Image& image) const {
         Size s = texture_->GetSize();
-        for (int y = position_.y; y < position_.y + size_.height; ++y) {
+        //for (int y = position_.y; y < position_.y + size_.height; ++y) {
+        for (int y = 0; y < size_.height; ++y) {
             if (y > s.height) {
                 std::string row(s.width, '.');
                 std::cout << row << std::endl;
@@ -44,7 +45,8 @@ public:
             }
 
             std::string& row = image[y];
-            for (int x = position_.x; x < position_.x + size_.width; ++x) {
+            //for (int x = position_.x; x < position_.x + size_.width; ++x) {
+            for (int x = 0; x < size_.width; ++x) {
         
                 if (! (x > s.width) ) {
                     char pixel = texture_->GetPixelColor({ x, y });
@@ -61,9 +63,11 @@ public:
 
     void DrawEllipse(Image& image) const {
         Size s = texture_->GetSize();
-        for (int y = position_.y; y < position_.y + size_.height; ++y) {
+        //for (int y = position_.y; y < position_.y + size_.height; ++y) {
+        for (int y=0; y <= size_.height; ++y) {
             std::string& row = image[y];
-            for (int x = position_.x; x < position_.x + size_.width; ++x) {
+            //for (int x = position_.x; x < position_.x + size_.width; ++x) {
+            for (int x = 0; x <= size_.width; ++x) {
 
                 if (IsPointInEllipse({ x, y }, s)) {
 
