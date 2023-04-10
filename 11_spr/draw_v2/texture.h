@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include <iostream>
 
 class Texture {
 public:
@@ -13,18 +14,17 @@ public:
     }
 
 
-    /*char GetPixelColor(Point p) const {
-        Size s = GetSize();
-        if (!IsPointInEllipse(p, s)) {
-            return '.';
-        }
-        else { return image_[p.y][p.x]; }
-    }*/
-
     char GetPixelColor(Point p) const {
         return image_[p.y][p.x]; 
     }
 
+
+    void PrintImage() {
+        for (auto el : image_)
+        {
+            std::cout << "THIS STTRING :" << el << std::endl;
+        }
+    }
 
 
 private:
