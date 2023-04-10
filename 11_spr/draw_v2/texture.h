@@ -8,30 +8,25 @@ public:
     }
 
     Size GetSize() const {
-        // Заглушка. Реализуйте метод самостоятельно
+        // Р—Р°РіР»СѓС€РєР°. Р РµР°Р»РёР·СѓР№С‚Рµ РјРµС‚РѕРґ СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ
         return GetImageSize(image_);
     }
 
 
-    char GetPixelColor(Point p) const {
+    /*char GetPixelColor(Point p) const {
         Size s = GetSize();
         if (!IsPointInEllipse(p, s)) {
             return '.';
         }
         else { return image_[p.y][p.x]; }
-    }
+    }*/
 
-    /*
-     char GetPixelColor(Point p) const {
-     const auto [x, y] = p;
-     const auto [width, height] = GetSize();
-     if (x < 0 || y < 0 || x >= width || y >= height) {
-         return '.';
-     }
-     return image_[y][x];
- }*/
+    char GetPixelColor(Point p) const {
+        return image_[p.y][p.x]; 
+    }
 
 
 
 private:
     Image image_;
+};
