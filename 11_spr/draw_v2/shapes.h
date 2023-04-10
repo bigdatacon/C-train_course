@@ -52,9 +52,11 @@ public:
                 if (! (x > s.width) ) {
                     char pixel = texture_->GetPixelColor({ x, y });
                     row[x] = pixel; 
+                    image[y][x] = pixel;
                 }
                 else { 
                 row[x] = '.';
+                image[y][x] = '.';
                 }     
             }
             std::cout << row << std::endl;
