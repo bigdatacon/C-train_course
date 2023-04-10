@@ -38,7 +38,7 @@ public:
         Size s = texture_->GetSize();
         (void)texture_->PrintImage();
         //for (int y = position_.y; y < position_.y + size_.height; ++y) {
-        for (int y = /*position_.y*/ 0; y < size_.height; ++y) {
+        for (int y = position_.y /*0*/; y < position_.y+ size_.height; ++y) {
             if (y > s.height) {
                 std::string row(s.width, '.');
                 std::cout << row << std::endl;
@@ -47,7 +47,7 @@ public:
 
             std::string& row = image[y];
             //for (int x = position_.x; x < position_.x + size_.width; ++x) {
-            for (int x = /*position_.x*/ 0; x < size_.width; ++x) {
+            for (int x = position_.x-1 /*0*/; x < position_.x + size_.width; ++x) {
         
                 if (! (x > s.width) ) {
                     char pixel = texture_->GetPixelColor({ x, y });
