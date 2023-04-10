@@ -37,10 +37,16 @@ public:
     void DrawRectangle(Image& image) const {
         Size s = texture_->GetSize();
         for (int y = position_.y; y < position_.y + size_.height; ++y) {
+            if (y > s.height) {
+                std::string row(s.width, '.');
+                std::cout << row << std::endl;
+                break;
+            }
+
             std::string& row = image[y];
             for (int x = position_.x; x < position_.x + size_.width; ++x) {
         
-                if (! (x > s.width || y > s.height) ) {
+                if (! (x > s.width) ) {
                     char pixel = texture_->GetPixelColor({ x, y });
                     row[x] = pixel; 
                 }
