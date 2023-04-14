@@ -110,12 +110,12 @@ namespace svg {
 
 
 		// Добавляет в svg-документ объект-наследник svg::Object
-	void AddPtr(std::unique_ptr<Object>&& obj) {
+	void Document::AddPtr(std::unique_ptr<Object>&& obj) {
 		objects_.emplace_back(std::move(obj));
 	}
 
 	// Выводит в ostream svg-представление документа
-	void Render(std::ostream& out) const {
+	void Document::Render(std::ostream& out) const {
 		out << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << std::endl;
 		out << R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1">)" << std::endl;
 		RenderContext context(out, 4);
