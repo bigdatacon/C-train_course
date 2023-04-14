@@ -1,140 +1,138 @@
-#pragma once
-
-#include <cstdint>
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <string>
+#include "svg.h"
 
 namespace svg {
 
-    struct Point {
-        Point() = default;
-        Point(double x, double y)
-            : x(x)
-            , y(y) {
-        }
-        double x = 0;
-        double y = 0;
-    };
+	using namespace std::literals;
 
-    /*
-     * Вспомогательная структура, хранящая контекст для вывода SVG-документа с отступами.
-     * Хранит ссылку на поток вывода, текущее значение и шаг отступа при выводе элемента
-     */
-    struct RenderContext {
-        RenderContext(std::ostream& out)
-            : out(out) {
-        }
+	void Object::Render(const RenderContext& context) const {
+		context.RenderIndent();
 
-        RenderContext(std::ostream& out, int indent_step, int indent = 0)
-            : out(out)
-            , indent_step(indent_step)
-            , indent(indent) {
-        }
+		// Делегируем вывод тега своим подклассам
+		RenderObject(context);
 
-        RenderContext Indented() const {
-            return { out, indent_step, indent + indent_step };
-        }
+		context.out << std::endl;
+	}
 
-        void RenderIndent() const {
-            for (int i = 0; i < indent; ++i) {
-                out.put(' ');
-            }
-        }
+	// ---------- Circle ------------------
 
-        std::ostream& out;
-        int indent_step = 0;
-        int indent = 0;
-    };
+	Circle& Circle::SetCenter(Point center) {
+		center_ = center;
+		return *this;
+	}
 
-    /*
-     * Абстрактный базовый класс Object служит для унифицированного хранения
-     * конкретных тегов SVG-документа
-     * Реализует паттерн "Шаблонный метод" для вывода содержимого тега
-     */
-    class Object {
-    public:
-        void Render(const RenderContext& context) const;
+	Circle& Circle::SetRadius(double radius) {
+		radius_ = radius;
+		return *this;
+	}
 
-        virtual ~Object() = default;
+	void Circle::RenderObject(const RenderContext& context) const  {
+		auto& out = context.out;
+		out << "<circle cx=\""sv << center_.x << "\" cy=\""sv << center_.y << "\" "sv;
+		out << "r=\""sv << radius_ << "\" "sv;
+		out << "/>"sv;
+	}
 
-    private:
-        virtual void RenderObject(const RenderContext& context) const = 0;
-    };
+	//--------------------Polyline
+
+		// Добавляет очередную вершину к ломаной линии
+	Polyline& Polyline::AddPoint(Point point) {
+		points_.push_back(point);
+		return *this;
+	}
 
 
-    class Circle final : public Object {
-    public:
-        Circle& SetCenter(Point center);
-        Circle& SetRadius(double radius);
+	// Отрисовывает ломаную линию
+	void Polyline::RenderObject(const RenderContext& context) const  {
+		auto& out = context.out;
+        out << "<polyline points=\"";
+		for (const Point& p : points_) {
+			out << p.x << "," << p.y << " ";
+		}
+		//out << "\" />\n";
+        out << "\" />";
+	}
 
-    private:
-        void RenderObject(const RenderContext& context) const override;
 
-        Point center_;
-        double radius_ = 1.0;
-    };
+	//--------------------------------------Text
+		// Задаёт координаты опорной точки (атрибуты x и y)
+	Text& Text::SetPosition(Point pos) {
+		x = pos.x;
+		y = pos.y;
+		return *this;
+	}
 
-    class Polyline : public  Object {
-    public:
-        // Добавляет очередную вершину к ломаной линии
-        Polyline& AddPoint(Point point);
+	// Задаёт смещение относительно опорной точки (атрибуты dx, dy)
+	Text& Text::SetOffset(Point offset) {
+		dx = offset.x;
+		dy = offset.y;
+		return *this;
+	}
 
-        void RenderObject(const RenderContext& context) const override;
+	// Задаёт размеры шрифта (атрибут font-size)
+	Text& Text::SetFontSize(uint32_t size) {
+		font_size = size;
+		return *this;
+	}
 
-    private:
-        std::vector<Point> points_;
-    };
+	// Задаёт название шрифта (атрибут font-family)
+	Text& Text::SetFontFamily(std::string font_family) {
+		font_family_name = font_family;
+		return *this;
+	}
 
-  
-    class Text : public Object {
-    public:
-        // Задаёт координаты опорной точки (атрибуты x и y)
-        Text& SetPosition(Point pos);
+	// Задаёт толщину шрифта (атрибут font-weight)
+	Text& Text::SetFontWeight(std::string font_weight) {
+		font_weight_type = font_weight;
+		return *this;
+	}
 
-        // Задаёт смещение относительно опорной точки (атрибуты dx, dy)
-        Text& SetOffset(Point offset);
+	// Задаёт текстовое содержимое объекта (отображается внутри тега text)
+	Text& Text::SetData(std::string data) {
+		text_data = data;
+		return *this;
+	}
 
-        // Задаёт размеры шрифта (атрибут font-size)
-        Text& SetFontSize(uint32_t size);
+	void Text::RenderObject(const RenderContext& context) const  {
+		auto& out = context.out;
+        out << "<text x=\"" << x << "\" y=\"" << y << "\"";
+		if (dx || dy) {
+			out << " dx=\"" << dx << "\" dy=\"" << dy << "\"";
+		}
+		out << " font-size=\"" << font_size << "\"";
+		if (!font_family_name.empty()) {
+			out << " font-family=\"" << font_family_name << "\"";
+		}
+		if (!font_weight_type.empty()) {
+			out << " font-weight=\"" << font_weight_type << "\"";
+		}
+		//out << ">" << text_data << "</text>\n";
+        out << ">" << text_data << "</text>";
+	}
 
-        // Задаёт название шрифта (атрибут font-family)
-        Text& SetFontFamily(std::string font_family);
 
-        // Задаёт толщину шрифта (атрибут font-weight)
-        Text& SetFontWeight(std::string font_weight);
+	//---------------------------Document
 
-        // Задаёт текстовое содержимое объекта (отображается внутри тега text)
-        Text& SetData(std::string data);
 
-        // Прочие данные и методы, необходимые для реализации элемента <text>
-    private:
-        uint32_t x, y; // Координаты опорной точки
-        uint32_t dx, dy; // Смещение относительно опорной точки
-        uint32_t font_size; // Размер шрифта
-        std::string font_family_name; // Название шрифта
-        std::string font_weight_type; // Толщина шрифта
-        std::string text_data; // Текстовое содержимое объекта
+		// Добавляет в svg-документ объект-наследник svg::Object
+	void Document::AddPtr(std::unique_ptr<Object>&& obj) {
+		objects_.emplace_back(std::move(obj));
+	}
 
-        void RenderObject(const RenderContext& context) const override;
+	// Выводит в ostream svg-представление документа
+	void Document::Render(std::ostream& out) const {
+		out << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << std::endl;
+		out << R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1">)" << std::endl;
+		RenderContext context(out, 4);
+		for (const auto& obj : objects_) {
+			obj->Render(context.Indented());
+		}
+		out << "</svg>" << std::endl;
 
-    };
+	}
 
-    class Document {
-    public:
-        template <typename Obj>
-        void Add(Obj obj) {
-            objects_.emplace_back(std::make_unique<Obj>(std::move(obj)));
-        }
-        // Добавляет в svg-документ объект-наследник svg::Object
-        void AddPtr(std::unique_ptr<Object>&& obj);
 
-        // Выводит в ostream svg-представление документа
-        void Render(std::ostream& out) const;
 
-    private:
-        std::vector<std::unique_ptr<Object>> objects_;
-    };
+
+
 
 }  // namespace svg
