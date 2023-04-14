@@ -112,8 +112,8 @@ namespace svg {
         // Прочие данные и методы, необходимые для реализации элемента <text>
     private:
         uint32_t x, y; // Координаты опорной точки
-        uint32_t dx, dy=0; // Смещение относительно опорной точки
-        uint32_t font_size; // Размер шрифта
+        uint32_t dx, dy; // Смещение относительно опорной точки
+        uint32_t font_size=1; // Размер шрифта
         std::string font_family_name; // Название шрифта
         std::string font_weight_type; // Толщина шрифта
         std::string text_data; // Текстовое содержимое объекта
