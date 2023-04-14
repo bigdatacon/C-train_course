@@ -25,7 +25,7 @@ namespace svg {
 		return *this;
 	}
 
-	void Circle::RenderObject(const RenderContext& context) const override {
+	void Circle::RenderObject(const RenderContext& context) const  {
 		auto& out = context.out;
 		out << "<circle cx=\""sv << center_.x << "\" cy=\""sv << center_.y << "\" "sv;
 		out << "r=\""sv << radius_ << "\" "sv;
@@ -42,7 +42,7 @@ namespace svg {
 
 
 	// Отрисовывает ломаную линию
-	void Polyline::RenderObject(const RenderContext& context) const override {
+	void Polyline::RenderObject(const RenderContext& context) const  {
 		context.out << "<polyline points=\"";
 		for (const Point& p : points_) {
 			context.out << p.x << "," << p.y << " ";
@@ -90,7 +90,7 @@ namespace svg {
 		return *this;
 	}
 
-	void Text::RenderObject(const RenderContext& context) const override {
+	void Text::RenderObject(const RenderContext& context) const  {
 		context.out << "<text x=\"" << x << "\" y=\"" << y << "\"";
 		if (dx || dy) {
 			context.out << " dx=\"" << dx << "\" dy=\"" << dy << "\"";
