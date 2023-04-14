@@ -105,7 +105,25 @@ namespace svg {
 		return *this;
 	}
 
-	void Text::RenderObject(const RenderContext& context) const  {
+    
+    void Text::RenderObject(const RenderContext& context) const  {
+		auto& out = context.out;
+        out << "<text x=\"" << x << "\" y=\"" << y << "\"";
+		
+		out << " dx=\"" << dx << "\" dy=\"" << dy << "\"";
+	
+		out << " font-size=\"" << font_size << "\"";
+		if (!font_family_name.empty()) {
+			out << " font-family=\"" << font_family_name << "\"";
+		}
+		if (!font_weight_type.empty()) {
+			out << " font-weight=\"" << font_weight_type << "\"";
+		}
+        out << ">" << text_data << "</text>";
+	}
+
+    
+	/*void Text::RenderObject(const RenderContext& context) const  {
 		auto& out = context.out;
         out << "<text x=\"" << x << "\" y=\"" << y << "\"";
 		if (dx || dy) {
@@ -118,9 +136,8 @@ namespace svg {
 		if (!font_weight_type.empty()) {
 			out << " font-weight=\"" << font_weight_type << "\"";
 		}
-		//out << ">" << text_data << "</text>\n";
         out << ">" << text_data << "</text>";
-	}
+	}*/
 
 
 	//---------------------------Document
