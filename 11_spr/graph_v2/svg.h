@@ -81,10 +81,11 @@ namespace svg {
         // Добавляет очередную вершину к ломаной линии
         Polyline& AddPoint(Point point);
 
-        void RenderObject(const RenderContext& context) const override;
+        
 
     private:
         std::vector<Point> points_;
+        void RenderObject(const RenderContext& context) const override;
     };
 
   
