@@ -43,11 +43,12 @@ namespace svg {
 
 	// Отрисовывает ломаную линию
 	void Polyline::RenderObject(const RenderContext& context) const  {
-		context.out << "<polyline points=\"";
+		auto& out = context.out;
+        out << "<polyline points=\"";
 		for (const Point& p : points_) {
-			context.out << p.x << "," << p.y << " ";
+			out << p.x << "," << p.y << " ";
 		}
-		context.out << "\" />\n";
+		out << "\" />\n";
 	}
 
 
@@ -91,18 +92,19 @@ namespace svg {
 	}
 
 	void Text::RenderObject(const RenderContext& context) const  {
-		context.out << "<text x=\"" << x << "\" y=\"" << y << "\"";
+		auto& out = context.out;
+        out << "<text x=\"" << x << "\" y=\"" << y << "\"";
 		if (dx || dy) {
-			context.out << " dx=\"" << dx << "\" dy=\"" << dy << "\"";
+			out << " dx=\"" << dx << "\" dy=\"" << dy << "\"";
 		}
-		context.out << " font-size=\"" << font_size << "\"";
+		out << " font-size=\"" << font_size << "\"";
 		if (!font_family_name.empty()) {
-			context.out << " font-family=\"" << font_family_name << "\"";
+			out << " font-family=\"" << font_family_name << "\"";
 		}
 		if (!font_weight_type.empty()) {
-			context.out << " font-weight=\"" << font_weight_type << "\"";
+			out << " font-weight=\"" << font_weight_type << "\"";
 		}
-		context.out << ">" << text_data << "</text>\n";
+		out << ">" << text_data << "</text>\n";
 	}
 
 
