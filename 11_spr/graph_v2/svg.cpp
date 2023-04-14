@@ -42,15 +42,28 @@ namespace svg {
 
 
 	// Отрисовывает ломаную линию
+    void Polyline::RenderObject(const RenderContext& context) const {
+    auto& out = context.out;
+    out << "<polyline points=\"";
+    for (auto it = points_.begin(); it != points_.end(); ++it) {
+        out << it->x << "," << it->y;
+        if (it != points_.end() - 1) {
+            out << " ";
+        }
+    }
+    out << "\" />\n";
+}
+
+    
+    /*
 	void Polyline::RenderObject(const RenderContext& context) const  {
 		auto& out = context.out;
         out << "<polyline points=\"";
 		for (const Point& p : points_) {
 			out << p.x << "," << p.y << " ";
 		}
-		//out << "\" />\n";
         out << "\" />";
-	}
+	}*/
 
 
 	//--------------------------------------Text
@@ -122,7 +135,7 @@ namespace svg {
 	void Document::Render(std::ostream& out) const {
 		out << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << std::endl;
 		out << R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1">)" << std::endl;
-		RenderContext context(out, 4);
+		RenderContext context(out, 2);
 		for (const auto& obj : objects_) {
 			obj->Render(context.Indented());
 		}
