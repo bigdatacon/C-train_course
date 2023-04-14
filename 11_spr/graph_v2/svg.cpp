@@ -25,7 +25,7 @@ namespace svg {
 		return *this;
 	}
 
-	void Circle::RenderObject(const RenderContext& context) const {
+	void Circle::RenderObject(const RenderContext& context) const override {
 		auto& out = context.out;
 		out << "<circle cx=\""sv << center_.x << "\" cy=\""sv << center_.y << "\" "sv;
 		out << "r=\""sv << radius_ << "\" "sv;
@@ -115,7 +115,7 @@ namespace svg {
 	}
 
 	// Выводит в ostream svg-представление документа
-	void Render(std::ostream& out) {
+	void Render(std::ostream& out) const {
 		out << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << std::endl;
 		out << R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1">)" << std::endl;
 		RenderContext context(out, 4);
