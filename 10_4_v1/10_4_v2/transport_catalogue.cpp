@@ -117,7 +117,7 @@ namespace transport_catalogue {
 
 	}
 
-	void AddStopDistance(Distance distance) {
+	void TransportCatalogue::AddStopDistance(Distance distance) {
 		if (distance.distances.size() != 0) {
 			Stop* main_stop_ptr = stop_name_to_stop_[distance.stop_name];
 			vector<pair<string, int>> stop_dist_main = distance.distances;
