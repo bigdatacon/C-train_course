@@ -37,7 +37,7 @@ namespace transport_catalogue {
 		stp.coordinates = stop.coordinates;
 		stops_.push_back(move(stp));
 		Stop* ptr_stop = &stops_.back();
-		stop_name_to_stop_.emplace(stop.stop_name, ptr_stop);
+		stop_name_to_stop_.emplace(string_view(stop.stop_name), ptr_stop);
 		}
 	
 
@@ -209,7 +209,7 @@ namespace transport_catalogue {
 			Stop* main_stop_ptr = stop_name_to_stop_[s.stop_name];
 			vector<pair<string, int>> stop_dist_main = s.stop_dist;
 			for (auto el : stop_dist_main) {
-				Stop* another_stop_ptr = stop_name_to_stop_[el.first];
+				Stop* another_stop_ptr = stop_name_to_stop_[string_view(el.first)];
 				int distance = el.second;
 				stops_distance_.emplace(make_pair(main_stop_ptr, another_stop_ptr), distance);
 			}
