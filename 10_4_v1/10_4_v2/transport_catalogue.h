@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <string>
 #include <unordered_set>
@@ -53,7 +53,7 @@ namespace transport_catalogue {
 		};
 
 		struct PairOfStopPointerUsingString {
-			std::size_t operator()(const std::pair<const Stop*,   const Stop*>& p) const {
+			std::size_t operator()(const std::pair< Stop*,    Stop*>& p) const {
 				const std::size_t constantal = 31;
 				std::size_t hash_value_one = 0;
 				std::size_t hash_value_two = 0;
