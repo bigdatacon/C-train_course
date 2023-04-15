@@ -44,7 +44,7 @@ namespace transport_catalogue {
 
 	namespace detail {
 		struct PairOfStopPointerUsing_hash {
-			std::size_t operator()(const std::pair<Stop*, Stop*>& p) const {
+			std::size_t operator()(const std::pair< Stop*,  Stop*>& p) const {
 				std::size_t hash1 = std::hash<Stop*>{}(p.first);
 				std::size_t hash2 = std::hash<Stop*>{}(p.second);
 				std::size_t combined_hash = hash1 + hash2;
@@ -53,7 +53,7 @@ namespace transport_catalogue {
 		};
 
 		struct PairOfStopPointerUsingString {
-			std::size_t operator()(const std::pair< Stop*,    Stop*>& p) const {
+			std::size_t operator()(const std::pair<const  Stop*,   const  Stop*>& p) const {
 				const std::size_t constantal = 31;
 				std::size_t hash_value_one = 0;
 				std::size_t hash_value_two = 0;
