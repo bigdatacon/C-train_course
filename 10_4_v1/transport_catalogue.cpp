@@ -209,7 +209,7 @@ namespace transport_catalogue {
 			Stop* main_stop_ptr = stop_name_to_stop_[s.stop_name];
 			vector<pair<string, int>> stop_dist_main = s.stop_dist;
 			for (auto el : stop_dist_main) {
-				Stop* another_stop_ptr = stop_name_to_stop_[string_view(el.first)];
+				Stop* another_stop_ptr = stop_name_to_stop_[el.first];
 				int distance = el.second;
 				stops_distance_.emplace(make_pair(main_stop_ptr, another_stop_ptr), distance);
 			}
