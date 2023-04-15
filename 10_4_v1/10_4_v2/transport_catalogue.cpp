@@ -1,6 +1,7 @@
-﻿#include "input_reader.h"
+#include "input_reader.h"
 #include "geo.h"
 #include "transport_catalogue.h"
+
 
 using namespace std;
 namespace transport_catalogue {
@@ -33,7 +34,7 @@ namespace transport_catalogue {
 		stp.coordinates = stop.coordinates;
 		stops_.push_back(move(stp));
 		Stop* ptr_stop = &stops_.back();
-		stop_name_to_stop_.emplace(string_view(stop.stop_name), ptr_stop);
+		stop_name_to_stop_.emplace(string_view(ptr_stop->stop_name), ptr_stop);
 		}
 	
 	const Bus* TransportCatalogue::FindBus(string bus) const  {
