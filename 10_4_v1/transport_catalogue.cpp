@@ -1,4 +1,4 @@
-﻿#include "input_reader.h"
+#include "input_reader.h"
 #include "geo.h"
 #include <string_view>
 #include "transport_catalogue.h"
@@ -218,9 +218,24 @@ namespace transport_catalogue {
 
 
 	//int TransportCatalogue::GetStopDistance(Stop* s1, Stop* s2) const {
-	int TransportCatalogue::GetStopDistance(const Stop& s1, const Stop& s2) const {
-		//const Stop* s1 = &s1;
-		//const Stop* s2 = &s2;
+	/*int TransportCatalogue::GetStopDistance(const Stop& s1, const Stop& s2) const {
+		const Stop* s11 = &s1;
+		const Stop* s22 = &s2;
+		auto it = stops_distance_.find(make_pair(s1, s2));
+		auto it2 = stops_distance_.find(make_pair(s2, s1));
+
+		if (it != stops_distance_.end()) {
+			return stops_distance_.at(make_pair(s1, s2));
+		}
+		else if (it2 != stops_distance_.end()) {
+			return stops_distance_.at(make_pair(s2, s1));
+		}
+		else { return 0; }
+	}*/
+
+	int TransportCatalogue::GetStopDistance(const Stop& s11, const Stop& s22) const {
+		const Stop* s1 = &s11;
+		const Stop* s2 = &s22;
 		auto it = stops_distance_.find(make_pair(s1, s2));
 		auto it2 = stops_distance_.find(make_pair(s2, s1));
 
@@ -232,4 +247,6 @@ namespace transport_catalogue {
 		}
 		else { return 0; }
 	}
+
+
 }
