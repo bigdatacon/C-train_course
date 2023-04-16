@@ -1,128 +1,102 @@
 Подсказка:
-Воспользуйтесь диаграммой классов, которая дана в условии задачи, чтобы знать, как следует изменить связи между классами.
-Шаблонный метод Add перенесите из Document в ObjectContainer. Так ObjectContainer станет абстрактным классом, реализующим паттерн проектирования «Шаблонный метод». Класс Document должен будет реализовать только чисто виртуальный метод AddPtr.
-Как видно из примеров кода, интерфейс svg::Drawable допускает полиморфное удаление. Поэтому его деструктор следует сделать виртуальным.
-Класс svg::ObjectContainer — абстрактный базовый класс. Поэтому его деструктор следует сделать защищённым невиртуальным либо публичным виртуальным. Выберите на своё усмотрение.
+Добавьте PathProps в качестве родителя к классам Circle, Text, Polyline, чтобы наделить их свойствами этого класса.
+Чтобы сохранять значения новых свойств класса PathProps только при вызове соответствующих Set-методов, храните значения свойств в optional. Для тех свойств, значения которых равны std::nullopt, Set-методы не вызывались. Значит, выводить их в выходной поток не нужно.
+Для вывода значений StrokeLineCap и StrokeLineJoin перегрузите оператор вывода в поток.
 
 Задание
 Задание
-Это задание — часть итогового проекта десятого спринта. Не забудьте сохранить файлы с решением — они вам ещё понадобятся в следующих заданиях.
-Добавьте в SVG-библиотеку интерфейсы Drawable и ObjectContainer.
-Позаботьтесь, чтобы класс svg::Document являлся ObjectContainer-ом.
-В основном приложении — то есть в файле main.cpp — внутри пространства имён shapes создайте классы фигур Triangle, Star и Snowman, реализующие интерфейс svg::Drawable.
-Требования к классам и интерфейсам
-svg::Drawable
-Интерфейс Drawable унифицирует работу с объектами, которые можно нарисовать, подключив SVG-библиотеку. Для этого в нём есть метод Draw, принимающий ссылку на интерфейс ObjectContainer. 
-svg::ObjectContainer
-ObjectContainer задаёт интерфейс для доступа к контейнеру SVG-объектов. Через этот интерфейс Drawable-объекты могут визуализировать себя, добавляя в контейнер SVG-примитивы. svg::Document — пока единственный класс библиотеки, реализующий интерфейс ObjectContainer.
-image
-Строго говоря, ObjectContainer — это абстрактный класс, а не интерфейс, так как шаблонный метод Add, принимающий наследников Object по значению, не получится сделать виртуальным: в C++ шаблонные методы не могут быть виртуальными. Метод ObjectContainer::Add реализуйте на основе чисто виртуального метода ObjectContainer::AddPtr, принимающего unique_ptr<Object>&&.
-**shapes::Triangle**
-В качестве примера Drawable-класса — класс Triangle, рисующий треугольник с использованием примитива Polyline:
-namespace shapes {
+Добавьте к классам Text, Circle и Polyline SVG-библиотеки поддержку следующих методов:
+SetFillColor(Color color) задаёт значение свойства fill — цвет заливки. По умолчанию свойство не выводится.
+SetStrokeColor(Color color) задаёт значение свойства stroke — цвет контура. По умолчанию свойство не выводится.
+SetStrokeWidth(double width) задаёт значение свойства stroke-width — толщину линии. По умолчанию свойство не выводится.
+SetStrokeLineCap(StrokeLineCap line_cap) задаёт значение свойства stroke-linecap — тип формы конца линии. По умолчанию свойство не выводится.
+SetStrokeLineJoin(StrokeLineJoin line_join) задаёт значение свойства stroke-linejoin — тип формы соединения линий. По умолчанию свойство не выводится.
+Эти методы должны поддерживать method chaining, то есть возвращать ссылку на тип объекта, у которого были вызваны.
+Тип Color объявите на основе типа std::string. Также объявите константу NoneColor, имеющую значение none:
+namespace svg {
+...
+using Color = std::string;
 
-class Triangle : public svg::Drawable {
-public:
-    Triangle(svg::Point p1, svg::Point p2, svg::Point p3)
-        : p1_(p1)
-        , p2_(p2)
-        , p3_(p3) {
-    }
-
-    // Реализует метод Draw интерфейса svg::Drawable
-    void Draw(svg::ObjectContainer& container) const override {
-        container.Add(svg::Polyline().AddPoint(p1_).AddPoint(p2_).AddPoint(p3_).AddPoint(p1_));
-    }
-
-private:
-    svg::Point p1_, p2_, p3_;
+// Объявив в заголовочном файле константу со спецификатором inline,
+// мы сделаем так, что она будет одной на все единицы трансляции,
+// которые подключают этот заголовок.
+// В противном случае каждая единица трансляции будет использовать свою копию этой константы
+inline const Color NoneColor{"none"};
+...
+} 
+Типы StrokeLineCap и StrokeLineJoin объявляются с использованием enum:
+namespace svg {
+...
+enum class StrokeLineCap {
+    BUTT,
+    ROUND,
+    SQUARE,
 };
 
-class Star { /* Реализуйте самостоятельно */ };
-class Snowman { /* Реализуйте самостоятельно */ };
-
-} // namespace shapes 
-**shapes::Star**
-Класс Star — N-лучевая звезда, задаваемая координатами центра, внешним и внутренним радиусами и количеством лучей. Для рисования звезды используйте готовую функцию CreateStar, чтобы тренажёр мог сравнить результат с ожидаемым:
-// Объявите этот макрос в самом начале файла, чтобы при подключении <cmath> были объявлены макросы M_PI и другие 
-#define _USE_MATH_DEFINES 
-#include <cmath>
-
-namespace {
-svg::Polyline CreateStar(svg::Point center, double outer_rad, double inner_rad, int num_rays) {
-    using namespace svg;
-    Polyline polyline;
-    for (int i = 0; i <= num_rays; ++i) {
-        double angle = 2 * M_PI * (i % num_rays) / num_rays;
-        polyline.AddPoint({center.x + outer_rad * sin(angle), center.y - outer_rad * cos(angle)});
-        if (i == num_rays) {
-            break;
-        }
-        angle += M_PI / num_rays;
-        polyline.AddPoint({center.x + inner_rad * sin(angle), center.y - inner_rad * cos(angle)});
-    }
-    return polyline;
-}
-} 
-**shapes::Snowman**
-Класс Snowman — снеговик, состоящий из трех кругов. Задаётся координатами центра головы и её радиусом. Размеры и положение оставшихся частей снеговика вычисляются по схеме, которая приводится ниже. Порядок рисования кругов — снизу вверх.
-image
-svg::Document
-Класс Document должен реализовывать интерфейс svg::ObjectContainer. Это позволит создать композицию из произвольных Drawable-объектов и создать на их основе SVG-документ:
-template <typename DrawableIterator>
-void DrawPicture(DrawableIterator begin, DrawableIterator end, svg::ObjectContainer& target) {
-    for (auto it = begin; it != end; ++it) {
-        (*it)->Draw(target);
-    }
-}
-
-template <typename Container>
-void DrawPicture(const Container& container, svg::ObjectContainer& target) {
-    using namespace std;
-    DrawPicture(begin(container), end(container), target);
-}
-
+enum class StrokeLineJoin {
+    ARCS,
+    BEVEL,
+    MITER,
+    MITER_CLIP,
+    ROUND,
+};
+...
+} // namespace svg 
+Класс shapes::Snowman должен использовать следующие цвета:
+Заливка: rgb(240,240,240)
+Контур: black
+Класс shapes::Star должен использовать следующие цвета:
+Заливка: red
+Контур: black
+Класс shapes::Triangle оставьте без изменений.
+Пример использования:
 int main() {
     using namespace svg;
     using namespace shapes;
     using namespace std;
 
     vector<unique_ptr<svg::Drawable>> picture;
-
     picture.emplace_back(make_unique<Triangle>(Point{100, 20}, Point{120, 50}, Point{80, 40}));
-    // 5-лучевая звезда с центром {50, 20}, длиной лучей 10 и внутренним радиусом 4
     picture.emplace_back(make_unique<Star>(Point{50.0, 20.0}, 10.0, 4.0, 5));
-    // Снеговик с "головой" радиусом 10, имеющей центр в точке {30, 20}
     picture.emplace_back(make_unique<Snowman>(Point{30, 20}, 10.0));
 
     svg::Document doc;
-    // Так как документ реализует интерфейс ObjectContainer,
-    // его можно передать в DrawPicture в качестве цели для рисования
     DrawPicture(picture, doc);
 
-    // Выводим полученный документ в stdout
+    const Text base_text =  //
+        Text()
+            .SetFontFamily("Verdana"s)
+            .SetFontSize(12)
+            .SetPosition({10, 100})
+            .SetData("Happy New Year!"s);
+    doc.Add(Text{base_text}
+                .SetStrokeColor("yellow"s)
+                .SetFillColor("yellow"s)
+                .SetStrokeLineJoin(StrokeLineJoin::ROUND)
+                .SetStrokeLineCap(StrokeLineCap::ROUND)
+                .SetStrokeWidth(3));
+    doc.Add(Text{base_text}.SetFillColor("red"s));
+
     doc.Render(cout);
 } 
-Примерный вывод программы:
+Ожидаемый результат (порядок перечисления атрибутов может отличаться):
 <?xml version="1.0" encoding="UTF-8" ?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
   <polyline points="100,20 120,50 80,40 100,20" />
-  <polyline points="50,10 52.3511,16.7639 59.5106,16.9098 53.8042,21.2361 55.8779,28.0902 50,24 44.1221,28.0902 46.1958,21.2361 40.4894,16.9098 47.6489,16.7639 50,10" />
-  <circle cx="30" cy="70" r="20" />
-  <circle cx="30" cy="40" r="15" />
-  <circle cx="30" cy="20" r="10" />
+  <polyline points="50,10 52.3511,16.7639 59.5106,16.9098 53.8042,21.2361 55.8779,28.0902 50,24 44.1221,28.0902 46.1958,21.2361 40.4894,16.9098 47.6489,16.7639 50,10" fill="red" stroke="black"/>
+  <circle cx="30" cy="70" r="20" fill="rgb(240,240,240)" stroke="black"/>
+  <circle cx="30" cy="40" r="15" fill="rgb(240,240,240)" stroke="black"/>
+  <circle cx="30" cy="20" r="10" fill="rgb(240,240,240)" stroke="black"/>
+  <text fill="yellow" stroke="yellow" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" x="10" y="100" dx="0" dy="0" font-size="12" font-family="Verdana">Happy New Year!</text>
+  <text fill="red" x="10" y="100" dx="0" dy="0" font-size="12" font-family="Verdana">Happy New Year!</text>
 </svg> 
-Сохранив вывод программы в файл с расширением .svg и открыв его в браузере, вы увидите такое изображение:
 image
 Описание формата выходных данных
-Содержимое, выводимое методом svg::Document::Render, аналогично требованиям из предыдущего урока.
+Требования к содержимому, выводимому методом svg::Document::Render, аналогичны требованиям из предыдущего урока.
 Ограничения
 Ограничения допускают любое адекватное линейное решение: за одну секунду нужно обрабатывать порядка 10 000 вызовов конструкторов объектов и методов выставления свойств, а также один вызов метода svg::Document::Render.
 Гарантируется, что при тестировании тренажёр будет передавать валидные параметры в методы классов и их конструкторы. Поэтому усложнять код проверками не нужно.
 Что отправлять на проверку
 Код библиотеки должен располагаться в файлах svg.h и svg.cpp. Файл main.cpp должен содержать классы Triangle, Snowman и Star в пространстве имён shapes и необходимые для их работы функции. Функция main будет заменена на версию из тренажёра.
 Как будет тестироваться ваш код
-Тренажёр проверит работу классов shapes::Triangle, shapes::Snowman и shapes::Star, а также svg::Document и svg::ObjectContainer, svg::Drawable.
-Сохраните сигнатуру метода svg::Drawable::Draw, совместимой с предоставленной в классе shapes::Triangle, чтобы код скомпилировался.
-При рисовании звезды используйте код функции CreateStar, чтобы избежать неоднозначностей при проверке тренажёром.
-При рисовании снеговика рисуйте окружности снизу вверх согласно схеме.
+Тренажёр проверит работу классов shapes::Triangle, shapes::Snowman и shapes::Star, а также классов объектов библиотеки svg.
