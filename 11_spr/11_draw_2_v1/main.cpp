@@ -53,6 +53,7 @@ namespace shapes {
     };
 
     class Snowman : public svg::Drawable {
+    public:
         Snowman(svg::Point head_center, double  head_radius)
             : head_center_(head_center)
             , head_radius_(head_radius)
