@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include "svg.h" // Объявления классов библиотеки должны быть расположены в файле svg.h
+#include "svg.h" // РћР±СЉСЏРІР»РµРЅРёСЏ РєР»Р°СЃСЃРѕРІ Р±РёР±Р»РёРѕС‚РµРєРё РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СЂР°СЃРїРѕР»РѕР¶РµРЅС‹ РІ С„Р°Р№Р»Рµ svg.h
 
 #include <cmath>
 
@@ -7,6 +7,10 @@
 using namespace std::literals;
 using namespace svg;
 using namespace std;
+
+namespace {
+    svg::Polyline CreateStar(svg::Point center, double outer_rad, double inner_rad, int num_rays);
+}
 
 namespace shapes {
 
@@ -18,7 +22,7 @@ namespace shapes {
             , p3_(p3) {
         }
 
-        // Реализует метод Draw интерфейса svg::Drawable
+        // Р РµР°Р»РёР·СѓРµС‚ РјРµС‚РѕРґ Draw РёРЅС‚РµСЂС„РµР№СЃР° svg::Drawable
         void Draw(svg::ObjectContainer& container) const override {
             container.Add(svg::Polyline().AddPoint(p1_).AddPoint(p2_).AddPoint(p3_).AddPoint(p1_));
         }
@@ -36,7 +40,7 @@ namespace shapes {
             , num_rays_(num_rays) {
         }
 
-        // Реализует метод Draw интерфейса svg::Drawable
+        // Р РµР°Р»РёР·СѓРµС‚ РјРµС‚РѕРґ Draw РёРЅС‚РµСЂС„РµР№СЃР° svg::Drawable
         void Draw(svg::ObjectContainer& container) const override {
             container.AddPtr(std::make_unique<Polyline>(::CreateStar(p1_, outer_radius_, inner_radius_, num_rays_)));
         }
@@ -55,11 +59,12 @@ namespace shapes {
         {
         }
 
-        // Реализует метод Draw интерфейса svg::Drawable
+        // Р РµР°Р»РёР·СѓРµС‚ РјРµС‚РѕРґ Draw РёРЅС‚РµСЂС„РµР№СЃР° svg::Drawable
         void Draw(svg::ObjectContainer& container) const override {
-            container.AddPtr(std::make_unique<Circle>(head_center_, head_radius_));
-            container.AddPtr(std::make_unique<Circle>(Point(head_center_.x, head_center_.y + 2 * head_radius_), 1.5 * head_radius_));
-            container.AddPtr(std::make_unique<Circle>(Point(head_center_.x, head_center_.y + 5 * head_radius_), 2 * head_radius_));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y }).SetRadius(head_radius_)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 5 }).SetRadius(head_radius_ * 1.5)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 5 }).SetRadius(head_radius_ * 2)));
+
         }
 
 
@@ -110,16 +115,16 @@ int main() {
     vector<unique_ptr<svg::Drawable>> picture;
 
     picture.emplace_back(make_unique<Triangle>(Point{ 100, 20 }, Point{ 120, 50 }, Point{ 80, 40 }));
-    // 5-лучевая звезда с центром {50, 20}, длиной лучей 10 и внутренним радиусом 4
+    // 5-Р»СѓС‡РµРІР°СЏ Р·РІРµР·РґР° СЃ С†РµРЅС‚СЂРѕРј {50, 20}, РґР»РёРЅРѕР№ Р»СѓС‡РµР№ 10 Рё РІРЅСѓС‚СЂРµРЅРЅРёРј СЂР°РґРёСѓСЃРѕРј 4
     picture.emplace_back(make_unique<Star>(Point{ 50.0, 20.0 }, 10.0, 4.0, 5));
-    // Снеговик с "головой" радиусом 10, имеющей центр в точке {30, 20}
+    // РЎРЅРµРіРѕРІРёРє СЃ "РіРѕР»РѕРІРѕР№" СЂР°РґРёСѓСЃРѕРј 10, РёРјРµСЋС‰РµР№ С†РµРЅС‚СЂ РІ С‚РѕС‡РєРµ {30, 20}
     picture.emplace_back(make_unique<Snowman>(Point{ 30, 20 }, 10.0));
 
     svg::Document doc;
-    // Так как документ реализует интерфейс ObjectContainer,
-    // его можно передать в DrawPicture в качестве цели для рисования
+    // РўР°Рє РєР°Рє РґРѕРєСѓРјРµРЅС‚ СЂРµР°Р»РёР·СѓРµС‚ РёРЅС‚РµСЂС„РµР№СЃ ObjectContainer,
+    // РµРіРѕ РјРѕР¶РЅРѕ РїРµСЂРµРґР°С‚СЊ РІ DrawPicture РІ РєР°С‡РµСЃС‚РІРµ С†РµР»Рё РґР»СЏ СЂРёСЃРѕРІР°РЅРёСЏ
     DrawPicture(picture, doc);
 
-    // Выводим полученный документ в stdout
+    // Р’С‹РІРѕРґРёРј РїРѕР»СѓС‡РµРЅРЅС‹Р№ РґРѕРєСѓРјРµРЅС‚ РІ stdout
     doc.Render(cout);
 }
