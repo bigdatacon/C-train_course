@@ -62,9 +62,19 @@ namespace shapes {
 
         // Реализует метод Draw интерфейса svg::Drawable
         void Draw(svg::ObjectContainer& container) const override {
-            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y }).SetRadius(head_radius_)));
+            /*container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y }).SetRadius(head_radius_)));
             container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 5 }).SetRadius(head_radius_ * 1.5)));
-            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 5 }).SetRadius(head_radius_ * 2)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 5 }).SetRadius(head_radius_ * 2)));*/
+            
+            /*container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 5*head_radius_ }).SetRadius(head_radius_ * 2)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 3*head_radius_ }).SetRadius(head_radius_ * 1.5)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + head_radius_ }).SetRadius(head_radius_ )));*/
+            
+            
+            
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_radius_ * 7 }).SetRadius(head_radius_ * 2)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_radius_ * 4 }).SetRadius(head_radius_ * 1.5)));
+            container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_radius_ * 2 }).SetRadius(head_radius_ )));
 
         }
 
