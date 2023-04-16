@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+
+
 namespace svg {
 
     struct Point {
@@ -81,14 +83,14 @@ namespace svg {
         // Добавляет очередную вершину к ломаной линии
         Polyline& AddPoint(Point point);
 
-        
+
 
     private:
         std::vector<Point> points_;
         void RenderObject(const RenderContext& context) const override;
     };
 
-  
+
     class Text : public Object {
     public:
         // Задаёт координаты опорной точки (атрибуты x и y)
@@ -113,7 +115,7 @@ namespace svg {
     private:
         uint32_t x, y; // Координаты опорной точки
         uint32_t dx, dy; // Смещение относительно опорной точки
-        uint32_t font_size=1; // Размер шрифта
+        uint32_t font_size = 1; // Размер шрифта
         std::string font_family_name; // Название шрифта
         std::string font_weight_type; // Толщина шрифта
         std::string text_data; // Текстовое содержимое объекта
@@ -122,20 +124,40 @@ namespace svg {
 
     };
 
-    class Document {
+
+    class ObjectContainer {
     public:
         template <typename Obj>
         void Add(Obj obj) {
-            objects_.emplace_back(std::make_unique<Obj>(std::move(obj)));
+            AddPtr(std::make_unique<Obj>(std::move(obj)));
         }
         // Добавляет в svg-документ объект-наследник svg::Object
-        void AddPtr(std::unique_ptr<Object>&& obj);
+        virtual void AddPtr(std::unique_ptr<Object>&& obj) = 0;
+
+        virtual ~ObjectContainer() = default;
+    };
+
+    // Интерфейс Drawable задаёт объекты, которые можно нарисовать с помощью ObjectContainer
+    class Drawable {
+    public:
+        virtual void Draw(ObjectContainer& o) const = 0;
+        virtual ~Drawable() = default;
+    };
+
+    class Document : public ObjectContainer {
+    public:
+        // Добавляет в svg-документ объект-наследник svg::Object
+        void AddPtr(std::unique_ptr<Object>&& obj) override;
 
         // Выводит в ostream svg-представление документа
         void Render(std::ostream& out) const;
+
+        virtual ~Document() = default;
 
     private:
         std::vector<std::unique_ptr<Object>> objects_;
     };
 
+
 }  // namespace svg
+
