@@ -138,7 +138,7 @@ namespace svg {
 
 
 		// Добавляет в svg-документ объект-наследник svg::Object
-	void Document::AddPtr(std::unique_ptr<Object>&& obj) const {
+	void Document::AddPtr(std::unique_ptr<Object>&& obj)  {
 		objects_.emplace_back(std::move(obj));
 	}
 
