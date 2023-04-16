@@ -132,7 +132,7 @@ namespace svg {
             objects_.emplace_back(std::make_unique<Obj>(std::move(obj)));
         }
         // Добавляет в svg-документ объект-наследник svg::Object
-        virtual void AddPtr(std::unique_ptr<Object>&& obj) const = 0;
+        virtual void AddPtr(std::unique_ptr<Object>&& obj)  = 0;
 
         virtual ~ObjectContainer() = default;
 
@@ -154,7 +154,7 @@ namespace svg {
             objects_.emplace_back(std::make_unique<Obj>(std::move(obj)));
         }*/
         // Добавляет в svg-документ объект-наследник svg::Object
-        void AddPtr(std::unique_ptr<Object>&& obj) const override;
+        void AddPtr(std::unique_ptr<Object>&& obj)  override;
 
         // Выводит в ostream svg-представление документа
         void Render(std::ostream& out) const;
