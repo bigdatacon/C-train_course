@@ -196,7 +196,8 @@ namespace svg {
 				std::visit(ColorPrinter{}, *fill_color_);
 			}
 			if (stroke_color_) {
-				out << " stroke=\""sv << *stroke_color_ << "\""sv;
+				//out << " stroke=\""sv << *stroke_color_ << "\""sv;
+				std::visit(ColorPrinter{}, *stroke_color_);
 			}
 			if (stroke_width_) {
 				out << " stroke-width=\""sv << *stroke_width_ << "\""sv;
