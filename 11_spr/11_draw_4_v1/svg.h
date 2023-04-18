@@ -11,6 +11,36 @@
 
 namespace svg {
 
+	struct Rgb {
+		Rgb() = default;
+		Rgb(uint32_t red, uint32_t green, uint32_t blue)
+			: red_(red)
+			, green_(green) 
+			, blue_(blue)
+		{
+		}
+
+		uint32_t red_ = 215;
+		uint32_t green_ = 30;
+		uint32_t blue_ = 25;
+	};
+
+	struct Rgba {
+		Rgba() = default;
+		Rgba(uint32_t red, uint32_t green, uint32_t blue, uint32_t opacity)
+			: red_(red)
+			, green_(green)
+			, blue_(blue)
+			, opacity_(opacity)
+		{
+		}
+
+		uint32_t red_ = 215;
+		uint32_t green_ = 30;
+		uint32_t blue_ = 25;
+		uint32_t opacity_ = 0.3;
+	};
+
 
 	//using Color = std::string;
 	using Color = std::variant<std::monostate, std::string, Rgb , Rgba>;
@@ -95,17 +125,17 @@ namespace svg {
 	std::ostream& operator<<(std::ostream& os, const StrokeLineJoin& join);
 
 	struct ColorPrinter {
-		void operator()(monostate) const {
-			cout << "none"sv << endl;
+		void operator()(std::monostate) const {
+			std::cout << std::string("none") /*NoneColor*/ << std::endl;
 		}
 		void operator()(std::string s) const {
-			cout  << s << endl;
+			std::cout << s << std::endl;
 		}
 		void operator()(Rgb r) const {
-			cout << r<< endl;
+			std::cout << "RGB(" << r.red_ << "," << r.green_ << "," << r.blue_ << ")" << std::endl;
 		}
 		void operator()(Rgba r) const {
-			cout << r << endl;
+			std::cout << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
 		}
 	};
 
