@@ -18,7 +18,7 @@ namespace svg {
 		case StrokeLineJoin::ARCS: os << "arcs"; break;
 		case StrokeLineJoin::BEVEL: os << "bevel"; break;
 		case StrokeLineJoin::MITER: os << "miter"; break;
-		case StrokeLineJoin::MITER_CLIP: os << "miter clip"; break;
+		case StrokeLineJoin::MITER_CLIP: os << "miter-clip"; break;
 		case StrokeLineJoin::ROUND: os << "round"; break;
 		}
 		return os;
@@ -84,10 +84,16 @@ namespace svg {
 				out << " ";
 			}
 		}
-		std::cout << "\"";
-		out << " />";
+		//std::cout << "\"";
+		/*out << " />";
 		RenderAttrs(context.out);
-		out << "/>";
+		out << "/>";*/
+
+		out << "\" ";
+		
+		RenderAttrs(out);
+		//out << ' ';
+		out << "/>"sv;
 		
 	}
 
