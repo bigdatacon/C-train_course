@@ -125,8 +125,25 @@ namespace svg {
 	std::ostream& operator<<(std::ostream& os, const StrokeLineJoin& join);
 
 	struct ColorPrinter {
+		ostream& os;
 		void operator()(std::monostate) const {
-			std::cout << std::string("none") /*NoneColor*/ << std::endl;
+			os << std::string("none") << std::endl;
+		}
+		void operator()(const std::string& s) const {
+			os << s << std::endl;
+		}
+		void operator()(const Rgb& r) const {
+			os << "RGB(" << r.red_ << "," << r.green_ << "," << r.blue_ << ")" << std::endl;
+		}
+		void operator()(const Rgba& r) const {
+			os << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
+		}
+		//std::ostream& os;
+	};
+
+	/*struct ColorPrinter {
+		void operator()(std::monostate) const {
+			std::cout << std::string("none")  << std::endl;
 		}
 		void operator()(std::string s) const {
 			std::cout << s << std::endl;
@@ -137,7 +154,7 @@ namespace svg {
 		void operator()(Rgba r) const {
 			std::cout << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
 		}
-	};
+	};*/
 
 	template <typename Owner>
 	class PathProps {
