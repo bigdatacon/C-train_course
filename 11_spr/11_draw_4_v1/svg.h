@@ -9,6 +9,7 @@
 #include <variant>
 
 
+
 namespace svg {
 
 	struct Rgb {
@@ -124,7 +125,7 @@ namespace svg {
 
 	std::ostream& operator<<(std::ostream& os, const StrokeLineJoin& join);
 
-	struct ColorPrinter {
+	/*struct ColorPrinter {
 		ostream& os;
 		void operator()(std::monostate) const {
 			os << std::string("none") << std::endl;
@@ -138,10 +139,10 @@ namespace svg {
 		void operator()(const Rgba& r) const {
 			os << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
 		}
-		//std::ostream& os;
-	};
+	};*/
 
-	/*struct ColorPrinter {
+
+	struct ColorPrinter {
 		void operator()(std::monostate) const {
 			std::cout << std::string("none")  << std::endl;
 		}
@@ -154,7 +155,7 @@ namespace svg {
 		void operator()(Rgba r) const {
 			std::cout << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
 		}
-	};*/
+	};
 
 	template <typename Owner>
 	class PathProps {
@@ -192,7 +193,7 @@ namespace svg {
 
 			if (fill_color_) {
 				//out << "fill=\""sv << *fill_color_ << "\""sv;
-				out << std::visit(ColorPrinter{}, *fill_color_)<< "\""sv;
+				std::visit(ColorPrinter{}, *fill_color_);
 			}
 			if (stroke_color_) {
 				out << " stroke=\""sv << *stroke_color_ << "\""sv;
