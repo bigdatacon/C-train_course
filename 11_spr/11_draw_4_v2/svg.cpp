@@ -25,7 +25,7 @@ namespace svg {
 		return os;
 	}
 
-	std::ostream& operator<<(std::ostream& os, const Rgb& rgb) {
+	/*std::ostream& operator<<(std::ostream& os, const Rgb& rgb) {
 		os << "rgb(" << static_cast<unsigned int>(rgb.red_) << ","
 			<< static_cast<unsigned int>(rgb.green_) << ","
 			<< static_cast<unsigned int>(rgb.blue_) << ")";
@@ -38,7 +38,7 @@ namespace svg {
 			<< static_cast<unsigned int>(rgba.blue_) << ","
 			<< static_cast<unsigned int>(rgba.opacity_) << ")";
 		return os;
-	}
+	}*/
 
 	std::ostream& operator<<(std::ostream& os, const Color& color) {
 		std::ostringstream out;
