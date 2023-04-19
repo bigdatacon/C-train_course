@@ -129,8 +129,8 @@ namespace svg {
 
 	std::ostream& operator<<(std::ostream& os, const StrokeLineJoin& join);
 
-	/*struct ColorPrinter {
-		ostream& os;
+	struct ColorPrinter {
+		std::ostream& os;
 		void operator()(std::monostate) const {
 			os << std::string("none") << std::endl;
 		}
@@ -143,7 +143,7 @@ namespace svg {
 		void operator()(const Rgba& r) const {
 			os << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
 		}
-	};*/
+	};
 
 
 	/*struct ColorPrinter {
@@ -161,7 +161,7 @@ namespace svg {
 		}
 	};*/
 
-	struct ColorPrinter {
+	/*struct ColorPrinter {
 		std::ostream& out;
 		void operator()(std::monostate) const {
 			out << "none";
@@ -175,7 +175,7 @@ namespace svg {
 		void operator()(Rgba rgba) const {
 			out << rgba;
 		}
-	};
+	};*/
 
 	std::ostream& operator<<(std::ostream& os, const Color& color);
 
@@ -238,11 +238,13 @@ namespace svg {
 
 			if (fill_color_) {
 				//out << "fill=\""sv << *fill_color_ << "\""sv;
-				std::visit(ColorPrinter{}, *fill_color_);
+				//std::visit(ColorPrinter{}, *fill_color_);
+				out << std::visit(ColorPrinter{}, *fill_color_)<< "\""sv;
 			}
 			if (stroke_color_) {
 				//cout << " stroke=\""sv << *stroke_color_ << "\""sv;
-				std::visit(ColorPrinter{}, *stroke_color_);
+				//std::visit(ColorPrinter{}, *stroke_color_);
+				out << std::visit(ColorPrinter{}, *stroke_color_) << "\""sv;
 			}
 			if (stroke_width_) {
 				out << " stroke-width=\""sv << *stroke_width_ << "\""sv;
