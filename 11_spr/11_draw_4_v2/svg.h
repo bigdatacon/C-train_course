@@ -15,32 +15,32 @@ namespace svg {
 
 	struct Rgb {
 		Rgb() = default;
-		Rgb(double  red, double  green, double  blue)
-			: red_(red)
-			, green_(green) 
-			, blue_(blue)
+		Rgb(uint32_t  red, uint32_t  green, uint32_t  blue)
+			: red(red)
+			, green(green) 
+			, blue(blue)
 		{
 		}
 
-		double red_ = 215;
-		double green_ = 30;
-		double blue_ = 25;
+		uint32_t red = 215;
+		uint32_t green = 30;
+		uint32_t blue = 25;
 	};
 
 	struct Rgba {
 		Rgba() = default;
-		Rgba(double  red, double  green, double  blue, double  opacity)
-			: red_(red)
-			, green_(green)
-			, blue_(blue)
-			, opacity_(opacity)
+		Rgba(uint32_t  red, uint32_t  green, uint32_t  blue, double  opacity)
+			: red(red)
+			, green(green)
+			, blue(blue)
+			, opacity(opacity)
 		{
 		}
 
-		double red_ = 215;
-		double green_ = 30;
-		double blue_ = 25;
-		double opacity_ = 0.3;
+		uint32_t red = 215;
+		uint32_t  green = 30;
+		uint32_t blue = 25;
+		double opacity = 0.3;
 	};
 
 	//std::ostream& operator<<(std::ostream& os, const Rgb& rgb); 
@@ -139,10 +139,10 @@ namespace svg {
 			os << s /*<< std::endl*/;
 		}
 		void operator()(const Rgb& r) const {
-			os << "rgb(" << r.red_ << "," << r.green_ << "," << r.blue_ << ")" /*<< std::endl*/;
+			os << "rgb(" << r.red << "," << r.green << "," << r.blue << ")" /*<< std::endl*/;
 		}
 		void operator()(const Rgba& r) const {
-			os << "rgba(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" /*<< std::endl*/;
+			os << "rgba(" << r.red << "," << r.green << "," << r.blue << "," << r.opacity << ")" /*<< std::endl*/;
 		}
 	};
 
