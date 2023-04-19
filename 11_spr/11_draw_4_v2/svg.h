@@ -130,6 +130,7 @@ namespace svg {
 	std::ostream& operator<<(std::ostream& os, const StrokeLineJoin& join);
 
 	struct ColorPrinter {
+		ColorPrinter() = default; // добавлен конструктор по умолчанию
 		std::ostream& os;
 		void operator()(std::monostate) const {
 			os << std::string("none") << std::endl;
@@ -144,6 +145,7 @@ namespace svg {
 			os << "RGBA(" << r.red_ << "," << r.green_ << "," << r.blue_ << "," << r.opacity_ << ")" << std::endl;
 		}
 	};
+
 
 
 	/*struct ColorPrinter {
