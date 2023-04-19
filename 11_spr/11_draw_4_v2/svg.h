@@ -7,6 +7,7 @@
 #include <string>
 #include <optional>
 #include <variant>
+#include <sstream>
 
 
 
@@ -215,7 +216,7 @@ namespace svg {
 		void RenderAttrs(std::ostream& out) const {
 			using namespace std::literals;
 
-			if (auto strPtr = std::get_if<std::string>(&fill_color_)) {
+			/*if (auto strPtr = std::get_if<std::string>(&fill_color_)) {
 				out << " fill=\""sv << *strPtr << "\""sv;
 			}
 			else if (auto rgbPtr = std::get_if<Rgb>(&fill_color_)) {
@@ -232,17 +233,17 @@ namespace svg {
 			}
 			else if (auto rgbaPtr = std::get_if<Rgba>(&stroke_color_)) {
 				out << " stroke=\""sv << *rgbaPtr << "\""sv;
-			}
+			}*/
 
 
-			/*if (fill_color_) {
+			if (fill_color_) {
 				//out << "fill=\""sv << *fill_color_ << "\""sv;
 				std::visit(ColorPrinter{}, *fill_color_);
 			}
 			if (stroke_color_) {
 				//cout << " stroke=\""sv << *stroke_color_ << "\""sv;
 				std::visit(ColorPrinter{}, *stroke_color_);
-			}*/
+			}
 			if (stroke_width_) {
 				out << " stroke-width=\""sv << *stroke_width_ << "\""sv;
 			}
