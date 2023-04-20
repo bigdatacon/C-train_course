@@ -35,6 +35,7 @@ namespace json {
         explicit Node(Array array);
         explicit Node(Dict map);
         explicit Node(int value);
+        explicit Node(double value);
         explicit Node(std::string value);
 
         const Array& AsArray() const;
@@ -62,6 +63,7 @@ namespace json {
         Array as_array_;
         Dict as_map_;
         int as_int_ = 0;
+        double as_double_ = 0;
         std::string as_string_;
         Value value_;
     };
