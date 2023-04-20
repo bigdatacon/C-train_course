@@ -17,21 +17,28 @@ namespace json {
 			case 0: // nullptr_t
 				return true;
 			case 1: // Array
-				return std::get<Array>(lhs.GetValue()) == std::get<Array>(rhs.GetValue());
+				return std::equal_to<>()(std::get<Array>(lhs.GetValue()), std::get<Array>(rhs.GetValue()))
+					&& lhs.GetValue().index() == rhs.GetValue().index();
 			case 2: // Dict
-				return std::get<Dict>(lhs.GetValue()) == std::get<Dict>(rhs.GetValue());
+				return std::equal_to<>()(std::get<Dict>(lhs.GetValue()), std::get<Dict>(rhs.GetValue()))
+					&& lhs.GetValue().index() == rhs.GetValue().index();
 			case 3: // bool
-				return std::get<bool>(lhs.GetValue()) == std::get<bool>(rhs.GetValue());
+				return std::equal_to<>()(std::get<bool>(lhs.GetValue()), std::get<bool>(rhs.GetValue()))
+					&& lhs.GetValue().index() == rhs.GetValue().index();
 			case 4: // int
-				return std::get<int>(lhs.GetValue()) == std::get<int>(rhs.GetValue());
+				return std::equal_to<>()(std::get<int>(lhs.GetValue()), std::get<int>(rhs.GetValue()))
+					&& lhs.GetValue().index() == rhs.GetValue().index();
 			case 5: // double
-				return std::get<double>(lhs.GetValue()) == std::get<double>(rhs.GetValue());
+				return std::equal_to<>()(std::get<double>(lhs.GetValue()), std::get<double>(rhs.GetValue()))
+					&& lhs.GetValue().index() == rhs.GetValue().index();
 			case 6: // string
-				return std::get<std::string>(lhs.GetValue()) == std::get<std::string>(rhs.GetValue());
+				return std::equal_to<>()(std::get<std::string>(lhs.GetValue()), std::get<std::string>(rhs.GetValue()))
+					&& lhs.GetValue().index() == rhs.GetValue().index();
 			default:
 				throw std::runtime_error("Unknown value type");
 			}
 		}
+
 
 		bool operator!=(const Node& lhs, const Node& rhs)
 		{
