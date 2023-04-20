@@ -121,6 +121,11 @@ namespace json {
 		: as_int_(value) {
 	}
 
+
+	Node::Node(double value)
+		: as_double_(value) {
+	}
+
 	Node::Node(string value)
 		: as_string_(move(value)) {
 	}
