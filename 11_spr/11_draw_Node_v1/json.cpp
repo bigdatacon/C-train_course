@@ -12,7 +12,7 @@ namespace json {
 	namespace {
 
 
-		bool operator==(const Node& lhs, const Node& rhs)
+		/*bool operator==(const Node& lhs, const Node& rhs)
 		{
 			if (lhs.GetValue().index() != rhs.GetValue().index()) {
 				return false;
@@ -48,7 +48,7 @@ namespace json {
 		bool operator!=(const Node& lhs, const Node& rhs)
 		{
 			return !(lhs == rhs);
-		}
+		}*/
 
 		Node LoadNode(istream& input);
 
@@ -302,6 +302,12 @@ namespace json {
 	}
 
 	/////////////////////
+
+
+	bool Node::operator==(const Node& rhs) const {
+		return value_ == rhs.value_;
+	}
+
 	bool Node::IsInt() const { return std::holds_alternative<int>(value_); };
 	bool Node::IsDouble() const { return std::holds_alternative<int>(value_) || std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится int либо double.
 	bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится double.
