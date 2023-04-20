@@ -23,9 +23,6 @@ namespace json {
     bool operator==(const Node& lhs, const Node& rhs);
     bool operator!=(const Node& lhs, const Node& rhs);
 
-
-
-    //using Value = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
     class Node {
     public:
         /* Реализуйте Node, используя std::variant */
@@ -60,11 +57,6 @@ namespace json {
 
 
     private:
-        Array as_array_;
-        Dict as_map_;
-        int as_int_ = 0;
-        double as_double_ = 0;
-        std::string as_string_;
         Value value_;
     };
 
