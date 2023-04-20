@@ -50,10 +50,6 @@ namespace json {
 			return !(lhs == rhs);
 		}
 
-
-
-
-
 		Node LoadNode(istream& input);
 
 		Node LoadArray(istream& input) {
@@ -201,7 +197,7 @@ namespace json {
 
 		// Считывает содержимое строкового литерала JSON-документа
 		// Функцию следует использовать после считывания открывающего символа ":
-		std::string LoadString(std::istream& input) {
+		/*std::string LoadString(std::istream& input) {
 			using namespace std::literals;
 
 			auto it = std::istreambuf_iterator<char>(input);
@@ -260,21 +256,7 @@ namespace json {
 			}
 
 			return s;
-		}
-
-		int main() {
-			using namespace std;
-			istringstream strm("123.456"s);
-			auto value = LoadNumber(strm);
-			assert(value == Number{ 123.456 });
-
-			istringstream strm2(R"(\\ABC\"   \r\n\t")");
-			auto s = LoadString(strm2);
-			assert(s == "\\ABC\"   \r\n\t"s);
-		}
-
-
-
+		}*/
 
 	}  // namespace
 	Node::Node(std::nullptr_t) : value_(nullptr) {}
