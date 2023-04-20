@@ -7,7 +7,7 @@ namespace json {
 	namespace {
 
 
-		bool operator==(const Node& lhs, const Node& rhs) 
+		bool operator==(const Node& lhs, const Node& rhs)
 		{
 			if (lhs.GetValue().index() != rhs.GetValue().index()) {
 				return false;
@@ -33,13 +33,11 @@ namespace json {
 			}
 		}
 
-		bool operator!=(const Node& lhs, const Node& rhs)  
+		bool operator!=(const Node& lhs, const Node& rhs)
 		{
-			if (lhs == rhs) {
-				return false;
-			}
-			else { return true; }
+			return !(lhs == rhs);
 		}
+
 
 
 
@@ -145,8 +143,8 @@ namespace json {
 
 	/////////////////////
 	bool Node::IsInt() const { return std::holds_alternative<int>(value_); };
-	bool Node::IsDouble() const { return std::holds_alternative<double>(value_) || std::holds_alternative<int>(value_); }; //Возвращает true, если в Node хранится int либо double.
-	bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится double.
+	bool Node::IsDouble() const { return std::holds_alternative<double>(value_) || std::holds_alternative<int>(value_); }; //Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ Node С…СЂР°РЅРёС‚СЃСЏ int Р»РёР±Рѕ double.
+	bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ Node С…СЂР°РЅРёС‚СЃСЏ double.
 	bool Node::IsBool() const { return std::holds_alternative<bool>(value_); };
 	bool Node::IsString() const { return std::holds_alternative<std::string>(value_); };
 	bool Node::IsNull() const { return std::holds_alternative<std::nullptr_t>(value_); };
@@ -159,7 +157,7 @@ namespace json {
 			return std::holds_alternative<double>(value_) ? std::get<double>(value_) : static_cast<double>(std::get<int>(value_));
 		}
 		throw std::bad_variant_access();
-	}; //.Возвращает значение типа double, если внутри хранится double либо int.В последнем случае возвращается приведённое в double значение.
+	}; //.Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ С‚РёРїР° double, РµСЃР»Рё РІРЅСѓС‚СЂРё С…СЂР°РЅРёС‚СЃСЏ double Р»РёР±Рѕ int.Р’ РїРѕСЃР»РµРґРЅРµРј СЃР»СѓС‡Р°Рµ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїСЂРёРІРµРґС‘РЅРЅРѕРµ РІ double Р·РЅР°С‡РµРЅРёРµ.
 
 	Document::Document(Node root)
 		: root_(move(root)) {
@@ -173,7 +171,7 @@ namespace json {
 		return Document{ LoadNode(input) };
 	}
 
-	// Шаблон, подходящий для вывода double и int
+	// РЁР°Р±Р»РѕРЅ, РїРѕРґС…РѕРґСЏС‰РёР№ РґР»СЏ РІС‹РІРѕРґР° double Рё int
 	template <typename Value>
 	void PrintValue(const Value& value, std::ostream& out) {
 		out << value;
@@ -181,11 +179,11 @@ namespace json {
 
 
 
-	// Перегрузка функции PrintValue для вывода значений null
+	// РџРµСЂРµРіСЂСѓР·РєР° С„СѓРЅРєС†РёРё PrintValue РґР»СЏ РІС‹РІРѕРґР° Р·РЅР°С‡РµРЅРёР№ null
 	void PrintValue(std::nullptr_t, std::ostream& out) {
 		out << "null"sv;
 	}
-	// Другие перегрузки функции PrintValue пишутся аналогично
+	// Р”СЂСѓРіРёРµ РїРµСЂРµРіСЂСѓР·РєРё С„СѓРЅРєС†РёРё PrintValue РїРёС€СѓС‚СЃСЏ Р°РЅР°Р»РѕРіРёС‡РЅРѕ
 
 
 	//bool
@@ -233,15 +231,15 @@ namespace json {
 		(void)&doc;
 		(void)&output;
 
-		// Реализуйте функцию самостоятельно
+		// Р РµР°Р»РёР·СѓР№С‚Рµ С„СѓРЅРєС†РёСЋ СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ
 		const Node& root = doc.GetRoot();
 
-		// Проверяем, что корневой узел действительно существует
+		// РџСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 		if (/*!root.GetValue() */ root.GetValue().index() == 0) {
 			return;
 		}
 
-		// Рекурсивно обходим дерево элементов
+		// Р РµРєСѓСЂСЃРёРІРЅРѕ РѕР±С…РѕРґРёРј РґРµСЂРµРІРѕ СЌР»РµРјРµРЅС‚РѕРІ
 		PrintNode(root, output);
 	}
 
