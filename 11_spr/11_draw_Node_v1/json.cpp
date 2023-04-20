@@ -115,6 +115,7 @@ namespace json {
 		}
 
 	}  // namespace
+	Node::Node(std::nullptr_t) : value_(nullptr) {}
 
 	Node::Node(Array array)
 		: value_(move(array)) {
@@ -136,6 +137,8 @@ namespace json {
 	Node::Node(string value)
 		: value_(move(value)) {
 	}
+
+	Node::Node(bool val) : value_(val) {}
 	/////////////////////////////////////
 
 	const Array& Node::AsArray() const {
