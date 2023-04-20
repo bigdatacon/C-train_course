@@ -20,8 +20,11 @@ namespace json {
         using runtime_error::runtime_error;
     };
 
-    bool operator==(const Node& lhs, const Node& rhs);
-    bool operator!=(const Node& lhs, const Node& rhs);
+    //bool operator==(const Node& lhs, const Node& rhs);
+    //bool operator!=(const Node& lhs, const Node& rhs);
+    inline bool operator!=(const Node& lhs, const Node& rhs) {
+        return !(lhs == rhs);
+    }
 
     class Node {
     public:
@@ -36,6 +39,8 @@ namespace json {
         explicit Node(int value);
         explicit Node(double value);
         explicit Node(std::string value);
+
+        bool operator==(const Node& rhs) const;
 
         const Array& AsArray() const;
         const Dict& AsMap() const;
