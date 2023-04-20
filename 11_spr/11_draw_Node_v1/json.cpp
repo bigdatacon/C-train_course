@@ -117,45 +117,46 @@ namespace json {
 	}  // namespace
 
 	Node::Node(Array array)
-		: as_array_(move(array)) {
+		: value_(move(array)) {
 	}
 
 	Node::Node(Dict map)
-		: as_map_(move(map)) {
+		: value_(move(map)) {
 	}
 
 	Node::Node(int value)
-		: as_int_(value) {
+		: value_(value) {
 	}
 
 
 	Node::Node(double value)
-		: as_double_(value) {
+		: value_(value) {
 	}
 
 	Node::Node(string value)
-		: as_string_(move(value)) {
+		: value_(move(value)) {
 	}
+	/////////////////////////////////////
 
 	const Array& Node::AsArray() const {
-		return as_array_;
+		return std::get<Array>(value_);
 	}
 
 	const Dict& Node::AsMap() const {
-		return as_map_;
+		return std::get<Dict>(value_);
 	}
 
 	int Node::AsInt() const {
-		return as_int_;
+		return std::get<int>(value_);
 	}
 
 	const string& Node::AsString() const {
-		return as_string_;
+		return std::get<std::string>(value_);
 	}
 
 	/////////////////////
 	bool Node::IsInt() const { return std::holds_alternative<int>(value_); };
-	bool Node::IsDouble() const { return std::holds_alternative<double>(value_) || std::holds_alternative<int>(value_); }; //Возвращает true, если в Node хранится int либо double.
+	bool Node::IsDouble() const { return std::holds_alternative<int>(value_) || std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится int либо double.
 	bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится double.
 	bool Node::IsBool() const { return std::holds_alternative<bool>(value_); };
 	bool Node::IsString() const { return std::holds_alternative<std::string>(value_); };
@@ -165,11 +166,13 @@ namespace json {
 
 	bool Node::AsBool() const { return std::get<bool>(value_); };
 	double Node::AsDouble() const {
-		if (IsDouble()) {
-			return std::holds_alternative<double>(value_) ? std::get<double>(value_) : static_cast<double>(std::get<int>(value_));
+		if (IsPureDouble()) {
+			return std::get<double>(value_);
 		}
-		throw std::bad_variant_access();
-	}; //.Возвращает значение типа double, если внутри хранится double либо int.В последнем случае возвращается приведённое в double значение.
+		else {
+			return static_cast<double>(std::get<int>(value_));
+		}
+	} //.Возвращает значение типа double, если внутри хранится double либо int.В последнем случае возвращается приведённое в double значение.
 
 	Document::Document(Node root)
 		: root_(move(root)) {
