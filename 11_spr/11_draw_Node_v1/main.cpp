@@ -10,10 +10,10 @@ using namespace std::literals;
 
 namespace {
 
-    // Ниже даны тесты, проверяющие JSON-библиотеку.
-    // Можете воспользоваться ими, чтобы протестировать свой код.
-    // Раскомментируйте их по мере работы.
-
+    // РќРёР¶Рµ РґР°РЅС‹ С‚РµСЃС‚С‹, РїСЂРѕРІРµСЂСЏСЋС‰РёРµ JSON-Р±РёР±Р»РёРѕС‚РµРєСѓ.
+    // РњРѕР¶РµС‚Рµ РІРѕСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РёРјРё, С‡С‚РѕР±С‹ РїСЂРѕС‚РµСЃС‚РёСЂРѕРІР°С‚СЊ СЃРІРѕР№ РєРѕРґ.
+    // Р Р°СЃРєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ РёС… РїРѕ РјРµСЂРµ СЂР°Р±РѕС‚С‹.
+    
     
     json::Document LoadJSON(const std::string& s) {
         std::istringstream strm(s);
@@ -58,7 +58,7 @@ namespace {
             assert(false);
         }
     }
-
+    
     void TestNull() {
         Node null_node;
         assert(null_node.IsNull());
@@ -79,7 +79,7 @@ namespace {
         const Node node = LoadJSON("null"s).GetRoot();
         assert(node.IsNull());
         assert(node == null_node);
-        // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
+        // РџСЂРѕР±РµР»С‹, С‚Р°Р±СѓР»СЏС†РёРё Рё СЃРёРјРІРѕР»С‹ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё РјРµР¶РґСѓ С‚РѕРєРµРЅР°РјРё JSON С„Р°Р№Р»Р° РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         assert(LoadJSON(" \t\r\n\n\r null \t\r\n\n\r "s).GetRoot() == null_node);
     }
 
@@ -87,19 +87,19 @@ namespace {
         const Node int_node{42};
         assert(int_node.IsInt());
         assert(int_node.AsInt() == 42);
-        // целые числа являются подмножеством чисел с плавающей запятой
+        // С†РµР»С‹Рµ С‡РёСЃР»Р° СЏРІР»СЏСЋС‚СЃСЏ РїРѕРґРјРЅРѕР¶РµСЃС‚РІРѕРј С‡РёСЃРµР» СЃ РїР»Р°РІР°СЋС‰РµР№ Р·Р°РїСЏС‚РѕР№
         assert(int_node.IsDouble());
-        // Когда узел хранит int, можно получить соответствующее ему double-значение
+        // РљРѕРіРґР° СѓР·РµР» С…СЂР°РЅРёС‚ int, РјРѕР¶РЅРѕ РїРѕР»СѓС‡РёС‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ РµРјСѓ double-Р·РЅР°С‡РµРЅРёРµ
         assert(int_node.AsDouble() == 42.0);
         assert(!int_node.IsPureDouble());
         assert(int_node == Node{42});
-        // int и double - разные типы, поэтому не равны, даже когда хранят
+        // int Рё double - СЂР°Р·РЅС‹Рµ С‚РёРїС‹, РїРѕСЌС‚РѕРјСѓ РЅРµ СЂР°РІРЅС‹, РґР°Р¶Рµ РєРѕРіРґР° С…СЂР°РЅСЏС‚
         assert(int_node != Node{42.0});
 
         const Node dbl_node{123.45};
         assert(dbl_node.IsDouble());
         assert(dbl_node.AsDouble() == 123.45);
-        assert(dbl_node.IsPureDouble());  // Значение содержит число с плавающей запятой
+        assert(dbl_node.IsPureDouble());  // Р—РЅР°С‡РµРЅРёРµ СЃРѕРґРµСЂР¶РёС‚ С‡РёСЃР»Рѕ СЃ РїР»Р°РІР°СЋС‰РµР№ Р·Р°РїСЏС‚РѕР№
         assert(!dbl_node.IsInt());
 
         assert(Print(int_node) == "42"s);
@@ -116,9 +116,10 @@ namespace {
         assert(LoadJSON("-123456"s).GetRoot().AsInt() == -123456);
         assert(LoadJSON("0").GetRoot() == Node{0});
         assert(LoadJSON("0.0").GetRoot() == Node{0.0});
-        // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
+        // РџСЂРѕР±РµР»С‹, С‚Р°Р±СѓР»СЏС†РёРё Рё СЃРёРјРІРѕР»С‹ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё РјРµР¶РґСѓ С‚РѕРєРµРЅР°РјРё JSON С„Р°Р№Р»Р° РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         assert(LoadJSON(" \t\r\n\n\r 0.0 \t\r\n\n\r ").GetRoot() == Node{0.0});
     }
+    
 
     void TestStrings() {
         Node str_node{"Hello, \"everybody\""s};
@@ -132,13 +133,14 @@ namespace {
 
         assert(LoadJSON(Print(str_node)).GetRoot() == str_node);
         const std::string escape_chars
-            = R"("\r\n\t\"\\")"s;  // При чтении строкового литерала последовательности \r,\n,\t,\\,\"
-        // преобразовываться в соответствующие символы.
-        // При выводе эти символы должны экранироваться, кроме \t.
+            = R"("\r\n\t\"\\")"s;  // РџСЂРё С‡С‚РµРЅРёРё СЃС‚СЂРѕРєРѕРІРѕРіРѕ Р»РёС‚РµСЂР°Р»Р° РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё \r,\n,\t,\\,\"
+        // РїСЂРµРѕР±СЂР°Р·РѕРІС‹РІР°С‚СЊСЃСЏ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ СЃРёРјРІРѕР»С‹.
+        // РџСЂРё РІС‹РІРѕРґРµ СЌС‚Рё СЃРёРјРІРѕР»С‹ РґРѕР»Р¶РЅС‹ СЌРєСЂР°РЅРёСЂРѕРІР°С‚СЊСЃСЏ, РєСЂРѕРјРµ \t.
         assert(Print(LoadJSON(escape_chars).GetRoot()) == "\"\\r\\n\t\\\"\\\\\""s);
-        // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
+        // РџСЂРѕР±РµР»С‹, С‚Р°Р±СѓР»СЏС†РёРё Рё СЃРёРјРІРѕР»С‹ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё РјРµР¶РґСѓ С‚РѕРєРµРЅР°РјРё JSON С„Р°Р№Р»Р° РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         assert(LoadJSON("\t\r\n\n\r \"Hello\" \t\r\n\n\r ").GetRoot() == Node{"Hello"s});
     }
+    
 
     void TestBool() {
         Node true_node{true};
@@ -157,7 +159,8 @@ namespace {
         assert(LoadJSON(" \t\r\n\n\r true \r\n"s).GetRoot() == true_node);
         assert(LoadJSON(" \t\r\n\n\r false \t\r\n\n\r "s).GetRoot() == false_node);
     }
-
+    
+    
     void TestArray() {
         Node arr_node{Array{1, 1.23, "Hello"s}};
         assert(arr_node.IsArray());
@@ -168,11 +171,12 @@ namespace {
         assert(LoadJSON("[1,1.23,\"Hello\"]"s).GetRoot() == arr_node);
         assert(LoadJSON(Print(arr_node)).GetRoot() == arr_node);
         assert(LoadJSON(R"(  [ 1  ,  1.23,  "Hello"   ]   )"s).GetRoot() == arr_node);
-        // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
+        // РџСЂРѕР±РµР»С‹, С‚Р°Р±СѓР»СЏС†РёРё Рё СЃРёРјРІРѕР»С‹ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё РјРµР¶РґСѓ С‚РѕРєРµРЅР°РјРё JSON С„Р°Р№Р»Р° РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         assert(LoadJSON("[ 1 \r \n ,  \r\n\t 1.23, \n \n  \t\t  \"Hello\" \t \n  ] \n  "s).GetRoot()
                == arr_node);
     }
-
+    
+    
     void TestMap() {
         Node dict_node{Dict{{"key1"s, "value1"s}, {"key2"s, 42}}};
         assert(dict_node.IsMap());
@@ -183,14 +187,15 @@ namespace {
 
         assert(LoadJSON("{ \"key1\": \"value1\", \"key2\": 42 }"s).GetRoot() == dict_node);
         assert(LoadJSON(Print(dict_node)).GetRoot() == dict_node);
-        // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
+        // РџСЂРѕР±РµР»С‹, С‚Р°Р±СѓР»СЏС†РёРё Рё СЃРёРјРІРѕР»С‹ РїРµСЂРµРІРѕРґР° СЃС‚СЂРѕРєРё РјРµР¶РґСѓ С‚РѕРєРµРЅР°РјРё JSON С„Р°Р№Р»Р° РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         assert(
             LoadJSON(
                 "\t\r\n\n\r { \t\r\n\n\r \"key1\" \t\r\n\n\r: \t\r\n\n\r \"value1\" \t\r\n\n\r , \t\r\n\n\r \"key2\" \t\r\n\n\r : \t\r\n\n\r 42 \t\r\n\n\r } \t\r\n\n\r"s)
                 .GetRoot()
             == dict_node);
     }
-
+    
+    
     void TestErrorHandling() {
         MustFailToLoad("["s);
         MustFailToLoad("]"s);
@@ -198,7 +203,7 @@ namespace {
         MustFailToLoad("{"s);
         MustFailToLoad("}"s);
 
-        MustFailToLoad("\"hello"s);  // незакрытая кавычка
+        MustFailToLoad("\"hello"s);  // РЅРµР·Р°РєСЂС‹С‚Р°СЏ РєР°РІС‹С‡РєР°
 
         MustFailToLoad("tru"s);
         MustFailToLoad("fals"s);
@@ -226,6 +231,8 @@ namespace {
             array_node.AsBool();
         });
     }
+    
+    
 
     void Benchmark() {
         const auto start = std::chrono::steady_clock::now();
@@ -260,9 +267,14 @@ int main() {
         TestNumbers();
         TestStrings();
         TestBool();
-        TestArray();
+        
         TestMap();
-        TestErrorHandling();
+        
         Benchmark();
+
+
+    //Pass
+    TestErrorHandling();
+    TestArray();
     
 }
