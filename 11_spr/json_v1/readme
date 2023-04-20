@@ -1,0 +1,318 @@
+Подсказка:
+Используйте std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> чтобы хранить текущее значение узла JSON-документа. Значение nullptr имеет тип std::nullptr_t. Поместив nullptr_t в начале списка типов, вы сделаете его типом по умолчанию для этого variant. Поместите этот variant внутрь Node:
+class Node {
+public:
+    using Value = std::variant</*перечислите список типов*/>;
+    // ...
+    const Value& GetValue() const { return value_; }
+private:
+    Value value_;
+}; 
+Чтобы вывести значение Node в поток вывода, воспользуйтесь одним из способов, описанных в теории. Например, std::visit:
+// Шаблон, подходящий для вывода double и int
+template <typename Value>
+void PrintValue(const Value& value, std::ostream& out) {
+    out << value;
+}
+
+// Перегрузка функции PrintValue для вывода значений null
+void PrintValue(std::nullptr_t, std::ostream& out) {
+    out << "null"sv;
+}
+// Другие перегрузки функции PrintValue пишутся аналогично
+
+void PrintNode(const Node& node, std::ostream& out) {
+    std::visit(
+        [&out](const auto& value){ PrintValue(value, out); },
+        node.GetValue());
+} 
+Чтобы вывести JSON с красивым форматированием, функция PrintValue должна принимать не только поток вывода, но и величину отступа. Можно объединить их в один объект:
+// Контекст вывода, хранит ссылку на поток вывода и текущий отсуп
+struct PrintContext {
+    std::ostream& out;
+    int indent_step = 4;
+    int indent = 0;
+
+    void PrintIndent() const {
+        for (int i = 0; i < indent; ++i) {
+            out.put(' ');
+        }
+    }
+
+    // Возвращает новый контекст вывода с увеличенным смещением
+    PrintContext Indented() const {
+        return {out, indent_step, indent_step + indent};
+    }
+};
+
+template <typename Value>
+void PrintValue(const Value& value, const PrintContext& ctx) {
+    ...
+} 
+Пример реализации функций, считывающих строки и числа из JSON:
+#include <cassert>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <variant>
+
+class ParsingError : public std::runtime_error {
+public:
+    using runtime_error::runtime_error;
+};
+
+using Number = std::variant<int, double>;
+
+Number LoadNumber(std::istream& input) {
+    using namespace std::literals;
+
+    std::string parsed_num;
+
+    // Считывает в parsed_num очередной символ из input
+    auto read_char = [&parsed_num, &input] {
+        parsed_num += static_cast<char>(input.get());
+        if (!input) {
+            throw ParsingError("Failed to read number from stream"s);
+        }
+    };
+
+    // Считывает одну или более цифр в parsed_num из input
+    auto read_digits = [&input, read_char] {
+        if (!std::isdigit(input.peek())) {
+            throw ParsingError("A digit is expected"s);
+        }
+        while (std::isdigit(input.peek())) {
+            read_char();
+        }
+    };
+
+    if (input.peek() == '-') {
+        read_char();
+    }
+    // Парсим целую часть числа
+    if (input.peek() == '0') {
+        read_char();
+        // После 0 в JSON не могут идти другие цифры
+    } else {
+        read_digits();
+    }
+
+    bool is_int = true;
+    // Парсим дробную часть числа
+    if (input.peek() == '.') {
+        read_char();
+        read_digits();
+        is_int = false;
+    }
+
+    // Парсим экспоненциальную часть числа
+    if (int ch = input.peek(); ch == 'e' || ch == 'E') {
+        read_char();
+        if (ch = input.peek(); ch == '+' || ch == '-') {
+            read_char();
+        }
+        read_digits();
+        is_int = false;
+    }
+
+    try {
+        if (is_int) {
+            // Сначала пробуем преобразовать строку в int
+            try {
+                return std::stoi(parsed_num);
+            } catch (...) {
+                // В случае неудачи, например, при переполнении,
+                // код ниже попробует преобразовать строку в double
+            }
+        }
+        return std::stod(parsed_num);
+    } catch (...) {
+        throw ParsingError("Failed to convert "s + parsed_num + " to number"s);
+    }
+}
+
+// Считывает содержимое строкового литерала JSON-документа
+// Функцию следует использовать после считывания открывающего символа ":
+std::string LoadString(std::istream& input) {
+    using namespace std::literals;
+    
+    auto it = std::istreambuf_iterator<char>(input);
+    auto end = std::istreambuf_iterator<char>();
+    std::string s;
+    while (true) {
+        if (it == end) {
+            // Поток закончился до того, как встретили закрывающую кавычку?
+            throw ParsingError("String parsing error");
+        }
+        const char ch = *it;
+        if (ch == '"') {
+            // Встретили закрывающую кавычку
+            ++it;
+            break;
+        } else if (ch == '\\') {
+            // Встретили начало escape-последовательности
+            ++it;
+            if (it == end) {
+                // Поток завершился сразу после символа обратной косой черты
+                throw ParsingError("String parsing error");
+            }
+            const char escaped_char = *(it);
+            // Обрабатываем одну из последовательностей: \\, \n, \t, \r, \"
+            switch (escaped_char) {
+                case 'n':
+                    s.push_back('\n');
+                    break;
+                case 't':
+                    s.push_back('\t');
+                    break;
+                case 'r':
+                    s.push_back('\r');
+                    break;
+                case '"':
+                    s.push_back('"');
+                    break;
+                case '\\':
+                    s.push_back('\\');
+                    break;
+                default:
+                    // Встретили неизвестную escape-последовательность
+                    throw ParsingError("Unrecognized escape sequence \\"s + escaped_char);
+            }
+        } else if (ch == '\n' || ch == '\r') {
+            // Строковый литерал внутри- JSON не может прерываться символами \r или \n
+            throw ParsingError("Unexpected end of line"s);
+        } else {
+            // Просто считываем очередной символ и помещаем его в результирующую строку
+            s.push_back(ch);
+        }
+        ++it;
+    }
+
+    return s;
+}
+
+int main() {
+    using namespace std;
+    istringstream strm("123.456"s);
+    auto value = LoadNumber(strm);
+    assert(value == Number{123.456});
+
+    istringstream strm2(R"(\\ABC\"   \r\n\t")");
+    auto s = LoadString(strm2);
+    assert(s == "\\ABC\"   \r\n\t"s);
+} 
+/////////////////////////////////////////////
+
+Это задание — часть итогового проекта десятого спринта. Не забудьте сохранить решение.
+Библиотека для чтения JSON, которую вы использовали в одном из заданий прошлого спринта, имеет очень ограниченный функционал:
+ограниченная поддержка целых чисел — отрицательные числа не поддерживаются;
+нет поддержки дробных чисел;
+ограниченная поддержка строк — не поддерживаются escape-последовательности, такие как \n, \r, \", \t, \\;
+не поддерживается тип bool;
+не поддерживаются значения null;
+не поддерживается вывод JSON;
+нет механизма уведомления об ошибках.
+Но главная проблема — неизвестно, значение какого типа содержит json::Node в текущий момент времени:
+#include "json.h"
+
+#include <cassert>
+#include <sstream>
+
+int main() {
+    using namespace json;
+    using namespace std;
+
+    istringstream strm{"[]"s};
+    json::Node node = json::Load(strm).GetRoot();
+
+    // Как узнать, какой тип хранит node в данный момент?
+    assert(node.AsInt() == 0);
+    assert(node.AsArray().empty());
+    assert(node.AsMap().empty());
+    assert(node.AsString().empty());
+} 
+Эта неоднозначность вызвана тем, что внутри Node одновременно хранятся несколько различных значений. Вдобавок это нерационально расходует память:
+class Node {
+public:
+    explicit Node(Array array);
+    explicit Node(Dict map);
+    explicit Node(int value);
+    explicit Node(std::string value);
+    ...
+private:
+    Array as_array_;
+    Dict as_map_;
+    int as_int_ = 0;
+    std::string as_string_;
+}; 
+Используйте класс std::variant, чтобы доработать JSON-библиотеку. В заготовке кода есть тесты и примеры использования. Они помогут вам реализовать недостающий функционал.
+Требования к классу Node
+Класс Node должен хранить значения одного из следующих типов:
+Целые числа типа int.
+Вещественные числа типа double.
+Строки — тип std::string.
+Логический тип bool.
+Массивы:
+using Array = std::vector<Node>; 
+Словари:
+using Dict = std::map<std::string, Node>; 
+std::nullptr_t. В C++ значение nullptr имеет тип std::nullptr_t. Используется, чтобы представить значение null в JSON документе. Кроме std::nullptr_t можно было бы также использовать тип std::monostate, однако std::nullptr_t кажется более подходящим по смыслу для представления null.
+Следующие методы Node сообщают, хранится ли внутри значение некоторого типа:
+bool IsInt() const;
+bool IsDouble() const; Возвращает true, если в Node хранится int либо double.
+bool IsPureDouble() const; Возвращает true, если в Node хранится double.
+bool IsBool() const;
+bool IsString() const;
+bool IsNull() const;
+bool IsArray() const;
+bool IsMap() const;
+Ниже перечислены методы, которые возвращают хранящееся внутри Node значение заданного типа. Если внутри содержится значение другого типа, должно выбрасываться исключение std::logic_error.
+int AsInt() const;
+bool AsBool() const;
+double AsDouble() const;. Возвращает значение типа double, если внутри хранится double либо int. В последнем случае возвращается приведённое в double значение.
+const std::string& AsString() const;
+const Array& AsArray() const;
+const Map& AsMap() const;
+Объекты Node можно сравнивать между собой при помощи == и !=. Значения равны, если внутри них значения имеют одинаковый тип и содержимое.
+Формат входных и выходных данных
+При загрузке и сохранении строк должны поддерживаться следующие escape-последовательности: \n, \r, \", \t, \\.
+Числа с плавающей запятой совместимы с double.
+image
+
+Формат представления чисел в JSON
+Примеры чисел:
+-0.25: тип double
+123.45: тип double
+12e-3: 0.012, тип double
+2.5E3: 2500.0, тип double
+12345: 12345 — тип int, 12345.0 — тип double
+-1e+3: -1000.0, тип double
+Красиво форматировать JSON при выводе желательно, хоть и необязательно. Библиотека должна уметь считывать документы JSON с любым валидным форматированием: между лексемами разрешается произвольное количество пробелов, табуляций и символов перевода строки. Ниже — некоторые примеры валидных JSON-документов, которые библиотека должна успешно считывать.
+В этом примере пробелы между лексемами отсутствуют:
+{"key":"value","key2":45,"key3":[null,15.5]} 
+Словарь с небрежно расставленными символами-разделителями. Тем не менее, он абсолютно валиден:
+ {
+  "key": "value", "key2"    : 4.31e8,
+  "key3"
+  :
+      [ null   ,   15.5
+           ]
+   } 
+Строка, в которой слова hello и world разделены символом перевода строки:
+"hello\nworld" 
+Массив из двух значений true и false:
+[true, false] 
+Значение null:
+null 
+Порядок вывода ключей, находящихся в словаре, может быть произвольным. Следующие JSON-файлы считаются эквивалентными:
+{"a": 5, "b": true} 
+{"b": true, "a": 5} 
+Ограничения
+Валидные JSON-документы должны успешно проходить загрузку. При загрузке невалидных JSON-документов вроде тех, которые даны в заготовке кода, должно выбрасываться исключение json::ParsingError.
+Что отправлять на проверку
+Код библиотеки должен располагаться в файлах json.h и json.cpp в пространстве имён json. Функция main будет заменена на версию из тренажёра.
+Как будет тестироваться ваш код
+Тренажёр проверит:
+работу классов JSON-библиотеки,
+загрузку и вывод JSON,
+базовую обработку ошибок парсинга.
