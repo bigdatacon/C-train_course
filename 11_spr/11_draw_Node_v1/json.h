@@ -22,9 +22,8 @@ namespace json {
 
     //bool operator==(const Node& lhs, const Node& rhs);
     //bool operator!=(const Node& lhs, const Node& rhs);
-    inline bool operator!=(const Node& lhs, const Node& rhs) {
-        return !(lhs == rhs);
-    }
+
+
 
     class Node {
     public:
@@ -41,7 +40,8 @@ namespace json {
         explicit Node(std::string value);
 
         bool operator==(const Node& rhs) const;
-
+        bool operator!=(const Node& rhs) const;
+   
         const Array& AsArray() const;
         const Dict& AsMap() const;
         int AsInt() const;
@@ -66,6 +66,12 @@ namespace json {
     private:
         Value value_;
     };
+    /*inline bool operator==(const Node& lhs, const Node& rhs) {
+        return lhs.value_ == rhs.value_;
+    }
+    inline bool operator!=(const Node& lhs, const Node& rhs) {
+        return !(lhs == rhs);
+    }*/
 
     class Document {
     public:
