@@ -66,6 +66,7 @@ namespace json {
     private:
         Value value_;
     };
+
     /*inline bool operator==(const Node& lhs, const Node& rhs) {
         return lhs.value_ == rhs.value_;
     }
