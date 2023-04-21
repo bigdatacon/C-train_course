@@ -199,7 +199,9 @@
 				while (true) {
 					if (it == end) {
 						// Поток закончился до того, как встретили закрывающую кавычку?
-						throw ParsingError("String parsing error");
+						return s;
+						//throw ParsingError("String parsing error");
+						//
 					}
 					const char ch = *it;
 					if (ch == '"') {
@@ -239,7 +241,8 @@
 					}
 					else if (ch == '\n' || ch == '\r') {
 						// Строковый литерал внутри- JSON не может прерываться символами \r или \n
-						throw ParsingError("Unexpected end of line"s);
+						continue;
+						//throw ParsingError("Unexpected end of line"s);
 					}
 					else {
 						// Просто считываем очередной символ и помещаем его в результирующую строку
@@ -296,6 +299,17 @@
 						}
 						else if (is_integer(str)) { return Node(std::stod(str)); }
 						else if (is_double(str)) { return Node(std::stoi(str)); }*/
+						
+						/*input.putback(c);
+						std::string str = LoadStringF(input);
+						
+						if (str == "null"s || str.find("null"s) != std::string::npos) {
+							return Node(nullptr);
+						}
+						else {
+							return Node(str);
+						}*/
+
 						input.putback(c);
 						return LoadString(input);
 					}
