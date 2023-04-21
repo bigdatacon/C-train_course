@@ -265,13 +265,13 @@
 		/////////////////////
 
 
-		/*bool Node::operator==(const Node& rhs) const {
+		bool Node::operator==(const Node& rhs)  {
 			return value_ == rhs.value_;
 		}
 
-		bool Node::operator!=(const Node& rhs) const {
+		bool Node::operator!=(const Node& rhs)  {
 			return value_ != rhs.value_;
-		}*/
+		}
 
 
 		bool Node::IsInt() const { return std::holds_alternative<int>(value_); };
@@ -280,6 +280,7 @@
 		bool Node::IsBool() const { return std::holds_alternative<bool>(value_); };
 		bool Node::IsString() const { return std::holds_alternative<std::string>(value_); };
 		bool Node::IsNull() const { return std::holds_alternative<std::nullptr_t>(value_) || std::get<int>(value_)==0; };
+		//bool Node::IsNull() const { return std::holds_alternative<std::nullptr_t>(value_); };
 		bool Node::IsArray() const { return std::holds_alternative<Array>(value_); };
 		bool Node::IsMap() const { return std::holds_alternative<Dict>(value_); };
 
@@ -304,6 +305,19 @@
 		Document Load(istream& input) {
 			return Document{ LoadNode(input) };
 		}
+
+
+		bool Document::operator==(const Document& rhs)  {
+			return root_ == rhs.GetRoot();
+		}
+
+		bool Document::operator!=(const Document& rhs)  {
+			return root_ != rhs.GetRoot();
+		}
+
+
+		//объявляю PrintNode 
+		void PrintNode(const Node& node, std::ostream& out);
 
 		// Шаблон, подходящий для вывода double и int
 		template <typename Value>
