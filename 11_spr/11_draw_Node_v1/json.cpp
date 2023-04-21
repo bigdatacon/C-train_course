@@ -11,45 +11,6 @@
 
 		namespace {
 
-
-			/*bool operator==(const Node& lhs, const Node& rhs)
-			{
-				if (lhs.GetValue().index() != rhs.GetValue().index()) {
-					return false;
-				}
-
-				switch (lhs.GetValue().index()) {
-				case 0: // nullptr_t
-					return true;
-				case 1: // Array
-					return std::equal_to<>()(std::get<Array>(lhs.GetValue()), std::get<Array>(rhs.GetValue()))
-						&& lhs.GetValue().index() == rhs.GetValue().index();
-				case 2: // Dict
-					return std::equal_to<>()(std::get<Dict>(lhs.GetValue()), std::get<Dict>(rhs.GetValue()))
-						&& lhs.GetValue().index() == rhs.GetValue().index();
-				case 3: // bool
-					return std::equal_to<>()(std::get<bool>(lhs.GetValue()), std::get<bool>(rhs.GetValue()))
-						&& lhs.GetValue().index() == rhs.GetValue().index();
-				case 4: // int
-					return std::equal_to<>()(std::get<int>(lhs.GetValue()), std::get<int>(rhs.GetValue()))
-						&& lhs.GetValue().index() == rhs.GetValue().index();
-				case 5: // double
-					return std::equal_to<>()(std::get<double>(lhs.GetValue()), std::get<double>(rhs.GetValue()))
-						&& lhs.GetValue().index() == rhs.GetValue().index();
-				case 6: // string
-					return std::equal_to<>()(std::get<std::string>(lhs.GetValue()), std::get<std::string>(rhs.GetValue()))
-						&& lhs.GetValue().index() == rhs.GetValue().index();
-				default:
-					throw std::runtime_error("Unknown value type");
-				}
-			}
-
-
-			bool operator!=(const Node& lhs, const Node& rhs)
-			{
-				return !(lhs == rhs);
-			}*/
-
 			Node LoadNode(istream& input);
 
 			Node LoadArray(istream& input) {
@@ -318,7 +279,7 @@
 		bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится double.
 		bool Node::IsBool() const { return std::holds_alternative<bool>(value_); };
 		bool Node::IsString() const { return std::holds_alternative<std::string>(value_); };
-		bool Node::IsNull() const { return std::holds_alternative<std::nullptr_t>(value_); };
+		bool Node::IsNull() const { return std::holds_alternative<std::nullptr_t>(value_) || std::get<int>(value_)==0; };
 		bool Node::IsArray() const { return std::holds_alternative<Array>(value_); };
 		bool Node::IsMap() const { return std::holds_alternative<Dict>(value_); };
 
@@ -409,7 +370,7 @@
 
 			// Проверяем, что корневой узел действительно существует
 			if (/*!root.GetValue() */ root.GetValue().index() == 0) {
-				return;
+				/*return*/ cout << "null"s;
 			}
 
 			// Рекурсивно обходим дерево элементов
