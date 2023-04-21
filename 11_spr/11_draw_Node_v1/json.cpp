@@ -304,13 +304,13 @@
 		/////////////////////
 
 
-		bool Node::operator==(const Node& rhs) const {
+		/*bool Node::operator==(const Node& rhs) const {
 			return value_ == rhs.value_;
 		}
 
 		bool Node::operator!=(const Node& rhs) const {
 			return value_ != rhs.value_;
-		}
+		}*/
 
 
 		bool Node::IsInt() const { return std::holds_alternative<int>(value_); };
