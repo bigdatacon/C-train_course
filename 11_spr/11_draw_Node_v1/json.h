@@ -29,8 +29,8 @@ namespace json {
     public:
         /* Реализуйте Node, используя std::variant */
         using Value = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
-        //Node() = default;
-        Node() : value_(nullptr) {};
+        Node() = default;
+        //Node() : value_(nullptr) {};
         Node(std::nullptr_t);
         Node(bool val);
         Node(Array array);
@@ -38,9 +38,6 @@ namespace json {
         Node(int value);
         Node(double value);
         Node(std::string value);
-
-        //bool operator==(const Node& rhs) const;
-        //bool operator!=(const Node& rhs) const;
    
         const Array& AsArray() const;
         const Dict& AsMap() const;
