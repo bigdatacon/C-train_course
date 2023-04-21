@@ -39,8 +39,8 @@ namespace json {
         Node(double value);
         Node(std::string value);
 
-        bool operator==(const Node& rhs) const;
-        bool operator!=(const Node& rhs) const;
+        //bool operator==(const Node& rhs) const;
+        //bool operator!=(const Node& rhs) const;
    
         const Array& AsArray() const;
         const Dict& AsMap() const;
@@ -67,12 +67,13 @@ namespace json {
         Value value_;
     };
 
-    /*inline bool operator==(const Node& lhs, const Node& rhs) {
-        return lhs.value_ == rhs.value_;
+    inline bool operator==(const Node& lhs, const Node& rhs) {
+        return lhs.GetValue() == rhs.GetValue();
     }
     inline bool operator!=(const Node& lhs, const Node& rhs) {
         return !(lhs == rhs);
-    }*/
+        //return lhs.GetValue() != rhs.GetValue();
+    }
 
     class Document {
     public:
