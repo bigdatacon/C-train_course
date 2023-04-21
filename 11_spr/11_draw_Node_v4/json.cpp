@@ -14,6 +14,7 @@
 		namespace {
 
 			Node LoadNode(istream& input);
+			std::string LoadStringHint(std::istream& input);
 
 			Node LoadArray(istream& input) {
 				Array result;
@@ -98,6 +99,41 @@
 			}
 
 			Node LoadDict(istream& input) {
+				Dict dict;
+				char c;
+				while (input >> c) {
+					if (c == '}') {
+						break;
+					}
+					if (c != '"') {
+						continue;
+					}
+					string key;
+					getline(input, key, '"');
+					input >> c; // :
+					input >> ws;
+					if (input.peek() == '"') {
+						input >> c; // "
+						string value;
+						getline(input, value, '"');
+						dict.emplace(move(key), Node(move(value)));
+					}
+					else {
+						int value;
+						input >> value;
+						dict.emplace(move(key), Node(value));
+					}
+					input >> ws;
+					if (input.peek() == ',') {
+						input >> c;
+					}
+				}
+				return dict;
+			}
+
+			/*Node LoadDict(istream& input) {
+				Dict result
+				
 				Dict result;
 
 				for (char c; input >> c && c != '}';) {
@@ -106,17 +142,27 @@
 					}
 
 					string key = LoadString(input).AsString();
+					
 					input >> c;
 					result.insert({ move(key), LoadNode(input) });
 				}
 
 				return Node(move(result));
-			}
+			}*/
 
 			Node LoadBool(std::istream& input) {
 				bool value;
-				input >> value;
+				/*input >> value;
 				return Node(value);
+				*/
+
+				std::string substr = "true";
+				string line;
+				getline(input, line);
+				if (line == "true"s  || line.find(substr) != std::string::npos) { value = true; return Node(value);
+				}
+				else { value = false; return Node(value); }
+
 			}
 
 			Node LoadNull(std::istream& input) {
@@ -265,6 +311,67 @@
 				}
 
 				return Node(s);
+			}
+
+			std::string LoadStringHint(std::istream& input) {
+				using namespace std::literals;
+
+				auto it = std::istreambuf_iterator<char>(input);
+				auto end = std::istreambuf_iterator<char>();
+				std::string s;
+				while (true) {
+					if (it == end) {
+						// Поток закончился до того, как встретили закрывающую кавычку?
+						throw ParsingError("String parsing error");
+					}
+					const char ch = *it;
+					if (ch == '"') {
+						// Встретили закрывающую кавычку
+						++it;
+						break;
+					}
+					else if (ch == '\\') {
+						// Встретили начало escape-последовательности
+						++it;
+						if (it == end) {
+							// Поток завершился сразу после символа обратной косой черты
+							throw ParsingError("String parsing error");
+						}
+						const char escaped_char = *(it);
+						// Обрабатываем одну из последовательностей: \\, \n, \t, \r, \"
+						switch (escaped_char) {
+						case 'n':
+							s.push_back('\n');
+							break;
+						case 't':
+							s.push_back('\t');
+							break;
+						case 'r':
+							s.push_back('\r');
+							break;
+						case '"':
+							s.push_back('"');
+							break;
+						case '\\':
+							s.push_back('\\');
+							break;
+						default:
+							// Встретили неизвестную escape-последовательность
+							throw ParsingError("Unrecognized escape sequence \\"s + escaped_char);
+						}
+					}
+					else if (ch == '\n' || ch == '\r') {
+						// Строковый литерал внутри- JSON не может прерываться символами \r или \n
+						throw ParsingError("Unexpected end of line"s);
+					}
+					else {
+						// Просто считываем очередной символ и помещаем его в результирующую строку
+						s.push_back(ch);
+					}
+					++it;
+				}
+
+				return s;
 			}
 
 			bool is_integer(const std::string& s) {
