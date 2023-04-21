@@ -481,7 +481,7 @@
 			out << value;
 		}
 
-		void PrintValue(const std::string& value, std::ostream& out) {
+		/*/void PrintValue(const std::string& value, std::ostream& out) {
 			out << '"';
 			for (const auto c : value) {
 				if (c == '\\' || c == '\"') {
@@ -490,7 +490,33 @@
 				out << c;
 			}
 			out << '"';
+		}*/
+
+		void PrintValue(const std::string& value, std::ostream& out) {
+			out << '"';
+			for (const auto c : value) {
+				switch (c) {
+				case '\r':
+					out << "\\r";
+					break;
+				case '\n':
+					out << "\\n";
+					break;
+				case '\t':
+					out << "\t";
+					break;
+				case '\"':
+				case '\\':
+					out << '\\' << c;
+					break;
+				default:
+					out << c;
+					break;
+				}
+			}
+			out << '"';
 		}
+
 
 
 		// Перегрузка функции PrintValue для вывода значений null
