@@ -9,12 +9,12 @@
 namespace json {
 
     class Node;
-    // Сохраните объявления Dict и Array без изменения
+    // РЎРѕС…СЂР°РЅРёС‚Рµ РѕР±СЉСЏРІР»РµРЅРёСЏ Dict Рё Array Р±РµР· РёР·РјРµРЅРµРЅРёСЏ
     using Dict = std::map<std::string, Node>;
     using Map = std::map<std::string, Node>;
     using Array = std::vector<Node>;
 
-    // Эта ошибка должна выбрасываться при ошибках парсинга JSON
+    // Р­С‚Р° РѕС€РёР±РєР° РґРѕР»Р¶РЅР° РІС‹Р±СЂР°СЃС‹РІР°С‚СЊСЃСЏ РїСЂРё РѕС€РёР±РєР°С… РїР°СЂСЃРёРЅРіР° JSON
     class ParsingError : public std::runtime_error {
     public:
         using runtime_error::runtime_error;
@@ -27,7 +27,7 @@ namespace json {
 
     class Node {
     public:
-        /* Реализуйте Node, используя std::variant */
+        /* Р РµР°Р»РёР·СѓР№С‚Рµ Node, РёСЃРїРѕР»СЊР·СѓСЏ std::variant */
         using Value = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
         Node() = default;
         //Node() : value_(nullptr) {};
@@ -52,8 +52,8 @@ namespace json {
 
 
         bool IsInt() const;
-        bool IsDouble() const; //Возвращает true, если в Node хранится int либо double.
-            bool IsPureDouble() const; //Возвращает true, если в Node хранится double.
+        bool IsDouble() const; //Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ Node С…СЂР°РЅРёС‚СЃСЏ int Р»РёР±Рѕ double.
+            bool IsPureDouble() const; //Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ Node С…СЂР°РЅРёС‚СЃСЏ double.
             bool IsBool() const;
         bool IsString() const;
         bool IsNull() const;
@@ -62,7 +62,7 @@ namespace json {
 
 
         bool AsBool() const;
-        double AsDouble() const; //.Возвращает значение типа double, если внутри хранится double либо int.В последнем случае возвращается приведённое в double значение.
+        double AsDouble() const; //.Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ С‚РёРїР° double, РµСЃР»Рё РІРЅСѓС‚СЂРё С…СЂР°РЅРёС‚СЃСЏ double Р»РёР±Рѕ int.Р’ РїРѕСЃР»РµРґРЅРµРј СЃР»СѓС‡Р°Рµ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїСЂРёРІРµРґС‘РЅРЅРѕРµ РІ double Р·РЅР°С‡РµРЅРёРµ.
 
 
     private:
