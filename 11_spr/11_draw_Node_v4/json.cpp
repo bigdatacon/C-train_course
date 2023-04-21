@@ -49,7 +49,7 @@
 
 					std::string s2 = ""s;
 					for (auto it = line.begin(); it != line.end()-1; ++it) {
-						// Если это не первый символ и текущий символ равен предыдущему
+						// Р•СЃР»Рё СЌС‚Рѕ РЅРµ РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» Рё С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР» СЂР°РІРµРЅ РїСЂРµРґС‹РґСѓС‰РµРјСѓ
 						if (*it == '\\'  && *(it + 1) == '\"') {
 							continue;
 						}
@@ -120,7 +120,7 @@
 			}
 
 			Node LoadNull(std::istream& input) {
-				input.ignore(4, 'l'); // Пропускаем слово "null"
+				input.ignore(4, 'l'); // РџСЂРѕРїСѓСЃРєР°РµРј СЃР»РѕРІРѕ "null"
 				return Node(nullptr);
 			}
 
@@ -138,7 +138,7 @@
 
 				std::string parsed_num;
 
-				// Считывает в parsed_num очередной символ из input
+				// РЎС‡РёС‚С‹РІР°РµС‚ РІ parsed_num РѕС‡РµСЂРµРґРЅРѕР№ СЃРёРјРІРѕР» РёР· input
 				auto read_char = [&parsed_num, &input] {
 					parsed_num += static_cast<char>(input.get());
 					if (!input) {
@@ -146,7 +146,7 @@
 					}
 				};
 
-				// Считывает одну или более цифр в parsed_num из input
+				// РЎС‡РёС‚С‹РІР°РµС‚ РѕРґРЅСѓ РёР»Рё Р±РѕР»РµРµ С†РёС„СЂ РІ parsed_num РёР· input
 				auto read_digits = [&input, read_char] {
 					if (!std::isdigit(input.peek())) {
 						throw ParsingError("A digit is expected"s);
@@ -159,24 +159,24 @@
 				if (input.peek() == '-') {
 					read_char();
 				}
-				// Парсим целую часть числа
+				// РџР°СЂСЃРёРј С†РµР»СѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р°
 				if (input.peek() == '0') {
 					read_char();
-					// После 0 в JSON не могут идти другие цифры
+					// РџРѕСЃР»Рµ 0 РІ JSON РЅРµ РјРѕРіСѓС‚ РёРґС‚Рё РґСЂСѓРіРёРµ С†РёС„СЂС‹
 				}
 				else {
 					read_digits();
 				}
 
 				bool is_int = true;
-				// Парсим дробную часть числа
+				// РџР°СЂСЃРёРј РґСЂРѕР±РЅСѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р°
 				if (input.peek() == '.') {
 					read_char();
 					read_digits();
 					is_int = false;
 				}
 
-				// Парсим экспоненциальную часть числа
+				// РџР°СЂСЃРёРј СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅСѓСЋ С‡Р°СЃС‚СЊ С‡РёСЃР»Р°
 				if (int ch = input.peek(); ch == 'e' || ch == 'E') {
 					read_char();
 					if (ch = input.peek(); ch == '+' || ch == '-') {
@@ -188,13 +188,13 @@
 
 				try {
 					if (is_int) {
-						// Сначала пробуем преобразовать строку в int
+						// РЎРЅР°С‡Р°Р»Р° РїСЂРѕР±СѓРµРј РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ РІ int
 						try {
 							return Node(std::stoi(parsed_num));
 						}
 						catch (...) {
-							// В случае неудачи, например, при переполнении,
-							// код ниже попробует преобразовать строку в double
+							// Р’ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё, РЅР°РїСЂРёРјРµСЂ, РїСЂРё РїРµСЂРµРїРѕР»РЅРµРЅРёРё,
+							// РєРѕРґ РЅРёР¶Рµ РїРѕРїСЂРѕР±СѓРµС‚ РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ РІ double
 						}
 					}
 					return Node(std::stod(parsed_num));
@@ -204,8 +204,8 @@
 				}
 			}
 
-			// Считывает содержимое строкового литерала JSON-документа
-			// Функцию следует использовать после считывания открывающего символа ":
+			// РЎС‡РёС‚С‹РІР°РµС‚ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃС‚СЂРѕРєРѕРІРѕРіРѕ Р»РёС‚РµСЂР°Р»Р° JSON-РґРѕРєСѓРјРµРЅС‚Р°
+			// Р¤СѓРЅРєС†РёСЋ СЃР»РµРґСѓРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїРѕСЃР»Рµ СЃС‡РёС‚С‹РІР°РЅРёСЏ РѕС‚РєСЂС‹РІР°СЋС‰РµРіРѕ СЃРёРјРІРѕР»Р° ":
 			/*std::string*/ Node LoadStringF(std::istream& input) {
 				using namespace std::literals;
 
@@ -214,24 +214,24 @@
 				std::string s;
 				while (true) {
 					if (it == end) {
-						// Поток закончился до того, как встретили закрывающую кавычку?
+						// РџРѕС‚РѕРє Р·Р°РєРѕРЅС‡РёР»СЃСЏ РґРѕ С‚РѕРіРѕ, РєР°Рє РІСЃС‚СЂРµС‚РёР»Рё Р·Р°РєСЂС‹РІР°СЋС‰СѓСЋ РєР°РІС‹С‡РєСѓ?
 						throw ParsingError("String parsing error");
 					}
 					const char ch = *it;
 					if (ch == '"') {
-						// Встретили закрывающую кавычку
+						// Р’СЃС‚СЂРµС‚РёР»Рё Р·Р°РєСЂС‹РІР°СЋС‰СѓСЋ РєР°РІС‹С‡РєСѓ
 						++it;
 						break;
 					}
 					else if (ch == '\\') {
-						// Встретили начало escape-последовательности
+						// Р’СЃС‚СЂРµС‚РёР»Рё РЅР°С‡Р°Р»Рѕ escape-РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
 						++it;
 						if (it == end) {
-							// Поток завершился сразу после символа обратной косой черты
+							// РџРѕС‚РѕРє Р·Р°РІРµСЂС€РёР»СЃСЏ СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ СЃРёРјРІРѕР»Р° РѕР±СЂР°С‚РЅРѕР№ РєРѕСЃРѕР№ С‡РµСЂС‚С‹
 							throw ParsingError("String parsing error");
 						}
 						const char escaped_char = *(it);
-						// Обрабатываем одну из последовательностей: \\, \n, \t, \r, \"
+						// РћР±СЂР°Р±Р°С‚С‹РІР°РµРј РѕРґРЅСѓ РёР· РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚РµР№: \\, \n, \t, \r, \"
 						switch (escaped_char) {
 						case 'n':
 							s.push_back('\n');
@@ -249,16 +249,16 @@
 							s.push_back('\\');
 							break;
 						default:
-							// Встретили неизвестную escape-последовательность
+							// Р’СЃС‚СЂРµС‚РёР»Рё РЅРµРёР·РІРµСЃС‚РЅСѓСЋ escape-РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ
 							throw ParsingError("Unrecognized escape sequence \\"s + escaped_char);
 						}
 					}
 					else if (ch == '\n' || ch == '\r') {
-						// Строковый литерал внутри- JSON не может прерываться символами \r или \n
+						// РЎС‚СЂРѕРєРѕРІС‹Р№ Р»РёС‚РµСЂР°Р» РІРЅСѓС‚СЂРё- JSON РЅРµ РјРѕР¶РµС‚ РїСЂРµСЂС‹РІР°С‚СЊСЃСЏ СЃРёРјРІРѕР»Р°РјРё \r РёР»Рё \n
 						throw ParsingError("Unexpected end of line"s);
 					}
 					else {
-						// Просто считываем очередной символ и помещаем его в результирующую строку
+						// РџСЂРѕСЃС‚Рѕ СЃС‡РёС‚С‹РІР°РµРј РѕС‡РµСЂРµРґРЅРѕР№ СЃРёРјРІРѕР» Рё РїРѕРјРµС‰Р°РµРј РµРіРѕ РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ
 						s.push_back(ch);
 					}
 					++it;
@@ -287,11 +287,25 @@
 				}
 			}
 
+			bool LoadKeyword(std::istream& input) {
+				std::string keyword;
+				input >> keyword;
+				if (keyword == "null" || keyword == "true" || keyword == "false") {
+					// valid keyword, do nothing
+					return true;
+				}
+				else {
+					throw std::runtime_error("Invalid keyword");
+					return false;
+				}
+			}
+
 
 			Node LoadNode(istream& input) {
 				input >> ws;
 				char c;
 				input >> c;
+				//if (islower(c)) { input.putback(c); return LoadKeyword(input); }
 				if (c == 'n') {
 					input.putback(c);
 					return LoadNull(input);
@@ -417,8 +431,8 @@
 
 
 		bool Node::IsInt() const { return std::holds_alternative<int>(value_); };
-		bool Node::IsDouble() const { return std::holds_alternative<int>(value_) || std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится int либо double.
-		bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Возвращает true, если в Node хранится double.
+		bool Node::IsDouble() const { return std::holds_alternative<int>(value_) || std::holds_alternative<double>(value_); }; //Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ Node С…СЂР°РЅРёС‚СЃСЏ int Р»РёР±Рѕ double.
+		bool Node::IsPureDouble() const { return std::holds_alternative<double>(value_); }; //Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РІ Node С…СЂР°РЅРёС‚СЃСЏ double.
 		bool Node::IsBool() const { return std::holds_alternative<bool>(value_); };
 		bool Node::IsString() const { return std::holds_alternative<std::string>(value_); };
 		bool Node::IsNull() const { return std::holds_alternative<std::nullptr_t>(value_) || std::get<int>(value_)==0; };
@@ -434,7 +448,7 @@
 			else {
 				return static_cast<double>(std::get<int>(value_));
 			}
-		} //.Возвращает значение типа double, если внутри хранится double либо int.В последнем случае возвращается приведённое в double значение.
+		} //.Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ С‚РёРїР° double, РµСЃР»Рё РІРЅСѓС‚СЂРё С…СЂР°РЅРёС‚СЃСЏ double Р»РёР±Рѕ int.Р’ РїРѕСЃР»РµРґРЅРµРј СЃР»СѓС‡Р°Рµ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїСЂРёРІРµРґС‘РЅРЅРѕРµ РІ double Р·РЅР°С‡РµРЅРёРµ.
 
 		Document::Document(Node root)
 			: root_(move(root)) {
@@ -458,10 +472,10 @@
 		}
 
 
-		//объявляю PrintNode 
+		//РѕР±СЉСЏРІР»СЏСЋ PrintNode 
 		void PrintNode(const Node& node, std::ostream& out);
 
-		// Шаблон, подходящий для вывода double и int
+		// РЁР°Р±Р»РѕРЅ, РїРѕРґС…РѕРґСЏС‰РёР№ РґР»СЏ РІС‹РІРѕРґР° double Рё int
 		template <typename Value>
 		void PrintValue(const Value& value, std::ostream& out) {
 			out << value;
@@ -479,11 +493,11 @@
 		}
 
 
-		// Перегрузка функции PrintValue для вывода значений null
+		// РџРµСЂРµРіСЂСѓР·РєР° С„СѓРЅРєС†РёРё PrintValue РґР»СЏ РІС‹РІРѕРґР° Р·РЅР°С‡РµРЅРёР№ null
 		void PrintValue(std::nullptr_t, std::ostream& out) {
 			out << "null"sv;
 		}
-		// Другие перегрузки функции PrintValue пишутся аналогично
+		// Р”СЂСѓРіРёРµ РїРµСЂРµРіСЂСѓР·РєРё С„СѓРЅРєС†РёРё PrintValue РїРёС€СѓС‚СЃСЏ Р°РЅР°Р»РѕРіРёС‡РЅРѕ
 
 
 		//bool
@@ -531,15 +545,15 @@
 			(void)&doc;
 			(void)&output;
 
-			// Реализуйте функцию самостоятельно
+			// Р РµР°Р»РёР·СѓР№С‚Рµ С„СѓРЅРєС†РёСЋ СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ
 			const Node& root = doc.GetRoot();
 
-			// Проверяем, что корневой узел действительно существует
+			// РџСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 			if (/*!root.GetValue() */ root.GetValue().index() == 0) {
 				/*return*/ cout << "null"s;
 			}
 
-			// Рекурсивно обходим дерево элементов
+			// Р РµРєСѓСЂСЃРёРІРЅРѕ РѕР±С…РѕРґРёРј РґРµСЂРµРІРѕ СЌР»РµРјРµРЅС‚РѕРІ
 			PrintNode(root, output);
 		}
 
