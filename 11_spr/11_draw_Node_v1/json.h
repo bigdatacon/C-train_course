@@ -46,6 +46,11 @@ namespace json {
 
         const Value& GetValue() const { return value_; }
 
+        bool operator==(const Node& rhs); 
+
+        bool operator!=(const Node& rhs); 
+
+
         bool IsInt() const;
         bool IsDouble() const; //Возвращает true, если в Node хранится int либо double.
             bool IsPureDouble() const; //Возвращает true, если в Node хранится double.
@@ -78,9 +83,22 @@ namespace json {
 
         const Node& GetRoot() const;
 
+        bool operator==(const Document& rhs); 
+
+        bool operator!=(const Document& rhs); 
+
+
     private:
         Node root_;
     };
+
+    inline bool operator==(const Document& lhs, const Document& rhs) {
+        return lhs.GetRoot() == rhs.GetRoot();
+    }
+    inline bool operator!=(const Document& lhs, const Document& rhs){
+        return !(lhs == rhs);
+    }
+
 
     Document Load(std::istream& input);
 
