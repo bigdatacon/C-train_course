@@ -76,6 +76,17 @@
 				}
 			}
 
+			Node LoadBool(std::istream& input) {
+				bool value;
+				input >> value;
+				return Node(value);
+			}
+
+			Node LoadNull(std::istream& input) {
+				input.ignore(4, 'l'); // Пропускаем слово "null"
+				return Node(nullptr);
+			}
+
 
 
 			class ParsingError : public std::runtime_error {
