@@ -38,7 +38,12 @@
 			Node LoadString(istream& input) {
 				string line;
 				getline(input, line, '"');
-				return Node(move(line));
+				if (line == "null"s) {
+					return Node(nullptr);
+				}
+				else {
+					return Node(move(line));
+				}
 			}
 
 			Node LoadDict(istream& input) {
