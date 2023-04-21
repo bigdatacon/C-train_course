@@ -53,7 +53,23 @@
 						if (*it == '\\'  && *(it + 1) == '\"') {
 							continue;
 						}
-						s2 += *it;
+
+						else if (*it == '\\' && *(it + 1) == 'n') {
+							s2 += '\n';
+							break;
+						}
+						else if (*it == '\\' && *(it + 1) == 'r') {
+							s2 += '\r';
+							break;
+						}
+						else if (*it == '\\' && *(it + 1) == 't') {
+							s2 += '\r';
+							break;
+						}
+						else {
+
+							s2 += *it;
+						}
 					}
 
 					return Node(move(s2));
