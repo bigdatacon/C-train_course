@@ -1,0 +1,125 @@
+#include <iostream>
+#include <string>
+#include <string_view>
+#include <vector>
+
+using namespace std;
+
+class Speakable {
+public:
+    virtual ~Speakable() = default;
+    virtual void Speak(ostream& out) const = 0;
+};
+
+class Drawable {
+public:
+    virtual ~Drawable() = default;
+    virtual void Draw(ostream& out) const = 0;
+};
+
+class Animal {
+public:
+    virtual ~Animal() = default;
+    void Eat(string_view food) {
+        cout << GetType() << " is eating "sv << food << endl;
+        ++energy_;
+    }
+    virtual string GetType() const = 0;
+
+private:
+    int energy_ = 100;
+};
+
+class Fish : public Animal, public Drawable {
+public:
+    string GetType() const override {
+        return "fish"s;
+    }
+    void Draw(ostream& out) const override {
+        out << "><(((*>"sv << endl;
+    }
+};
+
+class Cat : public Animal, public Speakable, public Drawable {
+public:
+    void Speak(ostream& out) const override {
+        out << "Meow-meow"sv << endl;
+    }
+    void Draw(ostream& out) const override {
+        out << "(^w^)"sv << endl;
+    }
+    string GetType() const override {
+        return "cat"s;
+    }
+};
+
+
+
+
+
+// Рисует животных, которых можно нарисовать
+void DrawAnimals(const std::vector<const Animal*>& animals, ostream& out) {
+    // Реализуйте самостоятельно
+    std::vector<Animal*> non_const_animals(animals.size());
+    std::copy(animals.begin(), animals.end(), non_const_animals.begin());
+    for (auto el : non_const_animals) {
+        if (Drawable* r = dynamic_cast<Drawable*>(el)) {
+            //cout << "Animal Draw"s<< endl;
+            r->Draw(out);
+        }
+
+    }
+}
+
+// Побеседовать с животными, которые умеют разговаривать
+void TalkToAnimals(const std::vector<const Animal*> animals, ostream& out) {
+    // Реализуйте самостоятельно
+    std::vector<Animal*> non_const_animals(animals.size());
+    std::copy(animals.begin(), animals.end(), non_const_animals.begin());
+    for (auto el : non_const_animals) {
+        if ( Speakable* r = dynamic_cast<Speakable*>(el)) {     
+            //cout << "Animal Speak"s << endl;
+            r->Speak(out);
+        }
+    
+    }
+}
+
+/*
+void DrawShape(const Shape& shape, Canvas& canvas) {
+    if (const Rectangle* r = dynamic_cast<const Rectangle*>(&shape)) {
+        // рисуем прямоугольник r на холсте canvas
+    } else if (const Circle* c = dynamic_cast<const Circle*>(&shape)) {
+        // рисуем окружность c на холсте canvas
+    }
+}
+*/
+
+/*
+void PlayWithAnimal(Animal& animal) {
+    if (Mouse* mouse = dynamic_cast<Mouse*>(&animal)) {
+        cout << "Mouse eats cheese"sv << endl;
+        mouse->EatCheese();
+    }
+
+    if (Hedgehog* hedgehog = dynamic_cast<Hedgehog*>(&animal)) {
+        cout << "Hedgehog sings songs"sv << endl;
+        hedgehog->Sing("Jingle Bells"s);
+        hedgehog->Sing("Yesterday"s);
+    }
+}
+*/
+
+
+
+void PlayWithAnimals(const std::vector<const Animal*> animals, ostream& out) {
+    TalkToAnimals(animals, out);
+    DrawAnimals(animals, out);
+}
+
+int main() {
+    Cat cat;
+    Fish fish;
+    vector<const Animal*> animals{ &cat, &fish };
+    PlayWithAnimals(animals, cerr);
+}
