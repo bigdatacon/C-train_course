@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <deque>
 
 #include "json.h"
 #include "geo.h"
@@ -31,22 +32,22 @@ inline std::string Print(const Node& node) {
 
 std::vector<std::string> GetStringRequests(std::string full_line) {
     std::vector<std::string> itg_vec;
-    //1 Обрезая от строки сначала блок "base_requests" - чтобы убрать "base_requests" и оставить только что в нем
+    //1 РћР±СЂРµР·Р°СЏ РѕС‚ СЃС‚СЂРѕРєРё СЃРЅР°С‡Р°Р»Р° Р±Р»РѕРє "base_requests" - С‡С‚РѕР±С‹ СѓР±СЂР°С‚СЊ "base_requests" Рё РѕСЃС‚Р°РІРёС‚СЊ С‚РѕР»СЊРєРѕ С‡С‚Рѕ РІ РЅРµРј
     std::size_t base_requests_pos = full_line.find("\"base_requests\":");
     std::size_t brace_pos = full_line.find('{', base_requests_pos);
     std::string stripped_line = full_line.substr(brace_pos);
 
-    // 3 обрезаю до "stat_requests"
+    // 3 РѕР±СЂРµР·Р°СЋ РґРѕ "stat_requests"
     std::string stripped_line_no_statr = stripped_line.substr(0, stripped_line.find("\"stat_requests\""));
 
 
-    // 4 удаляю пробелы с конца и ],
+    // 4 СѓРґР°Р»СЏСЋ РїСЂРѕР±РµР»С‹ СЃ РєРѕРЅС†Р° Рё ],
     size_t last_non_space = stripped_line_no_statr.find_last_not_of(" ");
     if (last_non_space != std::string::npos) {
         stripped_line_no_statr = stripped_line_no_statr.substr(0, last_non_space + 1);
     }
 
-    // Удаление знаков '], с конца'
+    // РЈРґР°Р»РµРЅРёРµ Р·РЅР°РєРѕРІ '], СЃ РєРѕРЅС†Р°'
     size_t last_bracket = stripped_line_no_statr.find_last_of("]");
     if (last_bracket != std::string::npos) {
         stripped_line_no_statr = stripped_line_no_statr.substr(0, last_bracket);
@@ -56,17 +57,17 @@ std::vector<std::string> GetStringRequests(std::string full_line) {
     std::cout << std::endl;
     std::cout << std::endl;
 
-    //II отдельно делаю строку в формате map для stat_requests
+    //II РѕС‚РґРµР»СЊРЅРѕ РґРµР»Р°СЋ СЃС‚СЂРѕРєСѓ РІ С„РѕСЂРјР°С‚Рµ map РґР»СЏ stat_requests
 
     itg_vec.push_back(stripped_line_no_statr);
 
-    //5 оставляю только то что в stat_requests
+    //5 РѕСЃС‚Р°РІР»СЏСЋ С‚РѕР»СЊРєРѕ С‚Рѕ С‡С‚Рѕ РІ stat_requests
     std::size_t pos = stripped_line.find("\"stat_requests\":");
     if (pos != std::string::npos) {
         stripped_line = stripped_line.substr(pos + 16);
     }
 
-    //6 Удаление пробелов и скобок
+    //6 РЈРґР°Р»РµРЅРёРµ РїСЂРѕР±РµР»РѕРІ Рё СЃРєРѕР±РѕРє
     size_t last_non_space2 = stripped_line.find_last_not_of(" ");
     if (last_non_space2 != std::string::npos) {
         stripped_line = stripped_line.substr(0, last_non_space2 - 1);
@@ -85,20 +86,20 @@ std::vector<std::string> GetStringRequests(std::string full_line) {
 }
 
 vector<string> ParsString(string stat_r) {
-    // разбиаю stat_r на подстроки по знака },
+    // СЂР°Р·Р±РёР°СЋ stat_r РЅР° РїРѕРґСЃС‚СЂРѕРєРё РїРѕ Р·РЅР°РєР° },
     vector<string> result;
     std::size_t pos = 0;
     std::size_t endpos;
 
-    while ((endpos = stat_r.find("},", pos)) != std::string::npos) // ищем все объекты JSON в строке
+    while ((endpos = stat_r.find("},", pos)) != std::string::npos) // РёС‰РµРј РІСЃРµ РѕР±СЉРµРєС‚С‹ JSON РІ СЃС‚СЂРѕРєРµ
     {
-        std::string jsonStr = stat_r.substr(pos, endpos - pos + 1); // объект JSON
+        std::string jsonStr = stat_r.substr(pos, endpos - pos + 1); // РѕР±СЉРµРєС‚ JSON
         //std::cout << jsonStr << std::endl;
         result.push_back(jsonStr);
-        pos = endpos + 2; // продолжаем поиск со следующего символа после разделителя
+        pos = endpos + 2; // РїСЂРѕРґРѕР»Р¶Р°РµРј РїРѕРёСЃРє СЃРѕ СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРёРјРІРѕР»Р° РїРѕСЃР»Рµ СЂР°Р·РґРµР»РёС‚РµР»СЏ
     }
 
-    // обрабатываем последний объект JSON
+    // РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РїРѕСЃР»РµРґРЅРёР№ РѕР±СЉРµРєС‚ JSON
     std::string jsonStr = stat_r.substr(pos);
     //std::cout << jsonStr << std::endl;
     result.push_back(jsonStr);
@@ -106,10 +107,11 @@ vector<string> ParsString(string stat_r) {
 
 }
 
+
 inline void ReadInputJsonRequest() {
-    std::ifstream inFile("input.json.txt"); // открытие файла для чтения
-    if (!inFile) { // проверка успешности открытия файла
-        std::cerr << "Ошибка при открытии файла " << std::endl;
+    std::ifstream inFile("input.json.txt"); // РѕС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РґР»СЏ С‡С‚РµРЅРёСЏ
+    if (!inFile) { // РїСЂРѕРІРµСЂРєР° СѓСЃРїРµС€РЅРѕСЃС‚Рё РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°
+        std::cerr << "РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° " << std::endl;
         return;
     }
 
@@ -119,7 +121,7 @@ inline void ReadInputJsonRequest() {
     //while (std::getline(std::cin, line)) {
         full_line += line;
     }
-    // Разабираю запрос на 2 строки с подзапросами для base и stat
+    // Р Р°Р·Р°Р±РёСЂР°СЋ Р·Р°РїСЂРѕСЃ РЅР° 2 СЃС‚СЂРѕРєРё СЃ РїРѕРґР·Р°РїСЂРѕСЃР°РјРё РґР»СЏ base Рё stat
     string stat_r = GetStringRequests(full_line)[1];
     string base_r = GetStringRequests(full_line)[0];
 
@@ -168,7 +170,7 @@ inline void ReadInputJsonRequest() {
     }
 
     std::deque<OutputRequestStop> out_req_stop;
-    std::deque<OutputRequestBus> out_req_bus;
+    deque<OutputRequestBus> out_req_bus;
 
     std::deque<BusDescriptionJson> upd_req_bus;
     std::deque<StopJson> upd_req_stop;
@@ -247,6 +249,11 @@ inline void ReadInputJsonRequest2() {
     
     }*/
 
+    struct StopDistancesDescriptionJson {
+        std::string stop_name;
+        std::vector<std::pair<std::string, int>> distances;
+    };
+
     using namespace std::literals;
     auto doc = json::Load(std::cin);
     const auto& json_array = ((doc.GetRoot()).AsMap()).at("base_requests"s);
@@ -254,7 +261,22 @@ inline void ReadInputJsonRequest2() {
     for (const auto& file : json_array.AsArray()) {
         const auto& json_obj = file.AsMap();
         if (json_obj.at("type"s) == "Stop"s) {
-            std::cout << "type"s  <<  std::endl;
+            StopDistancesDescriptionJson input_stop_dist;
+            auto heighbors = json_obj.at("road_distances");
+
+            for (auto el : heighbors.AsMap()) {
+                input_stop_dist.distances.push_back(make_pair(el.first, el.second.AsInt()));
+            
+            }
+            for (auto el : input_stop_dist.distances) { cout << el.first << " "s << el.second << endl; }
+
+            //for (auto const& [name, distance] : heighbors) {
+               // cout << "name : " << name << " dist : " << distance << endl;
+            //input_stop_dist.distances.emplace_back(name, distance);
+        //}
+
+
+
             continue;
         }
         else if (json_obj.at("type"s) == "Bus"s) {
@@ -263,6 +285,7 @@ inline void ReadInputJsonRequest2() {
         }
     }
 
+    
     
     
  }
