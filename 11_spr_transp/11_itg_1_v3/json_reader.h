@@ -242,16 +242,17 @@ inline void ReadInputJsonRequest() {
 
 inline void ReadInputJsonRequest2() {
     
-    /*auto input_json = Load(std::cin).GetRoot().AsMap();
-    auto base_input = input_json.at("base_request").AsArray();
-    for (auto el : base_input) {
-        auto first = el.AsMap();
-    
-    }*/
 
     struct StopDistancesDescriptionJson {
         std::string stop_name;
         std::vector<std::pair<std::string, int>> distances;
+    };
+
+
+    struct BusDescriptionJson {
+        std::string bus_name;
+        std::vector<std::string> stops;
+        std::string type;
     };
 
     using namespace std::literals;
@@ -270,18 +271,24 @@ inline void ReadInputJsonRequest2() {
             }
             for (auto el : input_stop_dist.distances) { cout << el.first << " "s << el.second << endl; }
 
-            //for (auto const& [name, distance] : heighbors) {
-               // cout << "name : " << name << " dist : " << distance << endl;
-            //input_stop_dist.distances.emplace_back(name, distance);
-        //}
-
-
-
             continue;
         }
         else if (json_obj.at("type"s) == "Bus"s) {
-            std::cout << std::endl;
-            continue;
+            //std::cout << std::endl;
+            //continue;
+            auto stop_list = json_obj.at("stops");
+            BusDescriptionJson bs;
+            for (auto el : stop_list.AsArray()) {
+                
+                bs.stops.push_back(el.AsString());
+                    
+            }
+            for (auto el : bs.stops) {
+
+                cout << "stop : " << el << endl;
+
+            }
+
         }
     }
 
