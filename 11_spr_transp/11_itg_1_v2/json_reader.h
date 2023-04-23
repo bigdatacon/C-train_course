@@ -116,12 +116,13 @@ inline void ReadInputJsonRequest() {
     std::string full_line;
     std::string line;
     while (std::getline(inFile, line)) {
+    //while (std::getline(std::cin, line)) {
         full_line += line;
     }
     // Разабираю запрос на 2 строки с подзапросами для base и stat
     string stat_r = GetStringRequests(full_line)[1];
     string base_r = GetStringRequests(full_line)[0];
-    
+
     vector<string> stat_result = ParsString(stat_r);
     vector<string> base_result = ParsString(base_r);
 
@@ -151,6 +152,21 @@ inline void ReadInputJsonRequest() {
         std::string bus_name;
     };
 
+
+    for (string s : stat_result) {
+        cout << "stat" << endl;
+        json::Document stat_req = LoadJSON(s);
+        Print(stat_req, cout);
+        cout << endl;
+    }
+
+    for (string s : base_result) {
+        cout << "base" << endl;
+        json::Document base_req = LoadJSON(s);
+        Print(base_req, cout);
+        cout << endl;
+    }
+
     std::deque<OutputRequestStop> out_req_stop;
     std::deque<OutputRequestBus> out_req_bus;
 
@@ -158,12 +174,12 @@ inline void ReadInputJsonRequest() {
     std::deque<StopJson> upd_req_stop;
     std::vector<StopDistancesDescriptionJson> distances;
 
-    
+
     OutputRequestBus out_bus;
 
     for (string s : stat_result) {
 
-        json::Document stat_req = LoadJSON(s); 
+        json::Document stat_req = LoadJSON(s);
         if (stat_req.GetRoot().AsMap().at("type").AsString() == "Stop") {
             OutputRequestStop out_stop;
             out_stop.id = stat_req.GetRoot().AsMap().at("id").AsInt();
@@ -175,7 +191,7 @@ inline void ReadInputJsonRequest() {
             out_bus.id = stat_req.GetRoot().AsMap().at("id").AsInt();
             out_bus.bus_name = stat_req.GetRoot().AsMap().at("name").AsString();
             out_req_bus.push_back(out_bus);
-        
+
         }
     }
 
@@ -183,7 +199,7 @@ inline void ReadInputJsonRequest() {
         json::Document base_req = LoadJSON(s);
         if (base_req.GetRoot().AsMap().at("type").AsString() == "Stop") {
             StopJson input_stop;
-            
+
             input_stop.stop_name = base_req.GetRoot().AsMap().at("name").AsString();
             input_stop.coordinates.lat = base_req.GetRoot().AsMap().at("latitude").AsDouble();
             input_stop.coordinates.lng = base_req.GetRoot().AsMap().at("longitude").AsDouble();
@@ -191,38 +207,50 @@ inline void ReadInputJsonRequest() {
             auto dist = base_req.GetRoot().AsMap().at("road_distances").AsString();
             cout << "Here dist : " << dist << endl;
 
-            if (base_req.GetRoot().AsMap().at("road_distances").AsMap().size()!=0) {
+            if (base_req.GetRoot().AsMap().at("road_distances").AsMap().size() != 0) {
                 StopDistancesDescriptionJson input_stop_dist;
                 input_stop_dist.stop_name = base_req.GetRoot().AsMap().at("name").AsString();
 
                 auto heighbors = base_req.GetRoot().AsMap().at("road_distances").AsMap();
                 for (auto const& [name, distance] : heighbors) {
-                    input_stop_dist.distances.push_back(make_pair(name, distance));
+                    input_stop_dist.distances[name] = distance;
                 }
 
 
                 distances.push_back(input_stop_dist);
             }
             upd_req_stop.push_back(input_stop);
-            
+
 
         }
         else {
             BusDescriptionJson input_bus;
             input_bus.bus_name = base_req.GetRoot().AsMap().at("name").AsString();
             input_bus.type = base_req.GetRoot().AsMap().at("is_roundtrip").AsString()[0];
-            auto stops_in_bus  = base_req.GetRoot().AsMap().at("stops");
-            for (auto el : stops_in_bus.AsArray()) {
+            auto stops_in_bus = base_req.GetRoot().AsMap().at("stops");
+            /*for (auto el : stops_in_bus.AsArray()) {
                 input_bus.stops.push_back(el);
-            }
+            }*/
             upd_req_bus.push_back(input_bus);
 
         }
     }
 
-
-
-
 }
+
+/*inline void ReadInputJsonRequest2() {
+    
+    auto input_json = Load(std::cin).GetRoot().AsMap();
+    auto base_input = input_json.at("base_request").AsArray();
+    /*for (auto el : base_input) {
+        auto first = el.AsMap().at("name").AsString();
+    
+    }*/
+
+    
+    
+  //  }
+
+
 
 
