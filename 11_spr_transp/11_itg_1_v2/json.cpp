@@ -172,6 +172,11 @@ namespace json {
                     // РџРѕС‚РѕРє Р·Р°РєРѕРЅС‡РёР»СЃСЏ РґРѕ С‚РѕРіРѕ, РєР°Рє РІСЃС‚СЂРµС‚РёР»Рё Р·Р°РєСЂС‹РІР°СЋС‰СѓСЋ РєР°РІС‹С‡РєСѓ?
                     throw ParsingError("String parsing error");
                 }
+                if (*it == '}') {
+                    //++it;
+                    break;
+                }
+
                 const char ch = *it;
                 if (ch == '"') {
                     // Р’СЃС‚СЂРµС‚РёР»Рё Р·Р°РєСЂС‹РІР°СЋС‰СѓСЋ РєР°РІС‹С‡РєСѓ
@@ -262,6 +267,8 @@ namespace json {
             else if (c == 't' || c == 'f') {
                 input.putback(c);
                 //return LoadBool(input);
+                //if (c == 't') { return Node("true"s); }
+                //else { return Node("false"s); }
                 return LoadString(input);
             }
             else if (c == '\"') {
