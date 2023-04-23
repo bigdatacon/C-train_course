@@ -121,27 +121,9 @@ inline void ReadInputJsonRequest() {
     // Разабираю запрос на 2 строки с подзапросами для base и stat
     string stat_r = GetStringRequests(full_line)[1];
     string base_r = GetStringRequests(full_line)[0];
-
-    //cout << "stat_r       " << stat_r << endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    //cout << "base_r        " << base_r << endl;
-
-    // разбиаю stat_r на подстроки по знака },
     
     vector<string> stat_result = ParsString(stat_r);
     vector<string> base_result = ParsString(base_r);
-    //for (string s : stat_result) { cout << "This stat req : " << s << endl; }
-    //for (string s : base_result) { cout << "This base req : " << s << endl; }
-
-    /* {
-        "type": "Stop",
-            "name" : "Морской вокзал",
-            "latitude" : 43.581969,
-            "longitude" : 39.719848,
-            "road_distances" : {"Ривьерский мост": 850}
-    }*/
 
     struct StopDistancesDescriptionJson {
         std::string stop_name;
