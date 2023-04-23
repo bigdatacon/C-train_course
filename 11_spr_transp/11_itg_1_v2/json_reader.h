@@ -29,22 +29,22 @@ inline std::string Print(const Node& node) {
 
 std::vector<std::string> GetStringRequests(std::string full_line) {
     std::vector<std::string> itg_vec;
-    //1 Обрезая от строки сначала блок "base_requests" - чтобы убрать "base_requests" и оставить только что в нем
+    //1 РћР±СЂРµР·Р°СЏ РѕС‚ СЃС‚СЂРѕРєРё СЃРЅР°С‡Р°Р»Р° Р±Р»РѕРє "base_requests" - С‡С‚РѕР±С‹ СѓР±СЂР°С‚СЊ "base_requests" Рё РѕСЃС‚Р°РІРёС‚СЊ С‚РѕР»СЊРєРѕ С‡С‚Рѕ РІ РЅРµРј
     std::size_t base_requests_pos = full_line.find("\"base_requests\":");
     std::size_t brace_pos = full_line.find('{', base_requests_pos);
     std::string stripped_line = full_line.substr(brace_pos);
 
-    // 3 обрезаю до "stat_requests"
+    // 3 РѕР±СЂРµР·Р°СЋ РґРѕ "stat_requests"
     std::string stripped_line_no_statr = stripped_line.substr(0, stripped_line.find("\"stat_requests\""));
 
 
-    // 4 удаляю пробелы с конца и ],
+    // 4 СѓРґР°Р»СЏСЋ РїСЂРѕР±РµР»С‹ СЃ РєРѕРЅС†Р° Рё ],
     size_t last_non_space = stripped_line_no_statr.find_last_not_of(" ");
     if (last_non_space != std::string::npos) {
         stripped_line_no_statr = stripped_line_no_statr.substr(0, last_non_space + 1);
     }
 
-    // Удаление знаков '], с конца'
+    // РЈРґР°Р»РµРЅРёРµ Р·РЅР°РєРѕРІ '], СЃ РєРѕРЅС†Р°'
     size_t last_bracket = stripped_line_no_statr.find_last_of("]");
     if (last_bracket != std::string::npos) {
         stripped_line_no_statr = stripped_line_no_statr.substr(0, last_bracket);
@@ -54,17 +54,17 @@ std::vector<std::string> GetStringRequests(std::string full_line) {
     std::cout << std::endl;
     std::cout << std::endl;
 
-    //II отдельно делаю строку в формате map для stat_requests
+    //II РѕС‚РґРµР»СЊРЅРѕ РґРµР»Р°СЋ СЃС‚СЂРѕРєСѓ РІ С„РѕСЂРјР°С‚Рµ map РґР»СЏ stat_requests
 
     itg_vec.push_back(stripped_line_no_statr);
 
-    //5 оставляю только то что в stat_requests
+    //5 РѕСЃС‚Р°РІР»СЏСЋ С‚РѕР»СЊРєРѕ С‚Рѕ С‡С‚Рѕ РІ stat_requests
     std::size_t pos = stripped_line.find("\"stat_requests\":");
     if (pos != std::string::npos) {
         stripped_line = stripped_line.substr(pos + 16);
     }
 
-    //6 Удаление пробелов и скобок
+    //6 РЈРґР°Р»РµРЅРёРµ РїСЂРѕР±РµР»РѕРІ Рё СЃРєРѕР±РѕРє
     size_t last_non_space2 = stripped_line.find_last_not_of(" ");
     if (last_non_space2 != std::string::npos) {
         stripped_line = stripped_line.substr(0, last_non_space2 - 1);
@@ -85,9 +85,9 @@ std::vector<std::string> GetStringRequests(std::string full_line) {
 
 
 inline void ReadInputJsonRequest() {
-    std::ifstream inFile("input.json.txt"); // открытие файла для чтения
-    if (!inFile) { // проверка успешности открытия файла
-        std::cerr << "Ошибка при открытии файла " << std::endl;
+    std::ifstream inFile("input.json.txt"); // РѕС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РґР»СЏ С‡С‚РµРЅРёСЏ
+    if (!inFile) { // РїСЂРѕРІРµСЂРєР° СѓСЃРїРµС€РЅРѕСЃС‚Рё РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°
+        std::cerr << "РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р° " << std::endl;
         return;
     }
 
@@ -96,7 +96,7 @@ inline void ReadInputJsonRequest() {
     while (std::getline(inFile, line)) {
         full_line += line;
     }
-    // Разабираю запрос на 2 строки с подзапросами для base и stat
+    // Р Р°Р·Р°Р±РёСЂР°СЋ Р·Р°РїСЂРѕСЃ РЅР° 2 СЃС‚СЂРѕРєРё СЃ РїРѕРґР·Р°РїСЂРѕСЃР°РјРё РґР»СЏ base Рё stat
     string stat_r = GetStringRequests(full_line)[1];
     string base_r = GetStringRequests(full_line)[0];
 
@@ -106,10 +106,14 @@ inline void ReadInputJsonRequest() {
     std::cout << std::endl;
     cout << "base_r        " << base_r << endl;
 
-    json::Document d = LoadJSON(stat_r);
-    cout << d.GetRoot().AsString() << endl;
+    //json::Document stat_req = LoadJSON(stat_r);
+    json::Document base_req = LoadJSON(base_r);
+    
+    
+    //cout << d.GetRoot().AsString() << endl;
+    //cout << d.GetRoot().GetValue() << endl;
 
-    std::istringstream input_stream(stat_r);
+    //std::istringstream input_stream(stat_r);
 
 }
 
