@@ -1,6 +1,3 @@
-/*new
-
-
 #define _USE_MATH_DEFINES
 #include "geo.h"
 
@@ -20,4 +17,3 @@ double ComputeDistance(Coordinates from, Coordinates to) {
 }
 
 }  // namespace geo
-*/
