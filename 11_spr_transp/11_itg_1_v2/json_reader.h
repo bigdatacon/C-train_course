@@ -209,12 +209,12 @@ inline void ReadInputJsonRequest() {
             auto dist = base_req.GetRoot().AsMap().at("road_distances").AsString();
             cout << "Here dist : " << dist << endl;
 
-            if (base_req.GetRoot().AsMap().at("road_distances").size() != 0) {
+            if (base_req.GetRoot().AsMap().at("road_distances").AsMap().size()!=0) {
                 StopDistancesDescriptionJson input_stop_dist;
                 input_stop_dist.stop_name = base_req.GetRoot().AsMap().at("name").AsString();
                 auto dist_in_stop = base_req.GetRoot().AsMap().at("road_distances");
                 for (auto el : dist_in_stop) {
-                    input_stop_dist.distances.push_back({el.first, el.second})
+                    input_stop_dist.distances.push_back(make_pair(el.first, el.second))
                 }
 
                 distances.push_back(input_stop_dist);
