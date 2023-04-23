@@ -237,26 +237,7 @@ inline void ReadInputJsonRequest() {
     }
 
 
-    /*for (string s : stat_result) {
-        cout << "stat" << endl;
-        json::Document stat_req = LoadJSON(s); Print(stat_req, cout); cout << endl;
-        auto id_s =  stat_req.GetRoot().AsMap().at("id");
-        cout << stat_req.GetRoot().AsMap().at("id").AsInt() << endl;
-    }
 
-    for (string s : base_result) {
-        cout << "base" << endl;
-        json::Document base_req = LoadJSON(s);  Print(base_req, cout); cout << endl;
-        cout << base_req.GetRoot().AsMap().at("type").AsString() << endl;
-        cout << base_req.GetRoot().AsMap().at("name").AsString() << endl;
-    }*/
-
-    
-    
-    //cout << d.GetRoot().AsString() << endl;
-    //cout << d.GetRoot().GetValue() << endl;
-
-    //std::istringstream input_stream(stat_r);
 
 }
 
