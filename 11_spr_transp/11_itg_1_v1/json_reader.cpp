@@ -7,7 +7,7 @@ using namespace std;
 
 
 
-json::Document LoadJSON(const std::string& s) {
+/*json::Document LoadJSON(const std::string& s) {
     std::istringstream strm(s);
     return json::Load(strm);
 }
@@ -16,9 +16,9 @@ std::string Print(const Node& node) {
     std::ostringstream out;
     Print(Document{ node }, out);
     return out.str();
-}
+}*/
 
-void ReadInputJsonRequest() {
+/*void ReadInputJsonRequest() {
     std::string input_str;
     std::getline(std::cin, input_str);
 
@@ -30,4 +30,4 @@ void ReadInputJsonRequest() {
     //cout << dict_node.AsMap().AsString() << endl;
 
 
-}
+}*/
