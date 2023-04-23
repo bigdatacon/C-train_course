@@ -212,10 +212,12 @@ inline void ReadInputJsonRequest() {
             if (base_req.GetRoot().AsMap().at("road_distances").AsMap().size()!=0) {
                 StopDistancesDescriptionJson input_stop_dist;
                 input_stop_dist.stop_name = base_req.GetRoot().AsMap().at("name").AsString();
-                auto dist_in_stop = base_req.GetRoot().AsMap().at("road_distances");
-                for (auto el : dist_in_stop) {
-                    input_stop_dist.distances.push_back(make_pair(el.first, el.second))
+
+                auto heighbors = base_req.GetRoot().AsMap().at("road_distances").AsMap();
+                for (auto const& [name, distance] : heighbors) {
+                    input_stop_dist.distances.push_back(make_pair(name, distance));
                 }
+
 
                 distances.push_back(input_stop_dist);
             }
@@ -227,8 +229,8 @@ inline void ReadInputJsonRequest() {
             BusDescriptionJson input_bus;
             input_bus.bus_name = base_req.GetRoot().AsMap().at("name").AsString();
             input_bus.type = base_req.GetRoot().AsMap().at("is_roundtrip").AsString()[0];
-            auto stops_in_bus  = base_req.GetRoot().AsMap().at("stops").AsArray();
-            for (auto el : stops_in_bus) {
+            auto stops_in_bus  = base_req.GetRoot().AsMap().at("stops");
+            for (auto el : stops_in_bus.AsArray()) {
                 input_bus.stops.push_back(el);
             }
             upd_req_bus.push_back(input_bus);
