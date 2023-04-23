@@ -82,7 +82,27 @@ std::vector<std::string> GetStringRequests(std::string full_line) {
 
 }
 
+vector<string> ParsString(string stat_r) {
+    // разбиаю stat_r на подстроки по знака },
+    vector<string> result;
+    std::size_t pos = 0;
+    std::size_t endpos;
 
+    while ((endpos = stat_r.find("},", pos)) != std::string::npos) // ищем все объекты JSON в строке
+    {
+        std::string jsonStr = stat_r.substr(pos, endpos - pos + 1); // объект JSON
+        //std::cout << jsonStr << std::endl;
+        result.push_back(jsonStr);
+        pos = endpos + 2; // продолжаем поиск со следующего символа после разделителя
+    }
+
+    // обрабатываем последний объект JSON
+    std::string jsonStr = stat_r.substr(pos);
+    //std::cout << jsonStr << std::endl;
+    result.push_back(jsonStr);
+    return result;
+
+}
 
 inline void ReadInputJsonRequest() {
     std::ifstream inFile("input.json.txt"); // открытие файла для чтения
@@ -106,8 +126,26 @@ inline void ReadInputJsonRequest() {
     std::cout << std::endl;
     cout << "base_r        " << base_r << endl;
 
+    // разбиаю stat_r на подстроки по знака },
+    
+    vector<string> stat_result = ParsString(stat_r);
+    vector<string> base_result = ParsString(base_r);
+    //for (string s : stat_result) { cout << "This stat req : " << s << endl; }
+    //for (string s : base_result) { cout << "This base req : " << s << endl; }
+
+
+    for (string s : stat_result) {
+        
+        json::Document stat_req = LoadJSON(s); cout << true << endl;
+    }
+
+    for (string s : base_result) {
+
+        json::Document base_req = LoadJSON(s); cout << true << endl;
+    }
+
     //json::Document stat_req = LoadJSON(stat_r);
-    json::Document base_req = LoadJSON(base_r);
+    //json::Document base_req = LoadJSON(base_r);
     
     
     //cout << d.GetRoot().AsString() << endl;
