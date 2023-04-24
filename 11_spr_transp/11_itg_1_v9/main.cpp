@@ -1,4 +1,4 @@
-﻿#include "geo.h"
+#include "geo.h"
 #include "transport_catalogue.h"
 #include "json_reader.h"
 #include "iostream"
@@ -49,6 +49,7 @@ struct BusDescription {
 	std::string type;
 };
 
+std::deque<BusDescription> upd_req_bus_;
 
 void ReadInputJsonRequest() {
 
@@ -79,8 +80,8 @@ void ReadInputJsonRequest() {
 		}
 		else if (json_obj.at("type"s) == "Bus"s) {
 			BusDescription bs;
-			auto stop_list = json_obj.at("stops");
-			for (auto el : stop_list.AsArray()) {
+			auto stop_list = json_obj.at("stops").AsArray();
+			for (auto el : stop_list) {
 
 				bs.stops.push_back(el.AsString());
 
@@ -94,7 +95,15 @@ void ReadInputJsonRequest() {
 			else { bs.type = "false"s; }
 
 			cout << "bs.type: "s  << bs.type << endl;
-
+			upd_req_bus_.push_back(bs);
+			
+		}
+	}
+	for (auto el : upd_req_bus_) {
+		cout << "el.bus_name  " << el.bus_name << " el.type  " << el.type << endl;
+		cout << "bus_stops : " << endl;
+		for (auto i : el.stops) {
+			cout << i << endl;
 		}
 	}
 
@@ -138,7 +147,7 @@ int main()
 
 	//ReadInputJsonRequest();
 
-
+	
 	transport_catalogue::TransportCatalogue tc;
 	transport_catalogue::InputReaderJson reader(std::cin);
 	(void)reader.ReadInputJsonRequest();
@@ -149,7 +158,7 @@ int main()
 
 	reader.ManageOutputRequests(tc);
 
-
+	
 
 	return 0;
 }
