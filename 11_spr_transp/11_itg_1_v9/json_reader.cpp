@@ -44,8 +44,8 @@ namespace transport_catalogue {
 			}
 			else if (json_obj.at("type"s) == "Bus"s) {
 				BusDescription bs;
-				auto stop_list = json_obj.at("stops");
-				for (auto el : stop_list.AsArray()) {
+				auto stop_list = json_obj.at("stops").AsArray();
+				for (auto el : stop_list) {
 
 					bs.stops.push_back(el.AsString());
 
