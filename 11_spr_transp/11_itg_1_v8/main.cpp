@@ -1,4 +1,4 @@
-﻿#include "geo.h"
+#include "geo.h"
 #include "transport_catalogue.h"
 #include "json_reader.h"
 #include "iostream"
@@ -107,7 +107,7 @@ struct OutputRequestTest {
 
 int main()
 {
-	std::ostream& out = std::cout;
+	/*std::ostream& out = std::cout;
 	AllBusInfoBusResponse tr;
 	OutputRequestTest req;
 	json::Array queries;
@@ -134,17 +134,17 @@ int main()
 	};
 	queries.emplace_back(res);
 	cout << "PRINT JSON :" << endl;
-	json::Print(json::Document{ queries }, out);
+	json::Print(json::Document{ queries }, out);*/
 
-	ReadInputJsonRequest();
+	//ReadInputJsonRequest();
 
 
-	/*transport_catalogue::TransportCatalogue tc;
+	transport_catalogue::TransportCatalogue tc;
 	transport_catalogue::InputReaderJson reader(std::cin);
 	(void)reader.ReadInputJsonRequest();
 	(void)reader.ReadOutputJsonRequest();
 
-	reader.UpdStop(tc);
+	/*reader.UpdStop(tc);
 	reader.UpdBus(tc);
 	reader.UpdStopDist(tc);*/
 
