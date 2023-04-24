@@ -133,38 +133,10 @@ struct OutputRequestTest {
 
 int main()
 {
-	/*std::ostream& out = std::cout;
-	AllBusInfoBusResponse tr;
-	OutputRequestTest req;
-	json::Array queries;
-	cout << "tr.bus_name = " << tr.bus_name << endl;
 
-	set<string> r{ "value1", "value2", "value3" };
-	json::Array routes; 
-	std::copy(r.begin(), r.end(), std::back_inserter(routes));
+	//ReadInputJsonRequest(); просто вызвать функцию чтобы проверить что все работает
 
-
-	json::Node answer_stop = json::Dict{
-	{"buses", routes},
-	{"request_id" ,  tr.id}
-
-	};
-	queries.emplace_back(answer_stop);
-
-	json::Node res = json::Dict{
-		{"curvature", tr.route_curvature},
-		{"request_id" , tr.id},
-		{"route_length" , tr.route_length},
-		{"stop_count" , tr.quant_stops},
-		{"unique_stop_count" , tr.quant_uniq_stops}
-	};
-	queries.emplace_back(res);
-	cout << "PRINT JSON :" << endl;
-	json::Print(json::Document{ queries }, out);*/
-
-	ReadInputJsonRequest();
-
-	/*
+	
 	transport_catalogue::TransportCatalogue tc;
 	transport_catalogue::InputReaderJson reader(std::cin);
 	(void)reader.ReadInputJsonRequest();
@@ -174,7 +146,7 @@ int main()
 	reader.UpdStopDist(tc);
 
 	reader.ManageOutputRequests(tc);
-	*/
+	
 	
 
 	return 0;
