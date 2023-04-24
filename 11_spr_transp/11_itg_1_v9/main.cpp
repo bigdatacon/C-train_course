@@ -94,14 +94,14 @@ void ReadInputJsonRequest() {
 
 			}
 			bs.bus_name = json_obj.at("name").AsString();
-			cout << "bus_name : " << json_obj.at("name").AsString()  << endl;
+			cout << "bus_name : " << json_obj.at("name").AsString() << endl;
 
 			if (json_obj.at("is_roundtrip").AsBool()) { bs.type = "true"s; }
 			else { bs.type = "false"s; }
 
-			cout << "bs.type: "s  << bs.type << endl;
+			cout << "bs.type: "s << bs.type << endl;
 			upd_req_bus_.push_back(bs);
-			
+
 		}
 	}
 	for (auto el : upd_req_bus_) {
@@ -117,12 +117,12 @@ void ReadInputJsonRequest() {
 	}
 	for (auto el : distances_) {
 		cout << "distances : " << endl;
-		cout << "el.stop_name  " << el.stop_name  << endl;
+		cout << "el.stop_name  " << el.stop_name << endl;
 		cout << "stops : " << endl;
-		for (auto i : el.distances) { cout << i.first << "  : " << "dist : "  << i.second << endl; }
+		for (auto i : el.distances) { cout << i.first << "  : " << "dist : " << i.second << endl; }
 
 	}
-	
+
 
 }
 struct OutputRequestTest {
@@ -164,8 +164,8 @@ int main()
 
 	ReadInputJsonRequest();
 
-	
-	/*transport_catalogue::TransportCatalogue tc;
+	/*
+	transport_catalogue::TransportCatalogue tc;
 	transport_catalogue::InputReaderJson reader(std::cin);
 	(void)reader.ReadInputJsonRequest();
 
