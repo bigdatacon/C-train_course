@@ -1,4 +1,4 @@
-﻿#include "stat_reader.h"
+#include "stat_reader.h"
 #include "geo.h"
 #include "transport_catalogue.h"
 #include "input_reader.h"
@@ -22,6 +22,7 @@ int main() {
 
 int main()
 {
-	ReadInputJsonRequest();
+	return ;
+	//ReadInputJsonRequest();
 }
 
