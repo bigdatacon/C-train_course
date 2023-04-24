@@ -51,6 +51,9 @@ struct BusDescription {
 
 std::deque<BusDescription> upd_req_bus_;
 
+std::deque<Stop> upd_req_stop_;
+std::vector<StopDistancesDescription> distances_;
+
 void ReadInputJsonRequest() {
 
 	using namespace std::literals;
@@ -76,6 +79,8 @@ void ReadInputJsonRequest() {
 				input_stop_dist.distances.push_back(make_pair(el.first, el.second.AsInt()));
 				cout << "el.first : " << el.first << " el.second.AsInt() : " << el.second.AsInt() << endl;
 			}
+			//upd_req_stop_.push_back(stopjson);
+			//distances_.push_back(input_stop_dist);
 
 		}
 		else if (json_obj.at("type"s) == "Bus"s) {
@@ -106,6 +111,18 @@ void ReadInputJsonRequest() {
 			cout << i << endl;
 		}
 	}
+
+	for (auto el : upd_req_stop_) {
+		cout << "el.stop_name  " << el.stop_name << " el.latitude  " << el.coordinates.lat << " el.lng  " << el.coordinates.lng << endl;
+	}
+	for (auto el : distances_) {
+		cout << "distances : " << endl;
+		cout << "el.stop_name  " << el.stop_name  << endl;
+		cout << "stops : " << endl;
+		for (auto i : el.distances) { cout << i.first << "  : " << "dist : "  << i.second << endl; }
+
+	}
+	
 
 }
 struct OutputRequestTest {
@@ -145,10 +162,10 @@ int main()
 	cout << "PRINT JSON :" << endl;
 	json::Print(json::Document{ queries }, out);*/
 
-	//ReadInputJsonRequest();
+	ReadInputJsonRequest();
 
 	
-	transport_catalogue::TransportCatalogue tc;
+	/*transport_catalogue::TransportCatalogue tc;
 	transport_catalogue::InputReaderJson reader(std::cin);
 	(void)reader.ReadInputJsonRequest();
 
@@ -157,7 +174,7 @@ int main()
 	reader.UpdStopDist(tc);
 
 	reader.ManageOutputRequests(tc);
-
+	*/
 	
 
 	return 0;
