@@ -1,4 +1,4 @@
-﻿#include "json_reader.h"
+#include "json_reader.h"
 #include "geo.h"
 #include "transport_catalogue.h"
 
@@ -57,7 +57,7 @@ namespace transport_catalogue {
 			if (stops_v.size() != 0) {
 				all_r.bus_name = bus;
 
-				if (fb->type == "c"s) {
+				if (fb->type == "true"s) {
 					all_r.quant_stops = stops_v.size();
 					unordered_set<string*> us(stops_v.begin(), stops_v.end());
 					all_r.quant_uniq_stops = us.size();
