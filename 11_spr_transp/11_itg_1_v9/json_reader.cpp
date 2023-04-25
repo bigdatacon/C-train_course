@@ -116,7 +116,7 @@ namespace transport_catalogue {
 				}
 			}
 
-			if (el.name == "Stop"s) {
+			if (el.type == "Stop"s) {
 				const Stop* myStop = tc.FindStop(el.name);
 				if (myStop == nullptr) {
 					json::Node answer_empty_stop = json::Dict{
@@ -145,6 +145,6 @@ namespace transport_catalogue {
 		}
 		json::Print(json::Document{ queries }, out);
 
-	};
+	}
 
 }
