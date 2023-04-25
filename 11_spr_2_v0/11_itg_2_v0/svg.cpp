@@ -1,5 +1,6 @@
 #include "svg.h"
-
+#include <iostream>
+#include <sstream>
 namespace svg {
 
 	using namespace std::literals;
@@ -24,15 +25,48 @@ namespace svg {
 		return os;
 	}
 
+	/*std::ostream& operator<<(std::ostream& os, const Rgb& rgb) {
+		os << "rgb(" << static_cast<unsigned int>(rgb.red_) << ","
+			<< static_cast<unsigned int>(rgb.green_) << ","
+			<< static_cast<unsigned int>(rgb.blue_) << ")";
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const Rgba& rgba) {
+		os << "rgb(" << static_cast<unsigned int>(rgba.red_) << ","
+			<< static_cast<unsigned int>(rgba.green_) << ","
+			<< static_cast<unsigned int>(rgba.blue_) << ","
+			<< static_cast<unsigned int>(rgba.opacity_) << ")";
+		return os;
+	}*/
+
+	std::ostream& operator<<(std::ostream& os, const Color& color) {
+		std::ostringstream out;
+		std::visit(ColorPrinter{ out}, color);
+		os << out.str();
+		return os;
+	}
+
 
 	void Object::Render(const RenderContext& context) const {
 		context.RenderIndent();
 
-		// Делегируем вывод тега своим подклассам
+		// Р”РµР»РµРіРёСЂСѓРµРј РІС‹РІРѕРґ С‚РµРіР° СЃРІРѕРёРј РїРѕРґРєР»Р°СЃСЃР°Рј
 		RenderObject(context);
 
 		context.out << std::endl;
 	}
+
+	//------------------PathProps----------------------------
+	/*void PathProps::RenderAttrs(std::ostream& out) const {
+		using namespace std::literals;
+		if (fill_color_) {
+			out << " fill=\""sv << *fill_color_ << "\""sv;
+		}
+		if (stroke_color_) {
+			out << " stroke=\""sv << *stroke_color_ << "\""sv;
+		}
+	}*/
 
 	// ---------- Circle ------------------
 
@@ -56,14 +90,14 @@ namespace svg {
 
 	//--------------------Polyline
 
-		// Добавляет очередную вершину к ломаной линии
+		// Р”РѕР±Р°РІР»СЏРµС‚ РѕС‡РµСЂРµРґРЅСѓСЋ РІРµСЂС€РёРЅСѓ Рє Р»РѕРјР°РЅРѕР№ Р»РёРЅРёРё
 	Polyline& Polyline::AddPoint(Point point) {
 		points_.push_back(point);
 		return *this;
 	}
 
 
-	// Отрисовывает ломаную линию
+	// РћС‚СЂРёСЃРѕРІС‹РІР°РµС‚ Р»РѕРјР°РЅСѓСЋ Р»РёРЅРёСЋ
 	void Polyline::RenderObject(const RenderContext& context) const {
 		auto& out = context.out;
 		out << "<polyline points=\"";
@@ -73,50 +107,76 @@ namespace svg {
 				out << " ";
 			}
 		}
+		//std::cout << "\"";
+		/*out << " />";
+		RenderAttrs(context.out);
+		out << "/>";*/
+
 		out << "\" ";
+
 		RenderAttrs(out);
+		//out << ' ';
 		out << "/>"sv;
 
 	}
 
+
+	/*
+	void Polyline::RenderObject(const RenderContext& context) const  {
+		auto& out = context.out;
+		out << "<polyline points=\"";
+		for (const Point& p : points_) {
+			out << p.x << "," << p.y << " ";
+		}
+		out << "\" />";
+	}*/
+
+
 	//--------------------------------------Text
-		// Задаёт координаты опорной точки (атрибуты x и y)
+		// Р—Р°РґР°С‘С‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ РѕРїРѕСЂРЅРѕР№ С‚РѕС‡РєРё (Р°С‚СЂРёР±СѓС‚С‹ x Рё y)
 	Text& Text::SetPosition(Point pos) {
 		x = pos.x;
 		y = pos.y;
 		return *this;
 	}
 
-	// Задаёт смещение относительно опорной точки (атрибуты dx, dy)
+	// Р—Р°РґР°С‘С‚ СЃРјРµС‰РµРЅРёРµ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РѕРїРѕСЂРЅРѕР№ С‚РѕС‡РєРё (Р°С‚СЂРёР±СѓС‚С‹ dx, dy)
 	Text& Text::SetOffset(Point offset) {
 		dx = offset.x;
 		dy = offset.y;
 		return *this;
 	}
 
-	// Задаёт размеры шрифта (атрибут font-size)
+	// Р—Р°РґР°С‘С‚ СЂР°Р·РјРµСЂС‹ С€СЂРёС„С‚Р° (Р°С‚СЂРёР±СѓС‚ font-size)
 	Text& Text::SetFontSize(uint32_t size) {
 		font_size = size;
 		return *this;
 	}
 
-	// Задаёт название шрифта (атрибут font-family)
+	// Р—Р°РґР°С‘С‚ РЅР°Р·РІР°РЅРёРµ С€СЂРёС„С‚Р° (Р°С‚СЂРёР±СѓС‚ font-family)
 	Text& Text::SetFontFamily(std::string font_family) {
 		font_family_name = font_family;
 		return *this;
 	}
 
-	// Задаёт толщину шрифта (атрибут font-weight)
+	// Р—Р°РґР°С‘С‚ С‚РѕР»С‰РёРЅСѓ С€СЂРёС„С‚Р° (Р°С‚СЂРёР±СѓС‚ font-weight)
 	Text& Text::SetFontWeight(std::string font_weight) {
 		font_weight_type = font_weight;
 		return *this;
 	}
 
-	// Задаёт текстовое содержимое объекта (отображается внутри тега text)
+	// Р—Р°РґР°С‘С‚ С‚РµРєСЃС‚РѕРІРѕРµ СЃРѕРґРµСЂР¶РёРјРѕРµ РѕР±СЉРµРєС‚Р° (РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ РІРЅСѓС‚СЂРё С‚РµРіР° text)
 	Text& Text::SetData(std::string data) {
 		text_data = data;
 		return *this;
 	}
+
+	//Text& SetStrokeLineJoin(StrokeLineJoin);
+	//Text& SetStrokeLineCap(StrokeLineCap);
+	/*Text& Text::SetStrokeWidth(uint32_t width) {
+		width_ = width;
+		return *this;
+	};*/
 
 
 	void Text::RenderObject(const RenderContext& context) const {
@@ -124,7 +184,12 @@ namespace svg {
 		out << "<text ";
 		RenderAttrs(context.out);
 		out << " x=\"" << x << "\" y=\"" << y << "\"";
+		//out << "<text x=\"" << x << "\" y=\"" << y << "\"";
+
+
+
 		out << " dx=\"" << dx << "\" dy=\"" << dy << "\"";
+
 		out << " font-size=\"" << font_size << "\"";
 		if (!font_family_name.empty()) {
 			out << " font-family=\"" << font_family_name << "\"";
@@ -138,15 +203,26 @@ namespace svg {
 	}
 
 
+	//-----------------ObjectContainer
+		// Р”РѕР±Р°РІР»СЏРµС‚ РІ svg-РґРѕРєСѓРјРµРЅС‚ РѕР±СЉРµРєС‚-РЅР°СЃР»РµРґРЅРёРє svg::Object
+	/*void ObjectContainer::AddPtr(std::unique_ptr<Object>&& obj) {
+		objects_.emplace_back(std::move(obj));
+	}*/
+
+	// РРЅС‚РµСЂС„РµР№СЃ Drawable Р·Р°РґР°С‘С‚ РѕР±СЉРµРєС‚С‹, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РЅР°СЂРёСЃРѕРІР°С‚СЊ СЃ РїРѕРјРѕС‰СЊСЋ Graphics
+	//Drawable----------------------------------------------------------
+	//virtual void Drawable::Draw(ObjectContainer& o) const = 0;
+
+
 	//---------------------------Document
 
 
-		// Добавляет в svg-документ объект-наследник svg::Object
+		// Р”РѕР±Р°РІР»СЏРµС‚ РІ svg-РґРѕРєСѓРјРµРЅС‚ РѕР±СЉРµРєС‚-РЅР°СЃР»РµРґРЅРёРє svg::Object
 	void Document::AddPtr(std::unique_ptr<Object>&& obj) {
 		objects_.emplace_back(std::move(obj));
 	}
 
-	// Выводит в ostream svg-представление документа
+	// Р’С‹РІРѕРґРёС‚ РІ ostream svg-РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
 	void Document::Render(std::ostream& out) const {
 		out << R"(<?xml version="1.0" encoding="UTF-8" ?>)" << std::endl;
 		out << R"(<svg xmlns="http://www.w3.org/2000/svg" version="1.1">)" << std::endl;
