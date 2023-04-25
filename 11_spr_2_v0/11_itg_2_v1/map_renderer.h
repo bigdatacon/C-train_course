@@ -56,59 +56,59 @@ bool IsZero(double value) {
 
 class SphereProjector {
 public:
-    // points_begin и points_end задают начало и конец интервала элементов geo::Coordinates
+    // points_begin Рё points_end Р·Р°РґР°СЋС‚ РЅР°С‡Р°Р»Рѕ Рё РєРѕРЅРµС† РёРЅС‚РµСЂРІР°Р»Р° СЌР»РµРјРµРЅС‚РѕРІ geo::Coordinates
     template <typename PointInputIt>
     SphereProjector(PointInputIt points_begin, PointInputIt points_end,
         double max_width, double max_height, double padding)
         : padding_(padding) //
     {
-        // Если точки поверхности сферы не заданы, вычислять нечего
+        // Р•СЃР»Рё С‚РѕС‡РєРё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё СЃС„РµСЂС‹ РЅРµ Р·Р°РґР°РЅС‹, РІС‹С‡РёСЃР»СЏС‚СЊ РЅРµС‡РµРіРѕ
         if (points_begin == points_end) {
             return;
         }
 
-        // Находим точки с минимальной и максимальной долготой
+        // РќР°С…РѕРґРёРј С‚РѕС‡РєРё СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґРѕР»РіРѕС‚РѕР№
         const auto [left_it, right_it] = std::minmax_element(
             points_begin, points_end,
             [](auto lhs, auto rhs) { return lhs.lng < rhs.lng; });
         min_lon_ = left_it->lng;
         const double max_lon = right_it->lng;
 
-        // Находим точки с минимальной и максимальной широтой
+        // РќР°С…РѕРґРёРј С‚РѕС‡РєРё СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ С€РёСЂРѕС‚РѕР№
         const auto [bottom_it, top_it] = std::minmax_element(
             points_begin, points_end,
             [](auto lhs, auto rhs) { return lhs.lat < rhs.lat; });
         const double min_lat = bottom_it->lat;
         max_lat_ = top_it->lat;
 
-        // Вычисляем коэффициент масштабирования вдоль координаты x
+        // Р’С‹С‡РёСЃР»СЏРµРј РєРѕСЌС„С„РёС†РёРµРЅС‚ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РІРґРѕР»СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ x
         std::optional<double> width_zoom;
         if (!IsZero(max_lon - min_lon_)) {
             width_zoom = (max_width - 2 * padding) / (max_lon - min_lon_);
         }
 
-        // Вычисляем коэффициент масштабирования вдоль координаты y
+        // Р’С‹С‡РёСЃР»СЏРµРј РєРѕСЌС„С„РёС†РёРµРЅС‚ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РІРґРѕР»СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ y
         std::optional<double> height_zoom;
         if (!IsZero(max_lat_ - min_lat)) {
             height_zoom = (max_height - 2 * padding) / (max_lat_ - min_lat);
         }
 
         if (width_zoom && height_zoom) {
-            // Коэффициенты масштабирования по ширине и высоте ненулевые,
-            // берём минимальный из них
+            // РљРѕСЌС„С„РёС†РёРµРЅС‚С‹ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РїРѕ С€РёСЂРёРЅРµ Рё РІС‹СЃРѕС‚Рµ РЅРµРЅСѓР»РµРІС‹Рµ,
+            // Р±РµСЂС‘Рј РјРёРЅРёРјР°Р»СЊРЅС‹Р№ РёР· РЅРёС…
             zoom_coeff_ = std::min(*width_zoom, *height_zoom);
         }
         else if (width_zoom) {
-            // Коэффициент масштабирования по ширине ненулевой, используем его
+            // РљРѕСЌС„С„РёС†РёРµРЅС‚ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РїРѕ С€РёСЂРёРЅРµ РЅРµРЅСѓР»РµРІРѕР№, РёСЃРїРѕР»СЊР·СѓРµРј РµРіРѕ
             zoom_coeff_ = *width_zoom;
         }
         else if (height_zoom) {
-            // Коэффициент масштабирования по высоте ненулевой, используем его
+            // РљРѕСЌС„С„РёС†РёРµРЅС‚ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РїРѕ РІС‹СЃРѕС‚Рµ РЅРµРЅСѓР»РµРІРѕР№, РёСЃРїРѕР»СЊР·СѓРµРј РµРіРѕ
             zoom_coeff_ = *height_zoom;
         }
     }
 
-    // Проецирует широту и долготу в координаты внутри SVG-изображения
+    // РџСЂРѕРµС†РёСЂСѓРµС‚ С€РёСЂРѕС‚Сѓ Рё РґРѕР»РіРѕС‚Сѓ РІ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІРЅСѓС‚СЂРё SVG-РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     svg::Point operator()(geo::Coordinates coords) const {
         return {
             (coords.lng - min_lon_) * zoom_coeff_ + padding_,
@@ -154,7 +154,7 @@ deque<string*> GetStopsForNonRounTtip(deque<string*> stops) {
 
 
 
-void DrawRoute(transport_catalogue::TransportCatalogue tc) { // сначала все для скорости делаю на классе каталога, потому нужно промежуточный клаас добавить 
+void DrawRoute(/*transport_catalogue::TransportCatalogue tc*/  RequestToTc rtotc) { // СЃРЅР°С‡Р°Р»Р° РІСЃРµ РґР»СЏ СЃРєРѕСЂРѕСЃС‚Рё РґРµР»Р°СЋ РЅР° РєР»Р°СЃСЃРµ РєР°С‚Р°Р»РѕРіР°, РїРѕС‚РѕРјСѓ РЅСѓР¶РЅРѕ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Р№ РєР»Р°Р°СЃ РґРѕР±Р°РІРёС‚СЊ 
     const double WIDTH = 600.0;
     const double HEIGHT = 400.0;
     const double PADDING = 50.0;
@@ -164,48 +164,47 @@ void DrawRoute(transport_catalogue::TransportCatalogue tc) { // сначала все для 
     
 
     std::vector<std::variant<std::string, std::vector<int>>> color_palette = r.color_palette;
-    std::deque<transport_catalogue::Bus> buses =  tc.GetBuses();
-    std::deque<transport_catalogue::Stop> stops = tc.GetStops();
+    std::deque<transport_catalogue::Bus> buses = rtotc.GetBuses();
+    std::deque<transport_catalogue::Stop> stops = rtotc.GetStops();
     std::sort(buses.begin(), buses.end(),
         [](const transport_catalogue::Bus& a, const transport_catalogue::Bus& b) { return a.bus_name < b.bus_name; });
-    //0 определяю цвет маршрута 
+    //0 РѕРїСЂРµРґРµР»СЏСЋ С†РІРµС‚ РјР°СЂС€СЂСѓС‚Р° 
     std::map<string, variant<std::string, std::vector<int>>> colors = GetColorForRoute(buses, color_palette);
 
-    //1 Для каждого автобсам собираю вектор координат
+    //1 Р”Р»СЏ РєР°Р¶РґРѕРіРѕ Р°РІС‚РѕР±СЃР°Рј СЃРѕР±РёСЂР°СЋ РІРµРєС‚РѕСЂ РєРѕРѕСЂРґРёРЅР°С‚
     for (auto bus : buses) {
 
         vector<geo::Coordinates> geo_coords;
 
 
-
-        // a) цвет текущего маршрута 
+        // a) С†РІРµС‚ С‚РµРєСѓС‰РµРіРѕ РјР°СЂС€СЂСѓС‚Р° 
         variant<std::string, std::vector<int>> current_color;
         deque<string*> current_stops;
         if (colors.count(bus.bus_name)) {
             variant<std::string, std::vector<int>> current_color = colors[bus.bus_name];
         }
 
-        //б) определяю перечень остановок r
+        //Р±) РѕРїСЂРµРґРµР»СЏСЋ РїРµСЂРµС‡РµРЅСЊ РѕСЃС‚Р°РЅРѕРІРѕРє r
         if (bus.type == "true") {
             current_stops = GetStopsForNonRounTtip(bus.stops);
         }
         else { current_stops = bus.stops; }
 
-        //в) иду по каждой остановке и получю для нее координаты. добавляю координаты в вектор 
+        //РІ) РёРґСѓ РїРѕ РєР°Р¶РґРѕР№ РѕСЃС‚Р°РЅРѕРІРєРµ Рё РїРѕР»СѓС‡СЋ РґР»СЏ РЅРµРµ РєРѕРѕСЂРґРёРЅР°С‚С‹. РґРѕР±Р°РІР»СЏСЋ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РІРµРєС‚РѕСЂ 
         for (int i = 0; i < current_stops.size() - 1; i++) {
-            const Stop* one = tc.FindStop(*current_stops[i]);
+            const Stop* one = rtotc.FindStop(*current_stops[i]);
             geo_coords.push_back(one->coordinates);
         }
-        //г Создаём проектор сферических координат на карту
+        //Рі РЎРѕР·РґР°С‘Рј РїСЂРѕРµРєС‚РѕСЂ СЃС„РµСЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ РЅР° РєР°СЂС‚Сѓ
         const SphereProjector proj{
             geo_coords.begin(), geo_coords.end(), WIDTH, HEIGHT, PADDING
         };
 
         vector<svg::Point> point_to_draw;
 
-        //д Проецируем и выводим координаты
+        //Рґ РџСЂРѕРµС†РёСЂСѓРµРј Рё РІС‹РІРѕРґРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
         for (const auto geo_coord : geo_coords) {
-            //г) получаю новый перечень координат 
+            //Рі) РїРѕР»СѓС‡Р°СЋ РЅРѕРІС‹Р№ РїРµСЂРµС‡РµРЅСЊ РєРѕРѕСЂРґРёРЅР°С‚ 
             const svg::Point screen_coord = proj(geo_coord);
             cout << '(' << geo_coord.lat << ", "sv << geo_coord.lng << ") -> "sv;
             cout << '(' << screen_coord.x << ", "sv << screen_coord.y << ')' << endl;
@@ -215,7 +214,7 @@ void DrawRoute(transport_catalogue::TransportCatalogue tc) { // сначала все для 
             point_to_draw.push_back(p);
         }
         
-        // в итоге есть перечень остановок : current_stops, цвет маршрута, новые координаты -этог должно быть достаточно
+        // РІ РёС‚РѕРіРµ РµСЃС‚СЊ РїРµСЂРµС‡РµРЅСЊ РѕСЃС‚Р°РЅРѕРІРѕРє : current_stops, С†РІРµС‚ РјР°СЂС€СЂСѓС‚Р°, РЅРѕРІС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ -СЌС‚РѕРі РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ
         
         
     }
@@ -233,18 +232,18 @@ int main() {
     const double HEIGHT = 400.0;
     const double PADDING = 50.0;
 
-    // Точки, подлежащие проецированию
+    // РўРѕС‡РєРё, РїРѕРґР»РµР¶Р°С‰РёРµ РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЋ
     vector<geo::Coordinates> geo_coords = {
         {43.587795, 39.716901}, {43.581969, 39.719848}, {43.598701, 39.730623},
         {43.585586, 39.733879}, {43.590317, 39.746833}
     }; 
 
-    // Создаём проектор сферических координат на карту
+    // РЎРѕР·РґР°С‘Рј РїСЂРѕРµРєС‚РѕСЂ СЃС„РµСЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ РЅР° РєР°СЂС‚Сѓ
     const SphereProjector proj{
         geo_coords.begin(), geo_coords.end(), WIDTH, HEIGHT, PADDING
     };
 
-    // Проецируем и выводим координаты
+    // РџСЂРѕРµС†РёСЂСѓРµРј Рё РІС‹РІРѕРґРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
     for (const auto geo_coord : geo_coords) {
         const svg::Point screen_coord = proj(geo_coord);
         cout << '(' << geo_coord.lat << ", "sv << geo_coord.lng << ") -> "sv;
