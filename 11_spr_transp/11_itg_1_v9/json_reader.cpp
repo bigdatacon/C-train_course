@@ -95,8 +95,9 @@ namespace transport_catalogue {
 		json::Array queries;
 		for (auto el : out_req_) {
 			if (el.type == "Bus"s) {
-				AllBusInfoBusResponse r = tc.GetAllBusInfo(el.name);
-				if (r.quant_stops == 0) {
+
+				const Bus* bus_resp = tc.FindBus(el.name);
+				if (bus_resp == nullptr) {
 					json::Node answer_empty_bus = json::Dict{
 							{"request_id", el.id},
 							{"error_message" ,  "not found"}
@@ -104,7 +105,9 @@ namespace transport_catalogue {
 					queries.emplace_back(answer_empty_bus);
 
 				}
+
 				else {
+					AllBusInfoBusResponse r = tc.GetAllBusInfo(el.name);
 					json::Node non_empty_bus = json::Dict{
 							{"curvature", r.route_curvature},
 							{"request_id" , el.id},
