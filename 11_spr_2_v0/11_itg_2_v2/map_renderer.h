@@ -250,8 +250,12 @@ void DrawRoute(/*transport_catalogue::TransportCatalogue tc*/  RequestToTc rtotc
         Polyline polyline = CreatePolyline(point_to_draw);
 
 
-        RouteLine routline(polyline);
-        doc.Add(std::move(routline));
+        //RouteLine routline(polyline);
+        //doc.Add(std::move(routline));
+
+
+        doc.Add(std::move(polyline));
+        //doc.Add(polyline);
         docs.push_back(doc);
     }
     // рисую линии 
