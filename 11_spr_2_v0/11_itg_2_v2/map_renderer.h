@@ -252,11 +252,32 @@ void DrawRoute(/*transport_catalogue::TransportCatalogue tc*/  RequestToTc rtotc
 
         //RouteLine routline(polyline);
         //doc.Add(std::move(routline));
+        using namespace svg;
+        using namespace std;
 
+        Color none_color;
+        cout << none_color << endl; // none
 
-        doc.Add(std::move(polyline));
+        Color purple{ "purple"s };
+        cout << purple << endl; // purple
+
+        Color rgb = Rgb{ 100, 200, 255 };
+        cout << rgb << endl; // rgb(100,200,255)
+
+        Color rgba = Rgba{ 100, 200, 255, 0.5 };
+        cout << rgba << endl; // rgba(100,200,255,0.5)
+
+        Circle c;
+        c.SetRadius(3.5).SetCenter({ 1.0, 2.0 });
+        c.SetFillColor(rgba);
+        c.SetStrokeColor(purple);
+
+        doc.Add(std::move(c));
+        doc.Render(cout);
+
+        //doc.Add(std::move(polyline));
         //doc.Add(polyline);
-        docs.push_back(doc);
+        //docs.push_back(doc);
     }
     // рисую линии 
     for (auto doc : docs) { doc.Render(cout); }
