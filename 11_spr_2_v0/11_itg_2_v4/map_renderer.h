@@ -121,13 +121,12 @@ struct Render_data {
     std::array<double, 2> stop_label_offset = { 7.0, -3.0 };
     std::array<int, 4> underlayer_color = { 255, 255, 255, 85 };
     double underlayer_width = 3.0;
-    std::vector<std::variant<std::string, std::vector<int>>> color_palette{
-        std::initializer_list<std::variant<std::string, std::vector<int>>> {
+    std::vector<Color> color_palette{
             "green",
-            std::vector<int> { 255, 160, 0 },
+            Rgb{ 255, 160, 0 },
             "red"
-        }
     };
+
 };
 
 
