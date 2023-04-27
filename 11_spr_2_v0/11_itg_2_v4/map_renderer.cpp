@@ -28,8 +28,8 @@ bool IsZero(double value) {
     return std::abs(value) < EPSILON;
 }
 
-std::map<string, variant<std::string, std::vector<int>>> GetColorForRoute(std::deque<transport_catalogue::Bus> buses, std::vector<std::variant<std::string, std::vector<int>>> color_palette) {
-    std::map<string, variant<std::string, std::vector<int>>> result;
+std::map<string, Color> GetColorForRoute(std::deque<transport_catalogue::Bus> buses, std::vector<Color> color_palette) {
+    std::map<string, Color> result;
     int index_color = 0;
     for (auto bus : buses) {
         if (bus.stops.size() != 0) {
@@ -56,17 +56,17 @@ deque<string*> GetStopsForNonRounTtip(deque<string*> stops) {
 }
 
 
-/*
+
 void DrawRoute(RequestToTc& rtotc) { 
     vector<svg::Document> docs; 
     Render_data render_data;
-    std::vector<std::variant<std::string, std::vector<int>>> color_palette = render_data.color_palette;
+    std::vector<Color> color_palette = render_data.color_palette;
     std::deque<transport_catalogue::Bus> buses = rtotc.GetBuses();
     std::deque<transport_catalogue::Stop> stops = rtotc.GetStops();
     std::sort(buses.begin(), buses.end(),
         [](const transport_catalogue::Bus& a, const transport_catalogue::Bus& b) { return a.bus_name < b.bus_name; });
    
-    std::map<string, variant<std::string, std::vector<int>>> colors = GetColorForRoute(buses, color_palette);
+    std::map<string, Color> colors = GetColorForRoute(buses, color_palette);
 
     for (auto bus : buses) {
 
@@ -75,7 +75,7 @@ void DrawRoute(RequestToTc& rtotc) {
         variant<std::string, std::vector<int>> current_color;
         deque<string*> current_stops;
         if (colors.count(bus.bus_name)) {
-            variant<std::string, std::vector<int>> current_color = colors[bus.bus_name];
+            svg::Color current_color = colors[bus.bus_name];
         }
 
         if (bus.type == "true") {
@@ -112,7 +112,7 @@ void DrawRoute(RequestToTc& rtotc) {
     for (auto doc : docs) { doc.Render(cout); }
 
 }
-*/
+
 
 
 void DrawPolyline() {
