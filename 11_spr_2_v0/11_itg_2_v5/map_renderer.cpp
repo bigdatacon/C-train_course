@@ -10,17 +10,17 @@ using namespace svg;
 using namespace std;
 
 
-/*цвет линии stroke определён по правилам выше;
-цвет заливки fill должен иметь значение none;
-толщина линии stroke-width равна настройке line_width;
-Формы конца линии stroke-linecap и соединений stroke-linejoin равны round.*/
+/*С†РІРµС‚ Р»РёРЅРёРё stroke РѕРїСЂРµРґРµР»С‘РЅ РїРѕ РїСЂР°РІРёР»Р°Рј РІС‹С€Рµ;
+С†РІРµС‚ Р·Р°Р»РёРІРєРё fill РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ Р·РЅР°С‡РµРЅРёРµ none;
+С‚РѕР»С‰РёРЅР° Р»РёРЅРёРё stroke-width СЂР°РІРЅР° РЅР°СЃС‚СЂРѕР№РєРµ line_width;
+Р¤РѕСЂРјС‹ РєРѕРЅС†Р° Р»РёРЅРёРё stroke-linecap Рё СЃРѕРµРґРёРЅРµРЅРёР№ stroke-linejoin СЂР°РІРЅС‹ round.*/
 
 svg::Polyline CreatePolyline(vector<svg::Point> points) {
     using namespace svg;
     Polyline polyline;
     for (auto p : points) { polyline.AddPoint(p); }
     //return polyline.SetFillColor("red"s).SetStrokeColor("black"s);
-    // рисую линию как по условию для маршрута 
+    // СЂРёСЃСѓСЋ Р»РёРЅРёСЋ РєР°Рє РїРѕ СѓСЃР»РѕРІРёСЋ РґР»СЏ РјР°СЂС€СЂСѓС‚Р° 
     return polyline;
 }
 
@@ -125,18 +125,18 @@ void DrawPolyline() {
     Render_data render_data;
     vector<svg::Point> point_to_draw;
 
-    // Точки, подлежащие проецированию
+    // РўРѕС‡РєРё, РїРѕРґР»РµР¶Р°С‰РёРµ РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЋ
     vector<geo::Coordinates> geo_coords = {
         {43.587795, 39.716901}, {43.581969, 39.719848}, {43.598701, 39.730623},
         {43.585586, 39.733879}, {43.590317, 39.746833}
     };
 
-    // Создаём проектор сферических координат на карту
+    // РЎРѕР·РґР°С‘Рј РїСЂРѕРµРєС‚РѕСЂ СЃС„РµСЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ РЅР° РєР°СЂС‚Сѓ
     const SphereProjector proj{
         geo_coords.begin(), geo_coords.end(), WIDTH, HEIGHT, PADDING
     };
 
-    // Проецируем и выводим координаты
+    // РџСЂРѕРµС†РёСЂСѓРµРј Рё РІС‹РІРѕРґРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
     for (const auto geo_coord : geo_coords) {
         const svg::Point screen_coord = proj(geo_coord);
         //cout << '(' << geo_coord.lat << ", "sv << geo_coord.lng << ") -> "sv;
@@ -150,11 +150,11 @@ void DrawPolyline() {
     svg::Document  doc_polyline;
     Polyline polyline = CreatePolyline(point_to_draw);
 
-    /*цвет линии stroke определён по правилам выше;
-цвет заливки fill должен иметь значение none;
-толщина линии stroke-width равна настройке line_width;
-Формы конца линии stroke-linecap и соединений stroke-linejoin равны round.*/
-    polyline.SetFillColor(NoneColor).SetStrokeColor(render_data.color_palette[0]).SetStrokeWidth(render_data.line_width).SetStrokeLineCap(StrokeLineCap::ROUND).SetStrokeLineJoin(StrokeLineJoin::ROUND);
+    /*С†РІРµС‚ Р»РёРЅРёРё stroke РѕРїСЂРµРґРµР»С‘РЅ РїРѕ РїСЂР°РІРёР»Р°Рј РІС‹С€Рµ;
+С†РІРµС‚ Р·Р°Р»РёРІРєРё fill РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ Р·РЅР°С‡РµРЅРёРµ none;
+С‚РѕР»С‰РёРЅР° Р»РёРЅРёРё stroke-width СЂР°РІРЅР° РЅР°СЃС‚СЂРѕР№РєРµ line_width;
+Р¤РѕСЂРјС‹ РєРѕРЅС†Р° Р»РёРЅРёРё stroke-linecap Рё СЃРѕРµРґРёРЅРµРЅРёР№ stroke-linejoin СЂР°РІРЅС‹ round.*/
+    polyline.SetFillColor(NoneColor)/*.SetStrokeColor(render_data.color_palette[0])*/.SetStrokeWidth(render_data.line_width).SetStrokeLineCap(StrokeLineCap::ROUND).SetStrokeLineJoin(StrokeLineJoin::ROUND);
 
 
     doc_polyline.Add(std::move(polyline));
