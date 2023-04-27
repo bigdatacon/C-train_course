@@ -12,10 +12,24 @@
 #include <optional>
 #include <vector>
 
+#include "request_handler.h"
+#include "transport_catalogue.h"
+
+#include <variant>
+#include <array>
+#include <string>
+#include <map>
+#include <deque>
+
+
 using namespace std::literals;
 using namespace svg;
 using namespace std;
+using namespace transport_catalogue;
 
+const double WIDTH = 600.0;
+const double HEIGHT = 400.0;
+const double PADDING = 50.0;
 
 svg::Polyline CreatePolyline(vector<svg::Point> points); 
 
@@ -91,8 +105,39 @@ private:
     double zoom_coeff_ = 0;
 };
 
+struct Render_data {
+    Render_data() = default;
+    uint16_t red = 0;
+    uint16_t green = 0;
+    uint16_t blue = 0;
+    double width = 1200.0;
+    double height = 1200.0;
+    double padding = 50.0;
+    double line_width = 14.0;
+    double stop_radius = 5.0;
+    int bus_label_font_size = 20;
+    std::array<double, 2> bus_label_offset = { 7.0, 15.0 };
+    int stop_label_font_size = 20;
+    std::array<double, 2> stop_label_offset = { 7.0, -3.0 };
+    std::array<int, 4> underlayer_color = { 255, 255, 255, 85 };
+    double underlayer_width = 3.0;
+    std::vector<std::variant<std::string, std::vector<int>>> color_palette{
+        std::initializer_list<std::variant<std::string, std::vector<int>>> {
+            "green",
+            std::vector<int> { 255, 160, 0 },
+            "red"
+        }
+    };
+};
 
 
+std::map<string, variant<std::string, std::vector<int>>> GetColorForRoute(std::deque<transport_catalogue::Bus> buses, std::vector<std::variant<std::string, std::vector<int>>> color_palette);
 
-void TestRender();
+
+deque<string*> GetStopsForNonRounTtip(deque<string*> stops);
+
+
+void DrawRoute(RequestToTc rtotc);
+
+void DrawPolyline();
 
