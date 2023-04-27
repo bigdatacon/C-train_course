@@ -1,0 +1,107 @@
+{
+"base_requests": [
+{
+"is_roundtrip": true, 
+"name": "14", 
+"stops": [
+"Ulitsa Lizy Chaikinoi", 
+"Elektroseti", 
+"Ulitsa Dokuchaeva", 
+"Ulitsa Lizy Chaikinoi"
+], 
+"type": "Bus"
+}, 
+{
+"is_roundtrip": false, 
+"name": "114", 
+"stops": [
+"Morskoy vokzal", 
+"Rivierskiy most"
+], 
+"type": "Bus"
+}, 
+{
+"latitude": 43.5878, 
+"longitude": 39.7169, 
+"name": "Rivierskiy most", 
+"road_distances": {
+"Morskoy vokzal": 850
+}, 
+"type": "Stop"
+}, 
+{
+"latitude": 43.582, 
+"longitude": 39.7198, 
+"name": "Morskoy vokzal", 
+"road_distances": {
+"Rivierskiy most": 850
+}, 
+"type": "Stop"
+}, 
+{
+"latitude": 43.5987, 
+"longitude": 39.7306, 
+"name": "Elektroseti", 
+"road_distances": {
+"Ulitsa Dokuchaeva": 3000, 
+"Ulitsa Lizy Chaikinoi": 4300
+}, 
+"type": "Stop"
+}, 
+{
+"latitude": 43.5856, 
+"longitude": 39.7339, 
+"name": "Ulitsa Dokuchaeva", 
+"road_distances": {
+"Elektroseti": 3000, 
+"Ulitsa Lizy Chaikinoi": 2000
+}, 
+"type": "Stop"
+}, 
+{
+"latitude": 43.5903, 
+"longitude": 39.7468, 
+"name": "Ulitsa Lizy Chaikinoi", 
+"road_distances": {
+"Elektroseti": 4300, 
+"Ulitsa Dokuchaeva": 2000
+}, 
+"type": "Stop"
+}
+], 
+"render_settings": {
+"bus_label_font_size": 20, 
+"bus_label_offset": [
+7, 
+15
+], 
+"color_palette": [
+"green", 
+[
+255, 
+160, 
+0
+], 
+"red"
+], 
+"height": 400, 
+"line_width": 14, 
+"padding": 50, 
+"stop_label_font_size": 20, 
+"stop_label_offset": [
+7, 
+-3
+], 
+"stop_radius": 5, 
+"underlayer_color": [
+255, 
+255, 
+255, 
+0.85
+], 
+"underlayer_width": 3, 
+"width": 600
+}, 
+"stat_requests": [
+]
+}
