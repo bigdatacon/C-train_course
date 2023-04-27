@@ -62,6 +62,7 @@ namespace transport_catalogue {
 				/*if (json_obj.at("is_roundtrip").AsBool()) { bs.type = "true"s; }
 				else { bs.type = "false"s; }
 				upd_req_bus_.push_back(bs);*/
+				upd_req_bus_.push_back(bs);
 
 			}
 		}
