@@ -130,7 +130,7 @@ struct Render_data {
 };
 
 
-std::map<string, variant<std::string, std::vector<int>>> GetColorForRoute(std::deque<transport_catalogue::Bus> buses, std::vector<std::variant<std::string, std::vector<int>>> color_palette);
+std::map<string, Color> GetColorForRoute(std::deque<transport_catalogue::Bus> buses, std::vector<Color> color_palette);
 
 
 deque<string*> GetStopsForNonRounTtip(deque<string*> stops);
