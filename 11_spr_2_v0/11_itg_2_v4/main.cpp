@@ -1,4 +1,4 @@
-﻿#include "geo.h"
+#include "geo.h"
 #include "transport_catalogue.h"
 #include "json_reader.h"
 #include "iostream"
@@ -11,8 +11,8 @@ using namespace std;
 
 int main() {
 	//RequestToTc rtotc;
-	//(void)DrawRoute(rtotc);
-	TestRender();
+	//DrawRoute(rtotc);
+	DrawPolyline();
 
 }
 
