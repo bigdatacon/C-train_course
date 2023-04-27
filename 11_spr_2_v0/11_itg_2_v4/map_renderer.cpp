@@ -9,11 +9,18 @@ using namespace svg;
 using namespace std;
 
 
+/*цвет линии stroke определён по правилам выше;
+цвет заливки fill должен иметь значение none;
+толщина линии stroke-width равна настройке line_width;
+Формы конца линии stroke-linecap и соединений stroke-linejoin равны round.*/
+
 svg::Polyline CreatePolyline(vector<svg::Point> points) {
     using namespace svg;
     Polyline polyline;
     for (auto p : points) { polyline.AddPoint(p); }
-    return polyline.SetFillColor("red"s).SetStrokeColor("black"s);
+    //return polyline.SetFillColor("red"s).SetStrokeColor("black"s);
+    // рисую линию как по условию для маршрута 
+    return polyline;
 }
 
 
@@ -109,6 +116,7 @@ void DrawRoute(RequestToTc& rtotc) {
 
 
 void DrawPolyline() {
+    Render_data render_data;
     vector<svg::Point> point_to_draw;
 
     // Точки, подлежащие проецированию
@@ -135,6 +143,14 @@ void DrawPolyline() {
 
     svg::Document  doc_polyline;
     Polyline polyline = CreatePolyline(point_to_draw);
+
+    /*цвет линии stroke определён по правилам выше;
+цвет заливки fill должен иметь значение none;
+толщина линии stroke-width равна настройке line_width;
+Формы конца линии stroke-linecap и соединений stroke-linejoin равны round.*/
+    polyline.SetFillColor(NoneColor).SetStrokeColor(render_data.color_palette[0]).SetStrokeWidth(render_data.line_width).SetStrokeLineCap(StrokeLineCap::ROUND).SetStrokeLineJoin(StrokeLineJoin::ROUND);
+
+
     doc_polyline.Add(std::move(polyline));
     doc_polyline.Render(cout);
 
