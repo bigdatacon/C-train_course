@@ -57,9 +57,13 @@ deque<string*> GetStopsForNonRounTtip(deque<string*> stops) {
 }
 
 
-/*
+
 void DrawRoute(RequestToTc& rtotc, InputReaderJson inprjs) {
+    const double WIDTH = 600.0;
+    const double HEIGHT = 400.0;
+    const double PADDING = 50.0;
     vector<svg::Document> docs; 
+    vector<svg::Polyline> routes_vec;
     Render_data render_data = inprjs.GetRenderData();
     std::vector<Color> color_palette = render_data.color_palette;
     std::deque<transport_catalogue::Bus> buses = rtotc.GetBuses();
@@ -106,14 +110,20 @@ void DrawRoute(RequestToTc& rtotc, InputReaderJson inprjs) {
         svg::Document  doc;
         Polyline polyline = CreatePolyline(point_to_draw);
 
-        doc.Add(std::move(polyline));
-        docs.push_back(doc);
+        //doc.Add(std::move(polyline));
+        routes_vec.push_back(polyline);
+
+        //docs.push_back(doc);
+        //docs.push_back(std::move(doc));
     }
 
-    for (auto doc : docs) { doc.Render(cout); }
+    for (auto polyline : routes_vec) {
+        svg::Document  doc;
+        doc.Add(std::move(polyline));
+        doc.Render(cout); }
 
 }
-*/
+
 
 
 void DrawPolyline() {
