@@ -20,7 +20,7 @@ namespace shapes {
     }
 
 
-        // Реализует метод Draw интерфейса svg::Drawable
+        // Р РµР°Р»РёР·СѓРµС‚ РјРµС‚РѕРґ Draw РёРЅС‚РµСЂС„РµР№СЃР° svg::Drawable
         void Triangle::Draw(svg::ObjectContainer& container) const  {
             container.Add(svg::Polyline().AddPoint(p1_).AddPoint(p2_).AddPoint(p3_).AddPoint(p1_));
         };
@@ -32,7 +32,7 @@ namespace shapes {
             , num_rays_(num_rays) {
         }
 
-        // Реализует метод Draw интерфейса svg::Drawable
+        // Р РµР°Р»РёР·СѓРµС‚ РјРµС‚РѕРґ Draw РёРЅС‚РµСЂС„РµР№СЃР° svg::Drawable
         void Star::Draw(svg::ObjectContainer& container) const  {
             //container.AddPtr(std::make_unique<Polyline>(::CreateStar(p1_, outer_radius_, inner_radius_, num_rays_)));
             container.AddPtr(  //
@@ -49,7 +49,7 @@ namespace shapes {
         {
         }
 
-        // Реализует метод Draw интерфейса svg::Drawable
+        // Р РµР°Р»РёР·СѓРµС‚ РјРµС‚РѕРґ Draw РёРЅС‚РµСЂС„РµР№СЃР° svg::Drawable
         void Snowman::Draw(svg::ObjectContainer& container) const {
             container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x,  head_center_.y + 5 * head_radius_ }).SetRadius(head_radius_ * 2).SetFillColor("rgb(240,240,240)").SetStrokeColor("black"s)));
             container.AddPtr(std::make_unique<Circle>(Circle().SetCenter({ head_center_.x, head_center_.y + 2 * head_radius_ }).SetRadius(head_radius_ * 1.5).SetFillColor("rgb(240,240,240)").SetStrokeColor("black"s)));
@@ -92,11 +92,15 @@ void DrawPicture(const Container& container, svg::ObjectContainer& target) {
     DrawPicture(begin(container), end(container), target);
 }
 
-// Выполняет линейную интерполяцию значения от from до to в зависимости от параметра t.
+// Р’С‹РїРѕР»РЅСЏРµС‚ Р»РёРЅРµР№РЅСѓСЋ РёРЅС‚РµСЂРїРѕР»СЏС†РёСЋ Р·РЅР°С‡РµРЅРёСЏ РѕС‚ from РґРѕ to РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїР°СЂР°РјРµС‚СЂР° t.
 uint8_t Lerp(uint8_t from, uint8_t to, double t) {
     return static_cast<uint8_t>(std::round((to - from) * t + from));
 }
 
+
+bool IsZero(double value) {
+    return std::abs(value) < EPSILON;
+}
 
 
 void TestRender() {
@@ -123,5 +127,32 @@ void TestRender() {
     svg::Document doc;
     doc.Add(std::move(c));
     doc.Render(cout);
+
+    const double WIDTH = 600.0;
+    const double HEIGHT = 400.0;
+    const double PADDING = 50.0;
+
+    // РўРѕС‡РєРё, РїРѕРґР»РµР¶Р°С‰РёРµ РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЋ
+    vector<geo::Coordinates> geo_coords = {
+        {43.587795, 39.716901}, {43.581969, 39.719848}, {43.598701, 39.730623},
+        {43.585586, 39.733879}, {43.590317, 39.746833}
+    };
+
+    // РЎРѕР·РґР°С‘Рј РїСЂРѕРµРєС‚РѕСЂ СЃС„РµСЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ РЅР° РєР°СЂС‚Сѓ
+    const SphereProjector proj{
+        geo_coords.begin(), geo_coords.end(), WIDTH, HEIGHT, PADDING
+    };
+
+    // РџСЂРѕРµС†РёСЂСѓРµРј Рё РІС‹РІРѕРґРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
+    for (const auto geo_coord : geo_coords) {
+        const svg::Point screen_coord = proj(geo_coord);
+        cout << '(' << geo_coord.lat << ", "sv << geo_coord.lng << ") -> "sv;
+        cout << '(' << screen_coord.x << ", "sv << screen_coord.y << ')' << endl;
+    }
+
+
+
+
+
 }
 
