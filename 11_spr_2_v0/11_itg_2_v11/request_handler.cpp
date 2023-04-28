@@ -1,22 +1,28 @@
 #include "request_handler.h"
 
 /*
- * Здесь можно было бы разместить код обработчика запросов к базе, содержащего логику, которую не
- * хотелось бы помещать ни в transport_catalogue, ни в json reader.
+ * Р—РґРµСЃСЊ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ Р±С‹ СЂР°Р·РјРµСЃС‚РёС‚СЊ РєРѕРґ РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РїСЂРѕСЃРѕРІ Рє Р±Р°Р·Рµ, СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ Р»РѕРіРёРєСѓ, РєРѕС‚РѕСЂСѓСЋ РЅРµ
+ * С…РѕС‚РµР»РѕСЃСЊ Р±С‹ РїРѕРјРµС‰Р°С‚СЊ РЅРё РІ transport_catalogue, РЅРё РІ json reader.
  *
- * Если вы затрудняетесь выбрать, что можно было бы поместить в этот файл,
- * можете оставить его пустым.
+ * Р•СЃР»Рё РІС‹ Р·Р°С‚СЂСѓРґРЅСЏРµС‚РµСЃСЊ РІС‹Р±СЂР°С‚СЊ, С‡С‚Рѕ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ Р±С‹ РїРѕРјРµСЃС‚РёС‚СЊ РІ СЌС‚РѕС‚ С„Р°Р№Р»,
+ * РјРѕР¶РµС‚Рµ РѕСЃС‚Р°РІРёС‚СЊ РµРіРѕ РїСѓСЃС‚С‹Рј.
  */
 
 
-    std::deque<transport_catalogue::Bus>  RequestToTc::GetBuses() {
-        return TransportCatalogue::GetBuses();
 
-    };
-    std::deque<transport_catalogue::Stop>  RequestToTc::GetStops() {
-        return TransportCatalogue::GetStops();
-    };
+    RequestHandler(const TransportCatalogue& tc, const /*renderer::*/ MapRenderer& renderer) : tc_(tc), renderer_(renderer) {}
 
-    const transport_catalogue::Stop* RequestToTc::FindStop(std::string_view stop) {
-        return TransportCatalogue::FindStop(stop);
+    // Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РјР°СЂС€СЂСѓС‚Рµ (Р·Р°РїСЂРѕСЃ Bus)
+    //std::optional<BusStat> GetBusStat(const std::string_view& bus_name) const;
+
+    // Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЂС€СЂСѓС‚С‹, РїСЂРѕС…РѕРґСЏС‰РёРµ С‡РµСЂРµР·
+    //const std::unordered_set<BusPtr>* GetBusesByStop(const std::string_view& stop_name) const;
+
+    // Р­С‚РѕС‚ РјРµС‚РѕРґ Р±СѓРґРµС‚ РЅСѓР¶РµРЅ РІ СЃР»РµРґСѓСЋС‰РµР№ С‡Р°СЃС‚Рё РёС‚РѕРіРѕРІРѕРіРѕ РїСЂРѕРµРєС‚Р°
+    svg::Document RequestHandler::RenderMap() const {
+        return renderer.DrawRoute(tc);
+    
+    
     };
+    
+    
