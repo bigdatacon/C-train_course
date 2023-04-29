@@ -90,12 +90,7 @@ bool  CheckSameStations(deque<string*> current_stops) {
     }
 }
 
-// Компаратор для сравнения указателей на строки
-struct PointerStringLess {
-    bool operator()(const Stop a, const Stop b) const {
-        return a.stop_name < b.stop_name;
-    }
-};
+
 
 std::set<std::string> ReturnSetOfstops(std::deque<transport_catalogue::Stop> stops) {
     std::set<std::string> res;
