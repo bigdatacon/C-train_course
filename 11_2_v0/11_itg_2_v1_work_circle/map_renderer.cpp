@@ -135,9 +135,9 @@ void MapRenderer::DrawRoute(TransportCatalogue& tc) {
 
     for (auto bus : buses) {
         if (bus.stops.size() == 0) { return; }
-        cout << " bus : " << bus.bus_name << endl;
-        cout << "bus stops : " << endl;
-        for (auto el : bus.stops) { cout << *el << endl; }
+        //cout << " bus : " << bus.bus_name << endl;
+        //cout << "bus stops : " << endl;
+        //for (auto el : bus.stops) { cout << *el << endl; }
 
 
 
@@ -238,7 +238,7 @@ void MapRenderer::DrawRoute(TransportCatalogue& tc) {
         c.SetFillColor("white");
         stops_circles.push_back(c);
 
-        cout << "ADD : " << *i << " : " << screen_coord.x << " : " << screen_coord.y << endl;
+        //cout << "ADD : " << *i << " : " << screen_coord.x << " : " << screen_coord.y << endl;
 
 
         Text stop_description_font;
@@ -267,16 +267,16 @@ void MapRenderer::DrawRoute(TransportCatalogue& tc) {
         doc.Add(std::move(text));
     }
     
-    cout << "stops_circles.size() : " << stops_circles.size()  << endl;
+
 
     for (auto c : stops_circles){
         doc.Add(std::move(c));
     }
-    /*
+    
     for (auto stop : stops_names) {
         doc.Add(std::move(stop));
     }
-    */
+    
   
 
     doc.Render(cout);
