@@ -265,10 +265,12 @@ namespace transport_catalogue {
 
 
 			}
-			json::Print(json::Document{ queries }, out);
+			//json::Print(json::Document{ queries }, out);
 
 		}
+		json::Print(json::Document{ queries }, out);
 	}
+	
 
 	Render_data InputReaderJson::GetRenderData() {
 		return render_data_;
