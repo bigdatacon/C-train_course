@@ -66,9 +66,6 @@ bool ProcessInclude(const smatch& match, const path& current_file_path, const ve
 }
 
 
-
-
-
 bool Preprocess(const path& in_file, const path& out_file, const vector<path>& include_directories) {
     ifstream input(in_file);
     if (!input) {
@@ -84,10 +81,16 @@ bool Preprocess(const path& in_file, const path& out_file, const vector<path>& i
     string line;
     int line_number = 1;
     regex include_regex(R"/(\s*#\s*include\s*"([^"]*)"\s*)/");
-        smatch include_match;
+    regex system_include_regex(R"/(\s*#\s*include\s*<([^>]*)>\s*)/");
+    smatch include_match;
 
     while (getline(input, line)) {
         if (regex_search(line, include_match, include_regex)) {
+            if (!ProcessInclude(include_match, in_file, include_directories, result, line_number)) {
+                return false;
+            }
+        }
+        else if (regex_search(line, include_match, system_include_regex)) {
             if (!ProcessInclude(include_match, in_file, include_directories, result, line_number)) {
                 return false;
             }
@@ -102,7 +105,7 @@ bool Preprocess(const path& in_file, const path& out_file, const vector<path>& i
     output << result.str();
 
     return true;
-    
+
 
 }
 
