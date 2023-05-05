@@ -44,5 +44,8 @@ namespace json {
         Node root_;
         std::vector<Node*> nodes_stack_;
         std::string current_key_;
+        bool is_array_= false;
+        bool is_dict_ = false;
+        bool is_built_ = false;
     };
-};
+}
