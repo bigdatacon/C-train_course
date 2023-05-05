@@ -31,7 +31,7 @@ namespace json {
 
     Builder& Builder::StartDict() {
         if ((!is_array_ && !is_dict_) && is_not_first_operation_) {
-            throw std::logic_error("Wrong context.");
+            throw std::logic_error("StartDict: Wrong context.");
         }
         if (in_array()) {
             nodes_stack_.back()->AsArray().push_back(json::Dict());
@@ -54,7 +54,7 @@ namespace json {
 
     Builder& Builder::EndDict() {
         if ((!is_array_ && !is_dict_) && is_not_first_operation_) {
-            throw std::logic_error("Wrong context.");
+            throw std::logic_error("EndDict: Wrong context.");
         }
         if (in_dict()) {
             nodes_stack_.pop_back();
