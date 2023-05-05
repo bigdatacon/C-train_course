@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "json.h"
+#include <stdexcept>
 
 namespace json {
     class Builder {
@@ -8,9 +9,7 @@ namespace json {
         Builder() {
         }
 
-        Node Build() const {
-            return root_;
-        }
+        Node Build() const;
 
         template<typename ValueType>
         Builder& Value(const ValueType& value) {
@@ -27,77 +26,20 @@ namespace json {
             return *this;
         }
 
-        Builder& Key(const std::string& key) {
-            if (in_dict()) {
-                current_key_ = key;
-            }
-            return *this;
-        }
+        Builder& Key(const std::string& key);
 
-        Builder& StartDict() {
-            if (in_array()) {
-                nodes_stack_.back()->AsArray().push_back(Dict());
-                nodes_stack_.push_back(&nodes_stack_.back()->AsArray().back());
-            }
-            else if (in_dict()) {
-                nodes_stack_.back()->AsDict()[current_key_] = Dict();
-                nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_]);
-            }
-            else {
-                root_ = Dict();
-                nodes_stack_.push_back(&root_);
-            }
-            return *this;
-        }
+        Builder& StartDict();
 
-        Builder& EndDict() {
-            if (in_dict()) {
-                nodes_stack_.pop_back();
-            }
-            return *this;
-        }
+        Builder& EndDict();
 
-        Builder& StartArray() {
-            if (in_array()) {
-                nodes_stack_.back()->AsArray().push_back(Array());
-                nodes_stack_.push_back(&nodes_stack_.back()->AsArray().back());
-            }
-            else if (in_dict()) {
-                nodes_stack_.back()->AsDict()[current_key_] = Array();
-                nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_]);
-            }
-            else {
-                root_ = Array();
-                nodes_stack_.push_back(&root_);
-            }
-            return *this;
-        }
+        Builder& StartArray();
 
-        Builder& EndArray() {
-            if (in_array()) {
-                nodes_stack_.pop_back();
-            }
-            return *this;
-        }
+        Builder& EndArray();
 
     private:
-        bool in_array() {
-            if (!nodes_stack_.empty()) {
-                if (nodes_stack_.back()->IsArray()) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        bool in_array();
 
-        bool in_dict() {
-            if (!nodes_stack_.empty()) {
-                if (nodes_stack_.back()->IsDict()) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        bool in_dict();
 
         Node root_;
         std::vector<Node*> nodes_stack_;
