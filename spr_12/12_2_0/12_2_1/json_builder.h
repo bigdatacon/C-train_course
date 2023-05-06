@@ -3,6 +3,9 @@
 #include "json.h"
 
 namespace json {
+
+    class DictItemContext ;
+
     class Builder {
     public:
         Builder() {
@@ -39,7 +42,7 @@ namespace json {
 
         Builder& Key(const std::string& key);
 
-        DictItemContext& StartDict();
+        DictItemContext StartDict();
 
         Builder& EndDict();
 
