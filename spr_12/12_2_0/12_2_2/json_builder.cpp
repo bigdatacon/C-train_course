@@ -124,6 +124,9 @@ namespace json {
         return false;
     }
 
+    DictItemContextKey DictItemContext::Key(const std::string& key) {
+        return builder_.Key(key);
+    }
 
 
 }
