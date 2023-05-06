@@ -5,9 +5,10 @@
 namespace json {
 
     class DictItemContextKey;
-    class DictItemContext ;
+    class DictItemContext;
     class DictItemContextKey;
-    
+    class  DictItemContextAftStartArrayAndValue;
+
 
     class Builder {
     public:
@@ -49,7 +50,7 @@ namespace json {
 
         Builder& EndDict();
 
-        Builder& StartArray();
+        DictItemContextAftStartArrayAndValue StartArray();
 
         Builder& EndArray();
 
@@ -97,16 +98,15 @@ namespace json {
             return builder_.StartDict();
         }
 
-         
-        Builder& StartArray() {
-            return builder_.StartArray();
-        }
 
-   
+        DictItemContextAftStartArrayAndValue StartArray(); 
+
+
     private:
         Builder& builder_;
 
     };
+    /*
 
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
     class DictItemContextValueAftKey : public Builder {
@@ -152,13 +152,13 @@ namespace json {
     private:
         Builder& builder_;
     };
-
+    */
 
     //5 После вызова StartArray и серии Value следует не Value, не StartDict, не StartArray и не EndArray.
 
     class DictItemContextAftStartArrayAndValue : public Builder {
     public:
-        DictItemContextAftStartArrayAndValue(DictItemContextValueAftKey& builder) : builder_(builder) {}
+        DictItemContextAftStartArrayAndValue(Builder& builder) : builder_(builder) {}
 
         template<typename ValueType>
         Builder& Value(const ValueType& value) {
@@ -169,10 +169,7 @@ namespace json {
             return builder_.StartDict();
         }
 
-        Builder& StartArray() {
-            return builder_.StartArray();
-        }
-
+        DictItemContextAftStartArrayAndValue StartArray();
 
 
     private:
@@ -181,4 +178,3 @@ namespace json {
 
 
 }
-
