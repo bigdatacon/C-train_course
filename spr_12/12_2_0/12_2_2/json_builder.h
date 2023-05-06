@@ -5,6 +5,7 @@
 namespace json {
 
     class DictItemContextKey;
+    class DictItemContextKey;
     class DictItemContext ;
     
 
@@ -67,7 +68,7 @@ namespace json {
 
     };
 
-    //3 �� ������� StartDict ������� �� Key � �� EndDict.
+    //3 За вызовом StartDict следует не Key и не EndDict.
     class DictItemContext : public Builder {
     public:
         DictItemContext(Builder& builder) : builder_(builder) {}
@@ -84,7 +85,7 @@ namespace json {
         Builder& builder_;
     };
 
-    //1 ��������������� ����� Key ������ �� Value, �� StartDict � �� StartArray.
+    //1 Непосредственно после Key вызван не Value, не StartDict и не StartArray.
     class DictItemContextKey : public Builder {
     public:
         DictItemContextKey(Builder& builder) : builder_(builder) {}
@@ -98,7 +99,7 @@ namespace json {
             return builder_.StartDict();
         }
 
-
+         
         Builder& StartArray() {
             return builder_.StartArray();
         }
@@ -107,6 +108,77 @@ namespace json {
     private:
         Builder& builder_;
 
+    };
+
+    //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
+    class DictItemContextValueAftKey : public Builder {
+    public:
+        DictItemContextValueAftKey(DictItemContextKey& builder) : builder_(builder) {}
+
+        DictItemContextKey Key(const std::string& key) {
+            return builder_.Key(key);
+        }
+
+        Builder& EndDict() {
+            return builder_.EndDict();
+        }
+
+
+    private:
+        Builder& builder_;
+
+    };
+
+    // 4 За вызовом StartArray следует не Value, не StartDict, не StartArray и не EndArray.
+    class DictItemContextAftStartArray : public Builder {
+    public:
+        DictItemContextAftStartArray(Builder& builder) : builder_(builder) {}
+
+        template<typename ValueType>
+        Builder& Value(const ValueType& value) {
+            return builder_.Value(value);
+        }
+
+        DictItemContext StartDict() {
+            return builder_.StartDict();
+        }
+
+        Builder& StartArray() {
+            return builder_.StartArray();
+        }
+
+        Builder& EndArray() {
+            return builder_.EndArray();
+        }
+
+    private:
+        Builder& builder_;
+    };
+
+
+    //5 После вызова StartArray и серии Value следует не Value, не StartDict, не StartArray и не EndArray.
+
+    class DictItemContextAftStartArrayAndValue : public Builder {
+    public:
+        DictItemContextAftStartArrayAndValue(DictItemContextValueAftKey& builder) : builder_(builder) {}
+
+        template<typename ValueType>
+        Builder& Value(const ValueType& value) {
+            return builder_.Value(value);
+        }
+
+        DictItemContext StartDict() {
+            return builder_.StartDict();
+        }
+
+        Builder& StartArray() {
+            return builder_.StartArray();
+        }
+
+
+
+    private:
+        Builder& builder_;
     };
 
 
