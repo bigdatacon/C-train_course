@@ -4,6 +4,15 @@
 namespace json {
 
 
+    DictItemContextKey DictItemContextValueAftKey::Key(const std::string& key) {
+        return builder_.Key(key);
+    }
+
+    Builder& DictItemContextValueAftKey::EndDict() {
+        return builder_.EndDict();
+    }
+
+
     Node Builder::Build() const {
         if (on_top() && have_something_) {
             return root_;
@@ -132,6 +141,7 @@ namespace json {
     DictItemContextAftStartArrayAndValue DictItemContextKey::StartArray() {
         return builder_.StartArray();
     }
+
 
 
     DictItemContextAftStartArrayAndValue DictItemContextAftStartArrayAndValue::StartArray() {
