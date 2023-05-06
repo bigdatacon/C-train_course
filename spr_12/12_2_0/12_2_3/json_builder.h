@@ -3,6 +3,21 @@
 #include "json.h"
 
 namespace json {
+    class Builder;
+    //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
+    class DictItemContextValueAftKey {
+    public:
+        DictItemContextValueAftKey(Builder& builder) : builder_(builder) {}
+
+        DictItemContextKey Key(const std::string& key);
+
+        Builder& EndDict();
+
+
+    private:
+        Builder& builder_;
+
+    };
 
     class DictItemContextKey;
     class DictItemContext;
@@ -137,24 +152,7 @@ namespace json {
     };
     
 
-    //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
-    class DictItemContextValueAftKey  {
-    public:
-        DictItemContextValueAftKey(Builder& builder) : builder_(builder) {}
 
-        DictItemContextKey Key(const std::string& key) {
-            return builder_.Key(key);
-        }
-
-        Builder& EndDict() {
-            return builder_.EndDict();
-        }
-
-
-    private:
-        Builder& builder_;
-
-    };
 
 
     /*
