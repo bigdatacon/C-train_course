@@ -26,7 +26,7 @@ namespace json {
         return *this;
     }
 
-    DictItemContext& Builder::StartDict() {
+    DictItemContext Builder::StartDict() {
         have_something_ = true;
         if (in_array()) {
             nodes_stack_.back()->AsArray().push_back(Dict());
