@@ -3,7 +3,34 @@
 #include "json.h"
 
 namespace json {
+    class DictItemContextKey;
+    class DictItemContext;
+
+    class  DictItemContextAftStartArrayAndValue;
+    class DictItemContextValueAftKey;
     class Builder;
+
+   
+    //1 Непосредственно после Key вызван не Value, не StartDict и не StartArray.
+    class DictItemContextKey  {
+    public:
+        DictItemContextKey(Builder& builder) : builder_(builder) {}
+
+        template<typename ValueType>
+        DictItemContextValueAftKey Value(const ValueType& value) {
+            return builder_.Value(value);
+        }
+
+        DictItemContext StartDict();
+
+        DictItemContextAftStartArrayAndValue StartArray();
+
+
+    private:
+        Builder& builder_;
+
+    };
+
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
     class DictItemContextValueAftKey {
     public:
@@ -19,11 +46,7 @@ namespace json {
 
     };
 
-    class DictItemContextKey;
-    class DictItemContext;
 
-    class  DictItemContextAftStartArrayAndValue;
-    class DictItemContextValueAftKey;
 
 
     class Builder {
@@ -128,28 +151,7 @@ namespace json {
         Builder& builder_;
     };
 
-    //1 Непосредственно после Key вызван не Value, не StartDict и не StartArray.
-    class DictItemContextKey : public Builder {
-    public:
-        DictItemContextKey(Builder& builder) : builder_(builder) {}
 
-        template<typename ValueType>
-        DictItemContextValueAftKey Value(const ValueType& value) {
-            return builder_.Value(value);
-        }
-
-        DictItemContext StartDict() {
-            return builder_.StartDict();
-        }
-
-
-        DictItemContextAftStartArrayAndValue StartArray(); 
-
-
-    private:
-        Builder& builder_;
-
-    };
     
 
 
