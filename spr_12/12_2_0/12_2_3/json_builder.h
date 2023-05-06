@@ -138,7 +138,7 @@ namespace json {
     
 
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
-    class DictItemContextValueAftKey : public Builder {
+    class DictItemContextValueAftKey  {
     public:
         DictItemContextValueAftKey(Builder& builder) : builder_(builder) {}
 
