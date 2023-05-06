@@ -4,6 +4,15 @@
 namespace json {
 
 
+    DictItemContext DictItemContextKey::StartDict() {
+        return builder_.StartDict();
+    }
+
+
+    DictItemContextAftStartArrayAndValue DictItemContextKey::StartArray() {
+        return builder_.StartArray();
+    }
+
     DictItemContextKey DictItemContextValueAftKey::Key(const std::string& key) {
         return builder_.Key(key);
     }
@@ -138,9 +147,6 @@ namespace json {
     }
 
 
-    DictItemContextAftStartArrayAndValue DictItemContextKey::StartArray() {
-        return builder_.StartArray();
-    }
 
 
 
