@@ -5,8 +5,8 @@
 namespace json {
 
     class DictItemContextKey;
-    class DictItemContextKey;
     class DictItemContext ;
+    class DictItemContextKey;
     
 
     class Builder {
@@ -73,9 +73,7 @@ namespace json {
     public:
         DictItemContext(Builder& builder) : builder_(builder) {}
 
-        DictItemContextKey Key(const std::string& key) {
-            return builder_.Key(key);
-        }
+        DictItemContextKey Key(const std::string& key);
 
         Builder& EndDict() {
             return builder_.EndDict();
