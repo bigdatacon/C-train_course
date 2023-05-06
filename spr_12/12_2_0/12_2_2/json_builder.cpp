@@ -65,7 +65,7 @@ namespace json {
         return *this;
     }
 
-    Builder& Builder::StartArray() {
+    DictItemContextAftStartArrayAndValue Builder::StartArray() {
         have_something_ = true;
         if (in_array()) {
             nodes_stack_.back()->AsArray().push_back(Array());
@@ -88,7 +88,7 @@ namespace json {
         else {
             throw std::logic_error("Starting an array while neither on top nor in array/dict");
         }
-        return *this;
+        return DictItemContextAftStartArrayAndValue(*this);
     }
 
     Builder& Builder::EndArray() {
@@ -126,6 +126,16 @@ namespace json {
 
     DictItemContextKey DictItemContext::Key(const std::string& key) {
         return builder_.Key(key);
+    }
+
+
+    DictItemContextAftStartArrayAndValue DictItemContextKey::StartArray() {
+        return builder_.StartArray();
+    }
+
+
+    DictItemContextAftStartArrayAndValue DictItemContextAftStartArrayAndValue::StartArray() {
+        return builder_.StartArray();
     }
 
 
