@@ -5,7 +5,7 @@
 namespace json {
     class DictItemContextValueAftKey;
     class  BaseContex;
-    
+
 
 
     class Builder {
@@ -18,7 +18,7 @@ namespace json {
         Node Build() const;
 
         template<typename ValueType>
-        Builder& Value(const ValueType& value) {
+        BaseContex Value(const ValueType& value) {
             if (in_array()) {
                 nodes_stack_.back()->AsArray().push_back(value);
             }
@@ -39,12 +39,12 @@ namespace json {
                 throw std::logic_error("Trying to put value while neither on top nor in array/dict");
             }
             have_something_ = true;
-            return *this;
+            return BaseContex(*this);
         }
 
         BaseContex Key(const std::string& key);
 
-        Builder& StartDict();
+        BaseContex StartDict();
 
         Builder& EndDict();
 
@@ -74,13 +74,13 @@ namespace json {
         Node Build() const;
 
         template<typename ValueType>
-        Builder& Value(const ValueType& value) {
+        BaseContex Value(const ValueType& value) {
             return builder_.Value(value);
         }
 
         BaseContex Key(const std::string& key);
 
-        Builder& StartDict();
+        BaseContex StartDict();
 
         Builder& EndDict();
 
@@ -98,12 +98,12 @@ namespace json {
     class DictItemContextKey : public BaseContex {
     public:
 
-        
+
         //DictItemContextKey(Builder& builder);
 
         Document Build() = delete;
         Builder& EndDict() = delete;
-        Builder& EndArray()=delete;
+        Builder& EndArray() = delete;
         BaseContex Key(const std::string& key) = delete;
 
 
@@ -111,7 +111,7 @@ namespace json {
         template<typename ValueType>
         Builder Value(const ValueType& value);
 
-        Builder StartDict();
+        BaseContex StartDict();
 
         Builder StartArray();
 
@@ -122,13 +122,14 @@ namespace json {
     };
 
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
+    //3 За вызовом StartDict следует не Key и не EndDict.
     class DictItemContextValueAftKey : public BaseContex {
         Document Build() = delete;
-        Builder& StartDict() = delete;
+        BaseContex StartDict() = delete;
         Builder& StartArray() = delete;
         Builder& EndArray() = delete;
         template<typename ValueType>
-        Builder Value(const ValueType& value) = delete;
+        BaseContex Value(const ValueType& value) = delete;
 
 
         BaseContex Key(const std::string& key);
