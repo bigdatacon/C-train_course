@@ -107,6 +107,7 @@ namespace json {
         BaseContex Key(const std::string& key) = delete;
 
 
+
         template<typename ValueType>
         Builder Value(const ValueType& value);
 
@@ -122,6 +123,12 @@ namespace json {
 
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
     class DictItemContextValueAftKey : public BaseContex {
+        Document Build() = delete;
+        Builder& StartDict() = delete;
+        Builder& StartArray() = delete;
+        Builder& EndArray() = delete;
+        template<typename ValueType>
+        Builder Value(const ValueType& value) = delete;
 
 
         BaseContex Key(const std::string& key);
