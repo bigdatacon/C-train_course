@@ -105,9 +105,7 @@ namespace json {
 
 
         template<typename ValueType>
-        Builder Value(const ValueType& value) {
-            return builder_.Value(value);
-        }
+        Builder Value(const ValueType& value);
 
         Builder StartDict();
 
@@ -118,5 +116,11 @@ namespace json {
         Builder& builder_;
 
     };
+
+
+
+
+
+
 
 }
