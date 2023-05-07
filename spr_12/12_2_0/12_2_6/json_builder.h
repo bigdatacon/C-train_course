@@ -20,7 +20,7 @@ namespace json {
 
         template<typename ValueType>
         BaseContex Value(const ValueType& value);
-        BaseContex Key(const std::string& key);
+        DictKeyContext Key(const std::string& key);
 
         BaseContex StartDict();
 
@@ -56,7 +56,7 @@ namespace json {
             return builder_.Value(value);
         }
 
-        BaseContex Key(const std::string& key);
+        DictKeyContext Key(const std::string& key);
 
         BaseContex StartDict();
 
@@ -82,7 +82,7 @@ namespace json {
         Document Build() = delete;
         Builder& EndDict() = delete;
         Builder& EndArray() = delete;
-        BaseContex Key(const std::string& key) = delete;
+        DictKeyContext Key(const std::string& key) = delete;
 
 
 
@@ -105,7 +105,7 @@ namespace json {
         BaseContex Value(const ValueType& value) = delete;
 
 
-        BaseContex Key(const std::string& key);
+        DictKeyContext Key(const std::string& key);
 
         Builder& EndDict();
     };
@@ -116,7 +116,7 @@ namespace json {
 
         Document Build() = delete;
         Builder& EndDict() = delete;
-        BaseContex Key(const std::string& key) = delete;
+        DictKeyContext Key(const std::string& key) = delete;
 
         template<typename ValueType>
         Builder Value(const ValueType& value);
