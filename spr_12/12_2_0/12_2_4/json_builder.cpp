@@ -15,7 +15,7 @@ namespace json {
 
 
 
-    Builder& Builder::Key(const std::string& key) {
+    BaseContex Builder::Key(const std::string& key) {
         if (in_dict()) {
             current_key_ = key;
             have_key_ = true;
@@ -23,7 +23,7 @@ namespace json {
         else {
             throw std::logic_error("Adding a key while not in dictionary");
         }
-        return *this;
+        return BaseContex(*this);
     }
 
     Builder& Builder::StartDict() {
@@ -132,7 +132,7 @@ namespace json {
         return builder_.Build();
     }
 
-    Builder& BaseContex::Key(const std::string& key) {
+    BaseContex BaseContex::Key(const std::string& key) {
         return  builder_.Key(key);
     }
 
