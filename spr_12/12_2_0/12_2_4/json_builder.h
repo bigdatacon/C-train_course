@@ -60,7 +60,7 @@ namespace json {
         bool have_something_;
     };
 
-    // 0 Базовый класс 
+    // 0 Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ 
     class  BaseContex : public Builder {
     public:
 
@@ -89,12 +89,12 @@ namespace json {
     };
 
 
-    //1 Непосредственно после Key вызван не Value, не StartDict и не StartArray.
+    //1 РќРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РїРѕСЃР»Рµ Key РІС‹Р·РІР°РЅ РЅРµ Value, РЅРµ StartDict Рё РЅРµ StartArray.
     class DictItemContextKey : public BaseContex {
     public:
 
-        Builder& Key(const std::string& key);
-        DictItemContextKey(Builder& builder);
+        
+        //DictItemContextKey(Builder& builder);
 
         Document Build() = delete;
         Builder& EndDict() = delete;
