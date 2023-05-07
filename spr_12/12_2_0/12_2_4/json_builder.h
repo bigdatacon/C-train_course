@@ -3,6 +3,8 @@
 #include "json.h"
 
 namespace json {
+    class  BaseContex;
+
     class Builder {
     public:
         Builder() {
@@ -37,7 +39,7 @@ namespace json {
             return *this;
         }
 
-        Builder& Key(const std::string& key);
+        BaseContex Key(const std::string& key);
 
         Builder& StartDict();
 
@@ -73,7 +75,7 @@ namespace json {
             return builder_.Value(value);
         }
 
-        Builder& Key(const std::string& key);
+        BaseContex Key(const std::string& key);
 
         Builder& StartDict();
 
@@ -116,10 +118,5 @@ namespace json {
         Builder& builder_;
 
     };
-
-
-
-
-
 
 }
