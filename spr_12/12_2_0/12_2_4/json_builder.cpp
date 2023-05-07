@@ -26,7 +26,7 @@ namespace json {
         return BaseContex(*this);
     }
 
-    Builder& Builder::StartDict() {
+    BaseContex Builder::StartDict() {
         have_something_ = true;
         if (in_array()) {
             nodes_stack_.back()->AsArray().push_back(Dict());
@@ -49,7 +49,7 @@ namespace json {
         else {
             throw std::logic_error("Starting a dictionary while neither on top nor in array/dict");
         }
-        return *this;
+        return BaseContex(*this);
     }
 
     Builder& Builder::EndDict() {
@@ -136,7 +136,7 @@ namespace json {
         return  builder_.Key(key);
     }
 
-    Builder& BaseContex::StartDict() {
+    BaseContex BaseContex::StartDict() {
         return  builder_.StartDict();
     }
     Builder& BaseContex::EndDict() {
@@ -157,14 +157,14 @@ namespace json {
     Builder DictItemContextKey::Value(const ValueType& value) {
         return BaseContex::Value(value);
     }
-    Builder DictItemContextKey::StartDict() { return  BaseContex::StartDict(); }
+    BaseContex DictItemContextKey::StartDict() { return  BaseContex::StartDict(); }
     Builder DictItemContextKey::StartArray() { return  BaseContex::StartArray(); }
 
     // 2 Реализация для класса DictItemContextValueAftKey
     BaseContex DictItemContextValueAftKey::Key(const std::string& key) { return BaseContex::Key(key); }
-    
 
-    Builder& DictItemContextValueAftKey::EndDict() {return  BaseContex::EndDict(); }
+
+    Builder& DictItemContextValueAftKey::EndDict() { return  BaseContex::EndDict(); }
 
 
 }
