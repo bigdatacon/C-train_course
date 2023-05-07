@@ -3,8 +3,11 @@
 #include "json.h"
 
 namespace json {
+    class DictItemContextValueAftKey;
+    class DictItemContextAftStartArray;
+    class BaseContex;
 
-    class DictItemContextKey;
+
 
     class Builder {
     public:
@@ -16,37 +19,14 @@ namespace json {
         Node Build() const;
 
         template<typename ValueType>
-        Builder& Value(const ValueType& value) {
-            if (in_array()) {
-                nodes_stack_.back()->AsArray().push_back(value);
-            }
-            else if (in_dict()) {
-                if (have_key_) {
-                    nodes_stack_.back()->AsDict()[current_key_] = value;
-                    current_key_.clear();
-                    have_key_ = false;
-                }
-                else {
-                    throw std::logic_error("Adding a value to dict with no key");
-                }
-            }
-            else if (on_top() && !have_something_) {
-                root_ = value;
-            }
-            else {
-                throw std::logic_error("Trying to put value while neither on top nor in array/dict");
-            }
-            have_something_ = true;
-            return *this;
-        }
+        BaseContex Value(const ValueType& value);
+        BaseContex Key(const std::string& key);
 
-        DictItemContextKey Key(const std::string& key);
-
-        Builder& StartDict();
+        BaseContex StartDict();
 
         Builder& EndDict();
 
-        Builder& StartArray();
+        BaseContex StartArray();
 
         Builder& EndArray();
 
@@ -63,31 +43,60 @@ namespace json {
         bool have_something_;
     };
 
-    //1 Непосредственно после Key вызван не Value, не StartDict и не StartArray.
-    class DictItemContextKey  {
+    // 0 Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ 
+    class  BaseContex {
+    public:
+
+        BaseContex(Builder& builder);
+
+        Node Build() const;
+
+        template<typename ValueType>
+        BaseContex Value(const ValueType& value) {
+            return builder_.Value(value);
+        }
+
+        BaseContex Key(const std::string& key);
+
+        BaseContex StartDict();
+
+        Builder& EndDict();
+
+        BaseContex StartArray();
+
+        Builder& EndArray();
+
+
+    protected:
+        Builder& builder_;
+    };
+
+
+    //1 РќРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РїРѕСЃР»Рµ Key РІС‹Р·РІР°РЅ РЅРµ Value, РЅРµ StartDict Рё РЅРµ StartArray.
+    class DictKeyContext : public BaseContex {
     public:
 
 
-        DictItemContextKey(Builder& builder);
+        //DictItemContextKey(Builder& builder);
+
+        Document Build() = delete;
+        Builder& EndDict() = delete;
+        Builder& EndArray() = delete;
+        BaseContex Key(const std::string& key) = delete;
+
+
 
         template<typename ValueType>
         Builder Value(const ValueType& value);
 
-        Builder& StartDict();
+        BaseContex StartDict();
 
-        Builder& StartArray();
-
-
-    private:
-        Builder& builder_;
-
+        BaseContex StartArray();
     };
 
-
-    /*
-    //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
-    //3 За вызовом StartDict следует не Key и не EndDict.
-    class DictItemContextValueAftKey : public BaseContex {
+    //2 РџРѕСЃР»Рµ РІС‹Р·РѕРІР° Value, РїРѕСЃР»РµРґРѕРІР°РІС€РµРіРѕ Р·Р° РІС‹Р·РѕРІРѕРј Key, РІС‹Р·РІР°РЅ РЅРµ Key Рё РЅРµ EndDict.
+    //3 Р—Р° РІС‹Р·РѕРІРѕРј StartDict СЃР»РµРґСѓРµС‚ РЅРµ Key Рё РЅРµ EndDict.
+    class DictValueContext : public BaseContex {
         Document Build() = delete;
         BaseContex StartDict() = delete;
         BaseContex StartArray() = delete;
@@ -99,19 +108,15 @@ namespace json {
         BaseContex Key(const std::string& key);
 
         Builder& EndDict();
-
-
     };
 
-    // 4 За вызовом StartArray следует не Value, не StartDict, не StartArray и не EndArray.
-    //5 После вызова StartArray и серии Value следует не Value, не StartDict, не StartArray и не EndArray
-    class DictItemContextAftStartArray : public BaseContex {
+    // 4 Р—Р° РІС‹Р·РѕРІРѕРј StartArray СЃР»РµРґСѓРµС‚ РЅРµ Value, РЅРµ StartDict, РЅРµ StartArray Рё РЅРµ EndArray.
+    //5 РџРѕСЃР»Рµ РІС‹Р·РѕРІР° StartArray Рё СЃРµСЂРёРё Value СЃР»РµРґСѓРµС‚ РЅРµ Value, РЅРµ StartDict, РЅРµ StartArray Рё РЅРµ EndArray
+    class DictStartArrayContex : public BaseContex {
 
         Document Build() = delete;
         Builder& EndDict() = delete;
         BaseContex Key(const std::string& key) = delete;
-
-
 
         template<typename ValueType>
         Builder Value(const ValueType& value);
@@ -119,15 +124,31 @@ namespace json {
         BaseContex StartDict();
         BaseContex StartArray();
         Builder& EndArray();
-
-
-
-
     };
 
-
-
-    */
-
+    template<typename ValueType>
+    inline BaseContex Builder::Value(const ValueType& value) {
+        if (in_array()) {
+            nodes_stack_.back()->AsArray().push_back(value);
+        }
+        else if (in_dict()) {
+            if (have_key_) {
+                nodes_stack_.back()->AsDict()[current_key_] = value;
+                current_key_.clear();
+                have_key_ = false;
+            }
+            else {
+                throw std::logic_error("Adding a value to dict with no key");
+            }
+        }
+        else if (on_top() && !have_something_) {
+            root_ = value;
+        }
+        else {
+            throw std::logic_error("Trying to put value while neither on top nor in array/dict");
+        }
+        have_something_ = true;
+        return BaseContex(*this);
+    }
 
 }
