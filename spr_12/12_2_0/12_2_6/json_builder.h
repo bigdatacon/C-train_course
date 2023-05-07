@@ -87,15 +87,16 @@ namespace json {
         DictKeyContext Key(const std::string& key) = delete;
 
 
-        template<typename ValueType>
-        BaseContex Value(const ValueType& value) {
-            return BaseContex::Value(value);
-        }
 
         BaseContex StartDict();
 
         BaseContex StartArray();
     };
+
+    template<typename ValueType>
+    inline BaseContex DictKeyContext::Value(const ValueType& value) {
+        return BaseContex::Value(value);
+    }
 
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
     //3 За вызовом StartDict следует не Key и не EndDict.
