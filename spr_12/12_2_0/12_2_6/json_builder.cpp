@@ -15,7 +15,7 @@ namespace json {
 
 
 
-    BaseContex Builder::Key(const std::string& key) {
+    DictKeyContext Builder::Key(const std::string& key) {
         if (in_dict()) {
             current_key_ = key;
             have_key_ = true;
@@ -132,7 +132,7 @@ namespace json {
         return builder_.Build();
     }
 
-    BaseContex BaseContex::Key(const std::string& key) {
+    DictKeyContext BaseContex::Key(const std::string& key) {
         return  builder_.Key(key);
     }
 
@@ -161,7 +161,7 @@ namespace json {
     BaseContex DictKeyContext::StartArray() { return  BaseContex::StartArray(); }
 
     // 2 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictValueContext
-    BaseContex DictValueContext::Key(const std::string& key) { return BaseContex::Key(key); }
+    DictKeyContext DictValueContext::Key(const std::string& key) { return BaseContex::Key(key); }
 
 
     Builder& DictValueContext::EndDict() { return  BaseContex::EndDict(); }
