@@ -5,7 +5,7 @@
 namespace json {
     class DictItemContextValueAftKey;
     class DictItemContextAftStartArray;
-    class  BaseContex;
+    class BaseContex;
 
 
 
@@ -19,30 +19,7 @@ namespace json {
         Node Build() const;
 
         template<typename ValueType>
-        BaseContex Value(const ValueType& value) {
-            if (in_array()) {
-                nodes_stack_.back()->AsArray().push_back(value);
-            }
-            else if (in_dict()) {
-                if (have_key_) {
-                    nodes_stack_.back()->AsDict()[current_key_] = value;
-                    current_key_.clear();
-                    have_key_ = false;
-                }
-                else {
-                    throw std::logic_error("Adding a value to dict with no key");
-                }
-            }
-            else if (on_top() && !have_something_) {
-                root_ = value;
-            }
-            else {
-                throw std::logic_error("Trying to put value while neither on top nor in array/dict");
-            }
-            have_something_ = true;
-            return BaseContex(*this);
-        }
-
+        BaseContex Value(const ValueType& value);
         BaseContex Key(const std::string& key);
 
         BaseContex StartDict();
@@ -67,7 +44,7 @@ namespace json {
     };
 
     // 0 Базовый класс 
-    class  BaseContex : public Builder {
+    class  BaseContex {
     public:
 
         BaseContex(Builder& builder);
@@ -90,7 +67,7 @@ namespace json {
         Builder& EndArray();
 
 
-    private:
+    protected:
         Builder& builder_;
     };
 
@@ -115,11 +92,6 @@ namespace json {
         BaseContex StartDict();
 
         BaseContex StartArray();
-
-
-    private:
-        Builder& builder_;
-
     };
 
     //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
@@ -136,8 +108,6 @@ namespace json {
         BaseContex Key(const std::string& key);
 
         Builder& EndDict();
-
-
     };
 
     // 4 За вызовом StartArray следует не Value, не StartDict, не StartArray и не EndArray.
@@ -147,21 +117,38 @@ namespace json {
         Document Build() = delete;
         Builder& EndDict() = delete;
         BaseContex Key(const std::string& key) = delete;
-        
-
 
         template<typename ValueType>
         Builder Value(const ValueType& value);
 
-        BaseContex StartDict() ;
-        BaseContex StartArray() ;
-        Builder& EndArray() ;
+        BaseContex StartDict();
+        BaseContex StartArray();
+        Builder& EndArray();
+    };
 
-
-
-
-        };
-
-
+    template<typename ValueType>
+    inline BaseContex Builder::Value(const ValueType& value) {
+        if (in_array()) {
+            nodes_stack_.back()->AsArray().push_back(value);
+        }
+        else if (in_dict()) {
+            if (have_key_) {
+                nodes_stack_.back()->AsDict()[current_key_] = value;
+                current_key_.clear();
+                have_key_ = false;
+            }
+            else {
+                throw std::logic_error("Adding a value to dict with no key");
+            }
+        }
+        else if (on_top() && !have_something_) {
+            root_ = value;
+        }
+        else {
+            throw std::logic_error("Trying to put value while neither on top nor in array/dict");
+        }
+        have_something_ = true;
+        return BaseContex(*this);
+    }
 
 }
