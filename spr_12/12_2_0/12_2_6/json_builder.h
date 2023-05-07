@@ -3,8 +3,10 @@
 #include "json.h"
 
 namespace json {
-    class DictItemContextValueAftKey;
-    class DictItemContextAftStartArray;
+    class  DictKeyContext;
+    class DictValueContex;
+    class DictStartArrayContex;
+
     class BaseContex;
 
 
