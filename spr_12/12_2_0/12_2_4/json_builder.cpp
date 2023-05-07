@@ -125,7 +125,7 @@ namespace json {
     }
 
 
-    // реализация функций BaseContex
+    // СЂРµР°Р»РёР·Р°С†РёСЏ С„СѓРЅРєС†РёР№ BaseContex
     BaseContex::BaseContex(Builder& builder) : builder_(builder) {}
 
     Node BaseContex::Build() const {
@@ -156,11 +156,11 @@ namespace json {
     }
 
 
-    // Реализация для класса DictItemContextKey
-    DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
+    // Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictItemContextKey
+    //DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
 
-    Builder DictItemContextKey::StartDict() { return builder_.StartDict(); }
-    Builder DictItemContextKey::StartArray() { return builder_.StartArray(); }
+    Builder DictItemContextKey::StartDict() { return  BaseContex::StartDict(); }
+    Builder DictItemContextKey::StartArray() { return  BaseContex::StartArray(); }
 
 
 
