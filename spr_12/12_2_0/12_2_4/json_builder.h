@@ -4,6 +4,7 @@
 
 namespace json {
     class DictItemContextValueAftKey;
+    class DictItemContextAftStartArray;
     class  BaseContex;
 
 
@@ -48,7 +49,7 @@ namespace json {
 
         Builder& EndDict();
 
-        Builder& StartArray();
+        BaseContex StartArray();
 
         Builder& EndArray();
 
@@ -84,7 +85,7 @@ namespace json {
 
         Builder& EndDict();
 
-        Builder& StartArray();
+        BaseContex StartArray();
 
         Builder& EndArray();
 
@@ -113,7 +114,7 @@ namespace json {
 
         BaseContex StartDict();
 
-        Builder StartArray();
+        BaseContex StartArray();
 
 
     private:
@@ -126,7 +127,7 @@ namespace json {
     class DictItemContextValueAftKey : public BaseContex {
         Document Build() = delete;
         BaseContex StartDict() = delete;
-        Builder& StartArray() = delete;
+        BaseContex StartArray() = delete;
         Builder& EndArray() = delete;
         template<typename ValueType>
         BaseContex Value(const ValueType& value) = delete;
@@ -139,7 +140,27 @@ namespace json {
 
     };
 
+    // 4 За вызовом StartArray следует не Value, не StartDict, не StartArray и не EndArray.
+    //5 После вызова StartArray и серии Value следует не Value, не StartDict, не StartArray и не EndArray
+    class DictItemContextAftStartArray : public BaseContex {
 
+        Document Build() = delete;
+        Builder& EndDict() = delete;
+        BaseContex Key(const std::string& key) = delete;
+        
+
+
+        template<typename ValueType>
+        Builder Value(const ValueType& value);
+
+        BaseContex StartDict() ;
+        BaseContex StartArray() ;
+        Builder& EndArray() ;
+
+
+
+
+        };
 
 
 
