@@ -15,7 +15,7 @@ namespace json {
 
 
 
-    DictItemContextKey Builder::Key(const std::string& key) {
+    BaseContex Builder::Key(const std::string& key) {
         if (in_dict()) {
             current_key_ = key;
             have_key_ = true;
@@ -23,10 +23,10 @@ namespace json {
         else {
             throw std::logic_error("Adding a key while not in dictionary");
         }
-        return *this;
+        return BaseContex(*this);
     }
 
-    Builder& Builder::StartDict() {
+    BaseContex Builder::StartDict() {
         have_something_ = true;
         if (in_array()) {
             nodes_stack_.back()->AsArray().push_back(Dict());
@@ -49,7 +49,7 @@ namespace json {
         else {
             throw std::logic_error("Starting a dictionary while neither on top nor in array/dict");
         }
-        return *this;
+        return BaseContex(*this);
     }
 
     Builder& Builder::EndDict() {
@@ -65,7 +65,7 @@ namespace json {
         return *this;
     }
 
-    Builder& Builder::StartArray() {
+    BaseContex Builder::StartArray() {
         have_something_ = true;
         if (in_array()) {
             nodes_stack_.back()->AsArray().push_back(Array());
@@ -88,7 +88,7 @@ namespace json {
         else {
             throw std::logic_error("Starting an array while neither on top nor in array/dict");
         }
-        return *this;
+        return BaseContex(*this);
     }
 
     Builder& Builder::EndArray() {
@@ -124,15 +124,58 @@ namespace json {
         return false;
     }
 
-    // 1 ���������� ��� ������ DictItemContextKey
-    DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
 
+    // СЂРµР°Р»РёР·Р°С†РёСЏ С„СѓРЅРєС†РёР№ BaseContex
+    BaseContex::BaseContex(Builder& builder) : builder_(builder) {}
+
+    Node BaseContex::Build() const {
+        return builder_.Build();
+    }
+
+    BaseContex BaseContex::Key(const std::string& key) {
+        return  builder_.Key(key);
+    }
+
+    BaseContex BaseContex::StartDict() {
+        return  builder_.StartDict();
+    }
+    Builder& BaseContex::EndDict() {
+        return  builder_.EndDict();
+    }
+
+    BaseContex BaseContex::StartArray() {
+        return  builder_.StartArray();
+    }
+    Builder& BaseContex::EndArray() {
+        return  builder_.EndArray();
+    }
+
+
+    // 1 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictKeyContext
+    //DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
+    template<typename ValueType>
+    Builder DictKeyContext::Value(const ValueType& value) {
+        return BaseContex::Value(value);
+    }
+    BaseContex DictKeyContext::StartDict() { return  BaseContex::StartDict(); }
+    BaseContex DictKeyContext::StartArray() { return  BaseContex::StartArray(); }
+
+    // 2 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictValueContext
+    BaseContex DictValueContext::Key(const std::string& key) { return BaseContex::Key(key); }
+
+
+    Builder& DictValueContext::EndDict() { return  BaseContex::EndDict(); }
+
+    // 3 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР°  DictStartArrayContex
 
     template<typename ValueType>
-    Builder DictItemContextKey::Value(const ValueType& value) {
-        return  builder_.Value(value);
-    }
-    Builder& DictItemContextKey::StartDict() { return   builder_.StartDict(); }
-    Builder& DictItemContextKey::StartArray() { return   builder_.StartArray(); }
+    Builder  DictStartArrayContex::Value(const ValueType& value) { return BaseContex::Value(value); }
+
+    BaseContex  DictStartArrayContex::StartDict() { return  BaseContex::StartDict(); }
+    BaseContex  DictStartArrayContex::StartArray() { return  BaseContex::StartArray(); }
+    Builder& DictStartArrayContex::EndArray() { return  BaseContex::EndArray(); }
+
+
+
 
 }
