@@ -151,11 +151,16 @@ namespace json {
     }
 
 
-    // Реализация для класса DictItemContextKey
+    // 1 Реализация для класса DictItemContextKey
     //DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
-
+    template<typename ValueType>
+    Builder Value(const ValueType& value) {
+        return BaseContex::Value(value);
+    }
     Builder DictItemContextKey::StartDict() { return  BaseContex::StartDict(); }
     Builder DictItemContextKey::StartArray() { return  BaseContex::StartArray(); }
+
+    // Реализация для класса DictItemContextValueAftKey
 
 
 
