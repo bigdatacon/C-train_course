@@ -23,7 +23,7 @@ namespace json {
         else {
             throw std::logic_error("Adding a key while not in dictionary");
         }
-        return BaseContex(*this);
+        return DictKeyContext(*this);
     }
 
     BaseContex Builder::StartDict() {
@@ -152,7 +152,7 @@ namespace json {
 
 
     // 1 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictKeyContext
-    //DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
+    DictKeyContext::DictKeyContext(Builder& builder) : BaseContex(builder) {}
     template<typename ValueType>
     Builder DictKeyContext::Value(const ValueType& value) {
         return BaseContex::Value(value);
