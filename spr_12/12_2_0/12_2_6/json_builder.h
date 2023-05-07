@@ -79,7 +79,7 @@ namespace json {
     public:
 
 
-        //DictItemContextKey(Builder& builder);
+        DictKeyContext(Builder& builder);
 
         Document Build() = delete;
         Builder& EndDict() = delete;
