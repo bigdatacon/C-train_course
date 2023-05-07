@@ -125,7 +125,7 @@ namespace json {
     }
 
 
-    // реализация функций BaseContex
+    // СЂРµР°Р»РёР·Р°С†РёСЏ С„СѓРЅРєС†РёР№ BaseContex
     BaseContex::BaseContex(Builder& builder) : builder_(builder) {}
 
     Node BaseContex::Build() const {
@@ -151,7 +151,7 @@ namespace json {
     }
 
 
-    // 1 Реализация для класса DictItemContextKey
+    // 1 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictItemContextKey
     //DictItemContextKey::DictItemContextKey(Builder& builder) : builder_(builder) {}
     template<typename ValueType>
     Builder DictItemContextKey::Value(const ValueType& value) {
@@ -160,18 +160,18 @@ namespace json {
     BaseContex DictItemContextKey::StartDict() { return  BaseContex::StartDict(); }
     BaseContex DictItemContextKey::StartArray() { return  BaseContex::StartArray(); }
 
-    // 2 Реализация для класса DictItemContextValueAftKey
+    // 2 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictItemContextValueAftKey
     BaseContex DictItemContextValueAftKey::Key(const std::string& key) { return BaseContex::Key(key); }
 
 
     Builder& DictItemContextValueAftKey::EndDict() { return  BaseContex::EndDict(); }
 
-    // 3 Реализация для класса DictItemContextAftStartArray
+    // 3 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictItemContextAftStartArray
 
     template<typename ValueType>
     Builder DictItemContextAftStartArray::Value(const ValueType& value) { return BaseContex::Value(value); }
 
-    BaseContex DictItemContextAftStartArray::StartDict(){ return  BaseContex::StartDict(); }
+    BaseContex DictItemContextAftStartArray::StartDict() { return  BaseContex::StartDict(); }
     BaseContex DictItemContextAftStartArray::StartArray() { return  BaseContex::StartArray(); }
     Builder& DictItemContextAftStartArray::EndArray() { return  BaseContex::EndArray(); }
 
