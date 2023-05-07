@@ -87,9 +87,10 @@ namespace json {
         DictKeyContext Key(const std::string& key) = delete;
 
 
-
         template<typename ValueType>
-        Builder Value(const ValueType& value);
+        BaseContex Value(const ValueType& value) {
+            return BaseContex::Value(value);
+        }
 
         BaseContex StartDict();
 
