@@ -154,9 +154,7 @@ namespace json {
     // 1 Р РµР°Р»РёР·Р°С†РёСЏ РґР»СЏ РєР»Р°СЃСЃР° DictKeyContext
     DictKeyContext::DictKeyContext(Builder& builder) : BaseContex(builder) {}
     template<typename ValueType>
-    Builder DictKeyContext::Value(const ValueType& value) {
-        return BaseContex::Value(value);
-    }
+ 
     BaseContex DictKeyContext::StartDict() { return  BaseContex::StartDict(); }
     BaseContex DictKeyContext::StartArray() { return  BaseContex::StartArray(); }
 
