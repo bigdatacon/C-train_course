@@ -3,7 +3,10 @@
 #include "json.h"
 
 namespace json {
+    class DictItemContextValueAftKey;
     class  BaseContex;
+    
+
 
     class Builder {
     public:
@@ -101,7 +104,7 @@ namespace json {
         Document Build() = delete;
         Builder& EndDict() = delete;
         Builder& EndArray()=delete;
-        Builder& Key(const std::string& key) = delete;
+        BaseContex Key(const std::string& key) = delete;
 
 
         template<typename ValueType>
@@ -117,7 +120,16 @@ namespace json {
 
     };
 
+    //2 После вызова Value, последовавшего за вызовом Key, вызван не Key и не EndDict.
+    class DictItemContextValueAftKey : public BaseContex {
 
+
+        BaseContex Key(const std::string& key);
+
+        Builder& EndDict();
+
+
+    };
 
 
 
