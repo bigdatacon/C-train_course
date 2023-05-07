@@ -129,12 +129,7 @@ namespace json {
     BaseContex::BaseContex(Builder& builder) : builder_(builder) {}
 
     Node BaseContex::Build() const {
-        if (on_top() && have_something_) {
-            return root_;
-        }
-        else {
-            throw std::logic_error("Returning an incomplete document");
-        }
+        return builder_.Build();
     }
 
     Builder& BaseContex::Key(const std::string& key) {
