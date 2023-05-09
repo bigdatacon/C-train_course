@@ -6,68 +6,121 @@ json::Builder::Builder() {
 json::Node json::Builder::Build() const {
     if (on_top()) {
         return root_;
-    } else {
+    }
+    else {
         throw std::logic_error("Returning an incomplete document");
     }
 }
 
-json::DictValueContext json::Builder::Key(const std::string &key) {
+
+json::Builder::BaseContext json::Builder::Value(const json::Node& value) {
+    if (in_array()) {
+        nodes_stack_.back()->AsArray().push_back(value);
+    }
+    else if (in_dict()) {
+        if (current_key_) {
+            nodes_stack_.back()->AsDict()[current_key_.value()] = value;
+            current_key_.reset();
+        }
+        else {
+            throw std::logic_error("Inserting a value with no key");
+        }
+    }
+    else if (on_top()) {
+        root_ = value;
+    }
+    else {
+        throw std::logic_error("Trying to put value while neither on top nor in array/dict");
+    }
+    return BaseContext(this);
+}
+
+
+json::Builder::DictValueContext json::Builder::Key(const std::string& key) {
     if (in_dict()) {
         current_key_ = key;
-    } else {
+    }
+    else {
         throw std::logic_error("Adding a key while not in dictionary");
     }
     return DictValueContext(this);
 }
 
-json::DictItemContext json::Builder::StartDict() {
+json::Builder::DictItemContext json::Builder::StartDict() {
+    return json::Builder::StartDictOrArrayInner(Dict());
+    /*
     if (in_array()) {
         nodes_stack_.back()->AsArray().push_back(Dict());
         nodes_stack_.push_back(&nodes_stack_.back()->AsArray().back());
-    } else if (in_dict()) {
-        nodes_stack_.back()->AsDict()[current_key_] = Dict();
-        nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_]);
-    } else if (on_top()) {
+    }
+    else if (in_dict()) {
+        if (current_key_) {
+            nodes_stack_.back()->AsDict()[current_key_.value()] = Dict();
+            nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_.value()]);
+            current_key_.reset();
+        }
+        else {
+            throw std::logic_error("Inserting a value with no key");
+        }
+    }
+    else if (on_top()) {
         root_ = Dict();
         nodes_stack_.push_back(&root_);
-    } else {
+    }
+    else {
         throw std::logic_error("Starting a dictionary while neither on top nor in array/dict");
     }
     return DictItemContext(this);
+    */
 }
 
-json::BaseContext json::Builder::EndDict() {
+json::Builder::BaseContext json::Builder::EndDict() {
     if (in_dict()) {
         nodes_stack_.pop_back();
-    } else {
+    }
+    else {
         throw std::logic_error("Ending a dictionary while not in dictionary");
     }
     return BaseContext(this);
 }
 
-json::ArrayItemContext json::Builder::StartArray() {
+json::Builder::ArrayItemContext json::Builder::StartArray() {
+    return json::Builder::StartDictOrArrayInner(Array());
+
+    /*
     if (in_array()) {
         nodes_stack_.back()->AsArray().push_back(Array());
         nodes_stack_.push_back(&nodes_stack_.back()->AsArray().back());
-    } else if (in_dict()) {
-        nodes_stack_.back()->AsDict()[current_key_] = Array();
-        nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_]);
-    } else if (on_top()) {
+    }
+    else if (in_dict()) {
+        if (current_key_) {
+            nodes_stack_.back()->AsDict()[current_key_.value()] = Array();
+            nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_.value()]);
+            current_key_.reset();
+        }
+        else {
+            throw std::logic_error("Inserting a value with no key");
+        }
+    }
+    else if (on_top()) {
         root_ = Array();
         nodes_stack_.push_back(&root_);
-    } else {
+    }
+    else {
         throw std::logic_error("Starting an array while neither on top nor in array/dict");
     }
-    return json::ArrayItemContext(this);
+    return ArrayItemContext(this);
+    */
 }
 
-json::BaseContext json::Builder::EndArray() {
+json::Builder::BaseContext json::Builder::EndArray() {
     if (in_array()) {
         nodes_stack_.pop_back();
-    } else {
+    }
+    else {
         throw std::logic_error("Ending an array while not in dictionary");
     }
-    return json::BaseContext(this);
+    return BaseContext(this);
 }
 
 bool json::Builder::on_top() const {
@@ -92,31 +145,46 @@ bool json::Builder::in_dict() const {
     return false;
 }
 
-json::Node json::BaseContext::Build() {
+json::Node json::Builder::BaseContext::Build() {
     return builder_->Build();
 }
 
-json::DictValueContext json::BaseContext::Key(const std::string &key)
+json::Builder::DictValueContext json::Builder::BaseContext::Key(const std::string& key)
 {
     return builder_->Key(key);
 }
 
-json::DictItemContext json::BaseContext::StartDict()
+json::Builder::DictItemContext json::Builder::BaseContext::StartDict()
 {
     return builder_->StartDict();
 }
 
-json::BaseContext json::BaseContext::EndDict()
+json::Builder::BaseContext json::Builder::BaseContext::EndDict()
 {
     return builder_->EndDict();
 }
 
-json::ArrayItemContext json::BaseContext::StartArray()
+json::Builder::ArrayItemContext json::Builder::BaseContext::StartArray()
 {
     return builder_->StartArray();
 }
 
-json::BaseContext json::BaseContext::EndArray()
+json::Builder::BaseContext json::Builder::BaseContext::EndArray()
 {
     return builder_->EndArray();
+}
+
+
+json::Builder::BaseContext json::Builder::BaseContext::Value(const json::Node& value) {
+    return builder_->Value(value);
+}
+
+json::Builder::DictItemContext json::Builder::DictValueContext::Value(const json::Node& value) {
+    builder_->Value(value);
+    return DictItemContext(builder_);
+}
+
+json::Builder::ArrayItemContext json::Builder::ArrayItemContext::Value(const json::Node& value) {
+    builder_->Value(value);
+    return ArrayItemContext(builder_);
 }
