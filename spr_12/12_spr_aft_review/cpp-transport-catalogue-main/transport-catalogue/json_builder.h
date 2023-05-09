@@ -1,24 +1,114 @@
 #pragma once
 #include <vector>
+#include <optional>
 #include "json.h"
 
 namespace json {
-    class BaseContext;
-    class DictValueContext;
-    class DictItemContext;
-    class ArrayItemContext;
 
     class Builder {
+    public:
+        class BaseContext;
+        class DictValueContext;
+        class DictItemContext;
+        class ArrayItemContext;
+
+    public:
+        class BaseContext {
+        public:
+            explicit BaseContext(Builder* builder) { builder_ = builder; }
+
+            Node Build();
+
+            BaseContext Value(const json::Node& value);
+
+            DictValueContext Key(const std::string& key);
+
+            DictItemContext StartDict();
+            BaseContext EndDict();
+            ArrayItemContext StartArray();
+            BaseContext EndArray();
+
+        protected:
+            Builder* builder_;
+        };
+
+
+        class DictValueContext : public BaseContext {
+        public:
+            explicit DictValueContext(Builder* builder) : BaseContext(builder) {}
+
+            Node Build() = delete;
+
+            DictItemContext Value(const json::Node& value);
+
+            DictValueContext Key(const std::string& key) = delete;
+            BaseContext EndArray() = delete;
+            BaseContext EndDict() = delete;
+        };
+
+
+        class DictItemContext : public BaseContext {
+        public:
+            explicit DictItemContext(Builder* builder) : BaseContext(builder) {}
+
+            Node Build() = delete;
+
+            BaseContext Value(const json::Node& value) = delete;
+            DictItemContext& StartDict() = delete;
+            ArrayItemContext& StartArray() = delete;
+            BaseContext EndArray() = delete;
+        };
+
+
+        class ArrayItemContext : public BaseContext {
+        public:
+            explicit ArrayItemContext(Builder* builder) : BaseContext(builder) {}
+
+            Node Build() = delete;
+
+            ArrayItemContext Value(const json::Node& value);
+
+            DictValueContext Key(const std::string& key) = delete;
+            BaseContext EndDict() = delete;
+        };
     public:
         Builder();
 
         Node Build() const;
 
-        template<typename ValueType>
-        BaseContext Value(const ValueType & value);
+        BaseContext Value(const json::Node& value);
+        DictValueContext Key(const std::string& key);
 
-        DictValueContext Key(const std::string & key);
+        template<typename Container>
+        DictItemContext StartDictOrArrayInner(Container value) {
+            if (in_array()) {
+                nodes_stack_.back()->AsArray().push_back(value);
+                nodes_stack_.push_back(&nodes_stack_.back()->AsArray().back());
+            }
+            else if (in_dict()) {
+                if (current_key_) {
+                    nodes_stack_.back()->AsDict()[current_key_.value()] = value;
+                    nodes_stack_.push_back(&nodes_stack_.back()->AsDict()[current_key_.value()]);
+                    current_key_.reset();
+                }
+                else {
+                    throw std::logic_error("Inserting a value with no key");
+                }
+            }
+            else if (on_top()) {
+                root_ = value;
+                nodes_stack_.push_back(&root_);
+            }
+            else {
+                throw std::logic_error("Starting a dictionary while neither on top nor in array/dict");
+            }
+            return DictItemContext(this);
+        }
+
         DictItemContext StartDict();
+
+
+
         BaseContext EndDict();
         ArrayItemContext StartArray();
         BaseContext EndArray();
@@ -29,105 +119,7 @@ namespace json {
         bool in_dict() const;
 
         Node root_;
-        std::vector<Node *> nodes_stack_;
-        std::string current_key_;
-        bool have_key_ = false;
+        std::vector<Node*> nodes_stack_;
+        std::optional<std::string> current_key_;
     };
-
-
-    class BaseContext {
-    public:
-        BaseContext(Builder * builder) { builder_ = builder; }
-
-        Node Build();
-
-        template<typename ValueType>
-        BaseContext Value(const ValueType & value);
-
-        DictValueContext Key(const std::string & key);
-
-        DictItemContext StartDict();
-        BaseContext EndDict();
-        ArrayItemContext StartArray();
-        BaseContext EndArray();
-
-    protected:
-        Builder * builder_;
-    };
-
-
-    class DictValueContext: public BaseContext {
-    public:
-        DictValueContext(Builder * builder): BaseContext(builder) {}
-
-        Node Build() = delete;
-
-        template<typename ValueType>
-        DictItemContext Value(const ValueType & value);
-
-        DictValueContext Key(const std::string & key) = delete;
-        BaseContext EndArray() = delete;
-        BaseContext EndDict() = delete;
-    };
-
-
-    class DictItemContext: public BaseContext {
-    public:
-        DictItemContext(Builder * builder): BaseContext(builder) {}
-
-        Node Build() = delete;
-
-        template<typename ValueType>
-        BaseContext Value(const ValueType & value) = delete;
-        DictItemContext &StartDict() = delete;
-        ArrayItemContext &StartArray() = delete;
-        BaseContext EndArray() = delete;
-    };
-
-
-    class ArrayItemContext: public BaseContext {
-    public:
-        ArrayItemContext(Builder * builder): BaseContext(builder) {}
-
-        Node Build() = delete;
-
-        template<typename ValueType>
-        ArrayItemContext Value(const ValueType & value);
-
-        DictValueContext Key(const std::string & key) = delete;
-        BaseContext EndDict() = delete;
-    };
-
-
-    template<typename ValueType>
-    inline BaseContext Builder::Value(const ValueType & value) {
-        if (in_array()) {
-            nodes_stack_.back()->AsArray().push_back(value);
-        } else if (in_dict()) {
-            nodes_stack_.back()->AsDict()[current_key_] = value;
-            current_key_.clear();
-        } else if (on_top()) {
-            root_ = value;
-        } else {
-            throw std::logic_error("Trying to put value while neither on top nor in array/dict");
-        }
-        return BaseContext(this);
-    }
-
-    template<typename ValueType>
-    inline BaseContext BaseContext::Value(const ValueType & value) {
-        return builder_->Value(value);
-    }
-
-    template<typename ValueType>
-    inline DictItemContext DictValueContext::Value(const ValueType & value) {
-        builder_->Value(value);
-        return DictItemContext(builder_);
-    }
-
-    template<typename ValueType>
-    inline ArrayItemContext ArrayItemContext::Value(const ValueType & value) {
-        builder_->Value(value);
-        return ArrayItemContext(builder_);
-    }
 }
