@@ -39,7 +39,7 @@ class BookManager {
 
 public:
     BookManager() {
-        quant_users_to_page_.resize(1025);
+        quant_users_to_page_.resize(1025); //  с учетом максимальных значений данных в задании
         user_and_page_.resize(100001);
     };
     void ReadInput(istream&  cin) {
@@ -55,7 +55,7 @@ public:
 
                 // Проверка наличия элемента в векторе
                 if (!users_.count(user_id)) {
-                    cout << 0 << endl;
+                    cout <<  fixed << setprecision(6) << (double)  0 << endl;
                 }
                 else {
                     int current_page = user_and_page_[user_id];
@@ -69,7 +69,7 @@ public:
                         }
                     }
                     else {
-                        cout << 0 << endl;
+                        cout << fixed << setprecision(6) << (double)  0 << endl;
                     }
 
                 }
