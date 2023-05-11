@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <numeric>
+#include <iomanip>
 
 using namespace std;
 
@@ -38,12 +39,13 @@ class BookManager {
 
 public:
     BookManager() {
-        quant_users_to_page_.resize(12);
+        quant_users_to_page_.resize(1025);
+        user_and_page_.resize(100001);
     };
     void ReadInput(istream&  cin) {
         int n;
         cin >> n;
-        user_and_page_.resize(n + 1);
+        //user_and_page_.resize(n + 1);
         for (int i = 1; i <= n; i++) {
             string op;
             cin >> op;
@@ -59,19 +61,14 @@ public:
                     int current_page = user_and_page_[user_id];
                     if (current_page != 0) {
                         std::vector<int> slice(quant_users_to_page_.begin(), quant_users_to_page_.begin() + current_page);
-
                         // вычисление суммы элементов среза
                         double sum = std::accumulate(slice.begin(), slice.end(), 0);
-
-                        double part = sum / (users_.size()-1);
                         if (users_.size() == 1) { cout << 1 << endl; }
                         else {
-
-                            cout << part << endl;
+                            cout << fixed << setprecision(6) << (double) sum / (users_.size()-1) << endl;
                         }
                     }
                     else {
-
                         cout << 0 << endl;
                     }
 
@@ -92,10 +89,6 @@ public:
                     if (!users_.count(user_id)) {
                         users_.insert(user_id);
                     }
-
-
-
-
                 }
             }
 
@@ -106,9 +99,6 @@ private:
     vector<int> user_and_page_;
     vector<int> quant_users_to_page_;
     set<int> users_;
-
-
-
 };
 
 int main() {
