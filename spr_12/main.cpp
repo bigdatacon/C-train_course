@@ -6,6 +6,9 @@
 #include <set>
 #include <numeric>
 #include <iomanip>
+#include <fstream> // добавленный заголовочный файл
+
+
 
 using namespace std;
 
@@ -46,6 +49,7 @@ public:
 		int n;
 		cin >> n;
 		//user_and_page_.resize(n + 1);
+		std::ofstream fout("from_func.txt");
 		for (int i = 1; i <= n; i++) {
 			string op;
 			cin >> op;
@@ -55,16 +59,23 @@ public:
 
 				int current_page = user_and_page_[user_id];
 				if (current_page != 0) {
-					std::vector<int> slice(quant_users_to_page_.begin(), quant_users_to_page_.begin() + current_page);
+
+					if (users_.size() == 1) {
+						fout << 1 << endl;
+					}
+
 					// вычисление суммы элементов среза
-					double sum = std::accumulate(slice.begin(), slice.end(), 0);
-					if (users_.size() == 1) { cout << 1 << endl; }
 					else {
-						cout << fixed << setprecision(6) << (double)sum / (users_.size() - 1) << endl;
+						std::vector<int> slice(quant_users_to_page_.begin(), quant_users_to_page_.begin() + current_page);
+						double sum = std::accumulate(slice.begin(), slice.end(), 0);
+						double result = sum / (users_.size() - 1);
+
+						fout << std::fixed << std::setprecision(6) << result << std::endl;
 					}
 				}
 				else {
-					cout << fixed << setprecision(6) << (double)0 << endl;
+					//fout << fixed << setprecision(6) << (double)0 << endl;
+					fout << 0 << endl;
 				}
 
 			}
@@ -95,6 +106,47 @@ private:
 	set<int> users_;
 };
 
+bool CompareFiles(const std::string& file1, const std::string& file2)
+{
+	std::ifstream f1(file1);
+	std::ifstream f2(file2);
+
+	if (!f1.is_open() || !f2.is_open()) {
+		std::cerr << "Unable to open files." << std::endl;
+		return false;
+	}
+
+	std::string line1, line2;
+	int lineNum = 1;
+	bool filesMatch = true;
+
+	while (getline(f1, line1) && getline(f2, line2))
+	{
+		if (line1 != line2)
+		{
+			std::cout << "Line " << lineNum << " does not match." << std::endl;
+			std::cout << "File1_test: " << line1 << std::endl;
+			std::cout << "File2_my: " << line2 << std::endl;
+			filesMatch = false;
+		}
+
+		lineNum++;
+	}
+
+	if (!filesMatch) {
+		std::cout << "Files do not match." << std::endl;
+	}
+	else {
+		std::cout << "Files match." << std::endl;
+	}
+
+	return filesMatch;
+}
+
+
+
+
+
 int main() {
 #ifdef _DEBUG
 	if (freopen("input.txt.txt", "r", stdin) == nullptr) {
@@ -106,5 +158,13 @@ int main() {
 	BookManager bm;
 	bm.ReadInput(cin);
 
+	std::string filename1 = "out.txt";
+	std::string filename2 = "from_func.txt";
+	if (CompareFiles(filename1, filename2)) {
+		std::cout << "The files are identical" << std::endl;
+	}
+	else {
+		std::cout << "The files are different" << std::endl;
+	}
 	return 0;
 }
