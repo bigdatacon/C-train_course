@@ -47,7 +47,7 @@ public:
 template <typename T>
 class AnyStorage : public AnyStorageBase {
 public:
-    template <typename T>
+    //template <typename T>
     AnyStorage(T&& value) : data_(std::forward<T>(value)) {}
 
     void Print(ostream& out) const override {
