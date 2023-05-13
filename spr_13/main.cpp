@@ -7,7 +7,7 @@
 using namespace std;
 
 /*
-Тестовый 
+РўРµСЃС‚РѕРІС‹Р№ 
 42
 abc
 construct
@@ -20,16 +20,16 @@ destruct
 destruct
 
 
-Мой вывод 
+РњРѕР№ РІС‹РІРѕРґ 
 42
 abc
 construct
 move
 destruct
 construct
-copy -- Лишнее 
-move -- лишнее 
-destruct -- лишнее 
+copy -- Р›РёС€РЅРµРµ 
+move -- Р»РёС€РЅРµРµ 
+destruct -- Р»РёС€РЅРµРµ 
 destruct
 destruct
 destruct
@@ -132,7 +132,7 @@ int main() {
     Any any_int(42);
     Any any_string("abc"s);
 
-    // операция вывода Any в поток определена чуть выше в примере
+    // РѕРїРµСЂР°С†РёСЏ РІС‹РІРѕРґР° Any РІ РїРѕС‚РѕРє РѕРїСЂРµРґРµР»РµРЅР° С‡СѓС‚СЊ РІС‹С€Рµ РІ РїСЂРёРјРµСЂРµ
     cout << any_int << endl << any_string << endl;
 
     Any any_dumper_temp{ Dumper() };
