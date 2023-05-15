@@ -1,116 +1,67 @@
 Подсказка:
-Класс Any имеет единственное поле — unique_ptr<AnyStorageBase>, где AnyStorageBase — вспомогательный класс.
-Класс AnyStorageBase абстрактный. Он содержит виртуальный метод Print и виртуальный деструктор. Не имеет явных конструкторов и данных.
-Вам понадобится шаблонный класс AnyStorage, производный от AnyStorageBase:
-  template <typename T>
-  class AnyStorage: public AnyStorageBase {
-  public:
-      // конструктор AnyStorage, принимающий T универсальным образом
-
-      void Print(ostream& out) const override;
-
-  private:
-      T data_;
-  };
+Сделайте так, чтобы функция Merge принимала две пары итераторов.
+Она будет иметь два типовых шаблонных параметра — InputIt1 и InputIt2.
+Если вам мешают предупреждения из-за сравнения разных видов чисел, используйте std::less, как это сказано в условии.
    
-В шаблонном конструкторе template <typename S> Any::Any<S> очистите S от ссылок и создайте объект AnyStorage:
-  using Initial = std::remove_reference_t<S>;
-  ptr_ = std::make_unique<AnyStorage<Initial>>(std::forward<S>(type));
-   
-   
-  Задание
-Реализуйте класс Any, который:
-имеет шаблонный конструктор, принимающий владение значением любого типа,
-имеет метод void Print(std::ostream& out) const, выводящий хранимое значение в поток out операцией <<.
-Для решения задачи вам понадобятся вспомогательные классы. Попробуйте догадаться, какие именно. Если не получится — заглядывайте в подсказку.
-Вам пригодится псевдоним типа std::remove_reference_t. Его можно применить, чтобы удалить из шаблонного типа все указания на ссылку:
-#include <utility>
-#include <string>
-
-using namespace std;
-
-// можно удалить обычную ссылку
-static_assert(is_same_v<remove_reference_t<int&>, int>);
-
-// можно удалить rvalue-ссылку
-static_assert(is_same_v<remove_reference_t<char&&>, char>);
-
-// если ссылки не было, то remove_reference_t ничего не меняет
-static_assert(is_same_v<remove_reference_t<string>, string>); 
-При использовании вспомогательных абстрактных классов не забудьте добавить в них виртуальный деструктор.
+   Задание
+  В заготовке — знакомая вам ещё из темы о рекурсивных алгоритмах функция слияния. Но реализована она не универсально, такой функцией можно сливать только векторы. Измените функцию Merge и реализуйте её так, чтобы она могла принять элементы любого контейнера. Её сигнатуру можно и нужно поменять. Каким образом — решите сами на основе материалов этого урока. Вызывать функцию Merge будет только ваш код, её сигнатура проверяться не будет.
+Также реализуйте функции MergeSomething, которые должны вызывать Merge. Можете написать вместо них одну шаблонную, принимающую два произвольных контейнера.
+Напоследок реализуйте функцию MergeHalves — она должна слить две половины вектора. Детали вы найдёте в заготовке.
+Чтобы избежать предупреждений из-за сравнения чисел разных типов, используйте  конструкцию less<>()(elem1, elem2) вместо elem1 < elem2.
 Ограничения
-Шаблонный конструктор должен принимать значение наиболее универсальным способом — Forwarding reference.
-Объект, переданный в конструктор Any, должен совершить только одно копирование или перемещение — в зависимости от того, передаётся в функцию временный объект или постоянный.
-При удалении объекта Any должен удалиться и хранимый объект.
-Класс Any — не шаблонный.
+Нельзя лишний раз копировать или перемещать переданные функции MergeSomething и MergeHalves контейнеры и их элементы.
+Не реализуйте логику слияния в функциях MergeSomething и MergeHalves, она должна остаться в Merge.
 Пример
-#include <iostream>
-#include <string_view>
-#include <string>
-
-using namespace std;
-
-class Dumper {
-public:
-    Dumper() {
-        std::cout << "construct"sv << std::endl;
-    }
-    ~Dumper() {
-        std::cout << "destruct"sv << std::endl;
-    }
-    Dumper(const Dumper&) {
-        std::cout << "copy"sv << std::endl;
-    }
-    Dumper(Dumper&&) {
-        std::cout << "move"sv << std::endl;
-    }
-    Dumper& operator = (const Dumper&) {
-        std::cout << "= copy"sv << std::endl;
-        return *this;
-    }
-    Dumper& operator = (Dumper&&) {
-        std::cout << "= move"sv << std::endl;
-        return *this;
-    }
-};
-
-ostream& operator<< (ostream& out, const Any& arg) {
-    arg.Print(out);
-    return out;
-}
-
-ostream& operator<< (ostream& out, const Dumper&) {
-    return out;
-}
-
-int main() {
-    Any any_int(42);
-    Any any_string("abc"s);
-  
-    // операция вывода Any в поток определена чуть выше в примере
-    cout << any_int << endl << any_string << endl;
-
-    Any any_dumper_temp{Dumper()};
-
-    Dumper auto_dumper;
-    Any any_dumper_auto(auto_dumper);
-} 
-Программа выводит такой текст:
-42
-abc
-construct
-move
-destruct
-construct
-copy
-destruct
-destruct
-destruct 
+Пример есть в заготовке кода. После решения задачи его вывод должен быть таким:
+Merging vectors:
+60
+65
+70
+75
+80
+85
+90
+95
+Merging vector and list:
+0.1
+60
+70
+72.5
+80
+82.11
+90
+1e+30
+Merging string and list:
+0.1
+A
+C
+72.5
+N
+82.11
+Z
+1e+30
+Merging set and vector:
+20
+65
+75
+77
+81
+85
+95
+Merging vector halves:
+60
+65
+70
+75
+80
+85
+90
+95 
 Что отправлять на проверку
-Реализуйте в заготовке полностью класс Any и все вспомогательные классы.
+Измените в заготовке функцию Merge, реализуйте MergeSomething и MergeHalves.
 Как будет тестироваться ваш код
 Мы проверим, что:
-класс Any правильно печатает объекты разных типов,
-класс Any конструируется по универсальной ссылке на объект,
-класс Any при конструировании не совершает лишних копий и перемещений,
-класс Any не забывает удалить хранимый объект.
+MergeSomething правильно сливает различные контейнеры,
+MergeHalves правильно сливает половины вектора,
+контейнеры не копируются и не перемещаются,
+элементы не копируются и не перемещаются лишний раз.
