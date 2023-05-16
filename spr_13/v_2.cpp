@@ -1,4 +1,3 @@
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <algorithm>
 #include <iostream>
@@ -125,11 +124,12 @@ const std::vector<Domain> ReadDomains(istream& input, size_t count) {
     std::vector<Domain> domains;
     domains.reserve(count);
 
-    string line;
-    getline(input, line);
+
 
     for (size_t i = 0; i < count; ++i) {
         string domain;
+        string line;
+        getline(input, line);
         //input >> domain;
         std::istringstream(line) >> domain;
         domains.push_back(Domain(domain));
