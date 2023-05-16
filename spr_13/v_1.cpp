@@ -84,11 +84,11 @@ public:
     template <typename InputIt>
     DomainChecker(InputIt begin, InputIt end) {
         forbiddenDomains_ = std::vector<Domain>(begin, end);
-        /*std::sort(forbiddenDomains_.begin(), forbiddenDomains_.end(), [](Domain l, Domain r) {return
+        std::sort(forbiddenDomains_.begin(), forbiddenDomains_.end(), [](Domain l, Domain r) {return
             lexicographical_compare(l.GetDomain().begin(), l.GetDomain().end(),
                 r.GetDomain().begin(), r.GetDomain().end());
             });
-            */
+            
     
 
     // удаляем избыточные поддомены
