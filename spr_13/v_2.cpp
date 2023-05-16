@@ -38,7 +38,8 @@ public:
     }
 
     bool operator<(const Domain& other) const {
-        return inverse_domain_ < other.inverse_domain_;
+        //return inverse_domain_ < other.inverse_domain_;
+        return lexicographical_compare(inverse_domain_.begin(), inverse_domain_.end(), other.inverse_domain_.begin(), other.inverse_domain_.end());
     }
 
     // разработайте метод IsSubdomain, принимающий другой домен и возвращающий true, если this его поддомен
