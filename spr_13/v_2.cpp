@@ -23,6 +23,9 @@ std::string reverseAndAddDot(std::string str) {
     return reversedStr;
 }
 
+
+
+
 class Domain {
 public:
     Domain(string domain) {
@@ -59,6 +62,15 @@ private:
 
 };
 
+/*
+bool operator==(const Domain& this_is, const Domain& other) const {
+    return this_is.GetDomain() == other.GetDomain();
+}
+
+bool operator<(const Domain& this_is, const Domain& other) const {
+    return this_is.GetDomain() < other.GetDomain();
+}
+*/
 
 int binary_search(const std::vector<Domain>& v, const Domain& target) {
     int left = 0;
@@ -70,10 +82,17 @@ int binary_search(const std::vector<Domain>& v, const Domain& target) {
         if (v[mid] == target) {
             return mid;
         }
+        /*
         else if (lexicographical_compare(v[mid].GetDomain().begin(), v[mid].GetDomain().end(),
             target.GetDomain().begin(), target.GetDomain().end())) {
             left = mid + 1;
         }
+        */
+
+        else if (v[mid]< target) {
+            left = mid + 1;
+        }
+
         else {
             right = mid - 1;
         }
@@ -88,6 +107,7 @@ public:
     template <typename InputIt>
     DomainChecker(InputIt begin, InputIt end) {
         forbiddenDomains_ = std::vector<Domain>(begin, end);
+        
         /*
         std::sort(forbiddenDomains_.begin(), forbiddenDomains_.end(), [](Domain l, Domain r) {return
             lexicographical_compare(l.GetDomain().begin(), l.GetDomain().end(),
