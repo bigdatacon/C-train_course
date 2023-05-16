@@ -132,9 +132,10 @@ public:
     // разработайте метод IsForbidden, возвращающий true, если домен запрещён
     bool IsForbidden(const Domain& domain) const {
         //return std::find(forbiddenDomains_.begin(), forbiddenDomains_.end(), domain) != forbiddenDomains_.end() ;
-        int res =  binary_search(forbiddenDomains_, domain);
-        if (res == -1) { return false; }
-        else { return true; }
+        //int res =  binary_search(forbiddenDomains_, domain);
+        //if (res == -1) { return false; }
+        //else { return true; }
+        return bool(binary_search(forbiddenDomains_, domain) != -1);
 
     }
 
