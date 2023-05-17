@@ -11,10 +11,7 @@ using namespace std;
 
 void ParseAndProcessQuery(BudgetManager& manager, string_view line) {
     // разработайте функцию чтения и обработки запроса
-    //istringstream iss(line.data(), line.size());
-    istringstream iss(line.data(), static_cast<std::ios_base::openmode>(line.size()));
-
-    //istringstream iss(string(line));
+    istringstream iss(line.data(), line.size());
     string command;
 
     iss >> command;
@@ -30,6 +27,7 @@ void ParseAndProcessQuery(BudgetManager& manager, string_view line) {
 
         for (int i = 0; i < quant_days; ++i) {
             double money_in_day = amount / quant_days;
+            cout << "money_in_day : " << money_in_day << endl;
             DayInfo day_info(money_in_day);
 
             manager.Earn(day_info, initial_index);
@@ -51,8 +49,7 @@ void ParseAndProcessQuery(BudgetManager& manager, string_view line) {
         iss >> date_from_str >> date_to_str;
         Date date_from = Date::FromString(date_from_str);
         Date date_to = Date::FromString(date_to_str);
-        //cout << "Compute income : " << manager.ComputeIncome(date_from, date_to) << endl;
-        cout << manager.ComputeIncome(date_from, date_to) << endl;
+        cout << "Compute income : " << manager.ComputeIncome(date_from, date_to) << endl;
     }
 }
 
