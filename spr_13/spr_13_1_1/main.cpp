@@ -51,7 +51,8 @@ void ParseAndProcessQuery(BudgetManager& manager, string_view line) {
         iss >> date_from_str >> date_to_str;
         Date date_from = Date::FromString(date_from_str);
         Date date_to = Date::FromString(date_to_str);
-        cout << "Compute income : " << manager.ComputeIncome(date_from, date_to) << endl;
+        //cout << "Compute income : " << manager.ComputeIncome(date_from, date_to) << endl;
+        cout << manager.ComputeIncome(date_from, date_to) << endl;
     }
 }
 
