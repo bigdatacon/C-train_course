@@ -65,7 +65,7 @@ struct BulkTaxApplier {
         return *this;
     }
 
-    double factor = 0.5;
+    double factor = 1.0;
 };
 
 
