@@ -88,10 +88,12 @@ public:
     }
 
 
-    double Collapse(IncomeExpense origin, IndexSegment segment) const {
+    /*double*/ IncomeExpense Collapse(IncomeExpense origin, IndexSegment segment) const {
         //return origin * tax_.ComputeFactor() + add_.delta * static_cast<double>(segment.length());
-        
-        return origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length()) - add_.expense * static_cast<double>(segment.length());
+        double inc = origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length());
+        double exp = add_.expense * static_cast<double>(segment.length());
+        return IncomeExpense(inc, exp);
+        //return origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length()) - add_.expense * static_cast<double>(segment.length());
     }
 
 
