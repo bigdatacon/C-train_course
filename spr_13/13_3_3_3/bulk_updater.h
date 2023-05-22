@@ -84,7 +84,7 @@ public:
     void CombineWith(const BulkLinearUpdater& other) {
         //tax_.count += other.tax_.count;
         //.delta = add_.delta * other.tax_.ComputeFactor() + other.add_.delta;
-        add_.income = add_.income * other.tax_.ComputeFactor() + other.add_.income - other.add_.expense;
+        add_.income = add_.income * other.tax_.ComputeFactor() + other.add_.income * other.tax_.ComputeFactor() - other.add_.expense;
     }
 
 
