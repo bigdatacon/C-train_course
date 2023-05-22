@@ -55,6 +55,33 @@ namespace queries {
         }
 
         void Process(BudgetManager& budget) const override {
+            double day_spend = amount_ / (Date::ComputeDistance(GetFrom(), GetTo()) + 1);
+
+            budget.AddBulkOperation(GetFrom(), GetTo(), IncomeExpense{ 0, day_spend });
+        }
+
+        class Factory : public QueryFactory {
+        public:
+            std::unique_ptr<Query> Construct(std::string_view config) const override {
+                auto parts = Split(config, ' ');
+                double spendload = std::stod(std::string(parts[2])); //отрицательное число
+                //cout << spendload << endl;
+                return std::make_unique<Spend>(Date::FromString(parts[0]), Date::FromString(parts[1]), spendload);
+            }
+        };
+
+    private:
+        double amount_;
+    };
+    /*
+    class Spend : public ModifyQuery {
+    public:
+        Spend(Date from, Date to, double amount)
+            : ModifyQuery(from, to)
+            , amount_(amount) {
+        }
+
+        void Process(BudgetManager& budget) const override {
             double day_income = amount_ / (Date::ComputeDistance(GetFrom(), GetTo()) + 1);
 
             budget.AddBulkOperation(GetFrom(), GetTo(), IncomeExpense{ day_income, 0});
@@ -64,7 +91,7 @@ namespace queries {
         public:
             std::unique_ptr<Query> Construct(std::string_view config) const override {
                 auto parts = Split(config, ' ');
-                double spendload = -(std::stod(std::string(parts[2]))); //������������� �����
+                double spendload = -(std::stod(std::string(parts[2]))); //отрицательное число
                 //cout << spendload << endl;
                 return std::make_unique<Spend>(Date::FromString(parts[0]), Date::FromString(parts[1]), spendload);
             }
@@ -73,7 +100,7 @@ namespace queries {
     private:
         double amount_;
     };
-
+    */
     class PayTax : public ModifyQuery {
     public:
         using ModifyQuery::ModifyQuery;
