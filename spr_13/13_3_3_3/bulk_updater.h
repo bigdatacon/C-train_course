@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cmath>
 #include <iostream>
+#include <string>
 
 
 struct IncomeExpense {
@@ -96,6 +97,11 @@ public:
         //return origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length()) - add_.expense * static_cast<double>(segment.length());
     }
 
+    std::string ToString() const {
+        std::string str = "Add: Income=" + std::to_string(add_.income) + ", Expense=" + std::to_string(add_.expense) + "\n";
+        str += "Tax: Factor=" + std::to_string(tax_.ComputeFactor());
+        return str;
+    }
 
 
 private:
