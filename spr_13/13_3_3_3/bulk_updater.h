@@ -82,60 +82,37 @@ public:
         : tax_(tax) {
     }
 
-    /*В CombineWith нужно умножать процентные ставки. Расходы складываем, а доходы облагаем налогом, после чего тоже складываем.*/
+    /*
+
     void CombineWith(const BulkLinearUpdater& other) {
-        //tax_.count += other.tax_.count;
-        //.delta = add_.delta * other.tax_.ComputeFactor() + other.add_.delta;
-        // 
-        // Было
-        //add_.income = add_.income * other.tax_.ComputeFactor() + other.add_.income * other.tax_.ComputeFactor() - other.add_.expense;
-
-        // Стало:
-        /*
-        std::cout << "add_.expense before" << add_.expense << std::endl;
-        std::cout << "add_.income before" << add_.income << std::endl;
-
-        std::cout << "other_.expense before" << other.add_.expense << std::endl;
-        std::cout << "other_.income before" << other.add_.income << std::endl;
-        */
-
         add_.expense = add_.expense + other.add_.expense;
         add_.income = add_.income * (other.tax_.ComputeFactor() * tax_.ComputeFactor());
         add_.income = add_.income + other.add_.income * (other.tax_.ComputeFactor() * tax_.ComputeFactor());
-
-        /*
-        std::cout << "add_.expense after" << add_.expense << std::endl;
-        std::cout << "add_.income after" << add_.income << std::endl;
-
-        std::cout << "other_.expense after" << other.add_.expense << std::endl;
-        std::cout << "other_.income after" << other.add_.income << std::endl;
-        */
-
-
-
-
-
-
-
     }
 
 
-    /*double*/ IncomeExpense Collapse(IncomeExpense origin, IndexSegment segment) const {
-        //std::cout << "origin income before : " << origin.income <<  " origin.income * tax_.ComputeFactor() " << origin.income * tax_.ComputeFactor() << "  tax_.ComputeFactor() " << tax_.ComputeFactor()  << std::endl;
-        //std::cout << "add_.expense before : " << add_.expense << " add_.expense * static_cast<double>(segment.length()) " << add_.expense * static_cast<double>(segment.length()) << " static_cast<double>(segment.length())::  " << static_cast<double>(segment.length()) << std::endl;
-        //return origin * tax_.ComputeFactor() + add_.delta * static_cast<double>(segment.length());
-        
+    IncomeExpense Collapse(IncomeExpense origin, IndexSegment segment) const {
         double inc = origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length());
-        double exp = add_.expense * static_cast<double>(segment.length()) + origin.expense /* static_cast<double>(segment.length())*/;
-        //std::cout << "origin income after : " << inc << std::endl;
-        //std::cout << "origin expense afer : " << exp << std::endl;
+        double exp = add_.expense * static_cast<double>(segment.length()) + origin.expense ;
         return IncomeExpense(inc, exp);
-        //return origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length()) - add_.expense * static_cast<double>(segment.length());
+    }
+    */
+
+    void CombineWith(const BulkLinearUpdater& other) {
+
+        tax_.factor *= other.tax_.factor;
+
+        add_.income = add_.income * other.tax_.ComputeFactor() + other.add_.income;
+        add_.expense += other.add_.expense;
+    }
+
+
+    IncomeExpense Collapse(IncomeExpense origin, IndexSegment segment) const {
+        return { origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length()),
+                origin.expense + add_.expense * static_cast<double>(segment.length()) };
     }
 
     std::string ToString() const {
-       
-
         std::string str = "Add: Income=" + std::to_string(add_.income) + ", Expense=" + std::to_string(add_.expense) + "\n";
         str += "Tax: Factor=" + std::to_string(tax_.ComputeFactor());
         return str;
