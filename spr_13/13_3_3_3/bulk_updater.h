@@ -127,6 +127,8 @@ public:
         
         double inc = origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length());
         double exp = add_.expense * static_cast<double>(segment.length());
+        std::cout << "origin income after : " << inc << std::endl;
+        std::cout << "origin expense afer : " << exp << std::endl;
         return IncomeExpense(inc, exp);
         //return origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length()) - add_.expense * static_cast<double>(segment.length());
     }
