@@ -82,15 +82,49 @@ public:
         : tax_(tax) {
     }
 
+    /*В CombineWith нужно умножать процентные ставки. Расходы складываем, а доходы облагаем налогом, после чего тоже складываем.*/
     void CombineWith(const BulkLinearUpdater& other) {
         //tax_.count += other.tax_.count;
         //.delta = add_.delta * other.tax_.ComputeFactor() + other.add_.delta;
-        add_.income = add_.income * other.tax_.ComputeFactor() + other.add_.income * other.tax_.ComputeFactor() - other.add_.expense;
+        // 
+        // Было
+        //add_.income = add_.income * other.tax_.ComputeFactor() + other.add_.income * other.tax_.ComputeFactor() - other.add_.expense;
+
+        // Стало:
+        
+        std::cout << "add_.expense before" << add_.expense << std::endl;
+        std::cout << "add_.income before" << add_.income << std::endl;
+
+        std::cout << "other_.expense before" << other.add_.expense << std::endl;
+        std::cout << "other_.income before" << other.add_.income << std::endl;
+        
+
+        add_.expense = add_.expense + other.add_.expense;
+        add_.income = add_.income * (other.tax_.ComputeFactor() * tax_.ComputeFactor());
+        add_.income = add_.income + other.add_.income * (other.tax_.ComputeFactor() * tax_.ComputeFactor());
+
+        
+        std::cout << "add_.expense after" << add_.expense << std::endl;
+        std::cout << "add_.income after" << add_.income << std::endl;
+
+        std::cout << "other_.expense after" << other.add_.expense << std::endl;
+        std::cout << "other_.income after" << other.add_.income << std::endl;
+        
+
+
+
+
+
+
+
     }
 
 
     /*double*/ IncomeExpense Collapse(IncomeExpense origin, IndexSegment segment) const {
+        std::cout << "origin income before : " << origin.income << std::endl;
+        std::cout << "origin expense before : " << origin.expense << std::endl;
         //return origin * tax_.ComputeFactor() + add_.delta * static_cast<double>(segment.length());
+        
         double inc = origin.income * tax_.ComputeFactor() + add_.income * static_cast<double>(segment.length());
         double exp = add_.expense * static_cast<double>(segment.length());
         return IncomeExpense(inc, exp);
@@ -98,6 +132,8 @@ public:
     }
 
     std::string ToString() const {
+       
+
         std::string str = "Add: Income=" + std::to_string(add_.income) + ", Expense=" + std::to_string(add_.expense) + "\n";
         str += "Tax: Factor=" + std::to_string(tax_.ComputeFactor());
         return str;
