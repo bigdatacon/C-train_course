@@ -32,7 +32,7 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
     if constexpr (need_max) {
         for (; first != last; ++first) {
             const Elem& value = *first;
-            if (!max_tmp || value > *max_tmp) {
+            if (/*!max_tmp*/ std::is_same_v<typename std::remove_reference_t<decltype(max_tmp)>, std::nullopt_t> || value > *max_tmp) {
                 max_tmp = value;
             }
         }
@@ -42,7 +42,7 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
         
         for (; first != last; ++first) {
             const Elem& value = *first;
-            if (sum_tmp) {
+            if (/*sum_tmp*/ !std::is_same_v<typename std::remove_reference_t<decltype(sum_tmp)>, std::nullopt_t>) {
                 *sum_tmp += value;
             }
             else {
@@ -55,7 +55,7 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
         
         for (; first != last; ++first) {
             const Elem& value = *first;
-            if (sq_sum_tmp) {
+            if (/*sq_sum_tmp*/ !std::is_same_v<typename std::remove_reference_t<decltype(sq_sum_tmp)>, std::nullopt_t>) {
                 *sq_sum_tmp += value * value;
             }
             else {
@@ -75,6 +75,7 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
         out_max = std::move(*max_tmp);
     }
     */
+    
 }
 
 
