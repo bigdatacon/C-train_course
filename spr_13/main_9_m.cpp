@@ -12,59 +12,64 @@ using namespace std;
  
  
  
- 
 template <typename InputIt, typename OutSumType, typename OutSqSumType, typename OutMaxType>
 void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSumType& out_sq_sum, OutMaxType& out_max) {
-	using Elem = std::decay_t<decltype(*first)>;
- 
-	constexpr bool need_sum = !is_same_v<typename std::remove_reference_t<OutSumType>, const nullopt_t>;
-	constexpr bool need_sq_sum = !is_same_v<typename std::remove_reference_t<OutSqSumType>, const nullopt_t>;
-	constexpr bool need_max = !is_same_v<typename std::remove_reference_t<OutMaxType>, const nullopt_t>;
- 
- 
+    using Elem = std::decay_t<decltype(*first)>;
+
+    constexpr bool need_sum = !is_same_v<typename std::remove_reference_t<OutSumType>, nullopt_t>;
+    constexpr bool need_sq_sum = !is_same_v<typename std::remove_reference_t<OutSqSumType>, nullopt_t>;
+    constexpr bool need_max = !is_same_v<typename std::remove_reference_t<OutMaxType>, nullopt_t>;
+
+    std::optional<OutSumType> sum_tmp;
+    std::optional<OutSqSumType> sq_sum_tmp;
+    std::optional<OutMaxType> max_tmp;
+
     if constexpr (need_max) {
-		//Elem out_max{};
         for (; first != last; ++first) {
-        const Elem& value = *first;
-            if (!out_max || value > out_max) {
-				out_max = value;
-			}
- 
+            const Elem& value = *first;
+            if (!max_tmp || value > *max_tmp) {
+                max_tmp = value;
+            }
         }
- 
-	}
- 
-	if constexpr (need_sum) {
-		//Elem out_sum{};
+    }
+
+    if constexpr (need_sum) {
         const Elem& value = *first;
         for (; first != last; ++first) {
-            if (out_sum) {
-                out_sum += value;
+            if (sum_tmp) {
+                *sum_tmp += value;
             }
             else {
-                out_sum = value;
+                sum_tmp = value;
             }
         }
-	}
- 
-	if constexpr (need_sq_sum) {
+    }
+
+    if constexpr (need_sq_sum) {
         const Elem& value = *first;
-		//Elem out_sq_sum{};
-        for (; first != last; ++first){
-            if (out_sq_sum ) {
-				out_sq_sum += value*value;
-			}
-            else {
-			out_sq_sum += value * value;
+        for (; first != last; ++first) {
+            if (sq_sum_tmp) {
+                *sq_sum_tmp += value * value;
             }
- 
+            else {
+                sq_sum_tmp = value * value;
+            }
         }
-	}
- 
- 
+    }
+
+    if constexpr (need_sum) {
+        out_sum = std::move(*sum_tmp);
+    }
+    if constexpr (need_sq_sum) {
+        out_sq_sum = std::move(*sq_sum_tmp);
+    }
+    if constexpr (need_max) {
+        out_max = std::move(*max_tmp);
+    }
 }
- 
- 
+
+
+
 struct OnlySum {
 	int value;
 };
