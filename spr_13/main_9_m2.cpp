@@ -4,6 +4,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include <numeric>
 #include <cmath>
@@ -118,6 +119,11 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
 
 struct OnlySum {
     int value;
+
+    OnlySum() = default;  // Добавьте явное объявление конструктора по умолчанию
+
+    OnlySum(const OnlySum& other) = default;  // Явное объявление конструктора копирования
+
     bool operator>(const OnlySum& other) const {
         return value > other.value;
     }
@@ -127,6 +133,7 @@ struct OnlySum {
         return *this;
     }
 };
+
 
 OnlySum operator+(OnlySum l, OnlySum r) {
     return { l.value + r.value };
@@ -149,7 +156,7 @@ int main() {
     int sq_sum;
     std::optional<int> max;
 
-    // Переданы выходные параметры разных типов - std::nullopt_t, int и std::optional<int>
+    // РџРµСЂРµРґР°РЅС‹ РІС‹С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ СЂР°Р·РЅС‹С… С‚РёРїРѕРІ - std::nullopt_t, int Рё std::optional<int>
     ComputeStatistics(input.begin(), input.end(), nullopt, sq_sum, max);
 
     assert(sq_sum == 91 && max && *max == 6);
@@ -157,8 +164,12 @@ int main() {
     vector<OnlySum> only_sum_vector = { {100}, {-100}, {20} };
     OnlySum sum;
 
-    // Поданы значения поддерживающие только суммирование, но запрошена только сумма
+    // РџРѕРґР°РЅС‹ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґРґРµСЂР¶РёРІР°СЋС‰РёРµ С‚РѕР»СЊРєРѕ СЃСѓРјРјРёСЂРѕРІР°РЅРёРµ, РЅРѕ Р·Р°РїСЂРѕС€РµРЅР° С‚РѕР»СЊРєРѕ СЃСѓРјРјР°
     ComputeStatistics(only_sum_vector.begin(), only_sum_vector.end(), sum, nullopt, nullopt);
 
     assert(sum.value == 20);
+
+    std::cout << "Success" << std::endl;
+
+    return 0;
 }
