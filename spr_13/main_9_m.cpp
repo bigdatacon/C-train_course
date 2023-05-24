@@ -57,13 +57,13 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
         }
     }
 
-    if constexpr (need_sum) {
+    if constexpr (need_sum && sum_tmp) {
         out_sum = std::move(*sum_tmp);
     }
-    if constexpr (need_sq_sum) {
+    if constexpr (need_sq_sum && sq_sum_tmp) {
         out_sq_sum = std::move(*sq_sum_tmp);
     }
-    if constexpr (need_max) {
+    if constexpr (need_max && max_tmp) {
         out_max = std::move(*max_tmp);
     }
 }
@@ -81,6 +81,15 @@ OnlySum& operator+=(OnlySum& l, OnlySum r) {
 	return l = l + r;
 }
  
+OnlySum operator*(OnlySum l, OnlySum r) {
+    return { l.value * r.value };
+}
+
+OnlySum& operator*=(OnlySum& l, OnlySum r) {
+    return l = l * r;
+}
+
+
 int main() {
 	vector input = { 1, 2, 3, 4, 5, 6 };
 	int sq_sum;
