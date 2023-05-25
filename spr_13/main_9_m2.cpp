@@ -10,9 +10,6 @@
 #include <cmath>
 using namespace std;
 
-
-
-
 template <typename InputIt, typename OutSum, typename OutSqSum, typename OutMax>
 void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& out_sq_sum,
     OutMax& out_max) {
@@ -21,28 +18,6 @@ void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& o
     constexpr bool need_sum = !is_same_v<OutSum, const nullopt_t>;
     constexpr bool need_sq_sum = !is_same_v<OutSqSum, const nullopt_t>;
     constexpr bool need_max = !is_same_v<OutMax, const nullopt_t>;
-
-
-    /*constexpr bool need_sum = !is_same_v<typename std::remove_reference_t<OutSumType>, nullopt_t>;
-    constexpr bool need_sq_sum = !is_same_v<typename std::remove_reference_t<OutSqSumType>, nullopt_t>;
-    constexpr bool need_max = !is_same_v<typename std::remove_reference_t<OutMaxType>, nullopt_t>;*/
-    /*
-    constexpr bool need_sum = !std::is_same_v<typename std::remove_reference_t<OutSumType>, std::optional<Elem>>;
-    constexpr bool need_sq_sum = !std::is_same_v<typename std::remove_reference_t<OutSqSumType>, std::optional<Elem>>;
-    constexpr bool need_max = !std::is_same_v<typename std::remove_reference_t<OutMaxType>, std::optional<Elem>>;
-    */
-    /*
-    constexpr bool need_sum = std::is_same_v<typename std::remove_reference_t<OutSumType>, std::optional<Elem>>;
-    constexpr bool need_sq_sum = std::is_same_v<typename std::remove_reference_t<OutSqSumType>, std::optional<Elem>>;
-    constexpr bool need_max = std::is_same_v<typename std::remove_reference_t<OutMaxType>, std::optional<Elem>>;
-    */
-
-    /*
-    constexpr bool need_sum = std::is_same_v<typename std::remove_reference_t<OutSumType>, std::optional<Elem> > || std::is_same_v<typename std::remove_reference_t<OutSumType>, Elem>;
-    constexpr bool need_sq_sum = std::is_same_v<typename std::remove_reference_t<OutSqSumType>, std::optional<Elem> > || std::is_same_v<typename std::remove_reference_t<OutSqSumType>, Elem>;
-    constexpr bool need_max = std::is_same_v<typename std::remove_reference_t<OutMaxType>, std::optional<Elem> > || std::is_same_v<typename std::remove_reference_t<OutMaxType>, Elem>;
-    */
-
 
     std::optional<Elem> sum_tmp = nullopt;
     std::optional<Elem> sq_sum_tmp = nullopt;
@@ -58,10 +33,11 @@ void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& o
             sum_tmp = value;
         }
 
-
-        if (max_tmp || value > *max_tmp) {
+        /*
+        if  (max_tmp || value > *max_tmp) {
                 max_tmp = value;
             }
+            */
 
         if (sq_sum_tmp) {
             *sq_sum_tmp += value * value;
@@ -71,7 +47,15 @@ void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& o
         }
     }
 
-    
+        
+    if constexpr (need_max) {
+        for (; first != last; ++first) {
+            const Elem& value = *first;
+            if (max_tmp || value > *max_tmp) {
+                max_tmp = value;
+            }
+        }
+    }
 
     if constexpr (need_sum) {
         out_sum = std::move(*sum_tmp);
@@ -127,7 +111,6 @@ int main() {
     int sq_sum;
     std::optional<int> max;
 
-    // РџРµСЂРµРґР°РЅС‹ РІС‹С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ СЂР°Р·РЅС‹С… С‚РёРїРѕРІ - std::nullopt_t, int Рё std::optional<int>
     ComputeStatistics(input.begin(), input.end(), nullopt, sq_sum, max);
 
     assert(sq_sum == 91 && max && *max == 6);
@@ -135,7 +118,7 @@ int main() {
     vector<OnlySum> only_sum_vector = { {100}, {-100}, {20} };
     OnlySum sum;
 
-    // РџРѕРґР°РЅС‹ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґРґРµСЂР¶РёРІР°СЋС‰РёРµ С‚РѕР»СЊРєРѕ СЃСѓРјРјРёСЂРѕРІР°РЅРёРµ, РЅРѕ Р·Р°РїСЂРѕС€РµРЅР° С‚РѕР»СЊРєРѕ СЃСѓРјРјР°
+
     ComputeStatistics(only_sum_vector.begin(), only_sum_vector.end(), sum, nullopt, nullopt);
 
     assert(sum.value == 20);
