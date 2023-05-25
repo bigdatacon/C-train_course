@@ -13,9 +13,15 @@ using namespace std;
 
 
 
-template <typename InputIt, typename OutSumType, typename OutSqSumType, typename OutMaxType>
-void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSumType& out_sq_sum, OutMaxType& out_max) {
+template <typename InputIt, typename OutSum, typename OutSqSum, typename OutMax>
+void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& out_sq_sum,
+    OutMax& out_max) {
     using Elem = std::decay_t<decltype(*first)>;
+
+    constexpr bool need_sum = !is_same_v<OutSum, const nullopt_t>;
+    constexpr bool need_sq_sum = !is_same_v<OutSqSum, const nullopt_t>;
+    constexpr bool need_max = !is_same_v<OutMax, const nullopt_t>;
+
 
     /*constexpr bool need_sum = !is_same_v<typename std::remove_reference_t<OutSumType>, nullopt_t>;
     constexpr bool need_sq_sum = !is_same_v<typename std::remove_reference_t<OutSqSumType>, nullopt_t>;
@@ -31,9 +37,12 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
     constexpr bool need_max = std::is_same_v<typename std::remove_reference_t<OutMaxType>, std::optional<Elem>>;
     */
 
+    /*
     constexpr bool need_sum = std::is_same_v<typename std::remove_reference_t<OutSumType>, std::optional<Elem> > || std::is_same_v<typename std::remove_reference_t<OutSumType>, Elem>;
     constexpr bool need_sq_sum = std::is_same_v<typename std::remove_reference_t<OutSqSumType>, std::optional<Elem> > || std::is_same_v<typename std::remove_reference_t<OutSqSumType>, Elem>;
     constexpr bool need_max = std::is_same_v<typename std::remove_reference_t<OutMaxType>, std::optional<Elem> > || std::is_same_v<typename std::remove_reference_t<OutMaxType>, Elem>;
+    */
+
 
     std::optional<Elem> sum_tmp = nullopt;
     std::optional<Elem> sq_sum_tmp = nullopt;
@@ -42,18 +51,19 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
 
     for (; first != last; ++first) {
         const Elem& value = *first;
-        if ( !std::is_same_v<typename std::remove_reference_t<decltype(sum_tmp)>, std::nullopt_t>) {
+        if (sum_tmp) {
             *sum_tmp += *first;
         }
         else {
             sum_tmp = value;
         }
 
-        if ( std::is_same_v<typename std::remove_reference_t<decltype(max_tmp)>, std::nullopt_t> || value > *max_tmp) {
-            max_tmp = value;
-        }
 
-        if ( !std::is_same_v<typename std::remove_reference_t<decltype(sq_sum_tmp)>, std::nullopt_t>) {
+        if (max_tmp || value > *max_tmp) {
+                max_tmp = value;
+            }
+
+        if (sq_sum_tmp) {
             *sq_sum_tmp += value * value;
         }
         else {
@@ -61,58 +71,19 @@ void ComputeStatistics(InputIt first, InputIt last, OutSumType& out_sum, OutSqSu
         }
     }
 
-
-
-
-
-    /*
-    if constexpr (need_max) {
-        for (; first != last; ++first) {
-            const Elem& value = *first;
-            if ( std::is_same_v<typename std::remove_reference_t<decltype(max_tmp)>, std::nullopt_t> || value > *max_tmp) {
-                max_tmp = value;
-            }
-        }
-    }
-
-    if constexpr (need_sum) {
-        
-        for (; first != last; ++first) {
-            const Elem& value = *first;
-            if ( !std::is_same_v<typename std::remove_reference_t<decltype(sum_tmp)>, std::nullopt_t>) {
-                *sum_tmp += *first;
-            }
-            else {
-                sum_tmp = value;
-            }
-        }
-    }
-
-    if constexpr (need_sq_sum) {
-        
-        for (; first != last; ++first) {
-            const Elem& value = *first;
-            if (!std::is_same_v<typename std::remove_reference_t<decltype(sq_sum_tmp)>, std::nullopt_t>) {
-                *sq_sum_tmp += value * value;
-            }
-            else {
-                sq_sum_tmp = value * value;
-            }
-        }
-    }
-    */
     
+
     if constexpr (need_sum) {
         out_sum = std::move(*sum_tmp);
     }
     if constexpr (need_sq_sum) {
         out_sq_sum = std::move(*sq_sum_tmp);
     }
-    if constexpr (need_max ) {
+    if constexpr (need_max) {
         out_max = std::move(*max_tmp);
     }
-    
-    
+
+
 }
 
 
