@@ -26,11 +26,13 @@ void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& o
 
     for (; first != last; ++first) {
         const Elem& value = *first;
-        if (sum_tmp) {
-            *sum_tmp += *first;
-        }
-        else {
-            sum_tmp = value;
+        if constexpr (need_sum) {
+            if (sum_tmp) {
+                *sum_tmp += *first;
+            }
+            else {
+                sum_tmp = value;
+            }
         }
 
         /*
@@ -46,12 +48,13 @@ void ComputeStatistics(InputIt first, InputIt last, OutSum& out_sum, OutSqSum& o
             else { max_tmp = value; }
 
         }
-
-        if (sq_sum_tmp) {
-            *sq_sum_tmp += value * value;
-        }
-        else {
-            sq_sum_tmp = value * value;
+        if constexpr (need_sq_sum) {
+            if (sq_sum_tmp) {
+                *sq_sum_tmp += value * value;
+            }
+            else {
+                sq_sum_tmp = value * value;
+            }
         }
     }
 
@@ -123,7 +126,7 @@ int main() {
     ComputeStatistics(input.begin(), input.end(), nullopt, sq_sum, max);
 
     assert(sq_sum == 91 && max && *max == 6);
-    std::cout << "Success 1 assert" << std::endl;
+    //std::cout << "Success 1 assert" << std::endl;
     vector<OnlySum> only_sum_vector = { {100}, {-100}, {20} };
     OnlySum sum;
 
@@ -131,7 +134,7 @@ int main() {
     ComputeStatistics(only_sum_vector.begin(), only_sum_vector.end(), sum, nullopt, nullopt);
 
     assert(sum.value == 20);
-    std::cout << "Success 2 assert" << std::endl;
+    //std::cout << "Success 2 assert" << std::endl;
 
 
     return 0;
