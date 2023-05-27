@@ -71,7 +71,7 @@ namespace transport_catalogue {
 		size_t GetVertexIds(const std::set<domain::Stop, StopComparer>& stops_set, const domain::Stop* stop);
 
 		std::set<domain::Stop, StopComparer> GetStopSet();
-
+		std::string GetStopNameByEdgeId(size_t EdgeId);
 
 	private:
 		double bus_wait_time_ = 6;
