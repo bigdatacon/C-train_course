@@ -158,9 +158,9 @@ namespace transport_catalogue {
 	/*size_t TransportCatalogue::GetVertexIds(const domain::Stop* stop) {
 		std::set<domain::Stop, StopComparer> stops_set = GetStopSet();
 		for (auto it = stops_set.begin(); it != stops_set.end(); it++) {
-			// Проверяем, является ли первый элемент пары указателем на target
+			// РџСЂРѕРІРµСЂСЏРµРј, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ РїР°СЂС‹ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° target
 			if (it->stop_name == stop->stop_name) {
-				// Индекс элемента найден
+				// РРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° РЅР°Р№РґРµРЅ
 				std::size_t vertex_main = std::distance(stops_set.begin(), it);
 
 				return vertex_main;
@@ -171,16 +171,38 @@ namespace transport_catalogue {
 
 	size_t TransportCatalogue::GetVertexIds(const std::set<domain::Stop, StopComparer>& stops_set,  const domain::Stop* stop) {
 		for (auto it = stops_set.begin(); it != stops_set.end(); it++) {
-			// Проверяем, является ли первый элемент пары указателем на target
+			// РџСЂРѕРІРµСЂСЏРµРј, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ РїР°СЂС‹ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° target
 			if (it->stop_name == stop->stop_name) {
-				// Индекс элемента найден
+				// РРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° РЅР°Р№РґРµРЅ
 				std::size_t vertex_main = std::distance(stops_set.begin(), it);
 
 				return vertex_main;
 			}
 		}
 
-	};
+	}
+
+
+	std::string TransportCatalogue::GetStopNameByEdgeId(size_t EdgeId) {
+		stops_distance_time_ = GetstopsDistanceTime();
+		size_t map_indx=0;
+		int offset=0;
+
+		if (EdgeId == 0) { map_indx == 0; offset == 0; }
+		if (EdgeId == 1) { map_indx == 0; offset == 1; }
+		else {
+			if (EdgeId % 2 == 0) { map_indx == EdgeId / 2; offset == 0; } // РµСЃР»Рё СЂРµР±СЂРѕ С‡РµС‚РЅРѕРµ С‚Рѕ СЌС‚Рѕ РѕР¶РёРґР°РЅРёРµ 
+			else { map_indx == EdgeId / 2; offset == 1; } // РµСЃР»Рё СЂРµР±СЂРѕ РЅРµ С‡РµС‚РЅРѕРµ С‚Рѕ СЌС‚Рѕ РїРѕРµР·РґРєР° 
+		}
+
+		auto it = stops_distance_time_.begin();
+		std::advance(it, map_indx); // РџРµСЂРµРјРµС‰Р°РµРј РёС‚РµСЂР°С‚РѕСЂ Рє РЅСѓР¶РЅРѕРјСѓ РёРЅРґРµРєСЃСѓ
+		if (it != stops_distance_time_.end()) {
+			if (!offset) { return it->first.first->stop_name; }
+			else { return it->first.second->stop_name; }
+
+		}
+	}
 
 
 
