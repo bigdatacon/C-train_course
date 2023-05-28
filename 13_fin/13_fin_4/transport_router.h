@@ -13,13 +13,14 @@ struct Activity {
 	double time;
 	std::string type_activity;
 	std::string bus_name;
+	int span_count;
 };
 
 bool IsEmptyActivity(const Activity& activity) {
 	return activity.stop_name_from.empty() &&
 		activity.stop_name_to.empty() &&
 		activity.time == 0.0 &&
-		activity.type_activity.empty()&& activity.bus_name.empty();;
+		activity.type_activity.empty()&& activity.bus_name.empty() && activity.span_count==0;
 }
 
 void ClearActivity(Activity& activity) {
@@ -28,6 +29,7 @@ void ClearActivity(Activity& activity) {
 	activity.time = 0.0;
 	activity.type_activity.clear();
 	activity.bus_name.clear();
+	activity.span_count = 0.0;
 }
 
 
@@ -68,7 +70,7 @@ template <typename Weight>
 std::vector<Activity> GetRouteAndBuses(graph::DirectedWeightedGraph<Weight>& graph, std::optional<typename graph::Router<Weight>::RouteInfo>& route_info, transport_catalogue::TransportCatalogue tc) {
 	std::set<domain::Stop, StopComparer> stop_set = tc.GetStopSet();
 	double time = 0.0;
-
+	int span_count = 0;
 	std::vector<Activity> final_route;
 	Activity go_activity;
 
@@ -81,12 +83,14 @@ std::vector<Activity> GetRouteAndBuses(graph::DirectedWeightedGraph<Weight>& gra
 		if (Edge.from == Edge.to) {
 			if (!IsEmptyActivity(go_activity)) {
 				go_activity.time = time;
+				go_activity.span_count = span_count;
 				go_activity.stop_name_to = Edge.to;
 				go_activity.type_activity = 'go';
 				go_activity.bus_name = *actual_buses.begin();
 				final_route.push_back(go_activity);
 				ClearActivity(go_activity);
 				time = 0.0;
+				span_count =0;
 
 			}
 
@@ -111,6 +115,7 @@ std::vector<Activity> GetRouteAndBuses(graph::DirectedWeightedGraph<Weight>& gra
 				std::set<std::string> actual_buses_0_1 = GetCommonElements(actual_buses, buses_for_route_first_stop);
 				actual_buses = GetCommonElements(actual_buses_0_1, buses_for_route_second_stop);
 				time += Edge.weight;
+				span_count += 1;
 
 			}
 			else {
@@ -118,6 +123,7 @@ std::vector<Activity> GetRouteAndBuses(graph::DirectedWeightedGraph<Weight>& gra
 				buses_for_route_second_stop = GetStopInfo(second_stop_name);
 				actual_buses = GetCommonElements(buses_for_route_first_stop, buses_for_route_second_stop)
 				time += Edge.weight;
+				span_count += 1;
 				go_activity.stop_name_from = EdgId.from;
 			}
 		}
