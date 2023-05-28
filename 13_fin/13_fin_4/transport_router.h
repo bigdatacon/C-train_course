@@ -12,13 +12,14 @@ struct Activity {
 
 	double time;
 	std::string type_activity;
+	std::string bus_name;
 };
 
 bool IsEmptyActivity(const Activity& activity) {
 	return activity.stop_name_from.empty() &&
 		activity.stop_name_to.empty() &&
 		activity.time == 0.0 &&
-		activity.type_activity.empty();
+		activity.type_activity.empty()&& activity.bus_name.empty();;
 }
 
 void ClearActivity(Activity& activity) {
@@ -26,6 +27,7 @@ void ClearActivity(Activity& activity) {
 	activity.stop_name_to.clear();
 	activity.time = 0.0;
 	activity.type_activity.clear();
+	activity.bus_name.clear();
 }
 
 
@@ -36,16 +38,16 @@ std::set<std::string> GetCommonElements(const std::set<std::string>& set1, const
 }
 
 
-//DirectedWeightedGraph<int> graph(2); -- это нужно в main отдельно создать или передать 
+//DirectedWeightedGraph<int> graph(2); -- СЌС‚Рѕ РЅСѓР¶РЅРѕ РІ main РѕС‚РґРµР»СЊРЅРѕ СЃРѕР·РґР°С‚СЊ РёР»Рё РїРµСЂРµРґР°С‚СЊ 
 
 template <typename Weight>
 graph::Router<Weight> ProcessRoute(graph::DirectedWeightedGraph<Weight>& graph, graph::Router<Weight>& router, transport_catalogue::TransportCatalogue tc) {
 	std::cout << "start";
 
-	//DirectedWeightedGraph<int> graph(2);  // Создаем граф с 2 вершинами -- нужно создание графа вынести отдельно 
+	//DirectedWeightedGraph<int> graph(2);  // РЎРѕР·РґР°РµРј РіСЂР°С„ СЃ 2 РІРµСЂС€РёРЅР°РјРё -- РЅСѓР¶РЅРѕ СЃРѕР·РґР°РЅРёРµ РіСЂР°С„Р° РІС‹РЅРµСЃС‚Рё РѕС‚РґРµР»СЊРЅРѕ 
 	graph(2);
 	AddKnots(graph, tc);
-	//graph::Router router(graph); // переношу граф в роутер 
+	//graph::Router router(graph); // РїРµСЂРµРЅРѕС€Сѓ РіСЂР°С„ РІ СЂРѕСѓС‚РµСЂ 
 	router(graph);
 	return router;
 }
@@ -81,6 +83,7 @@ std::vector<Activity> GetRouteAndBuses(graph::DirectedWeightedGraph<Weight>& gra
 				go_activity.time = time;
 				go_activity.stop_name_to = Edge.to;
 				go_activity.type_activity = 'go';
+				go_activity.bus_name = *actual_buses.begin();
 				final_route.push_back(go_activity);
 				ClearActivity(go_activity);
 				time = 0.0;
