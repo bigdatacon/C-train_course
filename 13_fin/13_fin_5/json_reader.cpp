@@ -103,7 +103,7 @@ namespace transport_catalogue {
 				out_req_.push_back(outputstopjson);
 
 			}
-			/*
+			
 			if (json_obj.at("type").AsString() == "Route"s) {
 				outputstopjson.id = json_obj.at("id").AsInt();
 				outputstopjson.type = json_obj.at("type").AsString();
@@ -112,7 +112,7 @@ namespace transport_catalogue {
 
 				out_req_.push_back(outputstopjson);
 			}
-			добавиьт когда будет заменен файл инпут */ 
+
 
 
 			else {
@@ -191,12 +191,14 @@ namespace transport_catalogue {
 	
 	void InputReaderJson::ReadInputJsonRouteSettings() {
 		const auto& json_array_out = ((load_.GetRoot()).AsDict()).at("routing_settings"s);
-
-		for (const auto& file : json_array_out.AsArray()) {
+		const auto& json_obj = json_array_out.AsDict();
+		route_settings_.bus_velocity = json_obj.at("bus_velocity").AsDouble();
+		route_settings_.bus_wait_time = json_obj.at("bus_wait_time").AsDouble();
+		/*for (const auto& file : json_array_out.AsArray()) {
 			const auto& json_obj = file.AsDict();
 			route_settings_.bus_velocity = json_obj.at("bus_velocity").AsDouble();
 			route_settings_.bus_wait_time = json_obj.at("bus_wait_time").AsDouble();
-		}
+		}*/
 	}
 	
 
@@ -210,7 +212,7 @@ namespace transport_catalogue {
 		ReadInputJsonBaseRequest();
 		ReadInputJsonStatRequest();
 		ReadInputJsonRenderSettings();
-		//ReadInputJsonRouteSettings(); -- добавить потом после замены файла инпут
+		ReadInputJsonRouteSettings(); 
 	}
 
 
