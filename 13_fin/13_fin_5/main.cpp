@@ -27,6 +27,7 @@ int main() {
 	reader.UpdStop(tc);
 	reader.UpdBus(tc);
 	reader.UpdStopDist(tc);
+	reader.UpdRouteSettings(tc);
 	RenderData rd = reader.GetRenderData();
 	MapRenderer mapdrawer(rd);
 	reader.ManageOutputRequests(tc, mapdrawer);
