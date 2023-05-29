@@ -334,12 +334,12 @@ namespace transport_catalogue {
 				std::set<domain::Stop, transport_catalogue::StopComparer> stop_set = tc.GetStopSet();
 				size_t index_drom = tc.GetStopVertexIdByName(stop_set, el.from);
 				size_t index_to = tc.GetStopVertexIdByName(stop_set, el.from);
-				//std::optional<typename graph::Router<Weight>::RouteInfo> route_info = actprocess.GetShortestRoute(index_drom, index_to);
-				//std::vector<graph::Activity> final_route = actprocess.GetRouteAndBuses(route_info);
-				/*for (auto el : final_route) {
+				std::optional<typename graph::Router<Weight>::RouteInfo> route_info = actprocess.GetShortestRoute(index_drom, index_to);
+				std::vector<graph::Activity> final_route = actprocess.GetRouteAndBuses(route_info);
+				for (auto el : final_route) {
 
 					std::cout << el << std::endl;
-				}*/
+				}
 			}
 
 
