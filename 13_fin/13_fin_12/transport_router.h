@@ -94,6 +94,7 @@ namespace graph {
 		//template <typename Weight>
 		std::vector<Activity> GetRouteAndBuses(std::optional<typename graph::Router<Weight>::RouteInfo>& route_info) {
 			std::set<domain::Stop, transport_catalogue::StopComparer> stop_set = tc.GetStopSet();
+			double wait_time = tc.GetWaitTime();
 			double time = 0.0;
 			int span_count = 0;
 			std::vector<Activity> final_route;
@@ -106,7 +107,7 @@ namespace graph {
 			if (route_info.has_value()) {
 				const graph::Router<Weight>::RouteInfo& route_info_value = route_info.value();
 				for (size_t EdgId : route_info_value.edges) {
-					// дальнейший код
+					// РґР°Р»СЊРЅРµР№С€РёР№ РєРѕРґ
 				//}
 			//}
 
@@ -130,9 +131,9 @@ namespace graph {
 
 						Activity activity;
 						activity.type_activity = "Wait";
-						activity.time = Edge.weight;
-						activity.stop_name_from = Edge.from;
-						activity.stop_name_to = Edge.to;
+						activity.time = wait_time;
+						activity.stop_name_from = first_stop_name;
+						activity.stop_name_to = second_stop_name;
 						final_route.push_back(activity);
 
 						if (!actual_buses.empty()) {
@@ -149,12 +150,23 @@ namespace graph {
 							span_count += 1;
 						}
 						else {
+							if (span_count == 0) {
+								Activity activity;
+								activity.type_activity = "Wait";
+								activity.time = wait_time;
+								activity.stop_name_from = first_stop_name;
+								activity.stop_name_to = second_stop_name;
+								final_route.push_back(activity);
+							}
+
+
+
 							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
 							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
 							actual_buses = GetCommonElements(buses_for_route_first_stop, buses_for_route_second_stop);
 							time += Edge.weight;
 							span_count += 1;
-							go_activity.stop_name_from = Edge.from;
+							go_activity.stop_name_from = first_stop_name;
 						}
 					}
 				}
