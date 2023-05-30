@@ -82,7 +82,7 @@ namespace graph {
 
 
 				auto diff_time_in_return_way = stops_distance_time_.find(std::make_pair(it->first.second, it->first.first));
-				// если нет обратного пути то дублирую пару, а если есть, то ничего не делаю так как эта пара появится в основном цикле 
+				// РµСЃР»Рё РЅРµС‚ РѕР±СЂР°С‚РЅРѕРіРѕ РїСѓС‚Рё С‚Рѕ РґСѓР±Р»РёСЂСѓСЋ РїР°СЂСѓ, Р° РµСЃР»Рё РµСЃС‚СЊ, С‚Рѕ РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°СЋ С‚Р°Рє РєР°Рє СЌС‚Р° РїР°СЂР° РїРѕСЏРІРёС‚СЃСЏ РІ РѕСЃРЅРѕРІРЅРѕРј С†РёРєР»Рµ 
 				if (diff_time_in_return_way == stops_distance_time_.end()) { 
 					Edge<double> edge3 = { num_vertex_2_wait, num_vertex2_go, tc.GetWaitTime() };
 					Edge<double> edge4 = { num_vertex2_go, num_vertex_1_wait, it->second };
@@ -235,7 +235,7 @@ namespace graph {
 			if (route_info.has_value()) {
 				const graph::Router<Weight>::RouteInfo& route_info_value = route_info.value();
 
-				for (auto it = route_info_value.edges.begin(); it != route_info_value.edges.end(); ++it) {
+				for (auto it = route_info_value.edges.begin(); it != route_info_value.edges.end(); ++it) { 
 					auto EdgId = *it;
 					bool is_last_element = (it == std::prev(route_info_value.edges.end()));
 
@@ -283,7 +283,8 @@ namespace graph {
 							span_count += 1;
 						}
 						else {
-							if (span_count == 0) {
+							// РµСЃР»Рё РїРµСЂРІР°СЏ РїРѕРµР·РґР°РєР° - РЅРѕ РїРѕ РёРґРµРµ С‚Р°РєРѕРіРѕ Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ РµСЃР»Рё РѕР¶РёРґР°РЅСЏРё РІРѕР·РІСЂР°С‰Р°РµС‚ РјР°СЂС€СЂСѓС‚
+							/*if (span_count == 0) {
 								Activity activity;
 								activity.type_activity = "Wait";
 								activity.time = wait_time;
@@ -291,9 +292,7 @@ namespace graph {
 								activity.stop_name_to = second_stop_name;
 								activity.span_count = 0;
 								final_route.push_back(activity);
-							}
-
-
+							}*/
 
 							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
 							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
