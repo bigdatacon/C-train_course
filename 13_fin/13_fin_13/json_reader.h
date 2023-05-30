@@ -156,10 +156,14 @@ namespace transport_catalogue {
 					std::vector<graph::Activity> final_route = actprocess.GetRouteAndBuses(route_info);
 
 
-					//json::Node bus_route = json::Builder{}.StartArray()
+					std::vector<json::Node> array;
+
+					int request_id = el.id;
+					double total_time = 0;
+
 						
 					for (auto el : final_route) {
-						// —ÓÁ‰‡ÂÏ ˝ÍÁÂÏÔÎˇ Builder
+						// –°–æ–∑–¥–∞–µ–º —ç–∫–∑–µ–º–ø–ª—è—Ä Builder
 						
 						if (el.type_activity == "Wait") {
 
@@ -171,9 +175,11 @@ namespace transport_catalogue {
 								.Key("type").Value(el.type_activity)
 								.EndDict().Build();
 
-							queries.emplace_back(bus_route_description);
+							//queries.emplace_back(bus_route_description);
+							total_time += el.time;
+							array.push_back(bus_route_description);
 							
-							//bus_route.Value(bus_route_description)
+					
 
 
 						}
@@ -186,20 +192,23 @@ namespace transport_catalogue {
 								.Key("type").Value(el.type_activity)
 								.EndDict().Build();
 
-							queries.emplace_back(bus_route_description);
-							//bus_route.Value(bus_route_description)
+							//queries.emplace_back(bus_route_description);
+							total_time += el.time;
+							array.push_back(bus_route_description);
+							
 							
 						}
-						//.EndArray()
-						//.Build();
-	
-
 						
-
-
-
-
 					}
+					json::Node final_route_description = json::Builder{}
+						.StartDict()
+						.Key("items").Value(array)
+						.Key("request_id").Value(request_id)
+						.Key("time").Value(total_time)
+						.EndDict().Build();
+
+					queries.emplace_back(final_route_description);
+
 				}
 
 
