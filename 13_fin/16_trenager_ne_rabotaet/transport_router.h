@@ -301,6 +301,8 @@ namespace graph {
 
 				return final_route;
 			}
+            			else {return final_route;
+			}
 		}
 
 
