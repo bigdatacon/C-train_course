@@ -90,7 +90,7 @@ namespace graph {
 
 
 				auto diff_time_in_return_way = stops_distance_time_.find(std::make_pair(it->first.second, it->first.first));
-				// если нет обратного пути то дублирую пару, а если есть, то ничего не делаю так как эта пара появится в основном цикле 
+				// РµСЃР»Рё РЅРµС‚ РѕР±СЂР°С‚РЅРѕРіРѕ РїСѓС‚Рё С‚Рѕ РґСѓР±Р»РёСЂСѓСЋ РїР°СЂСѓ, Р° РµСЃР»Рё РµСЃС‚СЊ, С‚Рѕ РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°СЋ С‚Р°Рє РєР°Рє СЌС‚Р° РїР°СЂР° РїРѕСЏРІРёС‚СЃСЏ РІ РѕСЃРЅРѕРІРЅРѕРј С†РёРєР»Рµ 
 				if (diff_time_in_return_way == stops_distance_time_.end()) {
 					Edge<double> edge3 = { num_vertex_2_wait, num_vertex2_go, tc.GetWaitTime() };
 					Edge<double> edge4 = { num_vertex2_go, num_vertex_1_wait, it->second };
@@ -130,14 +130,14 @@ namespace graph {
 				std::string type = bus.type;
 				std::deque<std::string_view> stops = bus.stops;
 				for (auto it = stops.begin(); it != std::prev(stops.end()); ++it) {
-					std::string_view current = *it;
-					std::string_view next = *(std::next(it));
+					//std::string_view current = *it;
+					//std::string_view next = *(std::next(it));
 
 					size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
 					size_t num_vertex_2_wait = tc.GetStopVertexIdByName(stop_set, std::string(*(std::next(it)))) * 2;
 					size_t num_vertex1_go = num_vertex_1_wait + 1;
 
-					// нахожу расстояние для пары  остановок
+					// РЅР°С…РѕР¶Сѓ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґР»СЏ РїР°СЂС‹  РѕСЃС‚Р°РЅРѕРІРѕРє
 					const Stop* stop_1 = tc.FindStop(*it);
 					const Stop* stop_2 = tc.FindStop(*(std::next(it)));
 
@@ -147,26 +147,26 @@ namespace graph {
 					Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };
 					Edge<double> edge2 = { num_vertex1_go, num_vertex_2_wait, time_min_1_2 };
 
-					// Проверка наличия элемента
+					// РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЌР»РµРјРµРЅС‚Р°
 					if (!containsElement(added_edges_, edge1)) {
 					//if (!added_edges_.count(edge1)) {
-						size_t Edge_id_wait_forward_1 = graph.AddEdge(edge1);
+						//size_t Edge_id_wait_forward_1 = graph.AddEdge(edge1);
 						//added_edges_.emplace(edge1, Edge_id_wait_forward_1);
 						added_edges_.push_back(edge1);
 					}
 
 					if (!containsElement(added_edges_, edge2)) {
 					//if (!added_edges_.count(edge2)) {
-						size_t Edge_id_go_forward_2 = graph.AddEdge(edge2);
+						//size_t Edge_id_go_forward_2 = graph.AddEdge(edge2);
 						//added_edges_.emplace(edge2, Edge_id_go_forward_2);
 						added_edges_.push_back(edge2);
 					}
 
 					if (type != "true") {
 						size_t num_vertex2_go = num_vertex_2_wait + 1;
-					// добавляю путь обратно если такой есть 
+					// РґРѕР±Р°РІР»СЏСЋ РїСѓС‚СЊ РѕР±СЂР°С‚РЅРѕ РµСЃР»Рё С‚Р°РєРѕР№ РµСЃС‚СЊ 
 						int distance_2_1 = tc.GetStopDistance(*stop_2, *stop_1);
-						if (distance_2_1) {
+						if (distance_2_1!= distance_1_2) {
 							double time_min_2_1 = distance_2_1 / (tc.GetVelocity() * 1000 / 60);
 							
 
@@ -176,14 +176,14 @@ namespace graph {
 
 							if (!containsElement(added_edges_, edge3)) {
 							//if (!added_edges_.count(edge3)) {
-								size_t Edge_id_wait_backward_1 = graph.AddEdge(edge3);
+								//size_t Edge_id_wait_backward_1 = graph.AddEdge(edge3);
 								//added_edges_.emplace(edge3, Edge_id_wait_backward_1);
 								added_edges_.push_back(edge3);
 							}
 
 							if (!containsElement(added_edges_, edge4)) {
 							//if (!added_edges_.count(edge4)) {
-								size_t Edge_id_go_backward_2 = graph.AddEdge(edge4);
+								//size_t Edge_id_go_backward_2 = graph.AddEdge(edge4);
 								//added_edges_.emplace(edge4, Edge_id_go_backward_2);
 								added_edges_.push_back(edge4);
 							}
@@ -191,22 +191,23 @@ namespace graph {
 							
 						}
 						else {
-							// если обратного пути нет, то для не кольцевого маршрута просто дублирую ребро в обратную сторону
+							// РµСЃР»Рё РѕР±СЂР°С‚РЅРѕРіРѕ РїСѓС‚Рё РЅРµС‚, С‚Рѕ РґР»СЏ РЅРµ РєРѕР»СЊС†РµРІРѕРіРѕ РјР°СЂС€СЂСѓС‚Р° РїСЂРѕСЃС‚Рѕ РґСѓР±Р»РёСЂСѓСЋ СЂРµР±СЂРѕ РІ РѕР±СЂР°С‚РЅСѓСЋ СЃС‚РѕСЂРѕРЅСѓ
 							Edge<double> edge3 = { num_vertex_2_wait, num_vertex2_go, tc.GetWaitTime() };
 							Edge<double> edge4 = { num_vertex2_go, num_vertex_1_wait, time_min_1_2 };
 
 							if (!containsElement(added_edges_, edge3)) {
-								size_t Edge_id_wait_backward_1 = graph.AddEdge(edge3);
+								//size_t Edge_id_wait_backward_1 = graph.AddEdge(edge3);
 								//added_edges_.emplace(edge3, Edge_id_wait_backward_1);
 								added_edges_.push_back(edge3);
 							}
 
 							if (!containsElement(added_edges_, edge4)) {
-								size_t Edge_id_go_backward_2 = graph.AddEdge(edge4);
+								//size_t Edge_id_go_backward_2 = graph.AddEdge(edge4);
 								//added_edges_.emplace(edge4, Edge_id_go_backward_2);
 								added_edges_.push_back(edge4);
 							}
 						}
+						
 					
 					}
 
@@ -246,7 +247,8 @@ namespace graph {
 
 
 			if (route_info.has_value()) {
-				const graph::Router<Weight>::RouteInfo& route_info_value = route_info.value();
+				//const graph::Router<Weight>::RouteInfo& route_info_value = route_info.value();
+                const auto & route_info_value = route_info.value();
 
 				for (auto it = route_info_value.edges.begin(); it != route_info_value.edges.end(); ++it) {
 					auto EdgId = *it;
