@@ -151,6 +151,7 @@ namespace graph {
 					if (!containsElement(added_edges_, edge1)) {
 					//if (!added_edges_.count(edge1)) {
 						//size_t Edge_id_wait_forward_1 = graph.AddEdge(edge1);
+                        graph.AddEdge(edge1);
 						//added_edges_.emplace(edge1, Edge_id_wait_forward_1);
 						added_edges_.push_back(edge1);
 					}
@@ -158,6 +159,7 @@ namespace graph {
 					if (!containsElement(added_edges_, edge2)) {
 					//if (!added_edges_.count(edge2)) {
 						//size_t Edge_id_go_forward_2 = graph.AddEdge(edge2);
+                        graph.AddEdge(edge2);
 						//added_edges_.emplace(edge2, Edge_id_go_forward_2);
 						added_edges_.push_back(edge2);
 					}
@@ -177,6 +179,7 @@ namespace graph {
 							if (!containsElement(added_edges_, edge3)) {
 							//if (!added_edges_.count(edge3)) {
 								//size_t Edge_id_wait_backward_1 = graph.AddEdge(edge3);
+                                graph.AddEdge(edge3);
 								//added_edges_.emplace(edge3, Edge_id_wait_backward_1);
 								added_edges_.push_back(edge3);
 							}
@@ -184,6 +187,7 @@ namespace graph {
 							if (!containsElement(added_edges_, edge4)) {
 							//if (!added_edges_.count(edge4)) {
 								//size_t Edge_id_go_backward_2 = graph.AddEdge(edge4);
+                                graph.AddEdge(edge4);
 								//added_edges_.emplace(edge4, Edge_id_go_backward_2);
 								added_edges_.push_back(edge4);
 							}
@@ -197,12 +201,14 @@ namespace graph {
 
 							if (!containsElement(added_edges_, edge3)) {
 								//size_t Edge_id_wait_backward_1 = graph.AddEdge(edge3);
+                                graph.AddEdge(edge3);
 								//added_edges_.emplace(edge3, Edge_id_wait_backward_1);
 								added_edges_.push_back(edge3);
 							}
 
 							if (!containsElement(added_edges_, edge4)) {
 								//size_t Edge_id_go_backward_2 = graph.AddEdge(edge4);
+                                graph.AddEdge(edge4);
 								//added_edges_.emplace(edge4, Edge_id_go_backward_2);
 								added_edges_.push_back(edge4);
 							}
@@ -248,7 +254,7 @@ namespace graph {
 
 			if (route_info.has_value()) {
 				//const graph::Router<Weight>::RouteInfo& route_info_value = route_info.value();
-                const auto & route_info_value = route_info.value();
+				const auto& route_info_value = route_info.value();
 
 				for (auto it = route_info_value.edges.begin(); it != route_info_value.edges.end(); ++it) {
 					auto EdgId = *it;
