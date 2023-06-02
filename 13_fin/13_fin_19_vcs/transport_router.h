@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ranges.h"
 #include "router.h"
 #include "graph.h"
@@ -81,30 +81,60 @@ namespace graph {
 
 			for (auto it = stops.begin(); it != std::prev(stops.end()); ++it) {
 
-				size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
-				size_t num_vertex_2_wait = tc.GetStopVertexIdByName(stop_set, std::string(*(std::next(it)))) * 2;
-				size_t num_vertex1_go = num_vertex_1_wait + 1;
+				if (it == std::prev(stops.end())) {
+					size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
+					size_t num_vertex_2_go = tc.GetStopVertexIdByName(stop_set, std::string(*(std::next(it)))) * 2 + 1;
+					size_t num_vertex1_go = num_vertex_1_wait + 1;
 
-				// нахожу расстояние для пары  остановок
-				const Stop* stop_1 = tc.FindStop(*it);
-				const Stop* stop_2 = tc.FindStop(*(std::next(it)));
+					// нахожу расстояние для пары  остановок
+					const Stop* stop_1 = tc.FindStop(*it);
+					const Stop* stop_2 = tc.FindStop(*(std::next(it)));
 
-				int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
-				double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60);
+					int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
+					double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60);
 
-				Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };
-				Edge<double> edge2 = { num_vertex1_go, num_vertex_2_wait, time_min_1_2 };
+					Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };
+					Edge<double> edge2 = { num_vertex1_go, num_vertex_2_go, time_min_1_2 };
+					// Проверка наличия элемента
+					if (!containsElement(added_edges_, edge1)) {
+						graph.AddEdge(edge1);
+						added_edges_.push_back(edge1);
+					}
 
-				// Проверка наличия элемента
-				if (!containsElement(added_edges_, edge1)) {
-					graph.AddEdge(edge1);
-					added_edges_.push_back(edge1);
+					if (!containsElement(added_edges_, edge2)) {
+						graph.AddEdge(edge2);
+						added_edges_.push_back(edge2);
+					}
+
+				}
+				else {
+
+					size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
+					size_t num_vertex_2_wait = tc.GetStopVertexIdByName(stop_set, std::string(*(std::next(it)))) * 2;
+					size_t num_vertex1_go = num_vertex_1_wait + 1;
+
+					// нахожу расстояние для пары  остановок
+					const Stop* stop_1 = tc.FindStop(*it);
+					const Stop* stop_2 = tc.FindStop(*(std::next(it)));
+
+					int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
+					double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60);
+
+					Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };
+					Edge<double> edge2 = { num_vertex1_go, num_vertex_2_wait, time_min_1_2 };
+					// Проверка наличия элемента
+					if (!containsElement(added_edges_, edge1)) {
+						graph.AddEdge(edge1);
+						added_edges_.push_back(edge1);
+					}
+
+					if (!containsElement(added_edges_, edge2)) {
+						graph.AddEdge(edge2);
+						added_edges_.push_back(edge2);
+					}
 				}
 
-				if (!containsElement(added_edges_, edge2)) {
-					graph.AddEdge(edge2);
-					added_edges_.push_back(edge2);
-				}
+
 
 
 			}
@@ -168,6 +198,7 @@ namespace graph {
 					graph.AddEdge(edge2);
 					added_edges_.push_back(edge2);
 				}
+
 
 			}
 
