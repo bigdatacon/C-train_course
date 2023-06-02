@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ranges.h"
 #include "router.h"
 #include "graph.h"
