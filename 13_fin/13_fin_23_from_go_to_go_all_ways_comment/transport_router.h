@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ranges.h"
 #include "router.h"
 #include "graph.h"
@@ -79,81 +79,83 @@ namespace graph {
 
 
 		void AddStopsOneDirection(std::deque<std::string_view> stops, std::set<domain::Stop, transport_catalogue::StopComparer> stop_set) {
+			
 			for (auto it = stops.begin(); it != std::prev(stops.end()); ++it) {
-				double sum_time = 0; // накапливаемое время
-
+				bool first = true;
+				double sum_time = 0; // накапливаемое время движения по ходу маршрута с каждой следующей остановкой сюда 
 
 				size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
-				size_t num_vertex_2_wait = tc.GetStopVertexIdByName(stop_set, std::string(*(std::next(it)))) * 2;
-				size_t num_vertex_2_go = num_vertex_2_wait  + 1;
 				size_t num_vertex1_go = num_vertex_1_wait + 1;
 
-				// нахожу расстояние для пары  остановок
 				const Stop* stop_1 = tc.FindStop(*it);
-				const Stop* stop_2 = tc.FindStop(*(std::next(it)));
 
-				int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
-				double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60);
+				Edge<double> edge_mirror = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };  // добавляю ребро зеркало для первой остановки 
 
-				if (it+2 == stops.end()) { // проверяю что следующий элемент последний - тогда для него нужно ехать до wait
-					Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };
-					Edge<double> edge2 = { num_vertex1_go, num_vertex_2_wait, time_min_1_2 };
-					// Проверка наличия элемента
-					if (!containsElement(added_edges_, edge1)) {
-						graph.AddEdge(edge1);
-						added_edges_.push_back(edge1);
-					}
-
-					if (!containsElement(added_edges_, edge2)) {
-						graph.AddEdge(edge2);
-						added_edges_.push_back(edge2);
-					}
-
-				}
-				else {
-					Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };
-					Edge<double> edge2 = { num_vertex1_go, num_vertex_2_go, time_min_1_2 };
-					// Проверка наличия элемента
-					if (!containsElement(added_edges_, edge1)) {
-						graph.AddEdge(edge1);
-						added_edges_.push_back(edge1);
-					}
-
-					if (!containsElement(added_edges_, edge2)) {
-						graph.AddEdge(edge2);
-						added_edges_.push_back(edge2);
-					}
-
-				
+				if (!containsElement(added_edges_, edge_mirror)) {
+					graph.AddEdge(edge_mirror);
+					added_edges_.push_back(edge_mirror);
 				}
 
+				// ребра на "ЕХАТЬ из останвовки во внешнем цикле добавяю во внутреннем"
+				for (auto it_inner = stops.begin()+1; it_inner != std::prev(stops.end()); ++it_inner) {  // иду до предпоследней останвокий так как вторая в паре остановка - последняя в такой конструкции вроде как 
+					if (first) { // тут заполняю первое ребро от внешней остановки до следующей -- ближайшей к внешней
+						size_t num_vertex_inner_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it_inner)) * 2;
+						size_t num_vertex_inner_go = num_vertex_inner_wait + 1;
+						const Stop* stop_inner = tc.FindStop(*it_inner);
+						int distance_1_2 = tc.GetStopDistance(*stop_1,  *stop_inner); // расстояние от остановки 
+						double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60) + sum_time;
+						sum_time += distance_1_2; // увеличиваю время 
+						Edge<double> edge_go = { num_vertex1_go, num_vertex_inner_go , time_min_1_2 };
+						// Проверка наличия элемента
 
+						if (!containsElement(added_edges_, edge_go)) {
+							graph.AddEdge(edge_go);
+							added_edges_.push_back(edge_go);
+						}
 
-				sum_time += time_min_1_2;
-
-				for (auto it_inner = stops.begin()+1; it_inner != stops.end()-2; ++it_inner) {
-					size_t num_vertex_2in_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it_inner)) * 2;
-					size_t num_vertex2in_go = num_vertex_2in_wait + 1;
-
-					// нахожу расстояние для пары  остановок
-					const Stop* stop_1 = tc.FindStop(*it_inner);
-					const Stop* stop_2 = tc.FindStop(*(std::next(it_inner)));
-
-
-					int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
-					double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60) + sum_time;
-					std::cout << "Stop1 , Stop 2" << std::string(*it_inner) << " " << *(std::next(it_inner)) << " time_min_1_2 " << time_min_1_2 << std::endl;
-
-					//Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() }; // Это ребро уже добавлено в основном цикле
-					Edge<double> edge2 = { num_vertex1_go, num_vertex2in_go, time_min_1_2 };
-					// Проверка наличия элемента
-
-					if (!containsElement(added_edges_, edge2)) {
-						graph.AddEdge(edge2);
-						added_edges_.push_back(edge2);
+						first = false;
 					}
 
-					sum_time = time_min_1_2;
+					// тут уже (это значит минимум через одну остановку от той что во внешнем цикле - ищу растояние между сосединими и к нему прибавляю расстояние (то есть время) накопленное пока ехал до этой пары остановок а именно до 1)
+
+					size_t num_vertex_inner_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it_inner)) * 2;
+					size_t num_vertex_inner_go = num_vertex_inner_wait + 1;
+
+					size_t num_vertex_inner_next_wait = tc.GetStopVertexIdByName(stop_set, std::string(*std::next(it_inner))) * 2;
+					size_t num_vertex_inner_next_go = num_vertex_inner_next_wait + 1;
+
+					const Stop* stop_inner = tc.FindStop(*it_inner);
+					const Stop* stop_inner_next = tc.FindStop(*(std::next(it_inner)));
+					int distance_1_2 = tc.GetStopDistance(*stop_inner, *stop_inner_next); // расстояние от остановки 
+
+
+					double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60) + sum_time; // увиличиваю время на то что уже было накоплено пока ехал до этой остановки 
+					//std::cout << "Stop1 , Stop 2" << std::string(*it_inner) << " " << *it << " time_min_1_2 " << time_min_1_2 << std::endl;
+
+					
+					if (it_inner+1 == std::prev(stops.end())) { // проверяю что дошел до предпоследней остановки , значит в последнюю едем в зеракало то есть в wait но тут не уверен нужно prev(stops.end() или просто stops.end() !!!!????
+						
+						Edge<double> edge_mirror = { num_vertex1_go, num_vertex_inner_next_wait , time_min_1_2 };
+						// Проверка наличия элемента
+
+						if (!containsElement(added_edges_, edge_mirror)) {
+							graph.AddEdge(edge_mirror);
+							added_edges_.push_back(edge_mirror);
+						}
+
+					}
+
+					else {
+						Edge<double> edge_go = { num_vertex1_go, num_vertex_inner_next_go , time_min_1_2 };
+						// Проверка наличия элемента
+
+						if (!containsElement(added_edges_, edge_go)) {
+							graph.AddEdge(edge_go);
+							added_edges_.push_back(edge_go);
+						}
+					}
+
+					sum_time = time_min_1_2; // присваиваю значение накопленного времени - текущее потраченное время 
 					
 				}
 			}
