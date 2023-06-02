@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ranges.h"
 #include "router.h"
 #include "graph.h"
@@ -81,7 +81,7 @@ namespace graph {
 
 			for (auto it = stops.begin(); it != std::prev(stops.end()); ++it) {
 
-				if (it == std::prev(stops.end())) {
+				if (std::next(it) == std::prev(stops.end())) {  // когда след остановка последняя 
 					size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
 					size_t num_vertex_2_go = tc.GetStopVertexIdByName(stop_set, std::string(*(std::next(it)))) * 2 + 1;
 					size_t num_vertex1_go = num_vertex_1_wait + 1;
@@ -174,7 +174,7 @@ namespace graph {
 			// заполняю остановки в обратном направлении 
 			for (auto it = stops.rbegin() + 1; it != stops.rend(); ++it) {
 
-				size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*(it - 1) )) * 2;
+				size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*(it - 1))) * 2;
 				size_t num_vertex_2_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
 				size_t num_vertex1_go = num_vertex_1_wait + 1;
 
@@ -344,5 +344,4 @@ namespace graph {
 
 	};
 }
-
 
