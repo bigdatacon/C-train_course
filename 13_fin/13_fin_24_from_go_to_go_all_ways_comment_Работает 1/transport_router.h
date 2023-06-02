@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ranges.h"
 #include "router.h"
 #include "graph.h"
@@ -84,8 +84,15 @@ namespace graph {
 				double sum_time = 0; // накапливаемое время движения по ходу маршрута с каждой следующей остановкой сюда 
 				size_t num_vertex_1_wait = tc.GetStopVertexIdByName(stop_set, std::string(*it)) * 2;
 				size_t num_vertex1_go = num_vertex_1_wait + 1;
+				size_t num_vertex_next_wait = tc.GetStopVertexIdByName(stop_set, std::string(*std::next(it))) * 2;
+				size_t num_vertex_next_go = num_vertex_next_wait + 1;
 
-				if (it == std::prev(stops.end())) { // проверяю что дошел до последней остановки , значит  едем в зеракало и цикл завершается  то есть в wait но тут не уверен нужно prev(stops.end() или просто stops.end() !!!!????
+				const Stop* stop_1 = tc.FindStop(*it);
+				const Stop* stop_1_next = tc.FindStop(*std::next(it));
+				int distance_inner = tc.GetStopDistance(*stop_1, *stop_1_next); // расстояние от остановки 
+				double time_inner = distance_inner / (tc.GetVelocity() * 1000 / 60) + sum_time;
+
+				if (it+1 == std::prev(stops.end())) { // проверяю что дошел до предпоследней остановки 
 
 					Edge<double> edge_mirror = { num_vertex_1_wait, num_vertex1_go  ,  tc.GetWaitTime() };
 					// Проверка наличия элемента
@@ -95,20 +102,18 @@ namespace graph {
 						added_edges_.push_back(edge_mirror);
 					}
 
+					Edge<double> edge_go = { num_vertex1_go ,  num_vertex_next_wait  ,  time_inner }; // еду до последней до wait так как дальше нужно пересесть 
+					// Проверка наличия элемента
+
+					if (!containsElement(added_edges_, edge_go)) {
+						graph.AddEdge(edge_go);
+						added_edges_.push_back(edge_go);
+					}
+
 					break;
 
 				}
 
-
-
-
-				size_t num_vertex_next_wait = tc.GetStopVertexIdByName(stop_set, std::string(*std::next(it))) * 2;
-				size_t num_vertex_next_go = num_vertex_next_wait + 1;
-
-				const Stop* stop_1 = tc.FindStop(*it);
-				const Stop* stop_1_next = tc.FindStop(*std::next(it));
-				int distance_inner = tc.GetStopDistance(*stop_1, *stop_1_next); // расстояние от остановки 
-				double time_inner = distance_inner / (tc.GetVelocity() * 1000 / 60) + sum_time;
 
 				Edge<double> edge_mirror = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() };  // добавляю ребро зеркало для первой остановки 
 				Edge<double> edge_go = { num_vertex1_go, num_vertex_next_go, time_inner };  // добавляю ребро зеркало для первой остановки 
@@ -280,7 +285,7 @@ namespace graph {
 							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
 							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
 							std::set<std::string> actual_buses_0_1 = GetCommonElements(actual_buses, buses_for_route_first_stop);
-							actual_buses = GetCommonElements(actual_buses_0_1, buses_for_route_second_stop);
+							actual_buses = GetCommonElements(actual_buses_0_1, actual_buses);
 							time += Edge.weight;
 							span_count += 1;
 						}
