@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ranges.h"
 #include "router.h"
 #include "graph.h"
@@ -117,7 +116,7 @@ namespace graph {
 
 					// нахожу расстояние для пары  остановок
 					const Stop* stop_1 = tc.FindStop(*it_inner);
-					const Stop* stop_2 = tc.FindStop(*(std::next(it_inner)));
+					const Stop* stop_2 = tc.FindStop(*(std::next(it_inner))); // тут падает когда в stops менее 2 и менее элементов 
 
 
 					int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
@@ -169,7 +168,7 @@ namespace graph {
 					AddStopsOneDirection(stops, stop_set);
 				}
 				else {
-					//std::cout << "Non_round_TRIP" << std::endl;
+					std::cout << "Non_round_TRIP" << std::endl;
 
 					AddStopsNonRoundTrip(stops, stop_set);
 				}
@@ -179,7 +178,7 @@ namespace graph {
 
 		//template <typename Weight>
 		graph::Router<Weight> ProcessRoute() {
-			//std::cout << "start";
+			std::cout << "start";
 			AddKnots();
 			graph::Router<Weight> router(graph);
 			//router_(graph);
@@ -187,10 +186,157 @@ namespace graph {
 		}
 
 		//template <typename Weight>
+
+
+
 		std::optional<typename graph::Router<Weight>::RouteInfo> GetShortestRoute(graph::VertexId from, graph::VertexId to, graph::Router<Weight>& router) {
 			return router.BuildRoute(from, to);
 		}
 
+		/*
+		std::vector<Activity> GetRouteAndBuses(std::optional<typename graph::Router<Weight>::RouteInfo>& route_info) {
+			std::set<domain::Stop, transport_catalogue::StopComparer> stop_set = tc.GetStopSet();
+			double wait_time = tc.GetWaitTime();
+			double time = 0.0;
+			int span_count = 0;
+			std::vector<Activity> final_route;
+			Activity go_activity;
+
+			std::set<std::string> actual_buses;
+			std::set<std::string> buses_for_route_first_stop;
+			std::set<std::string> buses_for_route_second_stop;
+
+			if (route_info.has_value()) {
+				//const graph::Router<Weight>::RouteInfo& route_info_value = route_info.value();
+				const auto& route_info_value = route_info.value();
+				bool first = true;
+				for (auto it = route_info_value.edges.begin(); it != route_info_value.edges.end(); ++it) {
+					auto EdgId = *it;
+					bool is_last_element = (it == std::prev(route_info_value.edges.end()));
+
+
+					auto Edge = graph.GetEdge(EdgId);
+					std::string first_stop_name = tc.GetStopNameByVertexId(stop_set, Edge.from);
+					std::string second_stop_name = tc.GetStopNameByVertexId(stop_set, Edge.to);
+
+					if (first_stop_name == second_stop_name) {
+						if (first )  {
+
+							Activity activity;
+							activity.type_activity = "Wait";
+							activity.time = wait_time;
+							activity.stop_name_from = first_stop_name;
+							activity.stop_name_to = second_stop_name;
+							activity.span_count = 0;
+							final_route.push_back(activity);
+							first = false;
+
+						}
+
+
+						if (!actual_buses.empty()) {
+
+							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
+							actual_buses = GetCommonElements(actual_buses, buses_for_route_first_stop);
+
+							if (actual_buses.size()!=0) {
+								continue; // не добавляю ожидание так как могу ехать на том же  на том же автобусе
+
+							}
+							else {
+								go_activity.time = time;
+								go_activity.span_count = span_count;
+								go_activity.stop_name_to = first_stop_name;
+								go_activity.type_activity = "Bus";
+								go_activity.bus_name = *buses_for_route_first_stop.begin();
+								final_route.push_back(go_activity);
+								ClearActivity(go_activity);
+								time = 0.0;
+								span_count = 0;
+								actual_buses.clear();
+
+								Activity activity;
+								activity.type_activity = "Wait";
+								activity.time = wait_time;
+								activity.stop_name_from = first_stop_name;
+								activity.stop_name_to = second_stop_name;
+								activity.span_count = 0;
+								final_route.push_back(activity);
+							}
+
+
+
+						}
+
+
+
+
+
+
+					}
+					else {
+						if (!actual_buses.empty()) {
+							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
+							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
+							std::set<std::string> actual_buses_0_1 = GetCommonElements(actual_buses, buses_for_route_first_stop);
+							actual_buses = GetCommonElements(actual_buses_0_1, actual_buses);
+							time += Edge.weight;
+							span_count += 1;
+						}
+						else {
+
+							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
+							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
+							actual_buses = GetCommonElements(buses_for_route_first_stop, buses_for_route_second_stop);
+							time += Edge.weight;
+							span_count += 1;
+							go_activity.stop_name_from = first_stop_name;
+						}
+					}
+					if (is_last_element && !actual_buses.empty() && !IsEmptyActivity(go_activity)) {
+						go_activity.time = time;
+						go_activity.span_count = span_count;
+						go_activity.stop_name_to = second_stop_name;
+						go_activity.type_activity = "Bus";
+						go_activity.bus_name = *actual_buses.begin();
+						final_route.push_back(go_activity);
+					}
+				}
+
+				return final_route;
+			}
+			else {
+				return final_route;
+			}
+		}
+		*/
+
+
+		/*
+		std::vector<Activity> ProcessFinalRoute(std::vector<Activity>& final_route) {
+			std::vector<Activity> wait;
+			std::vector<Activity> go;
+			std::vector<Activity> itg;
+
+			for (Activity activity : final_route) {
+				if (activity.type_activity == "Bus") {
+					go.push_back(activity);
+				else { wait.push_back(activity); }
+
+				for (auto it_inner = go.begin(); std::next(it_inner) != go.end(); ++it_inner) {
+					if (*it_inner.bus_name == *(std::next(it_inner)).bus_name) {
+						continue;
+
+					}
+					else {
+						wait.erase(wait.begin() + std::distance(go.begin() + std::next(it_inner)));
+
+					}
+
+				}
+
+		}
+				*/
 
 		std::vector<Activity> ProcessFinalRoute(std::vector<Activity>& final_route) {
 			std::vector<Activity> real_final_route;
@@ -310,7 +456,7 @@ namespace graph {
 							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
 							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
 							std::set<std::string> actual_buses_0_1 = GetCommonElements(actual_buses, buses_for_route_first_stop);
-							actual_buses = GetCommonElements(actual_buses_0_1, buses_for_route_second_stop);
+							actual_buses = GetCommonElements(actual_buses_0_1, actual_buses);
 							time += Edge.weight;
 							span_count += 1;
 						}
@@ -333,6 +479,9 @@ namespace graph {
 						final_route.push_back(go_activity);
 					}
 				}
+
+
+
 				final_route = ProcessFinalRoute(final_route);
 				return final_route;
 			}
@@ -340,6 +489,7 @@ namespace graph {
 				return final_route;
 			}
 		}
+
 
 
 
