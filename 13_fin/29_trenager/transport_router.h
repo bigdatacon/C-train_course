@@ -115,24 +115,32 @@ namespace graph {
 					//size_t num_vertex2in_go = num_vertex_2in_wait + 1;
 
 					// нахожу расстояние для пары  остановок
-					const Stop* stop_1 = tc.FindStop(*it_inner);
-					const Stop* stop_2 = tc.FindStop(*(std::next(it_inner))); // тут падает когда в stops менее 2 и менее элементов 
+
+					if (it_inner != stops.end() && std::next(it_inner) != stops.end()) {
 
 
-					int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
-					double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60) + sum_time;
-					//std::cout << "Stop1 , Stop 2" << std::string(*it_inner) << " " << *(std::next(it_inner)) << " time_min_1_2 " << time_min_1_2 << std::endl;
+						const Stop* stop_1 = tc.FindStop(*it_inner);
+						const Stop* stop_2 = tc.FindStop(*(std::next(it_inner))); // тут падает когда в stops менее 2 и менее элементов 
+						int distance_1_2 = tc.GetStopDistance(*stop_1, *stop_2);
+						double time_min_1_2 = distance_1_2 / (tc.GetVelocity() * 1000 / 60) + sum_time;
+						//std::cout << "Stop1 , Stop 2" << std::string(*it_inner) << " " << *(std::next(it_inner)) << " time_min_1_2 " << time_min_1_2 << std::endl;
 
-					//Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() }; // Это ребро уже добавлено в основном цикле
-					Edge<double> edge2 = { num_vertex1_go, num_vertex_2in_wait, time_min_1_2 };
-					// Проверка наличия элемента
+						//Edge<double> edge1 = { num_vertex_1_wait, num_vertex1_go, tc.GetWaitTime() }; // Это ребро уже добавлено в основном цикле
+						Edge<double> edge2 = { num_vertex1_go, num_vertex_2in_wait, time_min_1_2 };
+						// Проверка наличия элемента
 
-					if (!containsElement(added_edges_, edge2)) {
-						graph.AddEdge(edge2);
-						added_edges_.push_back(edge2);
+						if (!containsElement(added_edges_, edge2)) {
+							graph.AddEdge(edge2);
+							added_edges_.push_back(edge2);
+						}
+
+						sum_time = time_min_1_2;
 					}
+					
 
-					sum_time = time_min_1_2;
+
+
+
 
 				}
 			}
@@ -482,7 +490,7 @@ namespace graph {
 
 
 
-				final_route = ProcessFinalRoute(final_route);
+				//final_route = ProcessFinalRoute(final_route);
 				return final_route;
 			}
 			else {
