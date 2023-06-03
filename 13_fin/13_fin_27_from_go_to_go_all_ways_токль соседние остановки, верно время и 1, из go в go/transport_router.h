@@ -305,9 +305,60 @@ namespace graph {
 							buses_for_route_first_stop = tc.GetStopInfo(first_stop_name);
 							buses_for_route_second_stop = tc.GetStopInfo(second_stop_name);
 							std::set<std::string> actual_buses_0_1 = GetCommonElements(actual_buses, buses_for_route_first_stop);
-							actual_buses = GetCommonElements(actual_buses_0_1, actual_buses);
-							time += Edge.weight;
-							span_count += 1;
+							actual_buses = GetCommonElements(buses_for_route_second_stop, actual_buses);
+							if (!actual_buses.empty()) {
+
+								time += Edge.weight;
+								span_count += 1;
+							}
+							else {
+								
+								// записываю что есть в маршрту в финальный route
+								go_activity.time = time;
+								go_activity.span_count = span_count;
+								go_activity.stop_name_to = first_stop_name;
+								go_activity.type_activity = "Bus";
+								go_activity.bus_name = *actual_buses_0_1.begin();
+								final_route.push_back(go_activity);
+								ClearActivity(go_activity);
+								time = 0.0;
+								span_count = 0;
+								actual_buses.clear();
+
+
+								// нужна пересадка -- добавляю пересадку
+
+								Activity activity;
+								activity.type_activity = "Wait";
+								activity.time = wait_time;
+								activity.stop_name_from = first_stop_name;
+								activity.stop_name_to = first_stop_name;
+								activity.span_count = 0;
+								final_route.push_back(activity);
+
+
+								//добавляю новую остановку в паршрут 
+								time += Edge.weight;
+								span_count += 1;
+								go_activity.stop_name_to = second_stop_name;
+								actual_buses = buses_for_route_second_stop;
+
+								/*go_activity.time = time;
+								go_activity.span_count = span_count;
+								go_activity.stop_name_to = second_stop_name;
+								go_activity.type_activity = "Bus";
+								go_activity.bus_name = *buses_for_route_second_stop.begin();
+								final_route.push_back(go_activity);
+
+								actual_buses = buses_for_route_second_stop;
+								*/
+								
+
+							}
+
+
+
+
 						}
 						else {
 
