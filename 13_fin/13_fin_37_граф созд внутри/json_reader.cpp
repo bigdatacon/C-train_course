@@ -99,32 +99,34 @@ namespace transport_catalogue {
 
 	void InputReaderJson::ReadInputJsonStatRequest() {
 		const auto& json_array_out = ((load_.GetRoot()).AsDict()).at("stat_requests"s);
-		for (const auto& file : json_array_out.AsArray()) {
-			const auto& json_obj = file.AsDict();
-			OutputRequest outputstopjson;
-			if (json_obj.at("type").AsString() == "Map"s) {
-				outputstopjson.id = json_obj.at("id").AsInt();
-				outputstopjson.type = json_obj.at("type").AsString();
-				out_req_.push_back(outputstopjson);
+		if (!json_array_out.IsNull()) {
+			for (const auto& file : json_array_out.AsArray()) {
+				const auto& json_obj = file.AsDict();
+				OutputRequest outputstopjson;
+				if (json_obj.at("type").AsString() == "Map"s) {
+					outputstopjson.id = json_obj.at("id").AsInt();
+					outputstopjson.type = json_obj.at("type").AsString();
+					out_req_.push_back(outputstopjson);
 
-			}
+				}
 
-			if (json_obj.at("type").AsString() == "Route"s) {
-				outputstopjson.id = json_obj.at("id").AsInt();
-				outputstopjson.type = json_obj.at("type").AsString();
-				outputstopjson.from = json_obj.at("from").AsString();
-				outputstopjson.to = json_obj.at("to").AsString();
+				if (json_obj.at("type").AsString() == "Route"s) {
+					outputstopjson.id = json_obj.at("id").AsInt();
+					outputstopjson.type = json_obj.at("type").AsString();
+					outputstopjson.from = json_obj.at("from").AsString();
+					outputstopjson.to = json_obj.at("to").AsString();
 
-				out_req_.push_back(outputstopjson);
-			}
+					out_req_.push_back(outputstopjson);
+				}
 
 
 
-			else {
-				outputstopjson.name = json_obj.at("name").AsString();
-				outputstopjson.id = json_obj.at("id").AsInt();
-				outputstopjson.type = json_obj.at("type").AsString();
-				out_req_.push_back(outputstopjson);
+				else {
+					outputstopjson.name = json_obj.at("name").AsString();
+					outputstopjson.id = json_obj.at("id").AsInt();
+					outputstopjson.type = json_obj.at("type").AsString();
+					out_req_.push_back(outputstopjson);
+				}
 			}
 		}
 
