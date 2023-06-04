@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -221,7 +221,7 @@ namespace transport_catalogue {
 							.StartDict()
 							.Key("items").Value(array)
 							.Key("request_id").Value(request_id)
-							.Key("time").Value(total_time)
+							.Key("total_time").Value(total_time)
 							.EndDict().Build();
 
 						queries.emplace_back(final_route_description);
