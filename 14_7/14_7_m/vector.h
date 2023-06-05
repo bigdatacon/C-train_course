@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <cassert>
 #include <cstdlib>
 #include <new>
@@ -92,7 +92,7 @@ public:
 	}
 
 	Vector(const Vector& other)
-		: data_(Allocate(other.size_))
+		: data_(other.size_)
 		, size_(other.size_)  
 	{
 		size_t i = 0;
@@ -107,13 +107,55 @@ public:
 		}
 	}
 
-	void reserve(size_t new_capacity) {
+
+	/*
+	
+	    void Reserve(size_t new_capacity) {
+        if (new_capacity <= capacity_) {
+            return;
+        }
+        T* new_data = nullptr;
+        
+        size_t i = 0;
+        try {
+            new_data = Allocate(new_capacity);
+			for (; i != size_; ++i) {
+				new (new_data + i) T(data_[i]);
+			}
+			}
+			catch (...) {
+				//DestroyN(new_data, size_);
+				//Deallocate(new_data);
+
+				DestroyN(new_data, i);
+				// Освобождаем память, выделенную через Allocate
+				Deallocate(new_data);
+
+				throw;
+			}
+			DestroyN(data_, size_);
+			Deallocate(data_);
+			data_ = new_data;
+			capacity_ = new_capacity;
+	}
+	*/
+
+	void Reserve(size_t new_capacity) {
 		if (new_capacity <= data_.Capacity())
 			return;
 		RawMemory<T> new_data(new_capacity);
-		for (size_t i = 0; i < size_; i++) {
-			new (new_data + i) T(std::move(data_[i]));
-			data_[i].~T();
+		size_t i = 0;
+		try {
+			
+			for (; i < size_; i++) {
+				new (new_data + i) T(std::move(data_[i]));
+				data_[i].~T();
+			}
+		}
+		catch (...) {
+			DestroyN(new_data.GetAddress(), i);
+			throw;
+		
 		}
 		data_.Swap(new_data);
 		//data_.Capacity() = new_capacity; // объявление и инициализация переменной capacity_
