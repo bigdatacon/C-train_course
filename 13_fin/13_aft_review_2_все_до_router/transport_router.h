@@ -1,4 +1,4 @@
-﻿
+
 #pragma once
 
 #include "ranges.h"
@@ -35,13 +35,12 @@ namespace graph {
 		std::string type_activity = "Wait";
 	};
 
-	template <typename Weight>
 	class ActivityProcessor {
 
 	public:
 		ActivityProcessor(transport_catalogue::TransportCatalogue& tc)
 			: tc(tc) {
-			graph_ = DirectedWeightedGraph<Weight>(2 * tc.GetStopsQuantity());
+			graph_ = DirectedWeightedGraph<double>(2 * tc.GetStopsQuantity());
 			//AddKnots();
 
 			//router_(graph_);
@@ -64,19 +63,19 @@ namespace graph {
 			}
 		}
 
-		graph::Router<Weight> ProcessRoute() {
+		graph::Router<double> ProcessRoute() {
 			AddKnots();
-			graph::Router<Weight> router(graph_);
+			graph::Router<double> router(graph_);
 			return router;
 		}
 
 
-		std::vector<std::variant<BusActivity, WaitingActivity>> GetRouteAndBuses(std::string_view stop_name_from, std::string_view stop_name_to, graph::Router<Weight>& router) {
+		std::vector<std::variant<BusActivity, WaitingActivity>> GetRouteAndBuses(std::string_view stop_name_from, std::string_view stop_name_to, graph::Router<double>& router) {
 			size_t from = GetValueByKey(stop_name_from).value();
 			size_t to = GetValueByKey(stop_name_to).value();
 			std::vector<std::variant<BusActivity, WaitingActivity>> final_route;
 
-			std::optional<typename graph::Router<Weight>::RouteInfo> route_info = router.BuildRoute(from, to);
+			std::optional<typename graph::Router<double>::RouteInfo> route_info = router.BuildRoute(from, to);
 
 			double wait_time = tc.GetWaitTime();
 
@@ -123,13 +122,13 @@ namespace graph {
 
 	private:
 		transport_catalogue::TransportCatalogue& tc;
-		std::vector<Edge<Weight>*> added_edges_;
-		DirectedWeightedGraph<Weight> graph_;
+		std::vector<Edge<double>*> added_edges_;
+		DirectedWeightedGraph<double> graph_;
 		std::unordered_map<std::string_view, size_t> stop_to_vertex_;
-		//graph::Router<Weight> router_;
+		//graph::Router<double> router_;
 
 
-		bool containsElement(const std::vector<Edge<Weight>*>& container, const Edge<Weight>* some) {
+		bool containsElement(const std::vector<Edge<double>*>& container, const Edge<double>* some) {
 			return std::find(container.begin(), container.end(), some) != container.end();
 		}
 
