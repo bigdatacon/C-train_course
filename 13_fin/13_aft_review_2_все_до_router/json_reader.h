@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -57,7 +57,7 @@ namespace transport_catalogue {
 		void UpdStopDist(TransportCatalogue& tc);
 
 		template <typename Weight>
-		void ManageOutputRequests(TransportCatalogue& tc, MapRenderer& mr, graph::ActivityProcessor<Weight>& actprocess, graph::Router<Weight>& router)
+		void ManageOutputRequests(TransportCatalogue& tc, MapRenderer& mr, graph::ActivityProcessor& actprocess, graph::Router<Weight>& router)
 		{
 			std::ostream& out = std::cout;
 			json::Array queries;
