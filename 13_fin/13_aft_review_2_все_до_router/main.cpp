@@ -38,9 +38,9 @@ int main() {
 	RenderData rd = reader.GetRenderData();
 	MapRenderer mapdrawer(rd);
 
-	//создаю объекты классов граф и роутер и заполняю данными 
-	/*std::set<domain::Stop*, transport_catalogue::StopPointerComparer> stop_set = tc.GetStopSet(); // получаю количество остановок
-	graph::DirectedWeightedGraph<double> graph(stop_set.size()*2); // создаю граф с 2 вершинами
+	//СЃРѕР·РґР°СЋ РѕР±СЉРµРєС‚С‹ РєР»Р°СЃСЃРѕРІ РіСЂР°С„ Рё СЂРѕСѓС‚РµСЂ Рё Р·Р°РїРѕР»РЅСЏСЋ РґР°РЅРЅС‹РјРё 
+	/*std::set<domain::Stop*, transport_catalogue::StopPointerComparer> stop_set = tc.GetStopSet(); // РїРѕР»СѓС‡Р°СЋ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕСЃС‚Р°РЅРѕРІРѕРє
+	graph::DirectedWeightedGraph<double> graph(stop_set.size()*2); // СЃРѕР·РґР°СЋ РіСЂР°С„ СЃ 2 РІРµСЂС€РёРЅР°РјРё
 	graph::ActivityProcessor activityprocessor(graph, tc);*/
 
 
@@ -51,7 +51,7 @@ int main() {
 
 	////////////////******************
 
-	graph::ActivityProcessor<double> activityprocessor(tc);
+	graph::ActivityProcessor activityprocessor(tc);
 
 	graph::Router<double> router = activityprocessor.ProcessRoute();
 
