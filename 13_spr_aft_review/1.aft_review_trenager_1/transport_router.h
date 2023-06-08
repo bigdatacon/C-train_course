@@ -113,6 +113,13 @@ namespace graph {
 			}
 
 		}
+        
+        		void FreeMemory() {
+			for (Edge<double>* edge : added_edges_) {
+				delete edge;
+			}
+			added_edges_.clear();
+		}
 
 	private:
 		transport_catalogue::TransportCatalogue& tc;
