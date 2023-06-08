@@ -66,8 +66,7 @@ int main() {
 
 
 	//reader.ManageOutputRequests(tc, mapdrawer);
-
-
+	activityprocessor.FreeMemory();
 	return 0;
 
 
