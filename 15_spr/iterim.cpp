@@ -1,3 +1,6 @@
+
+*** PACKAGE ImgConverter ***
+ 
 -----------------------------------------------------------------------
 CMakeLists.txt
 -----------------------------------------------------------------------
@@ -6,189 +9,254 @@ cmake_minimum_required(VERSION 3.11)
 project(Negate CXX)
 set(CMAKE_CXX_STANDARD 17)
  
-set(IMGLIB_FILES img_lib.h img_lib.cpp
-                 ppm_image.h ppm_image.cpp)
+add_subdirectory(../ImgLib ImgLibBuildDir)
  
-if(CMAKE_SYSTEM_NAME MATCHES "^MINGW")
+if (CMAKE_SYSTEM_NAME MATCHES "^MINGW")
     set(SYSTEM_LIBS -lstdc++)
 else()
-    set(SYSTEM_LIBS) 
+    set(SYSTEM_LIBS)
 endif()
  
-add_executable("hmirror" "hmirr.cpp" ${IMGLIB_FILES})
-add_executable("vmirror" "vmirr.cpp" ${IMGLIB_FILES})
-add_executable("sobel" "sobel.cpp" ${IMGLIB_FILES})
------------------------------------------------------------------------
-hmirr.cpp
------------------------------------------------------------------------
-#include "ppm_image.h"
+add_executable(imgconv main.cpp)
  
-#include <iostream>
+target_include_directories(imgconv PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../ImgLib")
+ 
+target_link_libraries(imgconv ImgLib ${SYSTEM_LIBS})
+-----------------------------------------------------------------------
+main.cpp
+-----------------------------------------------------------------------
+#include <img_lib.h>
+#include <jpeg_image.h>
+#include <ppm_image.h>
+ 
+#include <filesystem>
 #include <string_view>
+#include <iostream>
  
 using namespace std;
- 
-void HMirrInplace(img_lib::Image& image) {
-    
-    int height = image.GetHeight();
-    int middle = image.GetWidth()/2;
-    
-    for (int i = 0; i < height; ++i) {
-        
-        for (int j = 0; j < middle; ++j) {
-            
-            std::swap(image.GetPixel(j, i).r, image.GetPixel(image.GetWidth() - j - 1, i).r);
-            std::swap(image.GetPixel(j, i).g, image.GetPixel(image.GetWidth() - j - 1, i).g);
-            std::swap(image.GetPixel(j, i).b, image.GetPixel(image.GetWidth() - j - 1, i).b);
-        }
-    }
-}
  
 int main(int argc, const char** argv) {
     
     if (argc != 3) {
-        cerr << "Usage: "sv << argv[0] << " <input image> <output image>"sv << endl;
+        cerr << "Usage: "sv << argv[0] << " <in_file> <out_file>"sv << endl;
         return 1;
     }
  
-    auto image = img_lib::LoadPPM(argv[1]);
+    img_lib::Path in_path = argv[1];
+    img_lib::Path out_path = argv[2];
+ 
+    img_lib::Image image = img_lib::LoadPPM(in_path);
+    
     if (!image) {
-        cerr << "Error loading image"sv << endl;
-        return 2;
+        cerr << "Loading failed"sv << endl;
+        return 4;
     }
  
-    HMirrInplace(image);
- 
-    if (!img_lib::SavePPM(argv[2], image)) {
-        cerr << "Error saving image"sv << endl;
-        return 3;
+    if (!img_lib::SaveJPEG(out_path, image)) {
+        cerr << "Saving failed"sv << endl;
+        return 5;
     }
  
-    cout << "Image saved successfully!"sv << endl;
+    cout << "Successfully converted"sv << endl;
 }
+ 
+*** PACKAGE ImgConverter END ***
+ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+*** PACKAGE ImgLib ***
+ 
 -----------------------------------------------------------------------
-vmirr.cpp
+CMakeLists.txt
+-----------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.11)
+ 
+project(ImgLib CXX)
+set(CMAKE_CXX_STANDARD 17)
+ 
+set(LIBJPEG_DIR CACHE STRING "LibJPEG static library directory")
+ 
+if(NOT LIBJPEG_DIR)
+    message(FATAL_ERROR "Please, specify LibJPEG directory via -DLIBJPEG_DIR=<dir>")
+endif()
+    message(STATUS "LibJPEG dir is ${LIBJPEG_DIR}, change via -DLIBJPEG_DIR=<dir>")
+ 
+set(IMGLIB_MAIN_FILES img_lib.h img_lib.cpp)
+ 
+set(IMGLIB_FORMAT_FILES ppm_image.h ppm_image.cpp 
+                        jpeg_image.h jpeg_image.cpp)
+ 
+add_library(ImgLib STATIC ${IMGLIB_MAIN_FILES} 
+                          ${IMGLIB_FORMAT_FILES})
+ 
+target_include_directories(ImgLib PUBLIC "${LIBJPEG_DIR}/include")
+ 
+target_link_directories(ImgLib INTERFACE "${LIBJPEG_DIR}/lib/$<IF:$<CONFIG:Debug>,Debug,Release>")
+ 
+target_link_libraries(ImgLib INTERFACE jpeg)
+-----------------------------------------------------------------------
+jpeg_image.h
+-----------------------------------------------------------------------
+#pragma once
+#include "img_lib.h"
+ 
+#include <filesystem>
+ 
+namespace img_lib {
+    
+using Path = std::filesystem::path;
+ 
+bool SaveJPEG(const Path& file, const Image& image);
+Image LoadJPEG(const Path& file);
+ 
+}//end namespace img_lib
+-----------------------------------------------------------------------
+jpeg_image.cpp
 -----------------------------------------------------------------------
 #include "ppm_image.h"
  
-#include <algorithm>
-#include <iostream>
-#include <string_view>
- 
-using namespace std;
- 
-void VMirrInplace(img_lib::Image& image) {
-    
-    int width = image.GetWidth();
-    int middle = image.GetHeight()/2;
-    
-    for (int i = 0; i < middle; ++i) {
-        
-        for (int j = 0; j < width; ++j) {
-            
-            std::swap(image.GetPixel(j, i).r, image.GetPixel(j, image.GetHeight() - i - 1).r);
-            std::swap(image.GetPixel(j, i).g, image.GetPixel(j, image.GetHeight() - i - 1).g);
-            std::swap(image.GetPixel(j, i).b, image.GetPixel(j, image.GetHeight() - i - 1).b);
-        }
-    }
-}
- 
-int main(int argc, const char** argv) {
-    
-    if (argc != 3) {
-        cerr << "Usage: "sv << argv[0] << " <input image> <output image>"sv << endl;
-        return 1;
-    }
- 
-    auto image = img_lib::LoadPPM(argv[1]);
-    if (!image) {
-        cerr << "Error loading image"sv << endl;
-        return 2;
-    }
- 
-    VMirrInplace(image);
- 
-    if (!img_lib::SavePPM(argv[2], image)) {
-        cerr << "Error saving image"sv << endl;
-        return 3;
-    }
- 
-    cout << "Image saved successfully!"sv << endl;
-}
------------------------------------------------------------------------
-sobel.cpp
------------------------------------------------------------------------
-#include "ppm_image.h"
- 
-#include <algorithm>
 #include <array>
-#include <cmath>
-#include <iostream>
-#include <string_view>
+#include <fstream>
+#include <stdio.h>
+#include <setjmp.h>
+#include <vector>
+ 
+#include <jpeglib.h>
  
 using namespace std;
  
-int Sum(img_lib::Color c) {return to_integer<int>(c.r) + to_integer<int>(c.g) + to_integer<int>(c.b);}
+namespace img_lib {
  
-img_lib::Image Sobel(const img_lib::Image& image) {
+struct my_error_mgr {
+    struct jpeg_error_mgr pub;
+    jmp_buf setjmp_buffer;
+};
+ 
+typedef struct my_error_mgr* my_error_ptr;
+ 
+METHODDEF(void)
+my_error_exit (j_common_ptr cinfo) {
+    my_error_ptr myerr = (my_error_ptr) cinfo->err;
+    (*cinfo->err->output_message) (cinfo);
+    longjmp(myerr->setjmp_buffer, 1);
+}
+ 
+bool SaveJPEG(const Path& file, const Image& image) {
+ 
+    jpeg_compress_struct cinfo;
+    jpeg_error_mgr jerr;
+ 
+    FILE* outfile;              
+    JSAMPROW row_pointer[1];     
+    int row_stride;                
+ 
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_compress(&cinfo);
+ 
+#ifdef _MSC_VER
+    if ((outfile = _wfopen(file.wstring().c_str(), "wb")) == NULL) {
+#else
+    if ((outfile = fopen(file.string().c_str(), "wb")) == NULL) {
+#endif
+    return false;}
     
-    img_lib::Color color = img_lib::Color::Black();
-    int width = image.GetWidth() - 1;
-    int height = image.GetHeight() - 1;
-    
-    img_lib::Image result(width + 1, height + 1, color);
-    
-    for (int i = 1; i < height; ++i) {
+    jpeg_stdio_dest(&cinfo, outfile);
+ 
+    cinfo.image_width = image.GetWidth(); 
+    cinfo.image_height = image.GetHeight();
+    cinfo.input_components = 3;       
+    cinfo.in_color_space = JCS_RGB;   
+ 
+    jpeg_set_defaults(&cinfo);
+    jpeg_start_compress(&cinfo, TRUE);
+    row_stride = image.GetWidth() * 3;
+ 
+    while (cinfo.next_scanline < cinfo.image_height) {       
+        std::vector<JSAMPLE> jsample(row_stride);
         
-        for (int j = 1; j < width; ++j) {
+        for (int i = 0; i < image.GetWidth(); ++i) {
             
-            int tl = Sum(image.GetPixel(j - 1, i - 1));
-            int tc = Sum(image.GetPixel(j, i - 1));
-            int tr = Sum(image.GetPixel(j + 1, i - 1));
-            
-            int cl = Sum(image.GetPixel(j - 1, i));
-            int cr = Sum(image.GetPixel(j + 1, i));
- 
-            int bl = Sum(image.GetPixel(j - 1, i + 1));
-            int bc = Sum(image.GetPixel(j, i + 1));
-            int br = Sum(image.GetPixel(j + 1, i + 1));
- 
-            int gx = -tl - 2 * tc - tr + bl + 2 * bc + br;
-            int gy = -tl - 2 * cl - bl + tr + 2 * cr + br;
- 
-            byte helper = byte(std::clamp<double>(std::sqrt(gx * gx + gy * gy), 0, 255));
- 
-            result.GetPixel(j, i).r = helper;
-            result.GetPixel(j, i).g = helper;
-            result.GetPixel(j, i).b = helper;
+            jsample[3 * i] = JSAMPLE(image.GetLine(cinfo.next_scanline)[i].r);
+            jsample[1 + 3 * i] = JSAMPLE(image.GetLine(cinfo.next_scanline)[i].g);
+            jsample[2 + 3 * i] = JSAMPLE(image.GetLine(cinfo.next_scanline)[i].b);
         }
+        
+        row_pointer[0] = &jsample[0];
+        (void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
     }
+ 
+    jpeg_finish_compress(&cinfo);
+    fclose(outfile);
+ 
+    jpeg_destroy_compress(&cinfo);
+    
+    return true;
+}
+ 
+void SaveScanlineToImage(const JSAMPLE* row, int y, Image& out_image) {
+    
+    Color* line = out_image.GetLine(y);
+    
+    for (int x = 0; x < out_image.GetWidth(); ++x) {
+        
+        const JSAMPLE* pixel = row + x * 3;
+        line[x] = Color{byte{pixel[0]}, byte{pixel[1]}, byte{pixel[2]}, byte{255}};
+    }
+}
+ 
+Image LoadJPEG(const Path& file) {
+    jpeg_decompress_struct cinfo;
+    my_error_mgr jerr;
+    
+    FILE* infile;
+    JSAMPARRAY buffer;
+    int row_stride;
+ 
+#ifdef _MSC_VER
+    if ((infile = _wfopen(file.wstring().c_str(), "rb")) == NULL) {
+#else
+    if ((infile = fopen(file.string().c_str(), "rb")) == NULL) {
+#endif
+        return {};
+    }
+ 
+    cinfo.err = jpeg_std_error(&jerr.pub);
+    jerr.pub.error_exit = my_error_exit;
+ 
+    if (setjmp(jerr.setjmp_buffer)) {
+        jpeg_destroy_decompress(&cinfo);
+        fclose(infile);
+        return {};
+    }
+ 
+    jpeg_create_decompress(&cinfo);
+    jpeg_stdio_src(&cinfo, infile);
+    (void) jpeg_read_header(&cinfo, TRUE);
+    cinfo.out_color_space = JCS_RGB;
+    cinfo.output_components = 3;
+    (void) jpeg_start_decompress(&cinfo);
+    
+    row_stride = cinfo.output_width * cinfo.output_components;    
+    buffer = (*cinfo.mem->alloc_sarray) ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
+ 
+    Image result(cinfo.output_width, cinfo.output_height, Color::Black());
+ 
+    while (cinfo.output_scanline < cinfo.output_height) {
+        int y = cinfo.output_scanline;
+        (void) jpeg_read_scanlines(&cinfo, buffer, 1);
+ 
+        SaveScanlineToImage(buffer[0], y, result);
+    }
+ 
+    (void) jpeg_finish_decompress(&cinfo);
+ 
+    jpeg_destroy_decompress(&cinfo);
+    fclose(infile);
  
     return result;
 }
  
-int main(int argc, const char** argv) {
-    
-    if (argc != 3) {
-        cerr << "Usage: "sv << argv[0] << " <input image> <output image>"sv << endl;
-        return 1;
-    }
- 
-    auto image = img_lib::LoadPPM(argv[1]);
-    if (!image) {
-        cerr << "Error loading image"sv << endl;
-        return 2;
-    }
- 
-    image = Sobel(image);
- 
-    if (!img_lib::SavePPM(argv[2], image)) {
-        cerr << "Error saving image"sv << endl;
-        return 3;
-    }
- 
-    cout << "Image saved successfully!"sv << endl;
-}
+}//end namespace img_lib
 -----------------------------------------------------------------------
 img_lib.h
 -----------------------------------------------------------------------
@@ -364,3 +432,5 @@ Image LoadPPM(const Path& file) {
 }
  
 }//end namespace img_lib
+ 
+*** PACKAGE ImgLib END ***
