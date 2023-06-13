@@ -1,0 +1,155 @@
+-----------------------------------------------------------------------
+main.cpp
+-----------------------------------------------------------------------
+#include "saveload.h"
+ 
+#include <cassert>
+#include <map>
+#include <sstream>
+#include <string>
+ 
+using namespace std;
+ 
+void TestSaveLoad() {
+    
+    map<uint32_t, string> m = {{1, "hello"}, {2, "bye"},};
+    stringstream ss;
+    Serialize(m, ss);
+    auto s = ss.str();
+ 
+    assert(s.size() == 40);
+ 
+    assert(s[0] == 0x02);
+    assert(s[1] == 0x00);
+    assert(s[2] == 0x00);
+    assert(s[3] == 0x00);
+    assert(s[4] == 0x00);
+    assert(s[5] == 0x00);
+    assert(s[6] == 0x00);
+    assert(s[7] == 0x00);
+ 
+    assert(s[8] == 0x01);
+    assert(s[9] == 0x00);
+    assert(s[10] == 0x00);
+    assert(s[11] == 0x00);
+ 
+    assert(s[12] == 0x05);
+    assert(s[13] == 0x00);
+    assert(s[14] == 0x00);
+    assert(s[15] == 0x00);
+    assert(s[16] == 0x00);
+    assert(s[17] == 0x00);
+    assert(s[18] == 0x00);
+    assert(s[19] == 0x00);
+ 
+    assert(s[20] == 0x68);  // 'h'
+    assert(s[21] == 0x65);  // 'e'
+    assert(s[22] == 0x6c);  // 'l'
+    assert(s[23] == 0x6c);  // 'l'
+    assert(s[24] == 0x6f);  // 'o'
+ 
+    assert(s[25] == 0x02);
+    assert(s[26] == 0x00);
+    assert(s[27] == 0x00);
+    assert(s[28] == 0x00);
+ 
+    assert(s[29] == 0x03);
+    assert(s[30] == 0x00);
+    assert(s[31] == 0x00);
+    assert(s[32] == 0x00);
+    assert(s[33] == 0x00);
+    assert(s[34] == 0x00);
+    assert(s[35] == 0x00);
+    assert(s[36] == 0x00);
+ 
+    assert(s[37] == 0x62);  // 'b'
+    assert(s[38] == 0x79);  // 'y'
+    assert(s[39] == 0x65);  // 'e'
+ 
+    map<uint32_t, string> m2;
+    Deserialize(ss, m2);
+ 
+    assert(m == m2);
+}
+ 
+int main() {
+    TestSaveLoad();
+}
+-----------------------------------------------------------------------
+saveload.h
+-----------------------------------------------------------------------
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+ 
+template <typename T>
+void Serialize(T val, std::ostream& out) {
+    out.write(reinterpret_cast<char*>(&val), sizeof(val));
+}
+ 
+inline void Serialize(const std::string& str, std::ostream& out) {    
+    Serialize(str.size(), out);
+    
+    out.write(reinterpret_cast<const char*>(str.data()), str.size());
+}
+ 
+template <typename T>
+void Serialize(const std::vector<T>& val, std::ostream& out) {    
+    Serialize(val.size(), out);
+    
+    for (const T& item : val) {
+        Serialize(item, out);
+    }
+}
+ 
+template <typename T1, typename T2>
+void Serialize(const std::map<T1, T2>& val, std::ostream& out) {
+    Serialize(val.size(), out);
+    
+    for (const auto& [key, value] : val) {
+        Serialize(key, out);
+        Serialize(value, out);
+    }
+}
+ 
+template <typename T>
+void Deserialize(std::istream& in, T& val) {
+    in.read(reinterpret_cast<char*>(&val), sizeof(val));
+}
+ 
+inline void Deserialize(std::istream& in, std::string& str) {   
+    size_t size_;
+    Deserialize(in, size_);
+    
+    str.resize(size_);          
+    in.read(reinterpret_cast<char*>(str.data()), str.size());
+}
+ 
+template <typename T>
+void Deserialize(std::istream& in, std::vector<T>& val) {
+    size_t size_;
+    Deserialize(in, size_);    
+    
+    val.resize(size_);   
+    for (auto& item : val) {
+        Deserialize(in, item);
+    }
+}
+ 
+template <typename T1, typename T2>
+void Deserialize(std::istream& in, std::map<T1, T2>& val) {
+    size_t size_;
+    Deserialize(in, size_);
+  
+    for (size_t i = 0; i < size_; ++i) {
+    
+        T1 key;
+        T2 value;
+        
+        Deserialize(in, key);
+        Deserialize(in, value);
+        
+        val.emplace(key, value);
+    }
+}
