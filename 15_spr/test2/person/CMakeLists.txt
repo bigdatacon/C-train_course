@@ -13,7 +13,8 @@ find_package(Threads REQUIRED)
 # Команда вызова protoc. 
 # Ей переданы названия переменных, в которые будут сохранены 
 # списки сгенерированных файлов, а также сам proto-файл.
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS person.proto)
+
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS person.proto address.proto)
 
 # добавляем цель - person_test
 add_executable(person_test ${PROTO_SRCS} ${PROTO_HDRS} main.cpp)
@@ -27,4 +28,8 @@ target_include_directories(person_test PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 # Также find_package определила Protobuf_LIBRARY.
 # Protobuf зависит от библиотеки Threads. Добавим и её при компоновке.
+#Это строки нужно добавить в CMakeLists.txt перед target_link_libraries
+string(REPLACE "protobuf.lib" "protobufd.lib" "Protobuf_LIBRARY_DEBUG" "${Protobuf_LIBRARY_DEBUG}")
+string(REPLACE "protobuf.a" "protobufd.a" "Protobuf_LIBRARY_DEBUG" "${Protobuf_LIBRARY_DEBUG}")
+
 target_link_libraries(person_test ${Protobuf_LIBRARY} Threads::Threads)
