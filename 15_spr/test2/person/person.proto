@@ -1,9 +1,6 @@
 syntax = "proto3";
 
-message Address {
-    string street = 1;
-    uint32 building = 2;
-}
+import "address.proto";
 
 message Person {
     string name = 1;
