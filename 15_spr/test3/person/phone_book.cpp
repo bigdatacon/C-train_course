@@ -47,12 +47,18 @@ void PhoneBook::SaveTo(std::ostream& output) const {
             contact_from_phone_book.mutable_birthday()->set_month(contact.birthday->month);
             contact_from_phone_book.mutable_birthday()->set_year(contact.birthday->year);
             
-        } else {     
+        }
+/*		else {     
             for (const std::string& phone_number : contact.phones) {
                 contact_from_phone_book.add_phone_number(phone_number);
             }
             contact_list.mutable_contact()->Add(std::move(contact_from_phone_book));
-        }       
+        }*/      
+
+		for (const std::string& phone_number : contact.phones) {
+                contact_from_phone_book.add_phone_number(phone_number);
+            }
+            contact_list.mutable_contact()->Add(std::move(contact_from_phone_book));
     }
     
     contact_list.SerializeToOstream(&output);
