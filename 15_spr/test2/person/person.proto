@@ -1,5 +1,5 @@
 syntax = "proto3";
-
+package person;
 import "address.proto";
 
 message Person {
