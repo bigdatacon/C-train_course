@@ -175,14 +175,14 @@ namespace transport_catalogue {
 	const std::deque<Stop>& TransportCatalogue::GetStops() const { return stops_; }
 
 
-	// добавлено на 13 спринт
-	// заполнить скорость и время ожидания 
+	// РґРѕР±Р°РІР»РµРЅРѕ РЅР° 13 СЃРїСЂРёРЅС‚
+	// Р·Р°РїРѕР»РЅРёС‚СЊ СЃРєРѕСЂРѕСЃС‚СЊ Рё РІСЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ 
 	void TransportCatalogue::AddRouteSettings(const domain::RouteSettings route_settings) {
 		bus_wait_time_ = route_settings.bus_wait_time;
 		bus_velocity_ = route_settings.bus_velocity;
 	}
 
-	// получить время ожидания на остановке
+	// РїРѕР»СѓС‡РёС‚СЊ РІСЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ РЅР° РѕСЃС‚Р°РЅРѕРІРєРµ
 	double TransportCatalogue::GetWaitTime() { return bus_wait_time_;  };
 
 	size_t TransportCatalogue::GetStopsQuantity() {
@@ -195,7 +195,7 @@ namespace transport_catalogue {
 
 	double TransportCatalogue::GetVelocity() { return bus_velocity_; }
 
-	//добавлено на 15 спринт
+	//РґРѕР±Р°РІР»РµРЅРѕ РЅР° 15 СЃРїСЂРёРЅС‚
 	void TransportCatalogue::AddSerializePathToFile(const std::string& serialize_file_path) {
 		serialize_file_path_ = serialize_file_path;
 	}
@@ -215,5 +215,7 @@ namespace transport_catalogue {
 		}
 	}
 
-
+	std::string TransportCatalogue::GetSerializerFilePath() const {
+		return serialize_file_path_;
+	}
 }
