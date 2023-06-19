@@ -5,7 +5,7 @@ namespace serialization {
     template <typename It>
     uint32_t calculate_id(It start, It end, std::string_view name) {
 
-        auto stop_it = std::find_if(start, end, [&name](const domain::Stop stop) {return stop.name == name; });
+        auto stop_it = std::find_if(start, end, [&name](const domain::Stop stop) {return stop.stop_name == name; });
         return std::distance(start, stop_it);
     }
 
@@ -121,7 +121,7 @@ namespace serialization {
             }
 
             tc_bus.type = bus_proto.is_roundtrip();
-            //tc_bus.route_length = bus_proto.route_length();  // Длина маршрута не добавляю так как она отдельно считаелась всегда от остановок
+            //tc_bus.route_length = bus_proto.route_length();  // Р”Р»РёРЅР° РјР°СЂС€СЂСѓС‚Р° РЅРµ РґРѕР±Р°РІР»СЏСЋ С‚Р°Рє РєР°Рє РѕРЅР° РѕС‚РґРµР»СЊРЅРѕ СЃС‡РёС‚Р°РµР»Р°СЃСЊ РІСЃРµРіРґР° РѕС‚ РѕСЃС‚Р°РЅРѕРІРѕРє
 
             transport_catalogue.AddBusFromSerializer(std::move(tc_bus));
         }
