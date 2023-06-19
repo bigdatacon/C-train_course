@@ -12,7 +12,7 @@ message Stop {
 message Bus {
     string name = 1;
     repeated uint32 stops = 2;
-    bool is_roundtrip = 3;
+    string is_roundtrip = 3;
     uint32 route_length = 4;
 }
 
