@@ -99,8 +99,8 @@ namespace serialization {
 
             domain::Distance tc_distance;
 
-            tc_distance.start = transport_catalogue.FindStop(tc_stops[distance.start()].name);
-            tc_distance.end = transport_catalogue.FindStop(tc_stops[distance.end()].name);
+            tc_distance.start = transport_catalogue.FindStop(tc_stops[distance.start()].stop_name);
+            tc_distance.end = transport_catalogue.FindStop(tc_stops[distance.end()].stop_name);
 
             tc_distance.distance = distance.distance();
 
@@ -116,7 +116,7 @@ namespace serialization {
             tc_bus.bus_name = bus_proto.name();
 
             for (auto stop_id : bus_proto.stops()) {
-                auto name = tc_stops[stop_id].name;
+                auto name = tc_stops[stop_id].stop_name;
                 tc_bus.stops.push_back(transport_catalogue.FindStop(name)->stop_name);
             }
 
