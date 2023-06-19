@@ -76,7 +76,7 @@ namespace transport_catalogue {
 		const std::deque<domain::Bus>& GetBuses() const;
 		const std::deque<domain::Stop>& GetStops() const ;
 
-		// добавлено на 13 спринт
+		// РґРѕР±Р°РІР»РµРЅРѕ РЅР° 13 СЃРїСЂРёРЅС‚
 		void AddRouteSettings(const domain::RouteSettings route_settings);
 		double GetWaitTime();
 		std::unordered_map<std::pair<const domain::Stop*, const domain::Stop*>, double, detail::PairOfStopPointerUsingString> GetstopsDistanceTime();
@@ -91,7 +91,7 @@ namespace transport_catalogue {
 		bool CheckExistenceOfStopByName(std::string stop_name);
 		std::set<domain::Stop*, StopPointerComparer> GetStopSet();
 
-		// Добавлено 15 спринт 
+		// Р”РѕР±Р°РІР»РµРЅРѕ 15 СЃРїСЂРёРЅС‚ 
 		void AddSerializePathToFile(const std::string& serialize_file_path);
 
 		const std::unordered_map<std::pair<const domain::Stop*, const domain::Stop*>, int, detail::PairOfStopPointerUsingString>& GetStopDistances() const;
@@ -100,9 +100,11 @@ namespace transport_catalogue {
 
 		void AddBusFromSerializer(const domain::Bus& bus);
 
+		std::string GetSerializerFilePath() const;
+
 	private:
-		double bus_wait_time_ = 6;  // добавлено на 13 спринт
-		double bus_velocity_ = 40; // добавлено на 13 спринт
+		double bus_wait_time_ = 6;  // РґРѕР±Р°РІР»РµРЅРѕ РЅР° 13 СЃРїСЂРёРЅС‚
+		double bus_velocity_ = 40; // РґРѕР±Р°РІР»РµРЅРѕ РЅР° 13 СЃРїСЂРёРЅС‚
 		std::deque<domain::Bus> buses_;
 		std::deque<domain::Stop> stops_;
 		
@@ -112,7 +114,7 @@ namespace transport_catalogue {
 		std::unordered_map<std::pair<const domain::Stop*, const domain::Stop*>, int, detail::PairOfStopPointerUsingString> stops_distance_;
 		std::unordered_map<std::pair<const domain::Stop*, const domain::Stop*>, double, detail::PairOfStopPointerUsingString> stops_distance_time_;
 		//std::set<domain::Stop*, StopPointerComparer> stop_set_;
-		// добавоено на 15 спринт 
+		// РґРѕР±Р°РІРѕРµРЅРѕ РЅР° 15 СЃРїСЂРёРЅС‚ 
 		std::string serialize_file_path_;
 
 
