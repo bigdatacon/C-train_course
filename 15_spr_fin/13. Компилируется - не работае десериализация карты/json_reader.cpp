@@ -232,7 +232,7 @@ namespace transport_catalogue {
 
 	void InputReaderJson::ReadInputJsonRequestForFillBase() {
 		ReadInputJsonBaseRequest();
-		//ReadInputJsonRenderSettings();
+		ReadInputJsonRenderSettings();
 		//ReadInputJsonRouteSettings();
 		ReadInputJsonSerializeSettings();
 	}
