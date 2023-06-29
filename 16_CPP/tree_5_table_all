@@ -1,0 +1,1906 @@
+-----------------------------------------------------------------------
+FindANTLR.cmake
+-----------------------------------------------------------------------
+find_package(Java QUIET COMPONENTS Runtime)
+
+if(NOT ANTLR_EXECUTABLE)
+  find_program(ANTLR_EXECUTABLE
+               NAMES antlr.jar antlr4.jar antlr-4.jar antlr-4.12.0-complete.jar)
+endif()
+
+if(ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
+  execute_process(
+      COMMAND ${Java_JAVA_EXECUTABLE} -jar ${ANTLR_EXECUTABLE}
+      OUTPUT_VARIABLE ANTLR_COMMAND_OUTPUT
+      ERROR_VARIABLE ANTLR_COMMAND_ERROR
+      RESULT_VARIABLE ANTLR_COMMAND_RESULT
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  if(ANTLR_COMMAND_RESULT EQUAL 0)
+    string(REGEX MATCH "Version [0-9]+(\\.[0-9]+)*" ANTLR_VERSION ${ANTLR_COMMAND_OUTPUT})
+    string(REPLACE "Version " "" ANTLR_VERSION ${ANTLR_VERSION})
+  else()
+    message(
+        SEND_ERROR
+        "Command '${Java_JAVA_EXECUTABLE} -jar ${ANTLR_EXECUTABLE}' "
+        "failed with the output '${ANTLR_COMMAND_ERROR}'")
+  endif()
+
+  macro(ANTLR_TARGET Name InputFile)
+    set(ANTLR_OPTIONS LEXER PARSER LISTENER VISITOR)
+    set(ANTLR_ONE_VALUE_ARGS PACKAGE OUTPUT_DIRECTORY DEPENDS_ANTLR)
+    set(ANTLR_MULTI_VALUE_ARGS COMPILE_FLAGS DEPENDS)
+    cmake_parse_arguments(ANTLR_TARGET
+                          "${ANTLR_OPTIONS}"
+                          "${ANTLR_ONE_VALUE_ARGS}"
+                          "${ANTLR_MULTI_VALUE_ARGS}"
+                          ${ARGN})
+
+    set(ANTLR_${Name}_INPUT ${InputFile})
+
+    get_filename_component(ANTLR_INPUT ${InputFile} NAME_WE)
+
+    if(ANTLR_TARGET_OUTPUT_DIRECTORY)
+      set(ANTLR_${Name}_OUTPUT_DIR ${ANTLR_TARGET_OUTPUT_DIRECTORY})
+    else()
+      set(ANTLR_${Name}_OUTPUT_DIR
+          ${CMAKE_CURRENT_BINARY_DIR}/antlr4cpp_generated_src/${ANTLR_INPUT})
+    endif()
+
+    unset(ANTLR_${Name}_CXX_OUTPUTS)
+
+    if((ANTLR_TARGET_LEXER AND NOT ANTLR_TARGET_PARSER) OR
+       (ANTLR_TARGET_PARSER AND NOT ANTLR_TARGET_LEXER))
+      list(APPEND ANTLR_${Name}_CXX_OUTPUTS
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.cpp)
+      set(ANTLR_${Name}_OUTPUTS
+          ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.interp
+          ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}.tokens)
+    else()
+      list(APPEND ANTLR_${Name}_CXX_OUTPUTS
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.cpp
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Parser.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Parser.cpp)
+      list(APPEND ANTLR_${Name}_OUTPUTS
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.interp
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Lexer.tokens)
+    endif()
+
+    if(ANTLR_TARGET_LISTENER)
+      list(APPEND ANTLR_${Name}_CXX_OUTPUTS
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseListener.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseListener.cpp
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Listener.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Listener.cpp)
+      list(APPEND ANTLR_TARGET_COMPILE_FLAGS -listener)
+    endif()
+
+    if(ANTLR_TARGET_VISITOR)
+      list(APPEND ANTLR_${Name}_CXX_OUTPUTS
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseVisitor.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}BaseVisitor.cpp
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Visitor.h
+           ${ANTLR_${Name}_OUTPUT_DIR}/${ANTLR_INPUT}Visitor.cpp)
+      list(APPEND ANTLR_TARGET_COMPILE_FLAGS -visitor)
+    endif()
+
+    if(ANTLR_TARGET_PACKAGE)
+      list(APPEND ANTLR_TARGET_COMPILE_FLAGS -package ${ANTLR_TARGET_PACKAGE})
+    endif()
+
+    list(APPEND ANTLR_${Name}_OUTPUTS ${ANTLR_${Name}_CXX_OUTPUTS})
+
+    if(ANTLR_TARGET_DEPENDS_ANTLR)
+      if(ANTLR_${ANTLR_TARGET_DEPENDS_ANTLR}_INPUT)
+        list(APPEND ANTLR_TARGET_DEPENDS
+             ${ANTLR_${ANTLR_TARGET_DEPENDS_ANTLR}_INPUT})
+        list(APPEND ANTLR_TARGET_DEPENDS
+             ${ANTLR_${ANTLR_TARGET_DEPENDS_ANTLR}_OUTPUTS})
+      else()
+        message(SEND_ERROR
+                "ANTLR target '${ANTLR_TARGET_DEPENDS_ANTLR}' not found")
+      endif()
+    endif()
+
+    add_custom_command(
+        OUTPUT ${ANTLR_${Name}_OUTPUTS}
+        COMMAND ${Java_JAVA_EXECUTABLE} -jar ${ANTLR_EXECUTABLE}
+                ${InputFile}
+                -o ${ANTLR_${Name}_OUTPUT_DIR}
+                -no-listener
+                -Dlanguage=Cpp
+                ${ANTLR_TARGET_COMPILE_FLAGS}
+        DEPENDS ${InputFile}
+                ${ANTLR_TARGET_DEPENDS}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Building ${Name} with ANTLR ${ANTLR_VERSION}")
+  endmacro(ANTLR_TARGET)
+
+endif(ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+    ANTLR
+    REQUIRED_VARS ANTLR_EXECUTABLE Java_JAVA_EXECUTABLE
+    VERSION_VAR ANTLR_VERSION)
+-----------------------------------------------------------------------
+CMakeLists.txt
+-----------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+project(spreadsheet)
+
+set(CMAKE_CXX_STANDARD 17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(
+        CMAKE_CXX_FLAGS_DEBUG
+        "${CMAKE_CXX_FLAGS_DEBUG} /JMC"
+    )
+else()
+    set(
+        CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough"
+    )
+endif()
+
+set(ANTLR_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/antlr-4.12.0-complete.jar)
+include(${CMAKE_CURRENT_SOURCE_DIR}/FindANTLR.cmake)
+
+add_definitions(
+    -DANTLR4CPP_STATIC
+    -D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+)
+
+set(WITH_STATIC_CRT OFF CACHE BOOL "Visual C++ static CRT for ANTLR" FORCE)
+add_subdirectory(antlr4_runtime)
+
+antlr_target(FormulaParser Formula.g4 LEXER PARSER LISTENER)
+
+include_directories(
+    ${ANTLR4_INCLUDE_DIRS}
+    ${ANTLR_FormulaParser_OUTPUT_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/antlr4_runtime/runtime/src
+)
+
+file(GLOB sources
+    *.cpp
+    *.h
+)
+
+add_executable(
+    spreadsheet
+    ${ANTLR_FormulaParser_CXX_OUTPUTS}
+    ${sources}
+)
+
+target_link_libraries(spreadsheet antlr4_static)
+if(MSVC)
+    target_compile_options(antlr4_static PRIVATE /W0)
+endif()
+
+install(
+    TARGETS spreadsheet
+    DESTINATION bin
+    EXPORT spreadsheet
+)
+
+set_directory_properties(PROPERTIES VS_STARTUP_PROJECT spreadsheet)
+-----------------------------------------------------------------------
+common.h
+-----------------------------------------------------------------------
+#pragma once
+
+#include <iosfwd>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <variant>
+#include <vector>
+
+struct Position {
+    int row = 0;
+    int col = 0;
+
+    bool operator==(Position rhs) const;
+    bool operator<(Position rhs) const;
+
+    bool IsValid() const;
+    std::string ToString() const;
+
+    static Position FromString(std::string_view str);
+
+    static const int MAX_ROWS = 16384;
+    static const int MAX_COLS = 16384;
+    static const Position NONE;
+};
+
+struct Size {
+    int rows = 0;
+    int cols = 0;
+
+    bool operator==(Size rhs) const;
+};
+
+class FormulaError {
+public:
+    enum class Category {
+        Ref,    
+        Value,  
+        Div0,  
+    };
+
+    FormulaError(Category category) {category_ = category;}
+    Category GetCategory() const {return category_;}
+    bool operator==(FormulaError rhs) const{return category_ == rhs.category_;}
+
+    std::string_view ToString() const {
+        
+        switch (category_) {
+                
+            case Category::Ref:
+                return "#REF!";
+                
+            case Category::Value:
+                return "#VALUE!";
+                
+            case Category::Div0:
+                return "#DIV/0!";
+        }
+        return "";
+    }
+
+private:
+    Category category_;
+};
+
+std::ostream& operator<<(std::ostream& output, FormulaError fe);
+
+class InvalidPositionException : public std::out_of_range {
+public:
+    using std::out_of_range::out_of_range;
+};
+
+class FormulaException : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
+};
+
+class CircularDependencyException : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
+};
+
+class CellInterface {
+public:
+
+    using Value = std::variant<std::string, double, FormulaError>;
+
+    virtual ~CellInterface() = default;
+    virtual Value GetValue() const = 0;
+    virtual std::string GetText() const = 0;
+    virtual std::vector<Position> GetReferencedCells() const = 0;
+};
+
+inline constexpr char FORMULA_SIGN = '=';
+inline constexpr char ESCAPE_SIGN = '\'';
+
+class SheetInterface {
+public:
+    
+    virtual ~SheetInterface() = default;
+
+    virtual void SetCell(Position pos, std::string text) = 0;
+    virtual const CellInterface* GetCell(Position pos) const = 0;
+    virtual CellInterface* GetCell(Position pos) = 0;
+    virtual void ClearCell(Position pos) = 0;
+    virtual Size GetPrintableSize() const = 0;
+    virtual void PrintValues(std::ostream& output) const = 0;
+    virtual void PrintTexts(std::ostream& output) const = 0;
+};
+
+std::unique_ptr<SheetInterface> CreateSheet();
+-----------------------------------------------------------------------
+Formula.g4
+-----------------------------------------------------------------------
+grammar Formula;
+
+main
+    : expr EOF
+    ;
+
+expr
+    : '(' expr ')'  # Parens
+    | (ADD | SUB) expr  # UnaryOp
+    | expr (MUL | DIV) expr  # BinaryOp
+    | expr (ADD | SUB) expr  # BinaryOp
+    | CELL  # Cell
+    | NUMBER  # Literal
+    ;
+
+fragment INT: [-+]? UINT ;
+fragment UINT: [0-9]+ ;
+fragment EXPONENT: [eE] INT;
+NUMBER
+    : UINT EXPONENT?
+    | UINT? '.' UINT EXPONENT?
+    ;
+
+ADD: '+' ;
+SUB: '-' ;
+MUL: '*' ;
+DIV: '/' ;
+CELL: [A-Z]+[0-9]+ ;
+WS: [ \t\n\r]+ -> skip ;
+-----------------------------------------------------------------------
+FormulaAST.h
+-----------------------------------------------------------------------
+#pragma once
+
+#include "FormulaLexer.h"
+#include "common.h"
+
+#include <forward_list>
+#include <functional>
+#include <stdexcept>
+
+namespace ASTImpl {
+class Expr;
+}
+
+class ParsingError : public std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
+class FormulaAST {
+public:
+    
+    explicit FormulaAST(std::unique_ptr<ASTImpl::Expr> root_expr,
+                        std::forward_list<Position> cells);
+    
+    FormulaAST(FormulaAST&&) = default;
+    FormulaAST& operator=(FormulaAST&&) = default;
+    ~FormulaAST();
+
+    double Execute(std::function<double(Position)>& args) const;
+    void PrintCells(std::ostream& out) const;
+    void Print(std::ostream& out) const;
+    void PrintFormula(std::ostream& out) const;
+
+    std::forward_list<Position>& GetCells() {return cells_;}
+    const std::forward_list<Position>& GetCells() const {return cells_;}
+
+private:
+    std::unique_ptr<ASTImpl::Expr> root_expr_;
+    std::forward_list<Position> cells_;
+};
+
+FormulaAST ParseFormulaAST(std::istream& in);
+FormulaAST ParseFormulaAST(const std::string& in_str);
+-----------------------------------------------------------------------
+FormulaAST.cpp
+-----------------------------------------------------------------------
+#include "FormulaAST.h"
+
+#include "FormulaBaseListener.h"
+#include "FormulaLexer.h"
+#include "FormulaParser.h"
+
+#include <cassert>
+#include <cmath>
+#include <memory>
+#include <optional>
+#include <sstream>
+
+namespace ASTImpl {
+
+enum ExprPrecedence {
+    EP_ADD,
+    EP_SUB,
+    EP_MUL,
+    EP_DIV,
+    EP_UNARY,
+    EP_ATOM,
+    EP_END,
+};
+
+enum PrecedenceRule {
+    PR_NONE = 0b00,                // never needed
+    PR_LEFT = 0b01,                // needed for a left child
+    PR_RIGHT = 0b10,               // needed for a right child
+    PR_BOTH = PR_LEFT | PR_RIGHT,  // needed for both children
+};
+
+constexpr PrecedenceRule PRECEDENCE_RULES[EP_END][EP_END] = {
+    /* EP_ADD */ {PR_NONE, PR_NONE, PR_NONE, PR_NONE, PR_NONE, PR_NONE},
+    /* EP_SUB */ {PR_RIGHT, PR_RIGHT, PR_NONE, PR_NONE, PR_NONE, PR_NONE},
+    /* EP_MUL */ {PR_BOTH, PR_BOTH, PR_NONE, PR_NONE, PR_NONE, PR_NONE},
+    /* EP_DIV */ {PR_BOTH, PR_BOTH, PR_RIGHT, PR_RIGHT, PR_NONE, PR_NONE},
+    /* EP_UNARY */ {PR_BOTH, PR_BOTH, PR_NONE, PR_NONE, PR_NONE, PR_NONE},
+    /* EP_ATOM */ {PR_NONE, PR_NONE, PR_NONE, PR_NONE, PR_NONE, PR_NONE},
+};
+
+class Expr {
+public:
+    
+    virtual ~Expr() = default;
+    virtual void Print(std::ostream& out) const = 0;
+    virtual void DoPrintFormula(std::ostream& out, ExprPrecedence precedence) const = 0;
+    virtual double Evaluate(std::function<double(Position)>& args) const = 0;
+
+    virtual ExprPrecedence GetPrecedence() const = 0;
+
+    void PrintFormula(std::ostream& out, ExprPrecedence parent_precedence,
+                      bool right_child = false) const {
+        auto precedence = GetPrecedence();
+        auto mask = right_child ? PR_RIGHT : PR_LEFT;
+        bool parens_needed = PRECEDENCE_RULES[parent_precedence][precedence] & mask;
+        
+        if (parens_needed) {out << '(';}
+        DoPrintFormula(out, precedence);
+        if (parens_needed) {out << ')';}
+    }
+};
+
+namespace {
+class BinaryOpExpr final : public Expr {
+public:
+    enum Type : char {
+        Add = '+',
+        Subtract = '-',
+        Multiply = '*',
+        Divide = '/',
+    };
+
+public:
+    
+    explicit BinaryOpExpr(Type type, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs) : type_(type)
+                                                                                           , lhs_(std::move(lhs))
+                                                                                           , rhs_(std::move(rhs)) {}
+
+    void Print(std::ostream& out) const override {
+        out << '(' << static_cast<char>(type_) << ' ';
+        lhs_->Print(out);
+        out << ' ';
+        rhs_->Print(out);
+        out << ')';
+    }
+
+    void DoPrintFormula(std::ostream& out, ExprPrecedence precedence) const override {
+        lhs_->PrintFormula(out, precedence);
+        out << static_cast<char>(type_);
+        rhs_->PrintFormula(out, precedence, true);
+    }
+
+    ExprPrecedence GetPrecedence() const override {
+        
+        switch (type_) {
+                
+            case Add:
+                return EP_ADD;
+                
+            case Subtract:
+                return EP_SUB;
+                
+            case Multiply:
+                return EP_MUL;
+                
+            case Divide:
+                return EP_DIV;
+                
+            default:
+                assert(false);
+                return static_cast<ExprPrecedence>(INT_MAX);
+        }
+    }
+
+    double Evaluate(std::function<double(Position)>& args) const override {
+        
+        switch (type_) {
+                
+            case Add:
+                return lhs_->Evaluate(args) + rhs_->Evaluate(args);
+                
+            case Subtract:
+                return lhs_->Evaluate(args) - rhs_->Evaluate(args);
+                
+            case Multiply:
+                return lhs_->Evaluate(args) * rhs_->Evaluate(args);
+            
+            case Divide:
+                
+                if (rhs_->Evaluate(args) != 0) {
+                    return lhs_->Evaluate(args) / rhs_->Evaluate(args); 
+                    
+                } else {
+                    throw FormulaError(FormulaError::Category::Div0);
+                }   
+            
+            default:
+                throw std::invalid_argument("unidentified operation type");
+        }
+    }
+
+private:
+    Type type_;
+    std::unique_ptr<Expr> lhs_;
+    std::unique_ptr<Expr> rhs_;
+};
+
+class UnaryOpExpr final : public Expr {
+public:
+    enum Type : char {
+        UnaryPlus = '+',
+        UnaryMinus = '-',
+    };
+
+public:
+    
+    explicit UnaryOpExpr(Type type, std::unique_ptr<Expr> operand) : type_(type)
+                                                                   , operand_(std::move(operand)) {}
+
+    void Print(std::ostream& out) const override {
+        out << '(' << static_cast<char>(type_) << ' ';
+        operand_->Print(out);
+        out << ')';
+    }
+
+    void DoPrintFormula(std::ostream& out, ExprPrecedence precedence) const override {
+        out << static_cast<char>(type_);
+        operand_->PrintFormula(out, precedence);
+    }
+
+    ExprPrecedence GetPrecedence() const override {return EP_UNARY;}
+
+    double Evaluate(std::function<double(Position)>& args) const override {
+        
+        switch (type_) {
+
+            case UnaryPlus:
+                return operand_->Evaluate(args);
+
+            case UnaryMinus:
+                return -operand_->Evaluate(args); 
+
+            default:
+                throw std::invalid_argument("unidentified operation type");
+        }
+    }
+
+private:
+    Type type_;
+    std::unique_ptr<Expr> operand_;
+};
+
+class CellExpr final : public Expr {
+public:
+    
+    explicit CellExpr(const Position* cell) : cell_(cell) {}
+
+    void Print(std::ostream& out) const override {
+        if (!cell_->IsValid()) {
+            out << FormulaError::Category::Ref;
+        } else {
+            out << cell_->ToString();
+        }
+    }
+
+    void DoPrintFormula(std::ostream& out, ExprPrecedence) const override {Print(out);}
+    ExprPrecedence GetPrecedence() const override {return EP_ATOM;}
+
+    double Evaluate(std::function<double(Position)>& args) const override {return args(*cell_);}
+
+private:
+    const Position* cell_;
+};
+
+class NumberExpr final : public Expr {
+public:
+    
+    explicit NumberExpr(double value) : value_(value) {}
+
+    void Print(std::ostream& out) const override {out << value_;}
+    void DoPrintFormula(std::ostream& out, ExprPrecedence) const override {out << value_;}
+    ExprPrecedence GetPrecedence() const override {return EP_ATOM;}
+    double Evaluate(std::function<double(Position)>& args) const override {return value_;}
+
+private:
+    double value_;
+};
+
+class ParseASTListener final : public FormulaBaseListener {
+public:
+    std::unique_ptr<Expr> MoveRoot() {
+        assert(args_.size() == 1);
+        auto root = std::move(args_.front());
+        args_.clear();
+
+        return root;
+    }
+
+    std::forward_list<Position> MoveCells() {return std::move(cells_);}
+
+public:
+    void exitUnaryOp(FormulaParser::UnaryOpContext* ctx) override {
+        assert(args_.size() >= 1);
+
+        auto operand = std::move(args_.back());
+
+        UnaryOpExpr::Type type;
+        if (ctx->SUB()) {
+            type = UnaryOpExpr::UnaryMinus;
+        } else {
+            assert(ctx->ADD() != nullptr);
+            type = UnaryOpExpr::UnaryPlus;
+        }
+
+        auto node = std::make_unique<UnaryOpExpr>(type, std::move(operand));
+        args_.back() = std::move(node);
+    }
+
+    void exitLiteral(FormulaParser::LiteralContext* ctx) override {
+        double value = 0;
+        auto valueStr = ctx->NUMBER()->getSymbol()->getText();
+        std::istringstream in(valueStr);
+        in >> value;
+        if (!in) {
+            throw ParsingError("Invalid number: " + valueStr);
+        }
+
+        auto node = std::make_unique<NumberExpr>(value);
+        args_.push_back(std::move(node));
+    }
+
+    void exitCell(FormulaParser::CellContext* ctx) override {
+        auto value_str = ctx->CELL()->getSymbol()->getText();
+        auto value = Position::FromString(value_str);
+        if (!value.IsValid()) {
+            throw FormulaException("Invalid position: " + value_str);
+        }
+
+        cells_.push_front(value);
+        auto node = std::make_unique<CellExpr>(&cells_.front());
+        args_.push_back(std::move(node));
+    }
+
+    void exitBinaryOp(FormulaParser::BinaryOpContext* ctx) override {
+        assert(args_.size() >= 2);
+
+        auto rhs = std::move(args_.back());
+        args_.pop_back();
+
+        auto lhs = std::move(args_.back());
+
+        BinaryOpExpr::Type type;
+        if (ctx->ADD()) {
+            type = BinaryOpExpr::Add;
+        } else if (ctx->SUB()) {
+            type = BinaryOpExpr::Subtract;
+        } else if (ctx->MUL()) {
+            type = BinaryOpExpr::Multiply;
+        } else {
+            assert(ctx->DIV() != nullptr);
+            type = BinaryOpExpr::Divide;
+        }
+
+        auto node = std::make_unique<BinaryOpExpr>(type, std::move(lhs), std::move(rhs));
+        args_.back() = std::move(node);
+    }
+
+    void visitErrorNode(antlr4::tree::ErrorNode* node) override {
+        throw ParsingError("Error when parsing: " + node->getSymbol()->getText());
+    }
+
+private:
+    std::vector<std::unique_ptr<Expr>> args_;
+    std::forward_list<Position> cells_;
+};
+
+class BailErrorListener : public antlr4::BaseErrorListener {
+public:
+    void syntaxError(antlr4::Recognizer*, antlr4::Token*, size_t, size_t, const std::string& msg, std::exception_ptr) override {
+        throw ParsingError("Error when lexing: " + msg);
+    }
+};
+
+}//end namespace
+}//end namespace ASTImpl
+
+FormulaAST ParseFormulaAST(std::istream& in) {
+    using namespace antlr4;
+
+    ANTLRInputStream input(in);
+
+    FormulaLexer lexer(&input);
+    ASTImpl::BailErrorListener error_listener;
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(&error_listener);
+
+    CommonTokenStream tokens(&lexer);
+
+    FormulaParser parser(&tokens);
+    auto error_handler = std::make_shared<BailErrorStrategy>();
+    parser.setErrorHandler(error_handler);
+    parser.removeErrorListeners();
+
+    tree::ParseTree* tree = parser.main();
+    ASTImpl::ParseASTListener listener;
+    tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+
+    return FormulaAST(listener.MoveRoot(), listener.MoveCells());
+}
+
+FormulaAST ParseFormulaAST(const std::string& in_str) {
+    std::istringstream in(in_str);
+    return ParseFormulaAST(in);
+}
+
+void FormulaAST::PrintCells(std::ostream& out) const {
+    for (auto cell : cells_) {
+        out << cell.ToString() << ' ';
+    }
+}
+
+void FormulaAST::Print(std::ostream& out) const {root_expr_->Print(out);}
+void FormulaAST::PrintFormula(std::ostream& out) const {root_expr_->PrintFormula(out, ASTImpl::EP_ATOM);}
+double FormulaAST::Execute(std::function<double(Position)>& args) const {return root_expr_->Evaluate(args);}
+
+FormulaAST::FormulaAST(std::unique_ptr<ASTImpl::Expr> root_expr, std::forward_list<Position> cells) : root_expr_(std::move(root_expr))
+                                                                                                    , cells_(std::move(cells)) {cells_.sort();}
+
+FormulaAST::~FormulaAST() = default;
+-----------------------------------------------------------------------
+main.cpp
+-----------------------------------------------------------------------
+#include <limits>
+#include "common.h"
+#include "formula.h"
+#include "test_runner_p.h"
+
+inline std::ostream& operator<<(std::ostream& output, Position pos) {
+    return output << "(" << pos.row << ", " << pos.col << ")";
+}
+
+inline Position operator"" _pos(const char* str, std::size_t) {
+    return Position::FromString(str);
+}
+
+inline std::ostream& operator<<(std::ostream& output, Size size) {
+    return output << "(" << size.rows << ", " << size.cols << ")";
+}
+
+inline std::ostream& operator<<(std::ostream& output, const CellInterface::Value& value) {
+    std::visit(
+        [&](const auto& x) {
+            output << x;
+        },
+        value);
+    return output;
+}
+
+namespace {
+
+void TestPositionAndStringConversion() {
+    auto testSingle = [](Position pos, std::string_view str) {
+        ASSERT_EQUAL(pos.ToString(), str);
+        ASSERT_EQUAL(Position::FromString(str), pos);
+    };
+
+    for (int i = 0; i < 25; ++i) {
+        testSingle(Position{i, i}, char('A' + i) + std::to_string(i + 1));
+    }
+
+    testSingle(Position{0, 0}, "A1");
+    testSingle(Position{0, 1}, "B1");
+    testSingle(Position{0, 25}, "Z1");
+    testSingle(Position{0, 26}, "AA1");
+    testSingle(Position{0, 27}, "AB1");
+    testSingle(Position{0, 51}, "AZ1");
+    testSingle(Position{0, 52}, "BA1");
+    testSingle(Position{0, 53}, "BB1");
+    testSingle(Position{0, 77}, "BZ1");
+    testSingle(Position{0, 78}, "CA1");
+    testSingle(Position{0, 701}, "ZZ1");
+    testSingle(Position{0, 702}, "AAA1");
+    testSingle(Position{136, 2}, "C137");
+    testSingle(Position{Position::MAX_ROWS - 1, Position::MAX_COLS - 1}, "XFD16384");
+}
+
+void TestPositionToStringInvalid() {
+    ASSERT_EQUAL((Position{-1, -1}).ToString(), "");
+    ASSERT_EQUAL((Position{-10, 0}).ToString(), "");
+    ASSERT_EQUAL((Position{1, -3}).ToString(), "");
+}
+
+void TestStringToPositionInvalid() {
+    ASSERT(!Position::FromString("").IsValid());
+    ASSERT(!Position::FromString("A").IsValid());
+    ASSERT(!Position::FromString("1").IsValid());
+    ASSERT(!Position::FromString("e2").IsValid());
+    ASSERT(!Position::FromString("A0").IsValid());
+    ASSERT(!Position::FromString("A-1").IsValid());
+    ASSERT(!Position::FromString("A+1").IsValid());
+    ASSERT(!Position::FromString("R2D2").IsValid());
+    ASSERT(!Position::FromString("C3PO").IsValid());
+    ASSERT(!Position::FromString("XFD16385").IsValid());
+    ASSERT(!Position::FromString("XFE16384").IsValid());
+    ASSERT(!Position::FromString("A1234567890123456789").IsValid());
+    ASSERT(!Position::FromString("ABCDEFGHIJKLMNOPQRS8").IsValid());
+}
+
+void TestEmpty() {
+    auto sheet = CreateSheet();
+    ASSERT_EQUAL(sheet->GetPrintableSize(), (Size{0, 0}));
+}
+
+void TestInvalidPosition() {
+    auto sheet = CreateSheet();
+    try {
+        sheet->SetCell(Position{-1, 0}, "");
+    } catch (const InvalidPositionException&) {
+    }
+    try {
+        sheet->GetCell(Position{0, -2});
+    } catch (const InvalidPositionException&) {
+    }
+    try {
+        sheet->ClearCell(Position{Position::MAX_ROWS, 0});
+    } catch (const InvalidPositionException&) {
+    }
+}
+
+void TestSetCellPlainText() {
+    auto sheet = CreateSheet();
+
+    auto checkCell = [&](Position pos, std::string text) {
+        sheet->SetCell(pos, text);
+        CellInterface* cell = sheet->GetCell(pos);
+        ASSERT(cell != nullptr);
+        ASSERT_EQUAL(cell->GetText(), text);
+        ASSERT_EQUAL(std::get<std::string>(cell->GetValue()), text);
+    };
+
+    checkCell("A1"_pos, "Hello");
+    checkCell("A1"_pos, "World");
+    checkCell("B2"_pos, "Purr");
+    checkCell("A3"_pos, "Meow");
+
+    const SheetInterface& constSheet = *sheet;
+    ASSERT_EQUAL(constSheet.GetCell("B2"_pos)->GetText(), "Purr");
+
+    sheet->SetCell("A3"_pos, "'=escaped");
+    CellInterface* cell = sheet->GetCell("A3"_pos);
+    ASSERT_EQUAL(cell->GetText(), "'=escaped");
+    ASSERT_EQUAL(std::get<std::string>(cell->GetValue()), "=escaped");
+}
+
+void TestClearCell() {
+    auto sheet = CreateSheet();
+
+    sheet->SetCell("C2"_pos, "Me gusta");
+    sheet->ClearCell("C2"_pos);
+    ASSERT(sheet->GetCell("C2"_pos) == nullptr);
+
+    sheet->ClearCell("A1"_pos);
+    sheet->ClearCell("J10"_pos);
+}
+
+void TestFormulaArithmetic() {
+    auto sheet = CreateSheet();
+    auto evaluate = [&](std::string expr) {
+        return std::get<double>(ParseFormula(std::move(expr))->Evaluate(*sheet));
+    };
+
+    ASSERT_EQUAL(evaluate("1"), 1);
+    ASSERT_EQUAL(evaluate("42"), 42);
+    ASSERT_EQUAL(evaluate("2 + 2"), 4);
+    ASSERT_EQUAL(evaluate("2 + 2*2"), 6);
+    ASSERT_EQUAL(evaluate("4/2 + 6/3"), 4);
+    ASSERT_EQUAL(evaluate("(2+3)*4 + (3-4)*5"), 15);
+    ASSERT_EQUAL(evaluate("(12+13) * (14+(13-24/(1+1))*55-46)"), 575);
+}
+
+void TestFormulaReferences() {
+    auto sheet = CreateSheet();
+    auto evaluate = [&](std::string expr) {
+        return std::get<double>(ParseFormula(std::move(expr))->Evaluate(*sheet));
+    };
+
+    sheet->SetCell("A1"_pos, "1");
+    ASSERT_EQUAL(evaluate("A1"), 1);
+    sheet->SetCell("A2"_pos, "2");
+    ASSERT_EQUAL(evaluate("A1+A2"), 3);
+
+    sheet->SetCell("B3"_pos, "");
+    ASSERT_EQUAL(evaluate("A1+B3"), 1); 
+    ASSERT_EQUAL(evaluate("A1+B1"), 1);  
+    ASSERT_EQUAL(evaluate("A1+E4"), 1);  
+}
+
+void TestFormulaExpressionFormatting() {
+    auto reformat = [](std::string expr) {
+        return ParseFormula(std::move(expr))->GetExpression();
+    };
+
+    ASSERT_EQUAL(reformat("  1  "), "1");
+    ASSERT_EQUAL(reformat("  -1  "), "-1");
+    ASSERT_EQUAL(reformat("2 + 2"), "2+2");
+    ASSERT_EQUAL(reformat("(2*3)+4"), "2*3+4");
+    ASSERT_EQUAL(reformat("(2*3)-4"), "2*3-4");
+    ASSERT_EQUAL(reformat("( ( (  1) ) )"), "1");
+}
+
+void TestFormulaReferencedCells() {
+    ASSERT(ParseFormula("1")->GetReferencedCells().empty());
+
+    auto a1 = ParseFormula("A1");
+    ASSERT_EQUAL(a1->GetReferencedCells(), (std::vector{"A1"_pos}));
+
+    auto b2c3 = ParseFormula("B2+C3");
+    ASSERT_EQUAL(b2c3->GetReferencedCells(), (std::vector{"B2"_pos, "C3"_pos}));
+
+    auto tricky = ParseFormula("A1 + A2 + A1 + A3 + A1 + A2 + A1");
+    ASSERT_EQUAL(tricky->GetExpression(), "A1+A2+A1+A3+A1+A2+A1");
+    ASSERT_EQUAL(tricky->GetReferencedCells(), (std::vector{"A1"_pos, "A2"_pos, "A3"_pos}));
+}
+
+void TestErrorValue() {
+    auto sheet = CreateSheet();
+    sheet->SetCell("E2"_pos, "A1");
+    sheet->SetCell("E4"_pos, "=E2");
+    ASSERT_EQUAL(sheet->GetCell("E4"_pos)->GetValue(),
+                 CellInterface::Value(FormulaError::Category::Value));
+
+    sheet->SetCell("E2"_pos, "3D");
+    ASSERT_EQUAL(sheet->GetCell("E4"_pos)->GetValue(),
+                 CellInterface::Value(FormulaError::Category::Value));
+}
+
+void TestErrorDiv0() {
+    auto sheet = CreateSheet();
+
+    constexpr double max = std::numeric_limits<double>::max();
+
+    sheet->SetCell("A1"_pos, "=1/0");
+    ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(),
+                 CellInterface::Value(FormulaError::Category::Div0));
+
+    sheet->SetCell("A1"_pos, "=1e+200/1e-200");
+    ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(),
+                 CellInterface::Value(FormulaError::Category::Div0));
+
+    sheet->SetCell("A1"_pos, "=0/0");
+    ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(),
+                 CellInterface::Value(FormulaError::Category::Div0));
+
+    {
+        std::ostringstream formula;
+        formula << '=' << max << '+' << max;
+        sheet->SetCell("A1"_pos, formula.str());
+        ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(),
+                     CellInterface::Value(FormulaError::Category::Div0));
+    }
+
+    {
+        std::ostringstream formula;
+        formula << '=' << -max << '-' << max;
+        sheet->SetCell("A1"_pos, formula.str());
+        ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(),
+                     CellInterface::Value(FormulaError::Category::Div0));
+    }
+
+    {
+        std::ostringstream formula;
+        formula << '=' << max << '*' << max;
+        sheet->SetCell("A1"_pos, formula.str());
+        ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(),
+                     CellInterface::Value(FormulaError::Category::Div0));
+    }
+}
+
+void TestEmptyCellTreatedAsZero() {
+    auto sheet = CreateSheet();
+    sheet->SetCell("A1"_pos, "=B2");
+    ASSERT_EQUAL(sheet->GetCell("A1"_pos)->GetValue(), CellInterface::Value(0.0));
+}
+
+void TestFormulaInvalidPosition() {
+    auto sheet = CreateSheet();
+    auto try_formula = [&](const std::string& formula) {
+        try {
+            sheet->SetCell("A1"_pos, formula);
+            ASSERT(false);
+        } catch (const FormulaException&) {
+            // we expect this one
+        }
+    };
+
+    try_formula("=X0");
+    try_formula("=ABCD1");
+    try_formula("=A123456");
+    try_formula("=ABCDEFGHIJKLMNOPQRS1234567890");
+    try_formula("=XFD16385");
+    try_formula("=XFE16384");
+    try_formula("=R2D2");
+}
+
+void TestPrint() {
+    auto sheet = CreateSheet();
+    sheet->SetCell("A2"_pos, "meow");
+    sheet->SetCell("B2"_pos, "=35");
+
+    ASSERT_EQUAL(sheet->GetPrintableSize(), (Size{2, 2}));
+
+    std::ostringstream texts;
+    sheet->PrintTexts(texts);
+    ASSERT_EQUAL(texts.str(), "\t\nmeow\t=35\n");
+
+    std::ostringstream values;
+    sheet->PrintValues(values);
+    ASSERT_EQUAL(values.str(), "\t\nmeow\t35\n");
+}
+
+void TestCellReferences() {
+    auto sheet = CreateSheet();
+    sheet->SetCell("A1"_pos, "1");
+    sheet->SetCell("A2"_pos, "=A1");
+    sheet->SetCell("B2"_pos, "=A1");
+
+    ASSERT(sheet->GetCell("A1"_pos)->GetReferencedCells().empty());
+    ASSERT_EQUAL(sheet->GetCell("A2"_pos)->GetReferencedCells(), std::vector{"A1"_pos});
+    ASSERT_EQUAL(sheet->GetCell("B2"_pos)->GetReferencedCells(), std::vector{"A1"_pos});
+
+    sheet->SetCell("B2"_pos, "=B1");
+    ASSERT(sheet->GetCell("B1"_pos)->GetReferencedCells().empty());
+    ASSERT_EQUAL(sheet->GetCell("B2"_pos)->GetReferencedCells(), std::vector{"B1"_pos});
+
+    sheet->SetCell("A2"_pos, "");
+    ASSERT(sheet->GetCell("A1"_pos)->GetReferencedCells().empty());
+    ASSERT(sheet->GetCell("A2"_pos)->GetReferencedCells().empty());
+
+    sheet->SetCell("B1"_pos, "=C3");
+    ASSERT_EQUAL(sheet->GetCell("B1"_pos)->GetReferencedCells(), std::vector{"C3"_pos});
+}
+
+void TestFormulaIncorrect() {
+    auto isIncorrect = [](std::string expression) {
+        try {
+            ParseFormula(std::move(expression));
+        } catch (const FormulaException&) {
+            return true;
+        }
+        return false;
+    };
+
+    ASSERT(isIncorrect("A2B"));
+    ASSERT(isIncorrect("3X"));
+    ASSERT(isIncorrect("A0++"));
+    ASSERT(isIncorrect("((1)"));
+    ASSERT(isIncorrect("2+4-"));
+}
+
+void TestCellCircularReferences() {
+    auto sheet = CreateSheet();
+    sheet->SetCell("E2"_pos, "=E4");
+    sheet->SetCell("E4"_pos, "=X9");
+    sheet->SetCell("X9"_pos, "=M6");
+    sheet->SetCell("M6"_pos, "Ready");
+
+    bool caught = false;
+    try {
+        sheet->SetCell("M6"_pos, "=E2");
+    } catch (const CircularDependencyException&) {
+        caught = true;
+    }
+
+    ASSERT(caught);
+    ASSERT_EQUAL(sheet->GetCell("M6"_pos)->GetText(), "Ready");
+}
+    
+}//end namespace
+
+int main() {
+    TestRunner tr;
+    RUN_TEST(tr, TestPositionAndStringConversion);
+    RUN_TEST(tr, TestPositionToStringInvalid);
+    RUN_TEST(tr, TestStringToPositionInvalid);
+    RUN_TEST(tr, TestEmpty);
+    RUN_TEST(tr, TestInvalidPosition);
+    RUN_TEST(tr, TestSetCellPlainText);
+    RUN_TEST(tr, TestClearCell);
+    RUN_TEST(tr, TestFormulaArithmetic);
+    RUN_TEST(tr, TestFormulaReferences);
+    RUN_TEST(tr, TestFormulaExpressionFormatting);
+    RUN_TEST(tr, TestFormulaReferencedCells);
+    RUN_TEST(tr, TestErrorValue);
+    RUN_TEST(tr, TestErrorDiv0);
+    RUN_TEST(tr, TestEmptyCellTreatedAsZero);
+    RUN_TEST(tr, TestFormulaInvalidPosition);
+    RUN_TEST(tr, TestPrint);
+    RUN_TEST(tr, TestCellReferences);
+    RUN_TEST(tr, TestFormulaIncorrect);
+    RUN_TEST(tr, TestCellCircularReferences);
+    return 0;
+}
+-----------------------------------------------------------------------
+test_runner_p.h
+-----------------------------------------------------------------------
+#pragma once
+
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace TestRunnerPrivate {
+  template <typename K, typename V, template <typename, typename> class Map>
+  std::ostream& PrintMap(std::ostream& os, const Map<K, V>& m) {
+    os << "{";
+    bool first = true;
+    for (const auto& kv : m) {
+      if (!first) {
+        os << ", ";
+      }
+      first = false;
+      os << kv.first << ": " << kv.second;
+    }
+    return os << "}";
+  }
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& s) {
+  os << "{";
+  bool first = true;
+  for (const auto& x : s) {
+    if (!first) {
+      os << ", ";
+    }
+    first = false;
+    os << x;
+  }
+  return os << "}";
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::set<T>& s) {
+  os << "{";
+  bool first = true;
+  for (const auto& x : s) {
+    if (!first) {
+      os << ", ";
+    }
+    first = false;
+    os << x;
+  }
+  return os << "}";
+}
+
+template <class K, class V>
+std::ostream& operator<<(std::ostream& os, const std::map<K, V>& m) {
+  return TestRunnerPrivate::PrintMap(os, m);
+}
+
+template <class K, class V>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& m) {
+  return TestRunnerPrivate::PrintMap(os, m);
+}
+
+template <class T, class U>
+void AssertEqual(const T& t, const U& u, const std::string& hint = {}) {
+  if (!(t == u)) {
+    std::ostringstream os;
+    os << "Assertion failed: " << t << " != " << u;
+    if (!hint.empty()) {
+      os << " hint: " << hint;
+    }
+    throw std::runtime_error(os.str());
+  }
+}
+
+inline void Assert(bool b, const std::string& hint) {
+  AssertEqual(b, true, hint);
+}
+
+class TestRunner {
+public:
+  template <class TestFunc>
+  void RunTest(TestFunc func, const std::string& test_name) {
+    try {
+      func();
+      std::cerr << test_name << " OK" << std::endl;
+    } catch (std::exception& e) {
+      ++fail_count;
+      std::cerr << test_name << " fail: " << e.what() << std::endl;
+    } catch (...) {
+      ++fail_count;
+      std::cerr << "Unknown exception caught" << std::endl;
+    }
+  }
+
+  ~TestRunner() {
+    std::cerr.flush();
+    if (fail_count > 0) {
+      std::cerr << fail_count << " unit tests failed. Terminate" << std::endl;
+      exit(1);
+    }
+  }
+
+private:
+  int fail_count = 0;
+};
+
+#ifndef FILE_NAME
+#define FILE_NAME __FILE__
+#endif
+
+#define ASSERT_EQUAL(x, y)                                               \
+  {                                                                      \
+    std::ostringstream __assert_equal_private_os;                        \
+    __assert_equal_private_os << #x << " != " << #y << ", " << FILE_NAME \
+                              << ":" << __LINE__;                        \
+    AssertEqual(x, y, __assert_equal_private_os.str());                  \
+  }
+
+#define ASSERT(x)                                                  \
+  {                                                                \
+    std::ostringstream __assert_private_os;                        \
+    __assert_private_os << #x << " is false, " << FILE_NAME << ":" \
+                        << __LINE__;                               \
+    Assert(x, __assert_private_os.str());                          \
+  }
+
+#define RUN_TEST(tr, func) tr.RunTest(func, #func)
+-----------------------------------------------------------------------
+formula.h
+-----------------------------------------------------------------------
+#pragma once
+
+#include "common.h"
+
+#include <memory>
+#include <vector>
+
+class FormulaInterface {
+public:
+    using Value = std::variant<double, FormulaError>;
+
+    virtual ~FormulaInterface() = default;
+    virtual Value Evaluate(const SheetInterface& sheet) const = 0;
+    virtual std::string GetExpression() const = 0;
+    virtual std::vector<Position> GetReferencedCells() const = 0;
+};
+
+std::unique_ptr<FormulaInterface> ParseFormula(std::string expression);
+-----------------------------------------------------------------------
+formula.cpp
+-----------------------------------------------------------------------
+#include "formula.h"
+
+#include "FormulaAST.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <sstream>
+
+using namespace std::literals;
+
+std::ostream& operator<<(std::ostream& output, FormulaError fe) {
+    return output << "#DIV/0!";
+}
+
+namespace {
+class Formula : public FormulaInterface {
+public:
+    
+    explicit Formula(std::string expression) try : ast_(ParseFormulaAST(expression)) {}
+    catch (...) {
+        throw FormulaException("formula is syntactically incorrect");
+    }
+    
+    Value Evaluate(const SheetInterface& sheet) const override {
+ 
+        try {
+            
+            std::function<double(Position)> args = [&sheet](const Position pos)->double {
+           
+                if (pos.IsValid()) {
+                
+                    const auto* cell = sheet.GetCell(pos);
+                    if (cell) {
+                        
+                        if (std::holds_alternative<double>(cell->GetValue())) {
+                            return std::get<double>(cell->GetValue());
+                            
+                        } else if (std::holds_alternative<std::string>(cell->GetValue())) {
+                            
+                            auto str_value = std::get<std::string>(cell->GetValue());
+                            if (str_value != "") {
+                                std::istringstream input(str_value);
+                                double num = 0.0;
+
+                                if (input.eof() && input >> num) {
+                                    return num;
+                                } else {
+                                    throw FormulaError(FormulaError::Category::Value);
+                                }
+
+                            } else {
+                                return 0.0;
+                            } 
+                            
+                        } else {
+                            throw FormulaError(std::get<FormulaError>(cell->GetValue()));
+                        }
+
+                    } else {
+                        return 0.0;
+                    } 
+                    
+                } else {
+                    throw FormulaError(FormulaError::Category::Ref);
+                }
+            };
+            
+            return ast_.Execute(args);
+            
+        } catch (const FormulaError& evaluate_error) {
+            return evaluate_error;
+        }
+    }
+    
+    std::string GetExpression() const override {
+        std::ostringstream out;
+        ast_.PrintFormula(out);
+        
+        return out.str();
+    }
+    
+    std::vector<Position> GetReferencedCells() const override {
+        std::vector<Position> cells;
+        for (const auto& cell : ast_.GetCells()) {
+            
+            if (cell.IsValid()) {
+                cells.push_back(cell);
+            } else {
+                continue;
+            }
+        }
+        return cells;
+    }
+
+private:
+    FormulaAST ast_;
+};
+    
+}//end namespace
+
+std::unique_ptr<FormulaInterface> ParseFormula(std::string expression) {
+    return std::make_unique<Formula>(std::move(expression));
+}
+-----------------------------------------------------------------------
+cell.cpp
+-----------------------------------------------------------------------
+#include "cell.h"
+#include "sheet.h"
+
+#include <cassert>
+#include <iostream>
+#include <string>
+#include <optional>
+
+Cell::Cell(Sheet& sheet) : impl_(std::make_unique<EmptyImpl>()),
+                           sheet_(sheet) {}
+Cell::~Cell() = default;
+
+void Cell::Set(std::string text) {
+    
+    std::unique_ptr<Impl> temp_impl;
+    
+    if (text.empty()) {
+        temp_impl = std::make_unique<EmptyImpl>();
+        
+    } else if (text.size() >= 2 && text.at(0) == FORMULA_SIGN) {
+        temp_impl = std::make_unique<FormulaImpl>(std::move(text), sheet_);
+        
+    } else {
+        temp_impl = std::make_unique<TextImpl>(std::move(text));
+    }
+    
+    //начали искать циклические зависимости
+    const Impl& temp_impl_ = *temp_impl;
+    const auto temp_ref_cells = temp_impl_.GetReferencedCells();
+    
+    if (!temp_ref_cells.empty()) {
+        
+        std::set<const Cell*> ref_collection;
+        std::set<const Cell*> enter_collection;
+        std::vector<const Cell*> to_enter_collection;
+        
+        for (auto position : temp_ref_cells) {
+            ref_collection.insert(sheet_.Get_Cell(position));
+        }
+
+        to_enter_collection.push_back(this);
+        
+        while (!to_enter_collection.empty()) {
+            
+            const Cell* ongoing = to_enter_collection.back();
+            
+            to_enter_collection.pop_back();
+            enter_collection.insert(ongoing);
+            
+            if (ref_collection.find(ongoing) == ref_collection.end()) {
+                
+                for (const Cell* dependent : ongoing->dependent_cells_) {
+
+                    if (enter_collection.find(dependent) == enter_collection.end()) {
+                        to_enter_collection.push_back(dependent);
+                    }
+                }
+                
+            } else {
+                throw CircularDependencyException("circular dependency detected");
+            }
+        }
+        
+        impl_ = std::move(temp_impl);
+        
+    } else {
+        impl_ = std::move(temp_impl);
+    }
+    //закончили искать циклические зависимости
+    
+    //обновляем зависимости
+    for (Cell* refrenced : referenced_cells_) {
+        refrenced->dependent_cells_.erase(this);
+    }
+    
+    referenced_cells_.clear();
+    
+    for (const auto& position : impl_->GetReferencedCells()) {
+        
+        Cell* refrenced = sheet_.Get_Cell(position);
+        
+        if (!refrenced) {
+            sheet_.SetCell(position, "");
+            refrenced = sheet_.Get_Cell(position);
+        }
+        
+        referenced_cells_.insert(refrenced);
+        refrenced->dependent_cells_.insert(this);
+    }
+    //обновили зависимости
+    
+    //инвалидация кеша
+    InvalidateAllCache(true);
+}
+
+void Cell::Clear() {
+    impl_ = std::make_unique<EmptyImpl>();
+}
+
+Cell::Value Cell::GetValue() const {return impl_->GetValue();}
+std::string Cell::GetText() const {return impl_->GetText();}
+std::vector<Position> Cell::GetReferencedCells() const {return impl_->GetReferencedCells();}
+bool Cell::IsReferenced() const {return !dependent_cells_.empty();}
+
+void Cell::InvalidateAllCache(bool flag = false) {
+    if (impl_->HasCache() || flag) {
+        impl_->InvalidateCache();
+        
+        for (Cell* dependent : dependent_cells_) {
+            dependent->InvalidateAllCache();
+        }
+    }
+}
+
+std::vector<Position> Cell::Impl::GetReferencedCells() const {return {};}
+bool Cell::Impl::HasCache() {return true;}
+void Cell::Impl::InvalidateCache() {}
+
+Cell::Value Cell::EmptyImpl::GetValue() const {return "";}
+std::string Cell::EmptyImpl::GetText() const {return "";}
+
+Cell::TextImpl::TextImpl(std::string text) : text_(std::move(text)) {}
+
+Cell::Value Cell::TextImpl::GetValue() const {
+    
+    if (text_.empty()) {
+        throw FormulaException("it is empty impl, not text");
+        
+    } else if (text_.at(0) == ESCAPE_SIGN) {
+        return text_.substr(1);
+        
+    } else {
+        return text_;    
+    }      
+}
+
+std::string Cell::TextImpl::GetText() const {return text_;}
+
+Cell::FormulaImpl::FormulaImpl(std::string text, SheetInterface& sheet) : formula_ptr_(ParseFormula(text.substr(1)))
+                                                                        , sheet_(sheet) {}
+
+Cell::Value Cell::FormulaImpl::GetValue() const {             
+    
+    if (!cache_) {cache_ = formula_ptr_->Evaluate(sheet_);}     
+    return std::visit([](auto& helper){return Value(helper);}, *cache_);        
+}
+
+std::string Cell::FormulaImpl::GetText() const {return FORMULA_SIGN + formula_ptr_->GetExpression();}
+std::vector<Position> Cell::FormulaImpl::GetReferencedCells() const {return formula_ptr_->GetReferencedCells();}
+bool Cell::FormulaImpl::HasCache() {return cache_.has_value();}
+void Cell::FormulaImpl::InvalidateCache() {cache_.reset();}
+-----------------------------------------------------------------------
+cell.h
+-----------------------------------------------------------------------
+#pragma once
+
+#include "common.h"
+#include "formula.h"
+
+#include <functional>
+#include <unordered_set>
+#include <stack>
+#include <set>
+
+class Sheet;
+
+class Cell : public CellInterface {
+public:
+    Cell(Sheet& sheet);
+    ~Cell();
+
+    void Set(std::string text);
+    void Clear();
+
+    Value GetValue() const override;
+    std::string GetText() const override;
+    std::vector<Position> GetReferencedCells() const override;
+    
+    bool IsReferenced() const;
+    void InvalidateAllCache(bool flag);
+    
+private:
+    
+    class Impl {
+    public:
+        virtual Value GetValue() const = 0;
+        virtual std::string GetText() const = 0;
+        virtual std::vector<Position> GetReferencedCells() const;
+
+        virtual bool HasCache();
+        virtual void InvalidateCache();
+        
+        virtual ~Impl() = default;
+    };
+    
+    class EmptyImpl : public Impl {
+    public:    
+        
+        Value GetValue() const override;
+        std::string GetText() const override;      
+    };
+    
+    class TextImpl : public Impl {
+    public:
+        
+        explicit TextImpl(std::string text); 
+        Value GetValue() const override;       
+        std::string GetText() const override;
+        
+    private:
+        std::string text_;        
+    };
+    
+    class FormulaImpl : public Impl {
+    public:
+        
+        explicit FormulaImpl(std::string text, SheetInterface& sheet);
+        
+        Value GetValue() const override;
+        std::string GetText() const override;
+        std::vector<Position> GetReferencedCells() const override;
+        
+        bool HasCache() override;
+        void InvalidateCache() override;
+        
+    private:
+        mutable std::optional<FormulaInterface::Value> cache_;
+        std::unique_ptr<FormulaInterface> formula_ptr_;
+        SheetInterface& sheet_;
+    };
+    
+    std::unique_ptr<Impl> impl_;
+    Sheet& sheet_;
+    
+    std::set<Cell*> dependent_cells_;
+    std::set<Cell*> referenced_cells_;
+};
+-----------------------------------------------------------------------
+sheet.h
+-----------------------------------------------------------------------
+#pragma once
+
+#include "cell.h"
+#include "common.h"
+
+#include <functional>
+#include <vector>
+
+using Table = std::vector<std::vector<std::unique_ptr<Cell>>>;
+
+class Sheet : public SheetInterface {
+public:
+    ~Sheet();
+
+    void SetCell(Position pos, std::string text) override;
+    
+    CellInterface* GetCell(Position pos) override;
+    const CellInterface* GetCell(Position pos) const override;
+    Cell* Get_Cell(Position pos);
+    const Cell* Get_Cell(Position pos) const;
+
+    void ClearCell(Position pos) override;
+
+    Size GetPrintableSize() const override;
+
+    void PrintValues(std::ostream& output) const override;
+    void PrintTexts(std::ostream& output) const override;
+
+private:
+	Table cells_;
+};
+-----------------------------------------------------------------------
+sheet.cpp
+-----------------------------------------------------------------------
+#include "sheet.h"
+
+#include "cell.h"
+#include "common.h"
+
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <optional>
+
+using namespace std::literals;
+
+Sheet::~Sheet() {}
+
+void Sheet::SetCell(Position pos, std::string text) { 
+    
+    if (pos.IsValid()) { 
+        
+        cells_.resize(std::max(pos.row + 1, int(std::size(cells_))));
+        cells_[pos.row].resize(std::max(pos.col + 1, int(std::size(cells_[pos.row]))));
+
+        if (!cells_[pos.row][pos.col]) {cells_[pos.row][pos.col] = std::make_unique<Cell>(*this);}
+        cells_[pos.row][pos.col]->Set(std::move(text));
+        
+    } else {
+        throw InvalidPositionException("invalid cell position. setsell");
+    }    
+}
+
+CellInterface* Sheet::GetCell(Position pos) {
+    
+    if (pos.IsValid()) {
+        
+        if (pos.row < int(std::size(cells_)) && pos.col < int(std::size(cells_[pos.row]))) {
+            
+            if (cells_[pos.row][pos.col].get()->GetText() == "") {
+                return nullptr;
+                
+            } else {
+                return cells_[pos.row][pos.col].get();
+            }
+
+        } else {
+            return nullptr;
+        }
+        
+    } else {
+        throw InvalidPositionException("invalid cell position. getcell");
+    } 
+}
+
+const CellInterface* Sheet::GetCell(Position pos) const {
+    if (pos.IsValid()) {
+        
+        if (pos.row < int(std::size(cells_)) && pos.col < int(std::size(cells_[pos.row]))) {
+            
+            if (cells_[pos.row][pos.col].get()->GetText() == "") {
+                return nullptr;
+                
+            } else {
+                return cells_[pos.row][pos.col].get();
+            }
+
+        } else {
+            return nullptr;
+        }
+        
+    } else {
+        throw InvalidPositionException("invalid cell position. getcell");
+    } 
+}
+
+Cell* Sheet::Get_Cell(Position pos) {
+    
+    if (pos.IsValid()) {
+        
+        if (pos.row < int(std::size(cells_)) && pos.col < int(std::size(cells_[pos.row]))) {
+            return cells_[pos.row][pos.col].get();
+            
+        } else {
+            return nullptr;
+        }
+         
+    } else {
+        throw InvalidPositionException("invalid cell position. get_cell");
+    }
+    
+}
+
+const Cell* Sheet::Get_Cell(Position pos) const {
+    const Cell* const_result = Get_Cell(pos);
+    return const_result;
+}
+
+void Sheet::ClearCell(Position pos) {
+    
+    if (pos.IsValid()) {
+        
+        if (pos.row < int(std::size(cells_)) && pos.col < int(std::size(cells_[pos.row]))) {
+            
+            if (cells_[pos.row][pos.col]) {
+                cells_[pos.row][pos.col]->Clear();
+                
+                if (!cells_[pos.row][pos.col]->IsReferenced()) {
+                    cells_[pos.row][pos.col].reset();
+                }
+            }
+        }
+        
+    } else {    
+        throw InvalidPositionException("invalid cell position. clearcell");
+    } 
+}
+
+Size Sheet::GetPrintableSize() const {
+    
+    Size size;
+    
+    for (int row = 0; row < int(std::size(cells_)); ++row) { 
+        
+        for (int col = (int(std::size(cells_[row])) - 1); col >= 0; --col) {
+  
+            if (cells_[row][col]) {
+                
+                if (cells_[row][col]->GetText().empty()) {
+                    continue;
+                    
+                } else {
+                    size.rows = std::max(size.rows, row + 1);
+                    size.cols = std::max(size.cols, col + 1);
+                    break;
+                }
+            }
+        }
+    }
+    
+    return size;
+}
+
+void Sheet::PrintValues(std::ostream& output) const {
+    
+    for (int row = 0; row < GetPrintableSize().rows; ++row) {    
+        
+        for (int col = 0; col < GetPrintableSize().cols; ++col) {
+            
+            if (col > 0) {output << '\t';}
+            
+            if (col < int(std::size(cells_[row]))) {   
+                
+                if (cells_[row][col]) {std::visit([&output](const auto& value) {output << value;}, 
+                                       cells_[row][col]->GetValue());}
+            }
+        }
+        
+        output << '\n';
+    }
+}
+            
+void Sheet::PrintTexts(std::ostream& output) const {
+   
+    for (int row = 0; row < GetPrintableSize().rows; ++row) {  
+        
+        for (int col = 0; col < GetPrintableSize().cols; ++col) {
+            
+            if (col) {output << '\t';}
+            
+            if (col < int(std::size(cells_[row]))) {  
+                
+                if (cells_[row][col]) {output << cells_[row][col]->GetText();}
+            }
+        }
+        
+        output << '\n';
+    }
+}
+
+std::unique_ptr<SheetInterface> CreateSheet() {return std::make_unique<Sheet>();}
+-----------------------------------------------------------------------
+structures.cpp
+-----------------------------------------------------------------------
+#include "common.h"
+
+#include <cctype>
+#include <sstream>
+#include <algorithm>
+
+const int LETTERS = 26;
+const int MAX_POSITION_LENGTH = 17;
+const int MAX_POS_LETTER_COUNT = 3;
+
+const Position Position::NONE = {-1, -1};
+
+bool Position::operator==(const Position rhs) const {return row == rhs.row && col == rhs.col;}
+bool Position::operator<(const Position rhs) const {return std::tie(row, col) < std::tie(rhs.row, rhs.col);}
+
+bool Position::IsValid() const {return row >= 0 && col >= 0 && row < MAX_ROWS && col < MAX_COLS;}
+
+std::string Position::ToString() const {
+    
+    if (!IsValid()) {return "";}
+
+    std::string result;
+    result.reserve(MAX_POSITION_LENGTH);
+    int c = col;
+    
+    while (c >= 0) {
+        result.insert(result.begin(), 'A' + c % LETTERS);
+        c = c / LETTERS - 1;
+    }
+
+    result += std::to_string(row + 1);
+    return result;
+}
+
+Position Position::FromString(std::string_view str) {
+    
+    auto it = std::find_if(str.begin(), str.end(), [](const char c) {
+        return !(std::isalpha(c) && std::isupper(c));
+    });
+    
+    auto letters = str.substr(0, it - str.begin());
+    auto digits = str.substr(it - str.begin());
+
+    if (letters.empty() || digits.empty()) {return Position::NONE;}
+    if (letters.size() > MAX_POS_LETTER_COUNT) {return Position::NONE;}
+    if (!std::isdigit(digits[0])) {return Position::NONE;}
+
+    int row;
+    std::istringstream row_in{std::string{digits}};
+    
+    if (!(row_in >> row) || !row_in.eof()) {return Position::NONE;}
+
+    int col = 0;
+    
+    for (char ch : letters) {
+        col *= LETTERS;
+        col += ch - 'A' + 1;
+    }
+
+    return {row - 1, col - 1};
+}
+
+bool Size::operator==(Size rhs) const {return cols == rhs.cols && rows == rhs.rows;}
