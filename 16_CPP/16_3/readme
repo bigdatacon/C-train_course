@@ -1,0 +1,99 @@
+Для реализации разных типов ячеек приходит на ум использовать базовый класс и его наследников — разные ячейки. Это хорошая догадка, но проблема в том, что ячейка может менять свой тип, если в ней заменили текст.
+Поэтому рекомендуем сначала реализовать базовый класс Impl для ячеек разных типов и три наследника: пустая ячейка, формульная ячейка и текстовая ячейка. А затем написать класс-обёртку Cell над ними.
+Когда пользователь задаёт текст в методе Cell::Set(), внутри метода определяется тип ячейки в зависимости от заданного текста и создаётся нужный объект-реализация: формульная, текстовая, пустая.
+Задание
+Реализуйте класс Cell в соответствии с интерфейсом CellInterface из файла common.h.
+Ограничения
+Не меняйте никакие файлы кроме cell.h и cell.cpp.
+Как будет тестироваться ваш код
+Протестируем только файлы cell.h и cell.cpp. Тестировать остальные файлы не будем. 
+Мы будем записывать в ячейки разные строки и проверять методы GetValue() и GetText().
+Примеры вы можете найти в файле main.cpp.
+Скопируйте содержимое файлов main.cpp и common.h ниже и вставьте в своё решение.
+common.h
+  #pragma once
+
+  #include <iosfwd>
+  #include <memory>
+  #include <stdexcept>
+  #include <string>
+  #include <string_view>
+  #include <variant>
+
+  // Описывает ошибки, которые могут возникнуть при вычислении формулы.
+  class FormulaError : public std::runtime_error {
+  public:
+      using std::runtime_error::runtime_error;
+  };
+
+  std::ostream& operator<<(std::ostream& output, FormulaError fe);
+
+  // Исключение, выбрасываемое при попытке задать синтаксически некорректную
+  // формулу
+  class FormulaException : public std::runtime_error {
+  public:
+      using std::runtime_error::runtime_error;
+  };
+
+  inline constexpr char FORMULA_SIGN = '=';
+  inline constexpr char ESCAPE_SIGN = '\'';
+
+  class CellInterface {
+  public:
+      // Либо текст ячейки, либо значение формулы, либо сообщение об ошибке из
+      // формулы
+      using Value = std::variant<std::string, double, FormulaError>;
+
+      virtual ~CellInterface() = default;
+
+      
+      // Задаёт содержимое ячейки. Если текст начинается со знака "=", то он
+      // интерпретируется как формула. Уточнения по записи формулы:
+      // * Если текст содержит только символ "=" и больше ничего, то он не считается
+      // формулой
+      // * Если текст начинается с символа "'" (апостроф), то при выводе значения
+      // ячейки методом GetValue() он опускается. Можно использовать, если нужно
+      // начать текст со знака "=", но чтобы он не интерпретировался как формула.
+      virtual void Set(std::string text) = 0;
+
+      // Возвращает видимое значение ячейки.
+      // В случае текстовой ячейки это её текст (без экранирующих символов). В
+      // случае формулы - числовое значение формулы или сообщение об ошибке.
+      virtual Value GetValue() const = 0;
+      // Возвращает внутренний текст ячейки, как если бы мы начали её
+      // редактирование. В случае текстовой ячейки это её текст (возможно,
+      // содержащий экранирующие символы). В случае формулы - её выражение.
+      virtual std::string GetText() const = 0;
+  };
+   
+main.cpp
+#include "cell.h"
+#include "common.h"
+#include "formula.h"
+#include "test_runner_p.h"
+
+inline std::ostream& operator<<(std::ostream& output, const CellInterface::Value& value) {
+    std::visit([&](const auto& x) { output << x; }, value);
+    return output;
+}
+
+std::unique_ptr<CellInterface> CreateCell(const std::string& str) {
+    std::unique_ptr<CellInterface> cell = std::make_unique<Cell>();
+    cell->Set(str);
+    return cell;
+}
+
+int main()
+{
+
+    auto simple_text = CreateCell("simple_text");
+    ASSERT_EQUAL(simple_text->GetText(), "simple_text");
+    ASSERT_EQUAL(std::get<std::string>(simple_text->GetValue()), "simple_text");
+
+    auto empty_apostroph = CreateCell("'");
+    ASSERT_EQUAL(empty_apostroph->GetText(), "'");
+    ASSERT_EQUAL(std::get<std::string>(empty_apostroph->GetValue()), "");
+
+    auto apostroph = CreateCell("'apostroph");
+    ASSERT_EQUAL(apostroph->GetText(), "'apostroph");
+    ASSERT_EQUAL(std::get<std::string>(apostroph->GetValue()), "apostroph");
