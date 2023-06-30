@@ -1,0 +1,163 @@
+Разберёмся с ограничениями на производительность. Метод GetCell() должен отрабатывать за константное время, в то время как ограничения на время работы для вставки и удаления столбцов/строк самые либеральные. Значит, операции произвольного доступа будут вызываться чаще, чем операции вставки.
+     Наверно, имеет смысл использовать простую структуру данных вроде вектора векторов.
+При вставке и удалении строк и столбцов ячейки должны «сдвигаться» на соседние позиции. Значит, есть смысл «отвязать» ячейку от её индекса. Например, хранить сами ячейки в динамической памяти, а в векторах хранить лишь указатели — желательно умные — на объекты ячеек.
+     Так вы к тому же экономите память, потому что не выделяете её под пустые ячейки. Ведь ваши векторы могут содержать nullptr.
+
+Задание
+Реализуйте структуру данных «Электронная таблица». Интерфейс таблицы SheetInterface вы найдёте в файле common.h.
+common.h содержит интерфейсы классов FormulaInterface, CellInterface, объявление структур Size и Position, описание исключений и ошибок. Интерфейс SheetInterface не содержит методов удаления и вставки. Реализовывать их не нужно.
+Для размера минимальной печатной области в файле common.h определена структура Size. В файле  structures.cpp из решения первой задачи реализуйте operator== для этой структуры. 
+Ограничения
+Вносите изменения только в файлы sheet.h, sheet.cpp и structures.cpp. В файле structures.cpp реализуйте Size::operator==().
+Как будет тестироваться ваш код
+Протестируем только файлы sheet.h и sheet.cpp. Мы не будем тестировать остальные файлы. Примеры тестов вы найдёте в файле main.cpp.
+Мы будем проводить нагрузочные тесты: создавать/удалять большое количество ячеек много раз и проверять время работы и использование памяти.
+Проверим, что минимальная видимая область находится корректно.
+Также будем проверять все функции интерфейса SheetInterface.
+Скопируйте содержимое файлов main.cpp и common.h ниже и вставьте в своё решение.
+main.cpp
+  #include "common.h"
+  #include "test_runner_p.h"
+
+  inline std::ostream& operator<<(std::ostream& output, Position pos) {
+      return output << "(" << pos.row << ", " << pos.col << ")";
+  }
+
+  inline Position operator"" _pos(const char* str, std::size_t) {
+      return Position::FromString(str);
+  }
+
+  inline std::ostream& operator<<(std::ostream& output, Size size) {
+      return output << "(" << size.rows << ", " << size.cols << ")";
+  }
+
+  inline std::ostream& operator<<(std::ostream& output, const CellInterface::Value& value) {
+      std::visit(
+          [&](const auto& x) {
+              output << x;
+          },
+          value);
+      return output;
+  }
+
+  namespace {
+
+  void TestEmpty() {
+      auto sheet = CreateSheet();
+      ASSERT_EQUAL(sheet->GetPrintableSize(), (Size{0, 0}));
+  }
+
+  void TestInvalidPosition() {
+      auto sheet = CreateSheet();
+      try {
+          sheet->SetCell(Position{-1, 0}, "");
+      } catch (const InvalidPositionException&) {
+      }
+      try {
+          sheet->GetCell(Position{0, -2});
+      } catch (const InvalidPositionException&) {
+      }
+      try {
+          sheet->ClearCell(Position{Position::MAX_ROWS, 0});
+      } catch (const InvalidPositionException&) {
+      }
+  }
+
+  void TestSetCellPlainText() {
+      auto sheet = CreateSheet();
+
+      auto checkCell = [&](Position pos, std::string text) {
+          sheet->SetCell(pos, text);
+          CellInterface* cell = sheet->GetCell(pos);
+          ASSERT(cell != nullptr);
+          ASSERT_EQUAL(cell->GetText(), text);
+          ASSERT_EQUAL(std::get<std::string>(cell->GetValue()), text);
+      };
+
+      checkCell("A1"_pos, "Hello");
+      checkCell("A1"_pos, "World");
+      checkCell("B2"_pos, "Purr");
+      checkCell("A3"_pos, "Meow");
+
+      const SheetInterface& constSheet = *sheet;
+      ASSERT_EQUAL(constSheet.GetCell("B2"_pos)->GetText(), "Purr");
+
+      sheet->SetCell("A3"_pos, "'=escaped");
+      CellInterface* cell = sheet->GetCell("A3"_pos);
+      ASSERT_EQUAL(cell->GetText(), "'=escaped");
+      ASSERT_EQUAL(std::get<std::string>(cell->GetValue()), "=escaped");
+  }
+
+  void TestClearCell() {
+      auto sheet = CreateSheet();
+
+      sheet->SetCell("C2"_pos, "Me gusta");
+      sheet->ClearCell("C2"_pos);
+      ASSERT(sheet->GetCell("C2"_pos) == nullptr);
+
+      sheet->ClearCell("A1"_pos);
+      sheet->ClearCell("J10"_pos);
+  }
+  void TestPrint() {
+      auto sheet = CreateSheet();
+      sheet->SetCell("A2"_pos, "meow");
+      sheet->SetCell("B2"_pos, "=1+2");
+      sheet->SetCell("A1"_pos, "=1/0");
+
+      ASSERT_EQUAL(sheet->GetPrintableSize(), (Size{2, 2}));
+
+      std::ostringstream texts;
+      sheet->PrintTexts(texts);
+      ASSERT_EQUAL(texts.str(), "=1/0\t\nmeow\t=1+2\n");
+
+      std::ostringstream values;
+      sheet->PrintValues(values);
+      ASSERT_EQUAL(values.str(), "#DIV/0!\t\nmeow\t3\n");
+
+      sheet->ClearCell("B2"_pos);
+      ASSERT_EQUAL(sheet->GetPrintableSize(), (Size{2, 1}));
+  }
+
+  }  // namespace
+
+  int main() {
+      TestRunner tr;
+      RUN_TEST(tr, TestEmpty);
+      RUN_TEST(tr, TestInvalidPosition);
+      RUN_TEST(tr, TestSetCellPlainText);
+      RUN_TEST(tr, TestClearCell);
+      RUN_TEST(tr, TestPrint);
+      return 0;
+  }
+   
+common.h
+#pragma once
+
+#include <iosfwd>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <variant>
+#include <vector>
+
+// Позиция ячейки. Индексация с нуля.
+struct Position {
+int row = 0;
+int col = 0;
+
+bool operator==(Position rhs) const;
+bool operator<(Position rhs) const;
+
+bool IsValid() const;
+std::string ToString() const;
+
+static Position FromString(std::string_view str);
+
+static const int MAX_ROWS = 16384;
+static const int MAX_COLS = 16384;
+static const Position NONE;
+};
+
+struct Size {
+int rows = 0;
