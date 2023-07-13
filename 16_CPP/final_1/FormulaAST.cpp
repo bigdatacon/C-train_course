@@ -141,6 +141,43 @@ namespace ASTImpl {
                         return static_cast<ExprPrecedence>(INT_MAX);
                 }
             }
+
+            double Evaluate(std::function<double(Position)>& args) const override {
+                double value;
+
+                switch (type_) {
+
+                    case Add:
+                        value = lhs_->Evaluate(args) + rhs_->Evaluate(args);
+                        break;
+
+                    case Subtract:
+                        value = lhs_->Evaluate(args) - rhs_->Evaluate(args);
+                        break;
+
+                    case Multiply:
+                        value = lhs_->Evaluate(args) * rhs_->Evaluate(args);
+                        break;
+
+                    case Divide:
+
+                        if (rhs_->Evaluate(args) != 0) {
+                            value = lhs_->Evaluate(args) / rhs_->Evaluate(args);
+                        } else {
+                            throw FormulaError(FormulaError::Category::Div0);
+                        }
+                        break;
+
+                    default:
+                        throw std::invalid_argument("unidentified operation type");
+                }
+                if (std::isfinite(value)) {
+                    return value;
+                } else {
+                    throw FormulaError(FormulaError::Category::Div0);
+                }
+            }
+            /*
             double Evaluate(std::function<double(Position)>& args) const override {
 
                 switch (type_) {
@@ -167,7 +204,7 @@ namespace ASTImpl {
                         throw std::invalid_argument("unidentified operation type");
                 }
             }
-
+            */
 
         private:
             Type type_;
