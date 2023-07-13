@@ -33,9 +33,9 @@ private:
 
     bool hasCircularDependency( Cell* cell) ;
 
-    bool CheckCircularDependencies(/*const std::vector<Cell>& cells*/ const Impl& new_impl) ;
+    bool CheckCircularDependenciess(/*const std::vector<Cell>& cells*/ const Impl& new_impl) ;
 
-    //bool CheckCircularDependencies(const Impl& new_impl) const;
+    bool CheckCircularDependencies(const Impl& new_impl) const;
 
     class Impl {
     public:
