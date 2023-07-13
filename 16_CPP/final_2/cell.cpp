@@ -64,7 +64,7 @@ bool Cell::hasCircularDependency( Cell* cell) {
     return false;
 }
 
-bool Cell::CheckCircularDependencies(/*const std::vector<Cell>& cells*/  const Impl& new_impl) {
+bool Cell::CheckCircularDependenciess( const Impl& new_impl) {
     const auto& cells = new_impl.GetReferencedCells();
     for (/*const Cell& cell : cells*/  const auto& position : cells) {
         Cell* ref_cell = sheet_.Get_Cell(position);
@@ -74,7 +74,7 @@ bool Cell::CheckCircularDependencies(/*const std::vector<Cell>& cells*/  const I
     return false;
 }
 
-/*
+
 bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
     const auto& new_ref_cells = new_impl.GetReferencedCells();
 
@@ -112,7 +112,7 @@ bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
 
     return false; // Циклических зависимостей не найдено
 }
-*/
+
 
 
 void Cell::Clear() {
