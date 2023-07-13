@@ -1,1 +1,58 @@
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+enum class CellState { NotVisited, Visiting, Visited };
+
+class Cell {
+public:
+    int id;
+    std::vector<Cell*> dependents;
+    CellState state;
+
+    Cell(int cellId) : id(cellId), state(CellState::NotVisited) {}
+};
+
+bool hasCircularDependency(Cell* cell) {
+    cell->state = CellState::Visiting;
+
+    for (Cell* dependent : cell->dependents) {
+        if (dependent->state == CellState::NotVisited) {
+            if (hasCircularDependency(dependent))
+                return true;
+        } else if (dependent->state == CellState::Visiting) {
+            return true; // Найдена циклическая зависимость
+        }
+    }
+
+    cell->state = CellState::Visited;
+    return false;
+}
+
+bool hasCircularDependencies(const std::vector<Cell>& cells) {
+    for (const Cell& cell : cells) {
+        if (cell.state == CellState::NotVisited && hasCircularDependency(&cell))
+            return true;
+    }
+    return false;
+}
+
+int main() {
+    // Пример использования
+    Cell A(1), B(2), C(3), D(4);
+
+    A.dependents.push_back(&B);
+    B.dependents.push_back(&C);
+    C.dependents.push_back(&D);
+    D.dependents.push_back(&A); // Циклическая зависимость
+
+    std::vector<Cell> allCells = {A, B, C, D};
+
+    if (hasCircularDependencies(allCells))
+        std::cout << "Найдена циклическая зависимость\n";
+    else
+        std::cout << "Циклических зависимостей не найдено\n";
+
+    return 0;
+}
 
