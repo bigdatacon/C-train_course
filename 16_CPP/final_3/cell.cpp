@@ -74,7 +74,59 @@ bool Cell::CheckCircularDependenciess( const Impl& new_impl) {
     return false;
 }
 
+void Cell::DepthFirstSearch( Cell* cell, std::unordered_set<Cell*>& visited, std::stack<Cell*>& sorted) {
+    visited.insert(cell);
 
+    for (Cell* dependent : cell->calculated_cells_) {
+        if (visited.find(dependent) == visited.end()) {
+            DepthFirstSearch(dependent, visited, sorted);
+        } else if (visited.find(dependent) != visited.end()) {
+            // Найдена циклическая зависимость
+            throw std::runtime_error("Найдена циклическая зависимость");
+        }
+    }
+
+    sorted.push(cell);
+}
+
+bool Cell::CheckCircularDependencies(const Impl& new_impl) /*const*/ {
+    auto new_ref_cells = new_impl.GetReferencedCells();
+
+    if (!new_ref_cells.empty()) {
+        std::unordered_set<Cell*> visited;
+        std::stack<Cell*> sorted;
+        std::vector< Cell*> insert_;
+
+        for (const auto& position : new_ref_cells) {
+            Cell* ref_cell = sheet_.Get_Cell(position);
+            if (ref_cell) {
+                using_cells_.insert(ref_cell);
+            } else {
+                sheet_.SetCell(position, "");
+                using_cells_.insert(sheet_.Get_Cell(position));
+            }
+        }
+
+        insert_.push_back(this);
+
+        while (!insert_.empty()) {
+            Cell* current = insert_.back();
+            insert_.pop_back();
+
+            DepthFirstSearch(current, visited, sorted);
+        }
+
+        while (!sorted.empty()) {
+            const Cell* cell = sorted.top();
+            sorted.pop();
+            insert_.push_back(const_cast<Cell*>(cell));
+        }
+    }
+
+    return false; // Циклических зависимостей не найдено
+}
+
+/*
 bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
     const auto& new_ref_cells = new_impl.GetReferencedCells();
 
@@ -112,7 +164,7 @@ bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
 
     return false; // Циклических зависимостей не найдено
 }
-
+*/
 
 
 void Cell::Clear() {

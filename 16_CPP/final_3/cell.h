@@ -35,7 +35,9 @@ private:
 
     bool CheckCircularDependenciess(/*const std::vector<Cell>& cells*/ const Impl& new_impl) ;
 
-    bool CheckCircularDependencies(const Impl& new_impl) const;
+    void DepthFirstSearch( Cell* cell, std::unordered_set<Cell*>& visited, std::stack<Cell*>& sorted);
+
+    bool CheckCircularDependencies(const Impl& new_impl) /*const*/;
 
     class Impl {
     public:
