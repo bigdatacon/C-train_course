@@ -22,7 +22,7 @@ void Cell::Set(std::string text, Position pos) {
         pos_for_ref_cell  = Position::FromString(text.substr(1));
     } catch (const std::out_of_range& e) {
         // Обработка исключения, если указанный индекс находится за пределами строки
-        std::cout << "Ошибка: " << e.what() << std::endl;
+        //std::cout << "Ошибка: " << e.what() << std::endl;
     }
 
     if (text.empty()) {
