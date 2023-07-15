@@ -7,6 +7,7 @@
 #include <string_view>
 #include <variant>
 #include <vector>
+#include <iostream>
 
 struct Position {
     int row = 0;
@@ -20,9 +21,13 @@ struct Position {
 
     static Position FromString(std::string_view str);
 
+
     static const int MAX_ROWS = 16384;
     static const int MAX_COLS = 16384;
     static const Position NONE;
+
+    //friend std::ostream& operator<<(std::ostream& os, const Position& pos);
+    //std::ostream& operator<<(std::ostream& os, const Position& pos);
 };
 
 struct Size {
