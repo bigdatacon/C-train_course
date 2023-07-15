@@ -26,7 +26,7 @@ void Sheet::SetCell(Position pos, std::string text) {
         // Проверяю что в text не ячейка типа =B1 то есть не ссылка на ячейку которая еще не создана, в данном случае ячейку нужно создать
         std::string text_copy = text;
 
-        cells_[pos.row][pos.col]->Set(std::move(text));
+        cells_[pos.row][pos.col]->Set(std::move(text), pos);
 
         // проверяю что ячейка на которую ссылаются пустая
         if (text_copy.size() > 0 && text_copy[0] == FORMULA_SIGN) {
@@ -266,5 +266,11 @@ void Sheet::PrintTexts(std::ostream& output) const {
         output << '\n';
     }
 }
+/*
+const Table& Sheet::GetTable() const {
+    return cells_;
+}
+ */
 
 std::unique_ptr<SheetInterface> CreateSheet() {return std::make_unique<Sheet>();}
+

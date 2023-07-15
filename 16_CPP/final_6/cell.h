@@ -18,7 +18,7 @@ public:
     Cell(Sheet& sheet);
     ~Cell();
 
-    void Set(std::string text);
+    void Set(std::string text, Position pos);
     void Clear();
 
     Value GetValue() const override;
@@ -93,4 +93,7 @@ private:
     std::set<Cell*> using_cells_;
 
     CellState state = CellState::NotVisited;
+
+
+    Position pos_;
 };

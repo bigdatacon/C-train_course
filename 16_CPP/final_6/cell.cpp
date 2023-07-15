@@ -10,8 +10,10 @@ Cell::Cell(Sheet& sheet) : impl_(std::make_unique<EmptyImpl>()),
                            sheet_(sheet) {}
 Cell::~Cell() = default;
 
-void Cell::Set(std::string text) {
+void Cell::Set(std::string text, Position pos) {
     std::unique_ptr<Impl> iterim;
+    pos_ = pos;
+    std::cout << "Begin Set Cell position of current is : " << pos_.ToString() << std::endl;
 
     if (text.empty()) {
         iterim = std::make_unique<EmptyImpl>();
@@ -83,6 +85,7 @@ bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
     auto value_in = new_impl.GetValue();
     auto text_in = new_impl.GetText();
 
+
     if (!new_ref_cells.empty()) {
         std::set<std::pair<const Cell*, int>> calc_;
         std::vector<std::pair<const Cell*, int>> insert_;
@@ -91,7 +94,7 @@ bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
 
         for (const auto& position : new_ref_cells) {
             auto pos_to_string = position.ToString();
-            std::cout << "position.ToString() : " << position.ToString() << std::endl;
+            std::cout << "Ref CElls CYCLE DEPENDENT CELL FOR   : "<< text_in <<" : " << position.ToString() << std::endl;
             const Cell* ref_cell = sheet_.Get_Cell(position);
             if (ref_cell) {
                 using_.insert(ref_cell);
