@@ -103,7 +103,7 @@ bool Cell::CheckCircularDependencies(const Impl& new_impl) const {
                 using_.insert(sheet_.Get_Cell(position));
             }
         }
-        std::cout << "This Get Text : " << this->GetText() << std::endl;
+        std::cout << "This Get Pos : " << this->pos_.ToString() << std::endl;
         insert_.push_back(std::make_pair(this, 0));
 
         while (!insert_.empty()) {
