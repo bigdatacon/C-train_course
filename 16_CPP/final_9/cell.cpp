@@ -25,6 +25,19 @@ void Cell::Set(std::string text, Position pos) {
         //std::cout << "Ошибка: " << e.what() << std::endl;
     }
 
+    try {
+        // сравниваю что не ссылается ячейка на саму себя
+        if (pos_for_ref_cell  == pos){
+            return;
+        }
+
+    } catch (const std::out_of_range& e) {
+        // Обработка исключения, если указанный индекс находится за пределами строки
+        //std::cout << "Ошибка: " << e.what() << std::endl;
+    }
+
+
+
     if (text.empty()) {
         iterim = std::make_unique<EmptyImpl>();
     } else if (text.size() >= 2 && text[0] == FORMULA_SIGN) {
