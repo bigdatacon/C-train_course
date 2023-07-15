@@ -63,6 +63,6 @@ Position Position::FromString(std::string_view str) {
 bool Size::operator==(Size rhs) const {return cols == rhs.cols && rows == rhs.rows;}
 
 std::ostream& operator<<(std::ostream& os, const Position& pos) {
-    os << "Row: " << pos.row << ", Col: " << pos.col;
+    os << "Row: " << pos.row << ", Col: " << pos.col << " ToString: " << pos.ToString();
     return os;
 }
