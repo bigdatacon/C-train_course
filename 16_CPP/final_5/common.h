@@ -30,6 +30,8 @@ struct Position {
     //std::ostream& operator<<(std::ostream& os, const Position& pos);
 };
 
+//std::ostream& operator<<(std::ostream& os, const Position& pos);
+
 struct Size {
     int rows = 0;
     int cols = 0;
