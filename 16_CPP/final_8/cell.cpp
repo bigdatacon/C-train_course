@@ -25,6 +25,19 @@ void Cell::Set(std::string text, Position pos) {
         //std::cout << "Ошибка: " << e.what() << std::endl;
     }
 
+    try {
+        // сравниваю что не ссылается ячейка на саму себя
+        if (pos_for_ref_cell  == pos){
+            return;
+        }
+
+    } catch (const std::out_of_range& e) {
+        // Обработка исключения, если указанный индекс находится за пределами строки
+        //std::cout << "Ошибка: " << e.what() << std::endl;
+    }
+
+
+
     if (text.empty()) {
         iterim = std::make_unique<EmptyImpl>();
     } else if (text.size() >= 2 && text[0] == FORMULA_SIGN) {
@@ -95,12 +108,7 @@ bool Cell::FindPairsInCalc(const Cell* dependent, const std::set<std::pair<const
     std::vector<int> matchingPairs;
 
     for (const auto& pair : calc_) {
-        auto f_1_0 =  pair.first->pos_.col;
-        auto f_1_1 =  pair.first->pos_.row;
-        auto f_2_0 =  dependent->pos_.col;
-        auto f_2_1 =  dependent->pos_.row;
 
-        auto rr = pair.first->pos_==dependent->pos_;
 
         if (pair.first->pos_ == dependent->pos_) {
             matchingPairs.push_back(pair.second);
