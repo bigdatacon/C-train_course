@@ -23,6 +23,10 @@ public:
 
     Value GetValue() const override;
     std::string GetText() const override;
+
+
+
+    bool CheckCircularDependency(const std::vector<Position>& referencedCells) const;
     std::vector<Position> GetReferencedCells() const override;
 
     bool IsReferenced() const;
@@ -33,8 +37,8 @@ private:
 
     bool CheckNumberInVector(const std::vector<int>& numbers, int n) const;
     bool FindPairsInCalc(const Cell* dependent, const std::set<std::pair<const Cell*, int>>& calc_, int dependent_level) const;
-    bool CheckCircularDependencies(const Impl& new_impl, Position pos_for_ref_cell, std::forward_list<Position> set_formula_cells) const;
-
+    bool hasCircularDependency( Cell* cell, std::set<Cell*>& visitedPos, const Position pos_const);
+    bool CheckCircularDependencies( const Impl& new_impl, Position pos);
 
     class Impl {
     public:

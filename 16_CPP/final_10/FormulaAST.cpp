@@ -177,34 +177,7 @@ namespace ASTImpl {
                     throw FormulaError(FormulaError::Category::Div0);
                 }
             }
-            /*
-            double Evaluate(std::function<double(Position)>& args) const override {
 
-                switch (type_) {
-
-                    case Add:
-                        return lhs_->Evaluate(args) + rhs_->Evaluate(args);
-
-                    case Subtract:
-                        return lhs_->Evaluate(args) - rhs_->Evaluate(args);
-
-                    case Multiply:
-                        return lhs_->Evaluate(args) * rhs_->Evaluate(args);
-
-                    case Divide:
-
-                        if (rhs_->Evaluate(args) != 0) {
-                            return lhs_->Evaluate(args) / rhs_->Evaluate(args);
-
-                        } else {
-                            throw FormulaError(FormulaError::Category::Div0);
-                        }
-
-                    default:
-                        throw std::invalid_argument("unidentified operation type");
-                }
-            }
-            */
 
         private:
             Type type_;

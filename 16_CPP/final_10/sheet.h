@@ -26,7 +26,6 @@ public:
     void PrintValues(std::ostream& output) const override;
     void PrintTexts(std::ostream& output) const override;
 
-    //const Table& GetTable() const;
 
 private:
     Table cells_;

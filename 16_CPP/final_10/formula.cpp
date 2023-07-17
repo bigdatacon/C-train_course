@@ -80,20 +80,7 @@ namespace {
             }
             return std::vector<Position>(cells.cbegin(), cells.cend());
         }
-        /*
-        std::vector<Position> GetReferencedCells() const override {
-            std::vector<Position> cells;
-            for (const auto& cell : ast_.GetCells()) {
 
-                if (cell.IsValid()) {
-                    cells.push_back(cell);
-                } else {
-                    continue;
-                }
-            }
-            return cells;
-        }
-        */
     private:
         FormulaAST ast_;
     };

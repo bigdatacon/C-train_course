@@ -39,33 +39,10 @@ void Sheet::SetCell(Position pos, std::string text) {
 
         cells_[pos.row][pos.col]->Set(std::move(text), pos);
 
-
-
-
-
-
-
     } else {
         throw InvalidPositionException("invalid cell position. setsell");
     }
 }
-
-/*
-void Sheet::SetCell(Position pos, std::string text) {
-
-    if (pos.IsValid()) {
-
-        cells_.resize(std::max(pos.row + 1, int(std::size(cells_))));
-        cells_[pos.row].resize(std::max(pos.col + 1, int(std::size(cells_[pos.row]))));
-
-        if (!cells_[pos.row][pos.col]) {cells_[pos.row][pos.col] = std::make_unique<Cell>(*this);}
-        cells_[pos.row][pos.col]->Set(std::move(text));
-
-    } else {
-        throw InvalidPositionException("invalid cell position. setsell");
-    }
-}
-*/
 
 CellInterface* Sheet::GetCell(Position pos) {
 
@@ -116,54 +93,6 @@ const CellInterface* Sheet::GetCell(Position pos) const {
         throw InvalidPositionException("invalid cell position. getcell");
     }
 }
-
-
-
-
-/*
-CellInterface* Sheet::GetCell(Position pos) {
-
-    if (pos.IsValid()) {
-
-        if (pos.row < int(std::size(cells_)) && pos.col < int(std::size(cells_[pos.row]))) {
-
-            if (cells_[pos.row][pos.col].get()->GetText() == "") {
-                return nullptr;
-
-            } else {
-                return cells_[pos.row][pos.col].get();
-            }
-
-        } else {
-            return nullptr;
-        }
-
-    } else {
-        throw InvalidPositionException("invalid cell position. getcell");
-    }
-}
-
-const CellInterface* Sheet::GetCell(Position pos) const {
-    if (pos.IsValid()) {
-
-        if (pos.row < int(std::size(cells_)) && pos.col < int(std::size(cells_[pos.row]))) {
-
-            if (cells_[pos.row][pos.col].get()->GetText() == "") {
-                return nullptr;
-
-            } else {
-                return cells_[pos.row][pos.col].get();
-            }
-
-        } else {
-            return nullptr;
-        }
-
-    } else {
-        throw InvalidPositionException("invalid cell position. getcell");
-    }
-}
-*/
 
 Cell* Sheet::Get_Cell(Position pos) {
 
@@ -268,10 +197,5 @@ void Sheet::PrintTexts(std::ostream& output) const {
         output << '\n';
     }
 }
-/*
-const Table& Sheet::GetTable() const {
-    return cells_;
-}
- */
 
 std::unique_ptr<SheetInterface> CreateSheet() {return std::make_unique<Sheet>();}

@@ -26,11 +26,8 @@ struct Position {
     static const int MAX_COLS = 16384;
     static const Position NONE;
 
-    //friend std::ostream& operator<<(std::ostream& os, const Position& pos);
-    //std::ostream& operator<<(std::ostream& os, const Position& pos);
 };
 
-//std::ostream& operator<<(std::ostream& os, const Position& pos);
 
 struct Size {
     int rows = 0;
