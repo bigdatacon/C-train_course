@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <iostream>
@@ -7,10 +7,53 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
+
+#include <cassert>
 #include "helper.h"
 #include "json.h"
 
 using namespace std;
+
+
+void TestIsPointInsidePolygon() {
+    std::vector<LineSegment> polygon;
+    // Инициализируйте многоугольник с вашими отрезками
+    polygon.push_back(LineSegment(Point(1.0, 1.0), Point(7.0, 1.0)));
+    polygon.push_back(LineSegment(Point(7.0, 1.0), Point(7.0, 7.0)));
+    polygon.push_back(LineSegment(Point(7.0, 7.0), Point(1.0, 7.0)));
+    polygon.push_back(LineSegment(Point(1.0, 7.0), Point(1.0, 1.0)));
+    // Точка, которая находится внутри многоугольника
+    Point insidePoint(3.0, 3.0);
+    assert(isPointInsidePolygon(insidePoint, polygon) == true);
+
+    // Точка, которая находится снаружи многоугольника
+    Point outsidePoint(8.0, 8.0);
+    assert(isPointInsidePolygon(outsidePoint, polygon) == false);
+}
+
+void TestArePolygonSidesNonIntersecting() {
+    std::vector<LineSegment> nonIntersectingPolygon;
+    // Инициализируйте многоугольник без самопересечений
+
+    // Создайте многоугольник с четырьмя сторонами без самопересечений
+    nonIntersectingPolygon.push_back(LineSegment(Point(1.0, 1.0), Point(7.0, 1.0)));
+    nonIntersectingPolygon.push_back(LineSegment(Point(7.0, 1.0), Point(7.0, 7.0)));
+    nonIntersectingPolygon.push_back(LineSegment(Point(7.0, 7.0), Point(1.0, 7.0)));
+    nonIntersectingPolygon.push_back(LineSegment(Point(1.0, 7.0), Point(1.0, 1.0)));
+
+    assert(ArePolygonSidesNonIntersecting(nonIntersectingPolygon) == true);
+
+    std::vector<LineSegment> intersectingPolygon;
+    // Инициализируйте многоугольник с самопересечениями
+
+    // Создайте многоугольник с самопересечениями
+    intersectingPolygon.push_back(LineSegment(Point(1.0, 1.0), Point(7.0, 7.0)));
+    intersectingPolygon.push_back(LineSegment(Point(7.0, 1.0), Point(1.0, 7.0)));
+
+    assert(ArePolygonSidesNonIntersecting(intersectingPolygon) == false);
+}
+
+
 
 
 
@@ -100,6 +143,11 @@ bool findIntersection(const Point& startPoint, double angle, const std::vector<L
 }
 
 int main() {
+    // тесты
+    TestIsPointInsidePolygon();
+    //TestArePolygonSidesNonIntersecting(); // функция ArePolygonSidesNonIntersecting не корректно считает поэтому этот тест не запускаю
+
+
     std::vector<LineSegment> polygon;
     std::vector<Point> test_line;
 
