@@ -29,8 +29,17 @@ bool operator!=(const Point& lhs, const Point& rhs) {
 }
 struct IntersectionResult {
     Point intersectionPoint;
-    double incidentAngle; // Угол падения
-    double reflectionAngle; // Угол отражения
+    double incidentAngle; // Г“ГЈГ®Г« ГЇГ Г¤ГҐГ­ГЁГї
+    double reflectionAngle; // Г“ГЈГ®Г« Г®ГІГ°Г Г¦ГҐГ­ГЁГї
+    bool find;
+    bool twice_more_visited;
+
+};
+
+struct IntersectionResult {
+    Point intersectionPoint;
+    double incidentAngle; // РЈРіРѕР» РїР°РґРµРЅРёСЏ
+    double reflectionAngle; // РЈРіРѕР» РѕС‚СЂР°Р¶РµРЅРёСЏ
     bool find;
     bool twice_more_visited;
 
@@ -58,23 +67,23 @@ bool isPointInsidePolygon(const Point& point, const std::vector<LineSegment>& po
 
 IntersectionResult calculateIntersection(const Point& startPoint, double angle, const LineSegment& edge, std::map<LineSegment, int>& visited) {
     IntersectionResult result;
-    // Проверка, что startPoint не лежит на edge
+    // ГЏГ°Г®ГўГҐГ°ГЄГ , Г·ГІГ® startPoint Г­ГҐ Г«ГҐГ¦ГЁГІ Г­Г  edge
     if (startPoint == edge.start || startPoint == edge.end) {
-        return result; // Начальная точка совпадает с одной из конечных точек, нет пересечения.
+        return result; // ГЌГ Г·Г Г«ГјГ­Г Гї ГІГ®Г·ГЄГ  Г±Г®ГўГЇГ Г¤Г ГҐГІ Г± Г®Г¤Г­Г®Г© ГЁГ§ ГЄГ®Г­ГҐГ·Г­Г»Гµ ГІГ®Г·ГҐГЄ, Г­ГҐГІ ГЇГҐГ°ГҐГ±ГҐГ·ГҐГ­ГЁГї.
     }
 
-    // Проверка, что startPoint не лежит на отрезке edge
+    // ГЏГ°Г®ГўГҐГ°ГЄГ , Г·ГІГ® startPoint Г­ГҐ Г«ГҐГ¦ГЁГІ Г­Г  Г®ГІГ°ГҐГ§ГЄГҐ edge
     if (
         (startPoint.x > std::min(edge.start.x, edge.end.x) && startPoint.x < std::max(edge.start.x, edge.end.x)) &&
         (startPoint.y > std::min(edge.start.y, edge.end.y) && startPoint.y < std::max(edge.start.y, edge.end.y))
         ) {
-        return result; // startPoint лежит на отрезке edge, нет пересечения.
+        return result; // startPoint Г«ГҐГ¦ГЁГІ Г­Г  Г®ГІГ°ГҐГ§ГЄГҐ edge, Г­ГҐГІ ГЇГҐГ°ГҐГ±ГҐГ·ГҐГ­ГЁГї.
     }
 
 
     result.find = false;
 
-    // Параметры луча
+    // ГЏГ Г°Г Г¬ГҐГІГ°Г» Г«ГіГ·Г 
     double x1 = startPoint.x;
     double y1 = startPoint.y;
     double x2 = x1 + cos(angle);
@@ -85,7 +94,7 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
     double x4 = edge.end.x;
     double y4 = edge.end.y;
 
-    // Проверяем, пересекается ли луч с отрезком
+    // ГЏГ°Г®ГўГҐГ°ГїГҐГ¬, ГЇГҐГ°ГҐГ±ГҐГЄГ ГҐГІГ±Гї Г«ГЁ Г«ГіГ· Г± Г®ГІГ°ГҐГ§ГЄГ®Г¬
     double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
     if (denominator != 0) {
@@ -96,7 +105,7 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
 
         //if (t >= 0 && t <= 1 && u > 0) {
         if (u > 0 && u <= 1 && t > 0) {
-            // Линии пересекаются
+            // Г‹ГЁГ­ГЁГЁ ГЇГҐГ°ГҐГ±ГҐГЄГ ГѕГІГ±Гї
             if (visited[edge] > 0) {
 
                 result.intersectionPoint.x = x1 + t * (x2 - x1);
@@ -104,10 +113,10 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
 
                 double normalAngle = atan2(y4 - y3, x4 - x3);
                 result.incidentAngle = normalAngle - angle;
-                result.reflectionAngle = normalAngle + result.incidentAngle; // Угол отражения
+                result.reflectionAngle = normalAngle + result.incidentAngle; // Г“ГЈГ®Г« Г®ГІГ°Г Г¦ГҐГ­ГЁГї
                 result.find = true;
 
-                // Ограничиваем угол в диапазоне [0, 2*Pi]
+                // ГЋГЈГ°Г Г­ГЁГ·ГЁГўГ ГҐГ¬ ГіГЈГ®Г« Гў Г¤ГЁГ ГЇГ Г§Г®Г­ГҐ [0, 2*Pi]
                 while (result.reflectionAngle < 0) {
                     result.reflectionAngle += 2 * M_PI;
                 }
@@ -126,11 +135,11 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
 
 
 bool findIntersection(const Point& startPoint, double angle, const std::vector<LineSegment>& polygon, std::map<LineSegment, int> visited, int& reflect_q, std::vector<Point>& points) {
-    if (reflect_q == polygon.size()) { return true; } // найден нужный угол при прохождении стороны 1 раз
+    if (reflect_q == polygon.size()) { return true; } // Г­Г Г©Г¤ГҐГ­ Г­ГіГ¦Г­Г»Г© ГіГЈГ®Г« ГЇГ°ГЁ ГЇГ°Г®ГµГ®Г¦Г¤ГҐГ­ГЁГЁ Г±ГІГ®Г°Г®Г­Г» 1 Г°Г Г§
 
     for (const LineSegment& edge : polygon) {
         IntersectionResult result = calculateIntersection(startPoint, angle, edge, visited);
-        if (result.twice_more_visited) { return false; } // если пересечений с 1 ребром более 1 раза выходим из цикла и этот угол не проверяем 
+        if (result.twice_more_visited) { return false; } // ГҐГ±Г«ГЁ ГЇГҐГ°ГҐГ±ГҐГ·ГҐГ­ГЁГ© Г± 1 Г°ГҐГЎГ°Г®Г¬ ГЎГ®Г«ГҐГҐ 1 Г°Г Г§Г  ГўГ»ГµГ®Г¤ГЁГ¬ ГЁГ§ Г¶ГЁГЄГ«Г  ГЁ ГЅГІГ®ГІ ГіГЈГ®Г« Г­ГҐ ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ 
 
         if (result.find) {
             Point next_point(result.intersectionPoint.x, result.intersectionPoint.y);
@@ -146,7 +155,7 @@ bool findIntersection(const Point& startPoint, double angle, const std::vector<L
 
 
 void drawPolygon(const std::vector<LineSegment>& polygon) {
-    // Найти границы фигуры
+    // ГЌГ Г©ГІГЁ ГЈГ°Г Г­ГЁГ¶Г» ГґГЁГЈГіГ°Г»
     double minX = polygon[0].start.x, minY = polygon[0].start.y, maxX = polygon[0].start.x, maxY = polygon[0].start.y;
     for (const LineSegment& edge : polygon) {
         if (edge.start.x < minX) minX = edge.start.x;
@@ -163,7 +172,7 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
     const int width = static_cast<int>(maxX - minX) + 1;
     const int height = static_cast<int>(maxY - minY) + 1;
 
-    // Создать двумерный массив для отрисовки фигуры
+    // Г‘Г®Г§Г¤Г ГІГј Г¤ГўГіГ¬ГҐГ°Г­Г»Г© Г¬Г Г±Г±ГЁГў Г¤Г«Гї Г®ГІГ°ГЁГ±Г®ГўГЄГЁ ГґГЁГЈГіГ°Г»
     char** drawing = new char* [height];
     for (int i = 0; i < height; ++i) {
         drawing[i] = new char[width];
@@ -172,14 +181,14 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
         }
     }
 
-    // Отметить линии фигуры в массиве
+    // ГЋГІГ¬ГҐГІГЁГІГј Г«ГЁГ­ГЁГЁ ГґГЁГЈГіГ°Г» Гў Г¬Г Г±Г±ГЁГўГҐ
     for (const LineSegment& edge : polygon) {
         int x1 = static_cast<int>(edge.start.x - minX);
         int y1 = static_cast<int>(edge.start.y - minY);
         int x2 = static_cast<int>(edge.end.x - minX);
         int y2 = static_cast<int> (edge.end.y - minY);
 
-        // Отрисовка линии в массиве
+        // ГЋГІГ°ГЁГ±Г®ГўГЄГ  Г«ГЁГ­ГЁГЁ Гў Г¬Г Г±Г±ГЁГўГҐ
         int dx = std::abs(x2 - x1);
         int dy = std::abs(y2 - y1);
         int sx = (x1 < x2) ? 1 : -1;
@@ -201,7 +210,7 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
         }
     }
 
-    // Отобразить массив в консоли
+    // ГЋГІГ®ГЎГ°Г Г§ГЁГІГј Г¬Г Г±Г±ГЁГў Гў ГЄГ®Г­Г±Г®Г«ГЁ
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             std::cout << drawing[i][j];
@@ -209,7 +218,7 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
         std::cout << std::endl;
     }
 
-    // Освободить память
+    // ГЋГ±ГўГ®ГЎГ®Г¤ГЁГІГј ГЇГ Г¬ГїГІГј
     for (int i = 0; i < height; ++i) {
         delete[] drawing[i];
     }
@@ -223,7 +232,7 @@ void drawLines(const std::vector<Point>& points) {
         return;
     }
 
-    // Найти границы фигуры
+    // ГЌГ Г©ГІГЁ ГЈГ°Г Г­ГЁГ¶Г» ГґГЁГЈГіГ°Г»
     double minX = points[0].x, minY = points[0].y, maxX = points[0].x, maxY = points[0].y;
     for (const Point& point : points) {
         if (point.x < minX) minX = point.x;
@@ -235,7 +244,7 @@ void drawLines(const std::vector<Point>& points) {
     const int width = static_cast<int>(maxX - minX) + 1;
     const int height = static_cast<int>(maxY - minY) + 1;
 
-    // Создать двумерный массив для отрисовки фигуры
+    // Г‘Г®Г§Г¤Г ГІГј Г¤ГўГіГ¬ГҐГ°Г­Г»Г© Г¬Г Г±Г±ГЁГў Г¤Г«Гї Г®ГІГ°ГЁГ±Г®ГўГЄГЁ ГґГЁГЈГіГ°Г»
     char** drawing = new char* [height];
     for (int i = 0; i < height; ++i) {
         drawing[i] = new char[width];
@@ -244,7 +253,7 @@ void drawLines(const std::vector<Point>& points) {
         }
     }
 
-    // Отметить линии между точками в массиве
+    // ГЋГІГ¬ГҐГІГЁГІГј Г«ГЁГ­ГЁГЁ Г¬ГҐГ¦Г¤Гі ГІГ®Г·ГЄГ Г¬ГЁ Гў Г¬Г Г±Г±ГЁГўГҐ
     for (size_t i = 1; i < points.size(); ++i) {
         const Point& point1 = points[i - 1];
         const Point& point2 = points[i];
@@ -254,7 +263,7 @@ void drawLines(const std::vector<Point>& points) {
         int x2 = static_cast<int>(point2.x - minX);
         int y2 = static_cast<int>(point2.y - minY);
 
-        // Отрисовка сплошной линии в массиве
+        // ГЋГІГ°ГЁГ±Г®ГўГЄГ  Г±ГЇГ«Г®ГёГ­Г®Г© Г«ГЁГ­ГЁГЁ Гў Г¬Г Г±Г±ГЁГўГҐ
         int dx = std::abs(x2 - x1);
         int dy = std::abs(y2 - y1);
         int sx = (x1 < x2) ? 1 : -1;
@@ -262,7 +271,7 @@ void drawLines(const std::vector<Point>& points) {
         int error = dx - dy;
 
         while (true) {
-            drawing[y1][x1] = '.'; // Используем символ '#' для сплошной линии
+            drawing[y1][x1] = '.'; // Г€Г±ГЇГ®Г«ГјГ§ГіГҐГ¬ Г±ГЁГ¬ГўГ®Г« '#' Г¤Г«Гї Г±ГЇГ«Г®ГёГ­Г®Г© Г«ГЁГ­ГЁГЁ
             if (x1 == x2 && y1 == y2) break;
             int e2 = 2 * error;
             if (e2 > -dy) {
@@ -276,7 +285,7 @@ void drawLines(const std::vector<Point>& points) {
         }
     }
 
-    // Отобразить массив в консоли
+    // ГЋГІГ®ГЎГ°Г Г§ГЁГІГј Г¬Г Г±Г±ГЁГў Гў ГЄГ®Г­Г±Г®Г«ГЁ
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             std::cout << drawing[i][j];
@@ -284,7 +293,7 @@ void drawLines(const std::vector<Point>& points) {
         std::cout << std::endl;
     }
 
-    // Освободить память
+    // ГЋГ±ГўГ®ГЎГ®Г¤ГЁГІГј ГЇГ Г¬ГїГІГј
     for (int i = 0; i < height; ++i) {
         delete[] drawing[i];
     }
@@ -301,23 +310,23 @@ int main() {
 
     Point startPoint(2.0, 2.0);
 
-    if (!isPointInsidePolygon(startPoint, polygon)) { // это в начало перенести потом 
+    if (!isPointInsidePolygon(startPoint, polygon)) { // ГЅГІГ® Гў Г­Г Г·Г Г«Г® ГЇГҐГ°ГҐГ­ГҐГ±ГІГЁ ГЇГ®ГІГ®Г¬ 
         std::cout << "start dot is out of figure" << std::endl;
         return 0;
     }
 
-    double angleStep = M_PI / 1800.0; // Шаг угла в радианах (1/10 градуса)
+    double angleStep = M_PI / 1800.0; // ГГ ГЈ ГіГЈГ«Г  Гў Г°Г Г¤ГЁГ Г­Г Гµ (1/10 ГЈГ°Г Г¤ГіГ±Г )
 
 
     for (int i = 0; i < 3600; ++i) {
         double currentAngle = i * angleStep;
         double rayX = cos(currentAngle);
         double rayY = sin(currentAngle);
-        // Теперь у вас есть луч с углом currentAngle и направлением (rayX, rayY)
-        // Вы можете использовать его для чего угодно, например, для проверки пересечений или других операций.
-        std::cout << "Угол: " << currentAngle * 180.0 / M_PI << " градусов, Направление: (" << rayX << ", " << rayY << ")" << std::endl;
+        // Г’ГҐГЇГҐГ°Гј Гі ГўГ Г± ГҐГ±ГІГј Г«ГіГ· Г± ГіГЈГ«Г®Г¬ currentAngle ГЁ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГҐГ¬ (rayX, rayY)
+        // Г‚Г» Г¬Г®Г¦ГҐГІГҐ ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ ГІГј ГҐГЈГ® Г¤Г«Гї Г·ГҐГЈГ® ГіГЈГ®Г¤Г­Г®, Г­Г ГЇГ°ГЁГ¬ГҐГ°, Г¤Г«Гї ГЇГ°Г®ГўГҐГ°ГЄГЁ ГЇГҐГ°ГҐГ±ГҐГ·ГҐГ­ГЁГ© ГЁГ«ГЁ Г¤Г°ГіГЈГЁГµ Г®ГЇГҐГ°Г Г¶ГЁГ©.
+        std::cout << "Г“ГЈГ®Г«: " << currentAngle * 180.0 / M_PI << " ГЈГ°Г Г¤ГіГ±Г®Гў, ГЌГ ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ: (" << rayX << ", " << rayY << ")" << std::endl;
 
-        //1. запускаю итерацию по сторонам многоугольника
+        //1. Г§Г ГЇГіГ±ГЄГ Гѕ ГЁГІГҐГ°Г Г¶ГЁГѕ ГЇГ® Г±ГІГ®Г°Г®Г­Г Г¬ Г¬Г­Г®ГЈГ®ГіГЈГ®Г«ГјГ­ГЁГЄГ 
         int reflect_q = 0;
         std::map<LineSegment, int> visited;
         std::vector<Point> points;
