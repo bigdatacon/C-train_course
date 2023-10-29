@@ -32,8 +32,8 @@ struct IntersectionResult {
     Point intersectionPoint;
     double incidentAngle; // Угол падения
     double reflectionAngle; // Угол отражения
-    bool find;
-    bool twice_more_visited;
+    bool find = false;
+    bool twice_more_visited=false;
 
 };
 
@@ -108,7 +108,7 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
         //if (t >= 0 && t <= 1 && u > 0) {
         if (u > 0 && u <= 1 && t > 0) {
             // Линии пересекаются
-            if (visited[edge] > 0) {
+            if (visited[edge] == 0) { //не было до этого пересечений
 
                 result.intersectionPoint.x = x1 + t * (x2 - x1);
                 result.intersectionPoint.y = y1 + t * (y2 - y1);
@@ -128,6 +128,7 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
                 visited[edge]++;
 
             }
+            // уже было пересечение с этим реброи
             else { result.twice_more_visited = true; return result; }
         }
     }
@@ -150,7 +151,7 @@ bool findIntersection(const Point& startPoint, double angle, const std::vector<L
             points.push_back(next_point);
             drawLines(points); // отрисовываю линию для отладки
             std::this_thread::sleep_for(std::chrono::milliseconds(10000)); // небольшая пауза для отладки 
-            return findIntersection(next_point, reflectionAngle, polygon, visited, reflect_q, points);
+            return findIntersection(next_point, reflectionAngle, polygon, visited, reflect_q, points); // рекурсивно иду дальше от новой точки пересечения ищу следующую точку
         }
 
     }
