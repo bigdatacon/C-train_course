@@ -67,8 +67,36 @@ bool isPointInsidePolygon(const Point& point, const std::vector<LineSegment>& po
     return count % 2 == 1;
 }
 
+
+bool DotOnEdge(const Point& point, const LineSegment& edge) {
+    double x1 = edge.start.x;
+    double y1 = edge.start.y;
+    double x2 = edge.end.x;
+    double y2 = edge.end.y;
+
+    // Проверяем, что точка лежит на отрезке, используя параметрическое уравнение отрезка.
+    double crossProduct = (point.x - x1) * (y2 - y1) - (point.y - y1) * (x2 - x1);
+
+    if (fabs(crossProduct) > std::numeric_limits<double>::epsilon()) {
+        // Если crossProduct не близок к нулю, точка не лежит на отрезке.
+        return false;
+    }
+
+    // Далее проверяем, что точка внутри отрезка, учитывая координаты x и y.
+    if (fabs(x1 - x2) > std::numeric_limits<double>::epsilon()) {
+        return (x1 <= point.x && point.x <= x2) || (x2 <= point.x && point.x <= x1);
+    }
+    else {
+        return (y1 <= point.y && point.y <= y2) || (y2 <= point.y && point.y <= y1);
+    }
+}
+
+
+
+
 IntersectionResult calculateIntersection(const Point& startPoint, double angle, const LineSegment& edge, std::map<LineSegment, int>& visited) {
     IntersectionResult result;
+    /*
     // Проверка, что startPoint не лежит на edge
     if (startPoint == edge.start || startPoint == edge.end) {
         return result; // Начальная точка совпадает с одной из конечных точек, нет пересечения.
@@ -81,6 +109,9 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
         ) {
         return result; // startPoint лежит на отрезке edge, нет пересечения.
     }
+    */
+
+    if (DotOnEdge(startPoint, edge)) { return result; } // Начальная точка лежит на отрезке}
 
 
     result.find = false;
@@ -110,8 +141,19 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
             // Линии пересекаются
             if (visited[edge] == 0) { //не было до этого пересечений
 
-                result.intersectionPoint.x = x1 + t * (x2 - x1);
-                result.intersectionPoint.y = y1 + t * (y2 - y1);
+
+                double new_x = x1 + t * (x2 - x1);
+                double new_y = y1 + t * (y2 - y1);
+
+                if (!DotOnEdge(Point(new_x, new_y), edge)) { return result; } //точка пересечения не на отрезке
+
+
+                result.intersectionPoint.x = new_x;
+                result.intersectionPoint.y = new_y;
+
+
+                //result.intersectionPoint.x = x1 + t * (x2 - x1);
+                //result.intersectionPoint.y = y1 + t * (y2 - y1);
 
                 double normalAngle = atan2(y4 - y3, x4 - x3);
                 result.incidentAngle = normalAngle - angle;
@@ -335,12 +377,27 @@ void drawPoint(const Point& point) {
 int main() {
     std::vector<LineSegment> polygon;
     std::vector<Point> test_line;
+    /*
     polygon.push_back(LineSegment(Point(1.0, 1.0), Point(7.0, 1.0)));
     polygon.push_back(LineSegment(Point(7.0, 1.0), Point(7.0, 7.0)));
     polygon.push_back(LineSegment(Point(7.0, 7.0), Point(1.0, 7.0)));
     polygon.push_back(LineSegment(Point(1.0, 7.0), Point(1.0, 1.0)));
 
     Point startPoint(2.0, 2.0);
+    */
+
+    
+    polygon.push_back(LineSegment(Point(2.0, 2.0), Point(4.0, 1.0)));
+    polygon.push_back(LineSegment(Point(4.0, 1.0), Point(6.0, 2.0)));
+    polygon.push_back(LineSegment(Point(6.0, 2.0), Point(6.0, 4.0)));
+    polygon.push_back(LineSegment(Point(6.0, 4.0), Point(4.0, 6.0)));
+    polygon.push_back(LineSegment(Point(4.0, 6.0), Point(2.0, 5.0)));
+    polygon.push_back(LineSegment(Point(2.0, 5.0), Point(1.0, 3.0)));
+    polygon.push_back(LineSegment(Point(1.0, 3.0), Point(2.0, 2.0)));
+
+    Point startPoint(3.0, 3.0);
+    
+
 
     if (!isPointInsidePolygon(startPoint, polygon)) { // это в начало перенести потом 
         std::cout << "start dot is out of figure" << std::endl;
@@ -352,13 +409,13 @@ int main() {
 
     std::vector<Point> test_line_start_point;
     test_line_start_point.push_back(startPoint);
-    drawLines(test_line_start_point); //рисую точку для проверки через вектор точек 
+    //drawLines(test_line_start_point); //рисую точку для проверки через вектор точек 
     drawPoint(startPoint);  // рисую точку для проверки через другую функцию 
 
 
 
-    
-
+    // Для быстрой отладке по уже найденному углу
+    /*
     const double angleInDegrees = 33;  // Угол в градусах
     const double angleInRadians = angleInDegrees * M_PI / 180.0;  // Преобразование в радианы
     int reflect_q = 0;
@@ -378,15 +435,13 @@ int main() {
 
     cout << "Not find need angle" << endl;
     }
+    */
     
-    /*
+    
+    
     
     for (int i = 0; i < 3600; ++i) {
         double currentAngle = i * angleStep;
-
-        // Теперь у вас есть луч с углом currentAngle и направлением (rayX, rayY)
-        // Вы можете использовать его для чего угодно, например, для проверки пересечений или других операций.
-        //std::cout << "Угол: " << currentAngle * 180.0 / M_PI << " градусов, Направление: (" << rayX << ", " << rayY << ")" << std::endl;
 
         //1. запускаю итерацию по сторонам многоугольника
         int reflect_q = 0;
@@ -403,7 +458,7 @@ int main() {
     }
 
     cout << "Not find need angle" << endl;
-     */
+     
 
     return 0;
 }
