@@ -36,14 +36,18 @@ struct IntersectionResult {
 
 };
 
-struct IntersectionResult {
-    Point intersectionPoint;
-    double incidentAngle; // Угол падения
-    double reflectionAngle; // Угол отражения
-    bool find;
-    bool twice_more_visited;
+bool operator<(const LineSegment& lhs, const LineSegment& rhs) {
+    // Сравниваем начальные точки линий
+    if (lhs.start.x < rhs.start.x) {
+        return true;
+    }
+    if (lhs.start.x > rhs.start.x) {
+        return false;
+    }
+    // Если x-координаты равны, сравниваем y-координаты
+    return lhs.start.y < rhs.start.y;
+}
 
-};
 
 
 
