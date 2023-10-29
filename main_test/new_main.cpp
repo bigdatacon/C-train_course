@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
-
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -29,12 +30,13 @@ bool operator!=(const Point& lhs, const Point& rhs) {
 }
 struct IntersectionResult {
     Point intersectionPoint;
-    double incidentAngle; // Óãîë ïàäåíèÿ
-    double reflectionAngle; // Óãîë îòðàæåíèÿ
+    double incidentAngle; // Угол падения
+    double reflectionAngle; // Угол отражения
     bool find;
     bool twice_more_visited;
 
 };
+
 
 struct LineSegment {
     Point start;
@@ -43,32 +45,13 @@ struct LineSegment {
 };
 
 bool operator<(const LineSegment& lhs, const LineSegment& rhs) {
-    // Сравниваем начальные точки линий
     if (lhs.start.x < rhs.start.x) {
         return true;
     }
     if (lhs.start.x > rhs.start.x) {
         return false;
     }
-    
-    // Если начальные x-координаты равны, сравниваем начальные y-координаты
-    if (lhs.start.y < rhs.start.y) {
-        return true;
-    }
-    if (lhs.start.y > rhs.start.y) {
-        return false;
-    }
-
-    // Если начальные точки совпадают, сравниваем конечные x-координаты
-    if (lhs.end.x < rhs.end.x) {
-        return true;
-    }
-    if (lhs.end.x > rhs.end.x) {
-        return false;
-    }
-    
-    // Если начальные и конечные x-координаты равны, сравниваем конечные y-координаты
-    return lhs.end.y < rhs.end.y;
+    return lhs.start.y < rhs.start.y;
 }
 
 
@@ -86,23 +69,23 @@ bool isPointInsidePolygon(const Point& point, const std::vector<LineSegment>& po
 
 IntersectionResult calculateIntersection(const Point& startPoint, double angle, const LineSegment& edge, std::map<LineSegment, int>& visited) {
     IntersectionResult result;
-    // Ïðîâåðêà, ÷òî startPoint íå ëåæèò íà edge
+    // Проверка, что startPoint не лежит на edge
     if (startPoint == edge.start || startPoint == edge.end) {
-        return result; // Íà÷àëüíàÿ òî÷êà ñîâïàäàåò ñ îäíîé èç êîíå÷íûõ òî÷åê, íåò ïåðåñå÷åíèÿ.
+        return result; // Начальная точка совпадает с одной из конечных точек, нет пересечения.
     }
 
-    // Ïðîâåðêà, ÷òî startPoint íå ëåæèò íà îòðåçêå edge
+    // Проверка, что startPoint не лежит на отрезке edge
     if (
         (startPoint.x > std::min(edge.start.x, edge.end.x) && startPoint.x < std::max(edge.start.x, edge.end.x)) &&
         (startPoint.y > std::min(edge.start.y, edge.end.y) && startPoint.y < std::max(edge.start.y, edge.end.y))
         ) {
-        return result; // startPoint ëåæèò íà îòðåçêå edge, íåò ïåðåñå÷åíèÿ.
+        return result; // startPoint лежит на отрезке edge, нет пересечения.
     }
 
 
     result.find = false;
 
-    // Ïàðàìåòðû ëó÷à
+    // Параметры луча
     double x1 = startPoint.x;
     double y1 = startPoint.y;
     double x2 = x1 + cos(angle);
@@ -113,7 +96,7 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
     double x4 = edge.end.x;
     double y4 = edge.end.y;
 
-    // Ïðîâåðÿåì, ïåðåñåêàåòñÿ ëè ëó÷ ñ îòðåçêîì
+    // Проверяем, пересекается ли луч с отрезком
     double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
     if (denominator != 0) {
@@ -124,7 +107,7 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
 
         //if (t >= 0 && t <= 1 && u > 0) {
         if (u > 0 && u <= 1 && t > 0) {
-            // Ëèíèè ïåðåñåêàþòñÿ
+            // Линии пересекаются
             if (visited[edge] > 0) {
 
                 result.intersectionPoint.x = x1 + t * (x2 - x1);
@@ -132,10 +115,10 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
 
                 double normalAngle = atan2(y4 - y3, x4 - x3);
                 result.incidentAngle = normalAngle - angle;
-                result.reflectionAngle = normalAngle + result.incidentAngle; // Óãîë îòðàæåíèÿ
+                result.reflectionAngle = normalAngle + result.incidentAngle; // Угол отражения
                 result.find = true;
 
-                // Îãðàíè÷èâàåì óãîë â äèàïàçîíå [0, 2*Pi]
+                // Ограничиваем угол в диапазоне [0, 2*Pi]
                 while (result.reflectionAngle < 0) {
                     result.reflectionAngle += 2 * M_PI;
                 }
@@ -151,20 +134,22 @@ IntersectionResult calculateIntersection(const Point& startPoint, double angle, 
 
     return result;
 }
-
+void drawLines(const std::vector<Point>& points);
 
 bool findIntersection(const Point& startPoint, double angle, const std::vector<LineSegment>& polygon, std::map<LineSegment, int> visited, int& reflect_q, std::vector<Point>& points) {
-    if (reflect_q == polygon.size()) { return true; } // íàéäåí íóæíûé óãîë ïðè ïðîõîæäåíèè ñòîðîíû 1 ðàç
+    if (reflect_q == polygon.size()) { return true; } // найден нужный угол при прохождении стороны 1 раз
 
     for (const LineSegment& edge : polygon) {
         IntersectionResult result = calculateIntersection(startPoint, angle, edge, visited);
-        if (result.twice_more_visited) { return false; } // åñëè ïåðåñå÷åíèé ñ 1 ðåáðîì áîëåå 1 ðàçà âûõîäèì èç öèêëà è ýòîò óãîë íå ïðîâåðÿåì 
+        if (result.twice_more_visited) { return false; } // если пересечений с 1 ребром более 1 раза выходим из цикла и этот угол не проверяем 
 
         if (result.find) {
             Point next_point(result.intersectionPoint.x, result.intersectionPoint.y);
             double reflectionAngle = result.reflectionAngle;
             reflect_q++;
             points.push_back(next_point);
+            drawLines(points); // отрисовываю линию для отладки
+            std::this_thread::sleep_for(std::chrono::milliseconds(10000)); // небольшая пауза для отладки 
             return findIntersection(next_point, reflectionAngle, polygon, visited, reflect_q, points);
         }
 
@@ -174,7 +159,7 @@ bool findIntersection(const Point& startPoint, double angle, const std::vector<L
 
 
 void drawPolygon(const std::vector<LineSegment>& polygon) {
-    // Íàéòè ãðàíèöû ôèãóðû
+    // Найти границы фигуры
     double minX = polygon[0].start.x, minY = polygon[0].start.y, maxX = polygon[0].start.x, maxY = polygon[0].start.y;
     for (const LineSegment& edge : polygon) {
         if (edge.start.x < minX) minX = edge.start.x;
@@ -191,7 +176,7 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
     const int width = static_cast<int>(maxX - minX) + 1;
     const int height = static_cast<int>(maxY - minY) + 1;
 
-    // Ñîçäàòü äâóìåðíûé ìàññèâ äëÿ îòðèñîâêè ôèãóðû
+    // Создать двумерный массив для отрисовки фигуры
     char** drawing = new char* [height];
     for (int i = 0; i < height; ++i) {
         drawing[i] = new char[width];
@@ -200,14 +185,14 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
         }
     }
 
-    // Îòìåòèòü ëèíèè ôèãóðû â ìàññèâå
+    // Отметить линии фигуры в массиве
     for (const LineSegment& edge : polygon) {
         int x1 = static_cast<int>(edge.start.x - minX);
         int y1 = static_cast<int>(edge.start.y - minY);
         int x2 = static_cast<int>(edge.end.x - minX);
         int y2 = static_cast<int> (edge.end.y - minY);
 
-        // Îòðèñîâêà ëèíèè â ìàññèâå
+        // Отрисовка линии в массиве
         int dx = std::abs(x2 - x1);
         int dy = std::abs(y2 - y1);
         int sx = (x1 < x2) ? 1 : -1;
@@ -229,7 +214,7 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
         }
     }
 
-    // Îòîáðàçèòü ìàññèâ â êîíñîëè
+    // Отобразить массив в консоли
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             std::cout << drawing[i][j];
@@ -237,7 +222,7 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
         std::cout << std::endl;
     }
 
-    // Îñâîáîäèòü ïàìÿòü
+    // Освободить память
     for (int i = 0; i < height; ++i) {
         delete[] drawing[i];
     }
@@ -246,12 +231,17 @@ void drawPolygon(const std::vector<LineSegment>& polygon) {
 
 
 void drawLines(const std::vector<Point>& points) {
+    char sign = '.';
+    if (points.size() == 0) { sign = '#'; }
+
+    
+    
     if (points.empty()) {
         std::cerr << "Error: The list of points is empty." << std::endl;
         return;
     }
 
-    // Íàéòè ãðàíèöû ôèãóðû
+    // Найти границы фигуры
     double minX = points[0].x, minY = points[0].y, maxX = points[0].x, maxY = points[0].y;
     for (const Point& point : points) {
         if (point.x < minX) minX = point.x;
@@ -263,7 +253,7 @@ void drawLines(const std::vector<Point>& points) {
     const int width = static_cast<int>(maxX - minX) + 1;
     const int height = static_cast<int>(maxY - minY) + 1;
 
-    // Ñîçäàòü äâóìåðíûé ìàññèâ äëÿ îòðèñîâêè ôèãóðû
+    // Создать двумерный массив для отрисовки фигуры
     char** drawing = new char* [height];
     for (int i = 0; i < height; ++i) {
         drawing[i] = new char[width];
@@ -272,7 +262,7 @@ void drawLines(const std::vector<Point>& points) {
         }
     }
 
-    // Îòìåòèòü ëèíèè ìåæäó òî÷êàìè â ìàññèâå
+    // Отметить линии между точками в массиве
     for (size_t i = 1; i < points.size(); ++i) {
         const Point& point1 = points[i - 1];
         const Point& point2 = points[i];
@@ -282,7 +272,7 @@ void drawLines(const std::vector<Point>& points) {
         int x2 = static_cast<int>(point2.x - minX);
         int y2 = static_cast<int>(point2.y - minY);
 
-        // Îòðèñîâêà ñïëîøíîé ëèíèè â ìàññèâå
+        // Отрисовка сплошной линии в массиве
         int dx = std::abs(x2 - x1);
         int dy = std::abs(y2 - y1);
         int sx = (x1 < x2) ? 1 : -1;
@@ -290,7 +280,7 @@ void drawLines(const std::vector<Point>& points) {
         int error = dx - dy;
 
         while (true) {
-            drawing[y1][x1] = '.'; // Èñïîëüçóåì ñèìâîë '#' äëÿ ñïëîøíîé ëèíèè
+            drawing[y1][x1] = sign; // Используем символ '#' для сплошной линии
             if (x1 == x2 && y1 == y2) break;
             int e2 = 2 * error;
             if (e2 > -dy) {
@@ -304,7 +294,7 @@ void drawLines(const std::vector<Point>& points) {
         }
     }
 
-    // Îòîáðàçèòü ìàññèâ â êîíñîëè
+    // Отобразить массив в консоли
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             std::cout << drawing[i][j];
@@ -312,12 +302,14 @@ void drawLines(const std::vector<Point>& points) {
         std::cout << std::endl;
     }
 
-    // Îñâîáîäèòü ïàìÿòü
+    // Освободить память
     for (int i = 0; i < height; ++i) {
         delete[] drawing[i];
     }
     delete[] drawing;
 }
+
+
 
 int main() {
     std::vector<LineSegment> polygon;
@@ -329,32 +321,38 @@ int main() {
 
     Point startPoint(2.0, 2.0);
 
-    if (!isPointInsidePolygon(startPoint, polygon)) { // ýòî â íà÷àëî ïåðåíåñòè ïîòîì 
+    if (!isPointInsidePolygon(startPoint, polygon)) { // это в начало перенести потом 
         std::cout << "start dot is out of figure" << std::endl;
         return 0;
     }
 
-    double angleStep = M_PI / 1800.0; // Øàã óãëà â ðàäèàíàõ (1/10 ãðàäóñà)
+    double angleStep = M_PI / 1800.0; // Шаг угла в радианах (1/10 градуса)
+    drawPolygon(polygon);
 
+    std::vector<Point> test_line_start_point;
+    test_line_start_point.push_back(startPoint);
+    drawLines(test_line_start_point);
 
     for (int i = 0; i < 3600; ++i) {
         double currentAngle = i * angleStep;
         double rayX = cos(currentAngle);
         double rayY = sin(currentAngle);
-        // Òåïåðü ó âàñ åñòü ëó÷ ñ óãëîì currentAngle è íàïðàâëåíèåì (rayX, rayY)
-        // Âû ìîæåòå èñïîëüçîâàòü åãî äëÿ ÷åãî óãîäíî, íàïðèìåð, äëÿ ïðîâåðêè ïåðåñå÷åíèé èëè äðóãèõ îïåðàöèé.
-        std::cout << "Óãîë: " << currentAngle * 180.0 / M_PI << " ãðàäóñîâ, Íàïðàâëåíèå: (" << rayX << ", " << rayY << ")" << std::endl;
+        // Теперь у вас есть луч с углом currentAngle и направлением (rayX, rayY)
+        // Вы можете использовать его для чего угодно, например, для проверки пересечений или других операций.
+        //std::cout << "Угол: " << currentAngle * 180.0 / M_PI << " градусов, Направление: (" << rayX << ", " << rayY << ")" << std::endl;
 
-        //1. çàïóñêàþ èòåðàöèþ ïî ñòîðîíàì ìíîãîóãîëüíèêà
+        //1. запускаю итерацию по сторонам многоугольника
         int reflect_q = 0;
         std::map<LineSegment, int> visited;
         std::vector<Point> points;
         points.push_back(startPoint);
         if (findIntersection(startPoint, currentAngle, polygon, visited, reflect_q, points)) { std::cout << "Find ANGLE : " << currentAngle << endl; break; }
+        //drawLines(points);
 
     }
 
     cout << "Not find need angle" << endl;
+   
 
     return 0;
 }
