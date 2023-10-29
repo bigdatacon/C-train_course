@@ -309,7 +309,27 @@ void drawLines(const std::vector<Point>& points) {
     delete[] drawing;
 }
 
+void drawPoint(const Point& point) {
+    // Определите размеры экрана или область, в которой вы хотите рисовать точку.
+    const int screenWidth = 80; // Ширина экрана
+    const int screenHeight = 24; // Высота экрана
 
+    // Проверьте, что координаты точки находятся в пределах экрана.
+    if (point.x >= 0 && point.x < screenWidth && point.y >= 0 && point.y < screenHeight) {
+        // Отобразите точку на экране, например, используя символ 'X'.
+        std::vector<std::vector<char>> screen(screenHeight, std::vector<char>(screenWidth, ' '));
+
+        screen[point.y][point.x] = 'X'; // Разместите символ 'X' на экране в заданных координатах.
+
+        // Выведите содержимое экрана в консоль.
+        for (int y = 0; y < screenHeight; ++y) {
+            for (int x = 0; x < screenWidth; ++x) {
+                std::cout << screen[y][x];
+            }
+            std::cout << std::endl;
+        }
+    }
+}
 
 int main() {
     std::vector<LineSegment> polygon;
@@ -331,7 +351,8 @@ int main() {
 
     std::vector<Point> test_line_start_point;
     test_line_start_point.push_back(startPoint);
-    drawLines(test_line_start_point);
+    drawLines(test_line_start_point); //рисую точку для проверки через вектор точек 
+    drawPoint(startPoint);  // рисую точку для проверки через другую функцию 
 
     for (int i = 0; i < 3600; ++i) {
         double currentAngle = i * angleStep;
