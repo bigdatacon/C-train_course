@@ -50,9 +50,27 @@ bool operator<(const LineSegment& lhs, const LineSegment& rhs) {
     if (lhs.start.x > rhs.start.x) {
         return false;
     }
-    // Если x-координаты равны, сравниваем y-координаты
-    return lhs.start.y < rhs.start.y;
+    
+    // Если начальные x-координаты равны, сравниваем начальные y-координаты
+    if (lhs.start.y < rhs.start.y) {
+        return true;
+    }
+    if (lhs.start.y > rhs.start.y) {
+        return false;
+    }
+
+    // Если начальные точки совпадают, сравниваем конечные x-координаты
+    if (lhs.end.x < rhs.end.x) {
+        return true;
+    }
+    if (lhs.end.x > rhs.end.x) {
+        return false;
+    }
+    
+    // Если начальные и конечные x-координаты равны, сравниваем конечные y-координаты
+    return lhs.end.y < rhs.end.y;
 }
+
 
 
 bool isPointInsidePolygon(const Point& point, const std::vector<LineSegment>& polygon) {
