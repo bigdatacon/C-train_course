@@ -36,6 +36,12 @@ struct IntersectionResult {
 
 };
 
+struct LineSegment {
+    Point start;
+    Point end;
+    LineSegment(const Point& start, const Point& end) : start(start), end(end) {}
+};
+
 bool operator<(const LineSegment& lhs, const LineSegment& rhs) {
     // Сравниваем начальные точки линий
     if (lhs.start.x < rhs.start.x) {
@@ -47,15 +53,6 @@ bool operator<(const LineSegment& lhs, const LineSegment& rhs) {
     // Если x-координаты равны, сравниваем y-координаты
     return lhs.start.y < rhs.start.y;
 }
-
-
-
-
-struct LineSegment {
-    Point start;
-    Point end;
-    LineSegment(const Point& start, const Point& end) : start(start), end(end) {}
-};
 
 
 bool isPointInsidePolygon(const Point& point, const std::vector<LineSegment>& polygon) {
